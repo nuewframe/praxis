@@ -1,0 +1,261 @@
+# Manifest for the `provision-project-overlay` skill.
+#
+# Each entry: a template that gets rendered with substitutions from
+# `praxis.config.yaml` and written to its target path.
+#
+# Conditions:
+#   - always
+#   - <key.path> == <literal>
+#   - <key.path> != <literal>
+#   - exists(<file-path>)
+#   - not exists(<file-path>)
+
+managed_files:
+  # ---------------------------------------------------------------------------
+  # Config (always)
+  # ---------------------------------------------------------------------------
+  - template: templates/praxis.config.yaml.tmpl
+    target: praxis.config.yaml
+    condition: always
+
+  # ---------------------------------------------------------------------------
+  # Claude Code entry point (always)
+  #
+  # Claude Code does not auto-discover the .github/ surface that Copilot uses.
+  # This pointer file makes the same overlay readable to Claude. Skip only if
+  # the project explicitly opts out of Claude Code support.
+  # ---------------------------------------------------------------------------
+  - template: templates/CLAUDE.md.tmpl
+    target: CLAUDE.md
+    condition: always
+
+  # ---------------------------------------------------------------------------
+  # Repo-root copilot-instructions.md (always)
+  #
+  # Copilot's most reliable native always-on attach. Some Copilot surfaces
+  # (JetBrains, enterprise variants, github.com PR review) only honor the
+  # repo-root file, not plugin-resident instructions.
+  # ---------------------------------------------------------------------------
+  - template: templates/.github/copilot-instructions.md.tmpl
+    target: .github/copilot-instructions.md
+    condition: always
+
+  # ---------------------------------------------------------------------------
+  # Claude API / agentic system prompt (opt-in)
+  #
+  # For Claude API, Bedrock, Cursor, custom CLI runners — anywhere the caller
+  # owns the system prompt directly. Skip if the project only uses Claude Code
+  # interactively (CLAUDE.md covers that case).
+  # ---------------------------------------------------------------------------
+  - template: templates/.claude/system-prompt.md.tmpl
+    target: .claude/system-prompt.md
+    condition: bootstrap.generate_claude_system_prompt == true
+
+  # ---------------------------------------------------------------------------
+  # Pre-commit hook (opt-in)
+  #
+  # Wires anti-dumping + lint + format + type-check into a git pre-commit
+  # hook. Tests are not run in pre-commit (too slow); they run on push or in CI.
+  # ---------------------------------------------------------------------------
+  - template: templates/.githooks/pre-commit.tmpl
+    target: .githooks/pre-commit
+    condition: bootstrap.generate_pre_commit_hook == true
+
+  # ---------------------------------------------------------------------------
+  # Always-on instructions
+  # ---------------------------------------------------------------------------
+  - template: templates/.github/instructions/README.md.tmpl
+    target: .github/instructions/README.md
+    condition: always
+
+  - template: templates/.github/instructions/agent-methodology-instructions.md.tmpl
+    target: .github/instructions/agent-methodology-instructions.md
+    condition: always
+
+  - template: templates/.github/instructions/stack-conventions.instructions.md.tmpl
+    target: .github/instructions/stack-conventions.instructions.md
+    condition: always
+
+  # Project-specific design-token reading rules. The plugin's
+  # `implement-with-defensive-patterns` Step 9 is intentionally stack-agnostic;
+  # this overlay supplies the actual token module paths and per-stack rules
+  # for THIS project.
+  - template: templates/.github/instructions/design-tokens.instructions.md.tmpl
+    target: .github/instructions/design-tokens.instructions.md
+    condition: always
+
+  # Thin-slice template lives in the plugin (create-product-design-spec) and is
+  # copied into the project at provision time so editors can open it locally.
+  - template: ../create-product-design-spec/templates/thin-slice-template.md
+    target: .github/instructions/thin-slice-template.md
+    condition: always
+
+  # ---------------------------------------------------------------------------
+  # Personas — alias overlays (only when use_aliases=true)
+  # ---------------------------------------------------------------------------
+  # Engineering persona
+  - template: templates/.github/agents/role-engineer.agent.md.tmpl
+    target: .github/agents/{{personas.aliases.principal-engineer}}.agent.md
+    condition: personas.use_aliases == true
+
+  - template: templates/.github/instructions/role-engineer.md.tmpl
+    target: .github/instructions/{{personas.aliases.principal-engineer}}-engineer.md
+    condition: personas.use_aliases == true
+
+  - template: templates/.github/instructions/role-engineer.instructions.md.tmpl
+    target: .github/instructions/{{personas.aliases.principal-engineer}}-engineer.instructions.md
+    condition: personas.use_aliases == true
+
+  - template: templates/.github/instructions/role-architecture.instructions.md.tmpl
+    target: .github/instructions/{{personas.aliases.principal-engineer}}-architecture.instructions.md
+    condition: personas.use_aliases == true
+
+  # Product manager persona
+  - template: templates/.github/agents/role-pm.agent.md.tmpl
+    target: .github/agents/{{personas.aliases.product-manager}}.agent.md
+    condition: personas.use_aliases == true
+
+  - template: templates/.github/instructions/role-pm.md.tmpl
+    target: .github/instructions/{{personas.aliases.product-manager}}-wave.md
+    condition: personas.use_aliases == true
+
+  - template: templates/.github/instructions/role-pm.instructions.md.tmpl
+    target: .github/instructions/{{personas.aliases.product-manager}}-wave.instructions.md
+    condition: personas.use_aliases == true
+
+  # Product designer persona
+  - template: templates/.github/agents/role-designer.agent.md.tmpl
+    target: .github/agents/{{personas.aliases.product-designer}}.agent.md
+    condition: personas.use_aliases == true
+
+  - template: templates/.github/instructions/role-designer.md.tmpl
+    target: .github/instructions/{{personas.aliases.product-designer}}-designer.md
+    condition: personas.use_aliases == true
+
+  - template: templates/.github/instructions/role-designer.instructions.md.tmpl
+    target: .github/instructions/{{personas.aliases.product-designer}}-designer.instructions.md
+    condition: personas.use_aliases == true
+
+  # ---------------------------------------------------------------------------
+  # Skill overlays (always — thin pointers to plugin skills with project paths)
+  # ---------------------------------------------------------------------------
+  - template: templates/.github/skills/create-wave/SKILL.md.tmpl
+    target: .github/skills/create-wave/SKILL.md
+    condition: always
+
+  - template: templates/.github/skills/create-product-design-spec/SKILL.md.tmpl
+    target: .github/skills/create-product-design-spec/SKILL.md
+    condition: always
+
+  - template: templates/.github/skills/create-product-architecture-spec/SKILL.md.tmpl
+    target: .github/skills/create-product-architecture-spec/SKILL.md
+    condition: always
+
+  - template: templates/.github/skills/create-system-architecture/SKILL.md.tmpl
+    target: .github/skills/create-system-architecture/SKILL.md
+    condition: always
+
+  - template: templates/.github/skills/create-sprint/SKILL.md.tmpl
+    target: .github/skills/create-sprint/SKILL.md
+    condition: always
+
+  - template: templates/.github/skills/intake-code-contribution/SKILL.md.tmpl
+    target: .github/skills/intake-code-contribution/SKILL.md
+    condition: always
+
+  - template: templates/.github/skills/close-sprint/SKILL.md.tmpl
+    target: .github/skills/close-sprint/SKILL.md
+    condition: always
+
+  - template: templates/.github/skills/create-adr/SKILL.md.tmpl
+    target: .github/skills/create-adr/SKILL.md
+    condition: always
+
+  - template: templates/.github/skills/implement-capability-change/SKILL.md.tmpl
+    target: .github/skills/implement-capability-change/SKILL.md
+    condition: always
+
+  - template: templates/.github/skills/write-tests/SKILL.md.tmpl
+    target: .github/skills/write-tests/SKILL.md
+    condition: always
+
+  # ---------------------------------------------------------------------------
+  # Prompt overlays (always — thin pointers)
+  # ---------------------------------------------------------------------------
+  - template: templates/.github/prompts/create-wave.prompt.md.tmpl
+    target: .github/prompts/create-wave.prompt.md
+    condition: always
+
+  - template: templates/.github/prompts/create-sprint.prompt.md.tmpl
+    target: .github/prompts/create-sprint.prompt.md
+    condition: always
+
+  - template: templates/.github/prompts/close-sprint.prompt.md.tmpl
+    target: .github/prompts/close-sprint.prompt.md
+    condition: always
+
+  - template: templates/.github/prompts/create-adr.prompt.md.tmpl
+    target: .github/prompts/create-adr.prompt.md
+    condition: always
+
+  - template: templates/.github/prompts/write-tests.prompt.md.tmpl
+    target: .github/prompts/write-tests.prompt.md
+    condition: always
+
+  # ---------------------------------------------------------------------------
+  # Phase-chain prompts (always — paste-ready for non-skill chat surfaces)
+  #
+  # For tools without skill auto-discovery (Claude.ai web, ChatGPT, Copilot
+  # in JetBrains, GitHub.com PR chat). Each prompt is self-contained and
+  # stops at its phase boundary for human review.
+  # ---------------------------------------------------------------------------
+  - template: templates/.github/prompts/phase-1-discovery.prompt.md.tmpl
+    target: .github/prompts/phase-1-discovery.prompt.md
+    condition: always
+
+  - template: templates/.github/prompts/phase-2-3-system-design.prompt.md.tmpl
+    target: .github/prompts/phase-2-3-system-design.prompt.md
+    condition: always
+
+  - template: templates/.github/prompts/phase-4-component-layout.prompt.md.tmpl
+    target: .github/prompts/phase-4-component-layout.prompt.md
+    condition: always
+
+  - template: templates/.github/prompts/phase-5-implementation.prompt.md.tmpl
+    target: .github/prompts/phase-5-implementation.prompt.md
+    condition: always
+
+  - template: templates/.github/prompts/phase-6-verification.prompt.md.tmpl
+    target: .github/prompts/phase-6-verification.prompt.md
+    condition: always
+
+  - template: templates/.github/prompts/refactor-legacy-to-capability.prompt.md.tmpl
+    target: .github/prompts/refactor-legacy-to-capability.prompt.md
+    condition: always
+
+  # ---------------------------------------------------------------------------
+  # Bootstrap docs (only when not present and user opted in)
+  # ---------------------------------------------------------------------------
+  - template: templates/docs/project-context.md.tmpl
+    target: "{{paths.project_context}}"
+    condition: bootstrap.generate_project_context == true
+
+  - template: templates/docs/product/PRODUCT.md.tmpl
+    target: "{{paths.product_dashboard}}"
+    condition: bootstrap.generate_product_dashboard == true
+
+  - template: templates/docs/product/adr/ADR-001-technology-stack.md.tmpl
+    target: "{{paths.adr}}/ADR-001-technology-stack.md"
+    condition: bootstrap.generate_first_adr == true
+
+  # ---------------------------------------------------------------------------
+  # Verification entry point (always)
+  #
+  # `scripts/verify.sh` is the single command reviewer mode runs. The plugin
+  # ships a stack-agnostic skeleton; the project edits the per-step bodies
+  # (format, lint, type-check, test runner) to match its toolchain. The
+  # check-* scripts the skeleton calls live alongside it under `scripts/`.
+  # ---------------------------------------------------------------------------
+  - template: templates/scripts/verify.sh.tmpl
+    target: scripts/verify.sh
+    condition: always

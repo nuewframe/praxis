@@ -1,0 +1,44 @@
+# ADR-001: Technology Stack
+
+**Status:** Accepted
+**Date:** YYYY-MM-DD
+**Decision-maker(s):** TBD
+
+## Context
+
+{{project.name}} ({{project.description}}) needs a primary technology stack that supports the team's delivery model and the product's quality, performance, and operability requirements.
+
+## Decision
+
+Adopt the following stack for {{project.name}}:
+
+- **Language:** {{stack.language}}
+- **Runtime:** {{stack.runtime}}
+- **API framework:** {{stack.api_framework}}
+- **Database:** {{stack.database}}
+- **UI framework:** {{stack.ui_framework}}
+- **Deployment target:** {{stack.deployment_target}}
+
+## Alternatives considered
+
+| Option | Pros | Cons | Rejected because |
+|---|---|---|---|
+| _(fill in)_ | | | |
+
+## Consequences
+
+- All capabilities are written in {{stack.language}} on {{stack.runtime}}.
+- HTTP surface uses {{stack.api_framework}}.
+- Persistent storage is {{stack.database}}; cross-store consistency requires explicit ADRs.
+- UI is built on {{stack.ui_framework}}; deployment is {{stack.deployment_target}}.
+- Quality gates: `{{quality_gates.lint}}`, `{{quality_gates.format}}`, `{{quality_gates.type_check}}`, `{{quality_gates.test}}` are mandatory before merge.
+
+## Follow-ups
+
+- Engineering handbook at `{{paths.engineering}}/handbook.md` documents stack-specific conventions, file shape, and operational patterns.
+- Per-stack overlays at `.github/instructions/stack-conventions.instructions.md` enforce file-shape and conventions for AI agents.
+
+## References
+
+- `praxis` plugin: `principal-engineer` agent, `capability-driven-guardrails` instruction
+- `{{paths.project_context}}` registers active ADRs.

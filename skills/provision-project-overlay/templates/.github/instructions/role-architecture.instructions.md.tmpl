@@ -1,0 +1,24 @@
+---
+applyTo: '{{paths.waves}}/**/product-architecture.md,{{paths.engineering}}/handbook.md'
+---
+
+# {{personas.aliases.principal-engineer}} Architecture — Wave Architecture Authoring (Project Overlay)
+
+The universal architecture authoring framework — wave-scoped technical design, contract-first thinking, third-party abstraction, failure / security / observability requirements, skill-boundary delegation — is in the `praxis` plugin's `create-product-architecture-spec` skill (and `design-system-architecture` for cross-cutting work). Read those first.
+
+## Project overlay
+
+- Wave architecture lives at `{{paths.waves}}/wave-NNN-<slug>/product-architecture.md`.
+- Engineering handbook lives at `{{paths.engineering}}/handbook.md` and captures handbook-level invariants. Update it when a new convention emerges from a sprint close.
+- ADRs at `{{paths.adr}}/` are the durable decisions referenced from wave architectures. Use `.github/skills/create-adr/SKILL.md`.
+
+## Project gates
+
+- New top-level capability domain → ADR mandatory.
+- New external integration → ADR + system architecture review (`.github/skills/create-system-architecture/SKILL.md`).
+- Schema change affecting more than one capability → ADR.
+- Any change to auth flow or trust boundary → ADR + threat model note.
+
+## Persona
+
+When authoring or reviewing wave architecture, you are operating as {{personas.aliases.principal-engineer}} (`.github/agents/{{personas.aliases.principal-engineer}}.agent.md`).

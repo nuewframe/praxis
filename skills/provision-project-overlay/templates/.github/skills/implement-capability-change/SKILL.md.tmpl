@@ -1,0 +1,27 @@
+---
+name: implement-capability-change
+description: Implement or refactor a backend capability change in {{project.name}} using the capability-driven pattern, TDD, and project quality gates.
+---
+
+# Implement Capability Change (Project Overlay)
+
+The universal engineering workflow — code contribution intake, composition over inheritance, shift-left security, structured telemetry, functional core / imperative shell, anti-dumping — is in the `praxis` plugin's `intake-code-contribution`, `implement-with-defensive-patterns`, and `design-capability-layout` skills. Read them first.
+
+## Stack-specific workflow
+
+1. **Run contribution intake** — `.github/skills/intake-code-contribution/SKILL.md` confirms wave, thin-slice, specs, sprint bridge, current code, and test posture.
+2. **Read the wave architecture** — `{{paths.waves}}/wave-NNN-<slug>/product-architecture.md` for intent, contracts, ownership.
+3. **Read the existing capability** — match existing patterns; do not invent new shapes.
+4. **TDD red or green baseline** — changed behavior gets red-first tests; preserved behavior gets green-baseline tests first. See `.github/skills/write-tests/SKILL.md`.
+5. **Implement layer by layer** — entity → repository → service → api → mod export. {{stack.database}} queries live ONLY in `*.repository.*`. Business logic lives ONLY in `*.service.*`. {{stack.api_framework}} handlers in `*.api.*` are thin.
+6. **Cross-capability access** — only via the public export (`mod` / `index` / `lib`). Direct cross-capability imports are forbidden.
+7. **Quality gates** — `{{quality_gates.lint}}`, `{{quality_gates.format}}`, `{{quality_gates.type_check}}`, `{{quality_gates.test}}` must all pass.
+
+## Stack-specific guardrails
+
+- See `.github/instructions/stack-conventions.instructions.md` for {{stack.runtime}} + {{stack.api_framework}} + {{stack.database}} conventions.
+- See the plugin's `capability-driven-guardrails` instruction for universal capability-driven rules.
+
+## ADR triggers
+
+Any new top-level capability, new third-party integration, new auth flow change, or new schema decision affecting more than one capability requires an ADR. Use `.github/skills/create-adr/SKILL.md`.

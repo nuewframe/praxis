@@ -1,0 +1,78 @@
+#!/usr/bin/env bash
+# verify.sh — universal verification entry point
+#
+# This is the single command reviewer mode runs to validate a change. It chains
+# all checks in a fixed order, fails fast on the first error, and prints a
+# summary. Bootstrap copies this file into every project and projects are free
+# to edit it — but the *order* and the *single entry point convention* should
+# stay so the principal-engineer skills can rely on it.
+#
+# Order (fast → slow, cheap → expensive):
+#   1. format check
+#   2. lint
+#   3. type check
+#   4. anti-dumping
+#   5. no skipped tests
+#   6. no sleep waits
+#   7. port/adapter parity
+#   8. unit + integration tests
+#
+# Each step is a function. Override or skip by setting:
+#   VERIFY_SKIP="format,lint"   # comma-separated step names
+#
+# Exit codes:
+#   0 — all steps passed
+#   N — first failing step's exit code
+
+set -u
+
+REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+cd "$REPO_ROOT"
+
+SKIP="${VERIFY_SKIP:-}"
+
+skipped() {
+  case ",$SKIP," in
+    *",$1,"*) return 0 ;;
+    *)        return 1 ;;
+  esac
+}
+
+run_step() {
+  local name="$1"; shift
+  if skipped "$name"; then
+    echo "verify: skip $name"
+    return 0
+  fi
+  echo "verify: $name"
+  "$@"
+  local rc=$?
+  if [[ $rc -ne 0 ]]; then
+    echo "verify: $name failed (exit $rc)" >&2
+    exit $rc
+  fi
+}
+
+# --- Step implementations. Edit these to match your stack. ---
+
+step_format()       { :; }   # e.g.: deno fmt --check  |  prettier --check .  |  ruff format --check
+step_lint()         { :; }   # e.g.: eslint .          |  ruff check          |  ./gradlew detekt
+step_typecheck()    { :; }   # e.g.: tsc --noEmit      |  mypy .              |  ./gradlew compileKotlin
+step_anti_dumping() { bash scripts/check-anti-dumping.sh; }
+step_no_skipped()   { bash scripts/check-no-skipped-tests.sh .; }
+step_no_sleeps()    { bash scripts/check-no-sleep-waits.sh .; }
+step_port_parity()  { bash scripts/check-port-adapter-parity.sh .; }
+step_tests()        { :; }   # e.g.: npm test          |  pytest              |  ./gradlew test
+
+# --- Pipeline. ---
+
+run_step format       step_format
+run_step lint         step_lint
+run_step typecheck    step_typecheck
+run_step anti-dumping step_anti_dumping
+run_step no-skipped   step_no_skipped
+run_step no-sleeps    step_no_sleeps
+run_step port-parity  step_port_parity
+run_step tests        step_tests
+
+echo "verify: all steps passed"

@@ -1,0 +1,25 @@
+---
+name: create-sprint
+description: Create a sprint document for {{project.name}} following the immutable-bridge model. Project overlay on top of the plugin's `create-sprint` skill.
+---
+
+# Create Sprint (Project Overlay)
+
+The full skill — sprint as immutable bridge, engineering current-state snapshot, hypothesis card, implementation + test + acceptance plans — is in the `praxis` plugin's `create-sprint` skill. Read it first.
+
+## Project-specific paths
+
+- Sprint file: `{{paths.sprints}}/sprint-NNN-<slug>.md` (sequential numbering)
+- Wave to read for thin-slice context: `{{paths.waves}}/wave-NNN-<slug>/`
+- Dashboard to update at sprint open: `{{paths.product_dashboard}}` (mark active)
+
+## Project-specific gates
+
+- Authored or owned by the product manager (`.github/agents/{{personas.aliases.product-manager}}.agent.md`).
+- Test plan section follows the Pyramid Test Strategy from the plugin's `test-by-ownership` skill, with project specifics from `.github/skills/write-tests/SKILL.md`.
+- Implementation plan section follows the project's capability-driven pattern — see `.github/skills/implement-capability-change/SKILL.md`.
+- Acceptance criteria copied verbatim from the wave's `product-design.md` thin-slice — do not paraphrase.
+
+## Sprint scope lock
+
+Once opened, scope is **immutable**. New work goes into a follow-up sprint or back into the wave backlog.

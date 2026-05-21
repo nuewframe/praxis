@@ -1,0 +1,36 @@
+{
+  "scanPaths": [
+    "agents/**",
+    "instructions/**",
+    "skills/**",
+    "scripts/**"
+  ],
+  "forbiddenNames": [
+    "utils",
+    "util",
+    "helpers",
+    "helper",
+    "common",
+    "shared",
+    "misc",
+    "general",
+    "controllers",
+    "controller",
+    "services",
+    "service",
+    "models",
+    "model",
+    "views",
+    "view",
+    "tmp",
+    "temp",
+    "wip",
+    "untitled",
+    "backup",
+    "_old",
+    "_new",
+    "_copy"
+  ],
+  "allowPatterns": [],
+  "exemptions": []
+}

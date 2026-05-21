@@ -1,0 +1,59 @@
+---
+name: intake-code-contribution
+description: Run the pre-implementation intake gate for {{project.name}} before writing or modifying implementation code for a user story, feature, thin-slice, behavior change, or non-trivial refactor.
+---
+
+# Intake Code Contribution (Project Overlay)
+
+The universal pre-implementation intake gate is in the `praxis` plugin's `intake-code-contribution` skill and `code-contribution-intake` always-on instruction. Read both first.
+
+## Project-specific sources
+
+| Artifact | Location |
+|---|---|
+| Project context | `{{paths.project_context}}` |
+| Product dashboard | `{{paths.product_dashboard}}` |
+| Waves | `{{paths.waves}}/` |
+| Sprints | `{{paths.sprints}}/` |
+| ADRs | `{{paths.adr}}/` |
+| Stack conventions | `.github/instructions/stack-conventions.instructions.md` |
+
+## Project-specific intake sequence
+
+1. Read `{{paths.project_context}}` and `{{paths.product_dashboard}}`.
+2. Locate the active wave under `{{paths.waves}}/` and the relevant `TS-NNN` thin-slice.
+3. Confirm the wave has `README.md`, `product-design.md`, `product-architecture.md`, and `qa.md`.
+4. Locate or create the sprint file under `{{paths.sprints}}/` using `.github/skills/create-sprint/SKILL.md`.
+5. Inspect current capability files and existing tests before editing.
+6. Classify test posture:
+   - Behavior changes: write/update the lowest-layer test first and observe `RED`.
+   - Behavior is preserved: run relevant tests and observe `GREEN` before editing.
+   - No preserved-behavior test exists: add a characterization test and observe `GREEN` before refactoring.
+7. Continue to `.github/skills/implement-capability-change/SKILL.md` only after the contribution envelope is clear.
+
+## Project quality gates
+
+- `{{quality_gates.lint}}`
+- `{{quality_gates.format}}`
+- `{{quality_gates.type_check}}`
+- `{{quality_gates.test}}`
+- `{{quality_gates.e2e}}` (if applicable)
+
+## Contribution envelope
+
+```markdown
+## Code Contribution Intake
+
+Wave: [name + path under {{paths.waves}}]
+Thin-slice: [TS-NNN + title]
+Sprint: [file under {{paths.sprints}}]
+Wave specs: [README/product-design/product-architecture/qa status]
+Current code touchpoints: [capabilities/files/contracts]
+Behavior impact: [changes behavior | preserves behavior | mixed]
+Test posture:
+- Red-first: [tests + expected red reason]
+- Green-baseline: [tests/commands]
+- Missing coverage: [layer + intent]
+Implementation boundary: [in scope / out of scope]
+Verification commands: [commands above]
+```

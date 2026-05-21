@@ -1,0 +1,269 @@
+---
+description: |
+  Paste-ready, self-contained prompt for refactoring a legacy technical-layer
+  codebase into capability-driven vertical slices, incrementally and safely.
+  Use on any chat surface that does not auto-discover the
+  `refactor-layered-to-capability` skill (Claude.ai web, ChatGPT, JetBrains
+  Copilot chat). One paste = the full refactor protocol.
+---
+
+# Refactor legacy → capability-driven
+
+You are operating as the Principal Software Engineer described in
+`.github/copilot-instructions.md` and (where applicable) `CLAUDE.md`. You are
+about to migrate a codebase organized by technical layer
+(`controllers/`, `services/`, `models/`, `views/`, `utils/`, `helpers/`,
+`common/`, `shared/`) into capability-driven vertical slices.
+
+**Iron rule:**
+
+```
+Migrate by capability, not by file. Land one full vertical slice at a time.
+Big-bang rewrites fail. Incremental capability extraction succeeds.
+```
+
+**Hard prohibitions throughout the migration:**
+
+- No big-bang rewrite. Each step must be independently shippable.
+- No new code added to the legacy `controllers/`, `services/`, `models/`,
+  `views/` folders. Adding to the legacy structure to "save time" is forbidden.
+- No new files in `utils/`, `helpers/`, `common/`, `shared/`, `misc.*`. The
+  anti-dumping policy applies during the migration, not just after it.
+- No skipping the dual-publish step. Flag-day migrations break callers.
+- No migration without a test safety net. Tests come first.
+- No leaving exemptions in `.anti-dumping.json` once the legacy folder is
+  empty. The exemption list ratchets to zero.
+
+---
+
+## Step 1 — Inventory the legacy area
+
+Pick the area you are about to modify (do not migrate "in general" — migrate
+as part of the work you were going to do anyway).
+
+Produce a table:
+
+```markdown
+| Legacy path | Files | Belongs to capability |
+|---|---|---|
+| `controllers/orderController.*` | … | `order-processing` |
+| `services/orderService.*` | … | `order-processing` |
+| `services/taxService.*` | … | `order-processing`? `billing`? |
+| `models/Order.*`, `models/Tax.*` | … | `order-processing`, `billing` |
+| `utils/dateFormatter.*` | … | should become `pkg/date-formatter/` |
+| `utils/utils.*` | mixed | split per function — see Step 5 |
+```
+
+Flag anything ambiguous. Stop and ask the human if a function in `utils/` is
+called from 10+ places and the right home isn't obvious, or if two capabilities
+seem to legitimately own the same domain concept (the boundary is wrong).
+
+---
+
+## Step 2 — Pick exactly one capability to extract first
+
+Choose by these criteria, in priority order:
+
+1. The capability you are about to modify.
+2. The smallest cohesive capability.
+3. The capability with the fewest cross-cutting dependencies.
+
+Do not start with the largest or most coupled capability.
+
+---
+
+## Step 3 — Design the target slice
+
+Produce the target layout for the chosen capability. Use the capability-driven
+file shape. **No `utils/`, `helpers/`, `common/`, `shared/`, `misc.*`, no
+sub-`services/` inside the capability.**
+
+```
+<capability-root>/
+└── <capability-name>/
+    ├── <capability>.entity.<ext>
+    ├── <capability>.repository.<ext>
+    ├── <capability>.service.<ext>
+    ├── <capability>.api.<ext>
+    ├── <capability>.test.<ext>
+    └── mod.<ext>                # the only file other capabilities may import
+```
+
+State which file is **core** (pure, no I/O — `*.entity.*`, `*.service.*`) and
+which is **shell** (I/O only, no business decisions — `*.repository.*`,
+`*.api.*`). The core never imports the shell.
+
+State the public surface — what `mod.*` exports and (more importantly) what
+stays private.
+
+---
+
+## Step 4 — Migration plan (expand → dual-publish → switch → contract)
+
+Apply the same pattern as zero-downtime data migrations. Each substep is
+independently shippable; you can pause between any two.
+
+| Step | Action | Done when |
+|---|---|---|
+| 4a Expand | Create the new capability folder. **Copy** (don't move) the relevant files into it, restructured into `entity / repository / service / api / mod`. Wire `mod.*`. | Both old and new locations work. Tests green. |
+| 4b Dual-publish | Replace the body of each legacy file with a re-export from the new capability's `mod.*`. Existing callers continue to work via the re-export. | All legacy files are thin re-export shims. Tests green. |
+| 4c Switch callers | Update each caller, one at a time, to import from the new `mod.*`. Land each as a small PR. | Search for imports from the legacy paths returns zero results. |
+| 4d Verify | Run the full search again. Confirm zero callers remain. | Empty search result captured in the PR. |
+| 4e Contract | Delete the legacy files. Delete the legacy folders if empty. | Anti-dumping linter exemption for these legacy folders is removed (see Step 8). |
+
+For each substep, name:
+
+- The exact files touched.
+- The exact test command that proves it green.
+- The exact rollback (usually: revert the substep's commit; for 4e, restore from git).
+
+---
+
+## Step 5 — Handle dumping grounds (`utils/`, `helpers/`, `common/`, `shared/`)
+
+For each function found in a dumping ground, choose one option. **"Leave it
+for now" is not an option.**
+
+| Decision | When to choose |
+|---|---|
+| Move into the only consuming capability | Used by exactly one capability |
+| Extract into a narrow named module (`pkg/encryption/`, `pkg/date-formatter/`, `pkg/idempotency-keys/`) | Used by 2+ capabilities, genuinely generic, stable interface |
+| **Duplicate** | Used by 2+ capabilities but lifecycles diverge, or the function is ≤10 lines |
+| Delete | Unused (verify with a search before deleting) |
+
+Output a per-function decision table. The reviewer can challenge individual
+rows, not the whole approach.
+
+---
+
+## Step 6 — Tests move with the code
+
+- Tests for the new capability live with it (`<capability>.test.*`), not in
+  a separate `tests/` tree.
+- Tests for moved functions get moved with the function in the same commit.
+- Run the full test suite after each substep. Green before proceeding.
+- If a test currently exercises a behavior through the legacy structure,
+  rewrite it to exercise the same behavior through the new public surface
+  before deleting the legacy file.
+
+---
+
+## Step 7 — ADR per extracted capability
+
+Write an Architecture Decision Record for the extraction. One per capability,
+numbered sequentially in the project's ADR directory
+(typically `docs/adr/` or `docs/product/adr/`).
+
+```markdown
+# ADR-NNN: Extract `<capability>` from layered structure
+
+## Status
+Accepted
+
+## Context
+What forces drove this extraction? What did the legacy layout cost us?
+
+## Decision
+Extract `<capability>` as a capability-driven slice with the file shape
+defined in the engineering guardrails. Public surface is `mod.*`.
+
+## Migration steps taken
+- 4a Expand: …
+- 4b Dual-publish: …
+- 4c Switch callers: <N callers updated across <M> PRs>
+- 4e Contract: <files deleted>
+
+## Alternatives considered
+| Option | Pros | Cons | Verdict |
+|---|---|---|---|
+| Capability-driven extraction (chosen) | … | … | Selected |
+| Leave in layered structure | … | … | Rejected because … |
+
+## Consequences
+- + …
+- − …
+- Risks: …
+```
+
+---
+
+## Step 8 — Wire the anti-dumping linter with shrinking exemptions
+
+Once the first capability is extracted, ensure the project has
+`scripts/check-anti-dumping.sh` (the plugin provides this) wired into CI and
+the pre-commit hook (`.githooks/pre-commit`). Configure `.anti-dumping.json`
+with **exemptions** for the legacy folders that still exist:
+
+```json
+{
+  "scanPaths": ["src/**"],
+  "forbiddenNames": [
+    "utils", "helpers", "common", "shared", "misc",
+    "controllers", "services", "models", "views"
+  ],
+  "exemptions": [
+    "src/legacy/services",
+    "src/legacy/controllers"
+  ]
+}
+```
+
+As each legacy folder is emptied and deleted, **remove its exemption in the
+same PR**. The exemption list shrinks to zero over the course of the
+migration. The linter ratchets you forward.
+
+---
+
+## Step 9 — Track progress in `MIGRATION.md`
+
+Maintain a single `MIGRATION.md` at the repo root for the duration of the
+migration:
+
+```markdown
+# Layered → Capability Migration
+
+## Capabilities extracted
+- [x] order-processing — ADR-NNN, completed YYYY-MM-DD
+- [ ] billing — in progress
+- [ ] shipping — not started
+
+## Legacy folders remaining
+- `src/legacy/services/` — 4 files left
+- `src/legacy/controllers/` — 2 files left
+- `src/legacy/utils/` — 12 functions left: 8 → split into `pkg/*`, 4 → duplicate
+
+## Anti-dumping linter exemptions
+- `src/legacy/services` — remove when shipping migration done
+- `src/legacy/controllers` — remove when shipping + notifications done
+```
+
+When the file is empty, delete it.
+
+---
+
+## Step 10 — Stop after the first capability and request review
+
+After the first capability is fully extracted (through Step 4e Contract), stop
+and say verbatim:
+
+> **First capability extracted. Please review the migration PRs, the ADR, the
+> updated anti-dumping exemptions, and `MIGRATION.md` before I proceed to the
+> next capability.**
+
+Do not start the second capability without explicit human approval. This
+prevents an "in-flight" state where partial work across multiple capabilities
+becomes hard to land cleanly.
+
+---
+
+## Halt conditions (stop and ask the human)
+
+- A function in `utils/` is called from 10+ places and the right home isn't
+  obvious.
+- Two capabilities both seem to legitimately own the same domain concept —
+  the boundary is wrong; re-examine.
+- The "expand" step would require breaking an external public contract.
+- A migration step would require a database schema change in the same PR —
+  split them.
+- You are tempted to "just add this new feature to `services/` for now."
+  That is the signal to apply this protocol first.

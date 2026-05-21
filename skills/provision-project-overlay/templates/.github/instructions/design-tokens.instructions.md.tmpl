@@ -1,0 +1,66 @@
+---
+applyTo: "apps/**/*,packages/**/*"
+---
+
+# Design Tokens — Project-specific Reading Rules
+
+> This file is a **project overlay**. It customizes the universal "single
+> design-token source" rule from the plugin's
+> `implement-with-defensive-patterns` skill (Step 9) with the actual token
+> entry points used in this codebase.
+>
+> **You must edit this file** after `provision-project-overlay` runs.
+> Replace every `<ThemeModule>` and stack row with the names and paths your
+> project actually uses. The plugin cannot guess your theme module name.
+
+A UI surface is not done until every color, spacing, radius, typography, elevation, and motion value reads from this project's design tokens. Tokens are the single point of control: change the brand value once and every surface updates. Inlined raw values defeat the system and silently rot the next time the palette shifts.
+
+## Per-stack mapping
+
+Replace this table with one row per UI stack in your repo. For each stack, name the path and the canonical way screens read tokens.
+
+| Stack                | Path                | Read tokens via                                                  |
+| -------------------- | ------------------- | ---------------------------------------------------------------- |
+| `<stack-1>`          | `<path/to/stack-1>` | `<ThemeModule>.colors.*`, `<ThemeModule>.spacing.*`, …           |
+| `<stack-2>`          | `<path/to/stack-2>` | `--color-*`, `--spacing-*`, … CSS custom properties from tokens  |
+| `<stack-3>`          | `<path/to/stack-3>` | the `tokens.*` object exported from `<path/to/tokens-package>`   |
+
+## Framework-default leakage
+
+Reading the framework's default theme directly from screen code (e.g. `MaterialTheme.*`, `useTheme()` defaults, vanilla CSS variables not from your token file) is leakage. Your project's theme module should already project brand tokens onto the framework theme under the hood, so screens consume `<ThemeModule>.*` and the framework picks up the same values automatically. Direct framework-default reads are a sign a token is missing — add it to your token files instead.
+
+## Allowed exceptions
+
+- Third-party brand colors (Google blue, Apple monochrome, Stripe purple, etc.) that are dictated by the third party's branding guidelines.
+- Intentionally off-scale dimensions called out by design (a specific card max-width, a tuned visual offset that doesn't fit the spacing scale).
+
+Both exceptions must carry a one-line _why_ comment — no multi-line banners, just a single sentence stating _why_ this value bypasses the system.
+
+If a needed token is missing, extend your token files and use the new name. Don't inline.
+
+## Examples
+
+```
+// Bad — raw hex, off-scale dimension, framework-default leakage
+text(value = 'Welcome', color = '#7F13EC')
+spacer(height = 20)
+progress(color = FrameworkTheme.colors.onPrimary)
+
+// Good — every value reads from <ThemeModule>
+text(value = 'Welcome', color = <ThemeModule>.colors.primary)
+spacer(height = <ThemeModule>.spacing.<scale-step>)
+progress(color = <ThemeModule>.colors.onPrimary)
+```
+
+## Self-review grep
+
+Before handing off, search the diff for the patterns that your stack treats as leakage. Adjust this list to your codebase:
+
+```
+0x[0-9A-Fa-f]{6,8}        # raw hex colors
+#[0-9A-Fa-f]{3,8}\b       # raw CSS hex
+\b\d+(\.\d+)?(px|dp|pt)\b # raw dimensions
+<FrameworkDefaultTheme>\.
+```
+
+Every hit must either resolve to a `<ThemeModule>` token or carry a one-line why-comment marking it as a justified exception. No silent inlining.

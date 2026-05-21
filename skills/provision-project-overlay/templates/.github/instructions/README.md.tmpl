@@ -1,0 +1,40 @@
+# Agent Operating Manual
+
+This folder contains **{{project.name}}**'s project overlay for AI agents (GitHub Copilot, Claude Code).
+
+The universal lean delivery methodology, capability-driven engineering discipline, and three role-based personas live in the [`praxis` plugin](../../plugin/) (skills, agents, always-on instructions). This folder adds only the project-specific context needed on top of the plugin: stack-specific conventions, project paths, ownership gates, and the personas / skills that are unique to {{project.name}}.
+
+The `.github/` overlay is **managed by the plugin's `provision-project-overlay` skill**. The source of truth is `praxis.config.yaml` at the repo root. Re-run the skill (with `--reconfigure` for an interview) to regenerate from a new template version.
+
+## What lives here
+
+- `agent-methodology-instructions.md` — project overlay on the plugin's `lean-delivery-guardrails` (paths, gates, persona ownership)
+- `stack-conventions.instructions.md` — stack-specific conventions for {{stack.runtime}} + {{stack.api_framework}} + {{stack.database}}
+- `thin-slice-template.md` — concrete fill-in template for thin-slice authoring (mirror of plugin source)
+- `<alias>-engineer.{md,instructions.md}` and `<alias>-architecture.instructions.md` — engineering persona overlays (only when `personas.use_aliases: true`)
+- `<alias>-wave.{md,instructions.md}` — product-management persona overlays
+- `<alias>-designer.{md,instructions.md}` — product-design persona overlays
+- Project-specific personas with no plugin equivalent (curated by hand, not regenerated)
+
+## Where the plugin lives
+
+The `praxis` plugin is available as:
+
+- **GitHub Copilot:** `~/.copilot/installed-plugins/nuewframe-marketplace/praxis/`
+- **Claude Code:** `~/.claude/plugins/cache/nuewframe-marketplace/praxis/<version>/`
+
+Plugin agents (universal personas):
+
+- `principal-engineer` — referenced by `.github/agents/{{personas.aliases.principal-engineer}}.agent.md`
+- `product-manager` — referenced by `.github/agents/{{personas.aliases.product-manager}}.agent.md`
+- `product-designer` — referenced by `.github/agents/{{personas.aliases.product-designer}}.agent.md`
+
+## Documentation flow
+
+`{{paths.project_context}}` is the single entry point. From there you can navigate to the dashboard, engineering handbook, ADRs, waves, and sprints.
+
+## Single-source-of-truth rules
+
+- ADRs at `{{paths.adr}}/` are the canonical source for technical strategy. Engineering handbook references ADRs, never restates them.
+- Wave README.md tracks thin-slices, status, and acceptance criteria. Split to `product-design.md`, `product-architecture.md`, or `qa.md` only when README becomes unwieldy.
+- One file per sprint at `{{paths.sprints}}/sprint-NNN-<slug>.md`. Deleted at sprint close.

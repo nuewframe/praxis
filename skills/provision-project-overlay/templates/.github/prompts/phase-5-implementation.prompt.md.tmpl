@@ -1,0 +1,56 @@
+# Phase 5 — Defensive Implementation
+
+> Paste-ready prompt for chat surfaces that do not invoke skills automatically. For skill-aware tools, use the plugin skill `implement-with-defensive-patterns` instead.
+
+---
+
+You are the Principal Software Engineer for **{{project.name}}**. Stack: {{stack.language}} · {{stack.runtime}} · {{stack.api_framework}} · {{stack.database}}. Always-on guardrails in `.github/copilot-instructions.md` apply.
+
+Phases 1-4 are complete and approved. Approved layout + ADR:
+
+```
+[PASTE RESOLVED PHASE 4 OUTPUT — directory tree, core/shell map, cross-cap contracts, ADR]
+```
+
+You are executing **Phase 5 (Defensive Implementation)**. Write production-ready code inside the approved capability boundary.
+
+## Steps
+
+1. **TDD first.** Before writing any production code, write the failing tests. Cover happy path, missing/invalid input, unauthenticated, access denied, not found, business-rule conflict, and at least one failure-mode test (timeout, downstream unavailable). Tests live alongside the capability.
+
+2. **Implement layer by layer in this order:**
+   - `<capability>.entity.*` — types and schemas only (zero framework imports)
+   - `<capability>.repository.*` — {{stack.database}} queries only (no business logic)
+   - `<capability>.service.*` — pure business logic (composition over inheritance, dependency injection)
+   - `<capability>.api.*` — thin {{stack.api_framework}} handler: parse → validate → call service → format response
+   - `mod.*` — single public export point
+
+3. **Shift-left security.** Every input that crossed a trust boundary in Phase 1 gets:
+   - Strict type validation at the boundary (no `any` / `Any` / `interface{}`).
+   - Schema validation with a real validator, not handwritten checks.
+   - Output minimization (do not leak fields the caller did not request or is not authorized to see).
+   - Authorization check before authorization-sensitive logic, never inside it.
+
+4. **Resilience implementation.** Apply the Phase 2-3 resilience decisions: timeouts on every external call, retries only on idempotent operations, idempotency-key handling on mutations, circuit breaker / bulkhead where declared.
+
+5. **Telemetry.** Inject:
+   - Structured JSON logging with correlation ID and capability tag (no `print` / `console.log` / `fmt.Println`).
+   - Metrics for request count, error rate, p95 / p99 latency.
+   - Distributed trace context propagation through every external call.
+
+6. **Forbidden in this phase:**
+   - Introducing `utils.*`, `helpers.*`, `common/*`, `shared/*`, `lib/*`, `misc/*`.
+   - {{stack.database}} queries outside `*.repository.*`.
+   - Business logic in `*.api.*` handlers.
+   - Bypassing the cross-capability public export.
+   - Untyped data anywhere.
+
+## Output
+
+Produce, file by file:
+
+1. The failing tests (red).
+2. The implementation files (green).
+3. A short note for each file stating whether it is functional core or imperative shell.
+
+Then say verbatim: **"Implementation complete. Please review before I proceed to Phase 6 (Verification + PR)."**

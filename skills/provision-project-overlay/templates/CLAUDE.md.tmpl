@@ -1,0 +1,57 @@
+# {{project.name}} — Claude Code Guide
+
+> {{project.description}}
+
+This file is the always-on entry point for **Claude Code**. The full agent operating model — methodology, personas, skills, prompts, stack conventions — lives in [`.github/instructions/README.md`](.github/instructions/README.md). Read it first.
+
+## Why this file points elsewhere
+
+This repo is dual-tool (GitHub Copilot + Claude Code). To avoid drift, the canonical agent surface lives under `.github/`. Copilot auto-discovers it; Claude Code reads it through this pointer.
+
+## Required reading order
+
+1. `.github/instructions/README.md` — the agent operating manual (overlay over the `praxis` plugin)
+2. `{{paths.project_context}}` — single documentation entry point
+3. The relevant skill in `.github/skills/<skill>/SKILL.md` for the task at hand
+
+## Stack
+
+- **Language:** {{stack.language}}
+- **Runtime:** {{stack.runtime}}
+- **API framework:** {{stack.api_framework}}
+- **Database:** {{stack.database}}
+- **UI framework:** {{stack.ui_framework}}
+
+## Personas
+
+| Role | Pointer |
+|---|---|
+| Engineering | `.github/agents/{{personas.aliases.principal-engineer}}.agent.md` (overlays plugin `principal-engineer`) |
+| Product management | `.github/agents/{{personas.aliases.product-manager}}.agent.md` (overlays plugin `product-manager`) |
+| Product design | `.github/agents/{{personas.aliases.product-designer}}.agent.md` (overlays plugin `product-designer`) |
+
+The `praxis` plugin is installed at `~/.claude/plugins/cache/nuewframe-marketplace/praxis/<version>/`. Plugin agents/skills are invocable directly; the `.github/agents/*` and `.github/skills/*` files are the project overlays.
+
+## Quality gates (before "done")
+
+```bash
+{{quality_gates.lint}}
+{{quality_gates.format}}
+{{quality_gates.type_check}}
+{{quality_gates.test}}
+```
+
+## Slash commands
+
+This project does not maintain a separate `.claude/commands/` directory. Use the plugin's commands directly, or read the project prompts at `.github/prompts/*.prompt.md` and execute them as instructions to Claude.
+
+## Non-negotiables
+
+See `CONTRIBUTING.md` and `.github/instructions/README.md`. The most important rules:
+
+- Single source of truth — improve existing files, never duplicate
+- Code contribution intake before implementation
+- TDD red-green-refactor for any non-trivial change
+- Quality gates above must pass before any work is "done"
+- Capability-driven layout — never dump into `core/`, `utils/`, `helpers/`, `lib/`
+- ADR for any decision a new contributor would otherwise have to reverse-engineer

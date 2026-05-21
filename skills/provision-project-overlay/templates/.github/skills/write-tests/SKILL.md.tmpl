@@ -1,0 +1,45 @@
+---
+name: write-tests
+description: Write tests for {{project.name}} following the Pyramid Test Strategy (Logic base through Journey tip), using the plugin's `test-by-ownership` skill.
+---
+
+# Write Tests (Project Overlay)
+
+The universal Pyramid Test Strategy — Logic base, Composition, Adapter Contract, Integration boundary, Journey tip — and the cardinal rule "one property of a behavior, one layer" are in the `praxis` plugin's `test-by-ownership` skill. Read it first.
+
+## Stack-specific test runners
+
+The pyramid should be broad at the base and narrow at the tip: many Logic tests, enough Composition and contract/boundary tests, and few Journey tests that cover full user experience.
+
+| Layer | Runner | Notes |
+|---|---|---|
+| Logic | {{stack.runtime}} test runner | Pure functions; no I/O |
+| Composition | {{stack.runtime}} test runner with in-memory Port adapters | Service/API wiring; no hand-rolled stubs |
+| Adapter Contract | {{stack.runtime}} test runner against in-memory and real adapters | Same contract suite runs against both adapters |
+| Integration boundary | {{stack.runtime}} test runner against contract-tested fake or sandbox | External dependency wrapper behavior |
+| Journey | (project E2E framework) | End-to-end through real UI or public surface |
+
+## Composition and Adapter Contract tests split ownership
+
+Composition tests use real service/API wiring with in-memory Port adapters. Adapter Contract tests prove the in-memory and real {{stack.database}} adapters honor the same Port contract. Do **not** replace owned Ports with hand-rolled stubs.
+
+## Mandatory coverage for new endpoints
+
+Every new endpoint composition test must cover:
+
+- Happy path
+- Missing required field (validation error)
+- Unauthenticated
+- Access denied
+- Not found
+- Business-rule conflict (when applicable)
+
+## Quality gates
+
+- `{{quality_gates.test}}` must pass before code is considered complete.
+- `{{quality_gates.e2e}}` must pass for journey tests (if applicable).
+- A single behavior property is tested at exactly one pyramid layer — never both Journey and Composition for the same assertion.
+
+## TDD discipline
+
+Changed behavior gets failing tests first (red), then minimum code to pass (green), then refactor with tests still green. Preserved behavior gets a green baseline before refactor. See `.github/skills/intake-code-contribution/SKILL.md` and `.github/skills/implement-capability-change/SKILL.md` for the layer-by-layer implementation order.

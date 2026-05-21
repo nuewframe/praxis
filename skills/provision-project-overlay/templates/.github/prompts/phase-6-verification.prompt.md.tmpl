@@ -1,0 +1,76 @@
+# Phase 6 — Verification + PR Narrative
+
+> Paste-ready prompt for chat surfaces that do not invoke skills automatically. For skill-aware tools, use the plugin skill `verify-and-assemble-pr` instead.
+
+---
+
+You are the Principal Software Engineer for **{{project.name}}**. Stack: {{stack.language}} · {{stack.runtime}} · {{stack.api_framework}} · {{stack.database}}. Always-on guardrails in `.github/copilot-instructions.md` apply.
+
+Phase 5 (Implementation) is complete. Implemented files:
+
+```
+[PASTE LIST OF IMPLEMENTED FILES + KEY EXCERPTS]
+```
+
+You are executing **Phase 6 (Verification + PR Narrative)**.
+
+## Steps
+
+1. **Pyramid test review.** Confirm each behavior property is tested at the right ownership layer and that the suite narrows toward Journey tests:
+   - **Logic** — pure function correctness, no I/O.
+   - **Composition** — service/API wiring with in-memory Port adapters.
+   - **Adapter Contract** — in-memory and real adapters run the same Port contract suite.
+   - **Integration boundary** — external dependency wrapper behavior against a contract-tested fake or sandbox.
+   - **Journey** — end-to-end through real UI / public surface.
+
+   List any property duplicated at two layers (must be removed from one), any required property tested at zero layers (must be added), or any Journey test that should move lower in the pyramid.
+
+2. **Quality gates.** State that the following must pass and report each as `passed` / `failed` / `not run`:
+   - `{{quality_gates.lint}}`
+   - `{{quality_gates.format}}`
+   - `{{quality_gates.type_check}}`
+   - `{{quality_gates.test}}`
+   - `{{quality_gates.e2e}}` (if applicable)
+
+3. **Anti-dumping check.** Confirm no `utils.*`, `helpers.*`, `common/*`, `shared/*`, `lib/*`, `misc/*` files were introduced. List every new file path. If the project ships `plugin/scripts/check-anti-dumping.sh`, state that it was run and the result.
+
+4. **Boundary audit.** Confirm:
+   - No {{stack.database}} queries outside `*.repository.*`.
+   - No business logic in `*.api.*`.
+   - No direct cross-capability imports (only via public exports).
+   - No untyped data crossing trust boundaries.
+
+5. **PR narrative.** Produce a PR description with these sections:
+
+   ```markdown
+   ## Summary
+   <one paragraph: what changed and why>
+
+   ## Capability impact
+   <which capabilities, which contracts, which schemas>
+
+   ## ADRs
+   <links to new or amended ADRs>
+
+   ## Tests
+   - Logic: <count, what they cover>
+   - Composition: <count, what they cover>
+   - Adapter Contract: <count, what they cover>
+   - Integration boundary: <count, what they cover>
+   - Journey: <count, what they cover>
+
+   ## Quality gates
+   <table of gate → result>
+
+   ## Risk + rollback
+   <blast radius, monitoring signal to watch, rollback procedure>
+
+   ## Follow-up work
+   <known follow-ups, deferred items, open questions>
+   ```
+
+## Output
+
+Produce: test-layer audit · quality-gate report · anti-dumping confirmation · boundary audit · PR narrative.
+
+Then say verbatim: **"Verification complete. Ready to merge after human review."**

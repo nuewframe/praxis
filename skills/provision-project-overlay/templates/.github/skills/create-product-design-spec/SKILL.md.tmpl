@@ -1,0 +1,25 @@
+---
+name: create-product-design-spec
+description: Author or refine a wave `product-design.md` for {{project.name}}. Project overlay on top of the plugin's `create-product-design-spec` skill.
+---
+
+# Create Product Design Spec (Project Overlay)
+
+The full skill — six-question framework, UX surfaces, ambiguity / error states — is in the `praxis` plugin's `create-product-design-spec` skill. Read it first.
+
+## Project-specific paths
+
+- Lives at: `{{paths.waves}}/wave-NNN-<slug>/product-design.md`
+- Personas referenced: `{{paths.product}}/use-cases.md`
+- Existing wave designs to read for tone: any closed wave under `{{paths.waves}}/`
+- Thin-slice template: `.github/instructions/thin-slice-template.md` (copied from the plugin)
+
+## Project-specific gates
+
+- Authored or owned by the product designer (`.github/agents/{{personas.aliases.product-designer}}.agent.md`).
+- Must be approved by the product manager (`.github/agents/{{personas.aliases.product-manager}}.agent.md`) before `product-architecture.md` is finalized.
+- Acceptance criteria are the single source of truth for sprint test plans — they must be precise enough that the engineering persona can write Journey + Composition + Logic test cases without a follow-up question.
+
+## UI-specific UX guidance
+
+If the wave touches the UI, also follow `.github/instructions/{{personas.aliases.product-designer}}-designer.instructions.md` for {{stack.ui_framework}} UX patterns.

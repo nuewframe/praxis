@@ -1,0 +1,45 @@
+# praxis project configuration.
+# Edit by hand or re-run `provision-project-overlay --reconfigure`.
+version: 1
+
+project:
+  name: {{project.name}}
+  description: {{project.description}}
+
+stack:
+  language: {{stack.language}}
+  runtime: {{stack.runtime}}
+  api_framework: {{stack.api_framework}}
+  database: {{stack.database}}
+  ui_framework: {{stack.ui_framework}}
+  deployment_target: {{stack.deployment_target}}
+
+paths:
+  product: {{paths.product}}
+  adr: {{paths.adr}}
+  waves: {{paths.waves}}
+  sprints: {{paths.sprints}}
+  engineering: {{paths.engineering}}
+  project_context: {{paths.project_context}}
+  product_dashboard: {{paths.product_dashboard}}
+
+quality_gates:
+  lint: {{quality_gates.lint}}
+  format: {{quality_gates.format}}
+  type_check: {{quality_gates.type_check}}
+  test: {{quality_gates.test}}
+  e2e: {{quality_gates.e2e}}
+
+personas:
+  use_aliases: {{personas.use_aliases}}
+  aliases:
+    principal-engineer: {{personas.aliases.principal-engineer}}
+    product-manager: {{personas.aliases.product-manager}}
+    product-designer: {{personas.aliases.product-designer}}
+
+bootstrap:
+  generate_project_context: {{bootstrap.generate_project_context}}
+  generate_product_dashboard: {{bootstrap.generate_product_dashboard}}
+  generate_first_adr: {{bootstrap.generate_first_adr}}
+  generate_claude_system_prompt: {{bootstrap.generate_claude_system_prompt}}
+  generate_pre_commit_hook: {{bootstrap.generate_pre_commit_hook}}

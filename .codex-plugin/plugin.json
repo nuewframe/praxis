@@ -1,0 +1,42 @@
+{
+  "name": "praxis",
+  "version": "0.1.0",
+  "description": "Lean wave-based product delivery unified with Principal Engineer discipline: planning, design, capability-driven architecture, defensive implementation, and TDD verification.",
+  "author": {
+    "name": "Nuewframe",
+    "url": "https://github.com/nuewframe"
+  },
+  "homepage": "https://github.com/nuewframe/praxis",
+  "repository": "https://github.com/nuewframe/praxis",
+  "license": "MIT",
+  "keywords": [
+    "praxis",
+    "skills",
+    "planning",
+    "tdd",
+    "wave-methodology",
+    "capability-driven",
+    "adr",
+    "code-review",
+    "workflow"
+  ],
+  "skills": "./skills/",
+  "agents": "./agents/",
+  "interface": {
+    "displayName": "Praxis",
+    "shortDescription": "Lean delivery + Principal Engineer discipline for coding agents",
+    "longDescription": "Use Praxis to guide product and engineering work through wave planning, thin-slice design, immutable sprint bridges, code-contribution intake, capability-driven architecture, defensive implementation, and TDD verification. Includes three personas (Product Manager, Product Designer, Principal Engineer) and ADR discipline.",
+    "developerName": "Nuewframe",
+    "category": "Coding",
+    "capabilities": [
+      "Interactive",
+      "Read",
+      "Write"
+    ],
+    "defaultPrompt": [
+      "Help me plan a new wave for this product.",
+      "Let's start a sprint and create the immutable bridge."
+    ],
+    "websiteURL": "https://github.com/nuewframe/praxis"
+  }
+}

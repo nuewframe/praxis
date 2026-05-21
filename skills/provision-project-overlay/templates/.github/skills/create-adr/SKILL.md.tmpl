@@ -1,0 +1,29 @@
+---
+name: create-adr
+description: Create an Architecture Decision Record (ADR) for {{project.name}}. Project overlay on top of the plugin's `create-adr` skill.
+---
+
+# Create ADR (Project Overlay)
+
+The full skill — ADR template, mandatory alternatives table, content discipline — is in the `praxis` plugin's `create-adr` skill. Read it first.
+
+## Project-specific paths
+
+- ADR directory: `{{paths.adr}}/`
+- Filename: `ADR-NNN-<kebab-slug>.md` where `NNN` is the next sequential number across the **whole project** (not per-domain).
+- Registration: add the ADR title and one-line summary to `{{paths.project_context}}` under the active ADR list.
+
+## When an ADR is mandatory
+
+- New top-level capability domain
+- New external integration (third-party API, identity provider, payment processor, etc.)
+- Storage schema changes that affect more than one capability
+- Any change to auth flow or trust boundary
+- Any change to the deployment topology
+- Any decision a new contributor would otherwise have to reverse-engineer from code
+
+## Project-specific gates
+
+- Authored or owned by the principal engineer (`.github/agents/{{personas.aliases.principal-engineer}}.agent.md`).
+- Must be referenced from the relevant wave's `product-architecture.md` if it was driven by wave work.
+- Status transitions (`Proposed` → `Accepted` → `Superseded`) update both the ADR file and `{{paths.project_context}}` in the same commit.

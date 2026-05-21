@@ -1,0 +1,47 @@
+{
+  "name": "praxis",
+  "version": "0.1.0",
+  "description": "Lean wave-based product delivery unified with Principal Engineer discipline. Bootstraps coding agents with personas, always-on guardrails, and a skill index across Claude Code, Codex, Cursor, Gemini CLI, OpenCode, and GitHub Copilot.",
+  "type": "module",
+  "main": ".opencode/plugins/praxis.js",
+  "author": {
+    "name": "Nuewframe",
+    "url": "https://github.com/nuewframe"
+  },
+  "homepage": "https://github.com/nuewframe/praxis",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nuewframe/praxis.git"
+  },
+  "license": "MIT",
+  "keywords": [
+    "praxis",
+    "skills",
+    "wave-methodology",
+    "capability-driven",
+    "tdd",
+    "adr",
+    "lean-delivery",
+    "principal-engineer",
+    "workflow"
+  ],
+  "files": [
+    "skills",
+    "agents",
+    "instructions",
+    "scripts",
+    "hooks",
+    ".claude-plugin",
+    ".codex-plugin",
+    ".cursor-plugin",
+    ".opencode",
+    "gemini-extension.json",
+    "AGENTS.md",
+    "CLAUDE.md",
+    "GEMINI.md",
+    "README.md",
+    "project-context.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ]
+}

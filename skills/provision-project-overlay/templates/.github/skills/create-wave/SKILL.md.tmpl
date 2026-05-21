@@ -1,0 +1,26 @@
+---
+name: create-wave
+description: Create a new product wave in {{project.name}} following the four-document wave pattern. Project overlay on top of the plugin's `create-wave` skill.
+---
+
+# Create Wave (Project Overlay)
+
+This is a **project overlay**. The full skill — four-document pattern, design questions, content discipline, anti-patterns — is provided by the `praxis` plugin's `create-wave` skill. Read it first, then apply the overlay below.
+
+## Project-specific paths
+
+- Wave directory: `{{paths.waves}}/wave-NNN-<slug>/`
+- Wave dashboard for registration: `{{paths.product_dashboard}}`
+- ADR directory referenced by `product-architecture.md`: `{{paths.adr}}/`
+- Active personas referenced in `product-design.md`: `{{paths.product}}/use-cases.md`
+
+## Project-specific gates
+
+- A new wave **must** be reviewed by the product manager (`.github/agents/{{personas.aliases.product-manager}}.agent.md`) and product designer (`.github/agents/{{personas.aliases.product-designer}}.agent.md`) before any sprint is opened against it.
+- The principal engineer (`.github/agents/{{personas.aliases.principal-engineer}}.agent.md`) must sign off on `product-architecture.md` before sprint creation.
+- If the wave introduces a new subsystem, runtime, or trust boundary, also run `.github/skills/create-system-architecture/SKILL.md`.
+
+## Wave numbering
+
+- Allocate the next sequential wave number (`wave-NNN-`) by reading the highest existing entry in `{{paths.waves}}/`.
+- Numbering is monotonic and does not reset per theme.

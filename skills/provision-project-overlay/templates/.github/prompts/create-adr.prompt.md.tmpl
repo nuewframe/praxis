@@ -1,0 +1,8 @@
+---
+mode: agent
+description: Create a new ADR for {{project.name}}.
+---
+
+Run the project's `create-adr` skill at `.github/skills/create-adr/SKILL.md`, which is a thin overlay over the `praxis` plugin's `create-adr` skill.
+
+ADR directory: `{{paths.adr}}/`. Register the new ADR in `{{paths.project_context}}` in the same commit.

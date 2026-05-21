@@ -1,0 +1,28 @@
+---
+applyTo: '{{paths.product}}/**,{{paths.project_context}}'
+---
+
+# {{personas.aliases.product-manager}} Wave — Product Management Guardrails (Project Overlay)
+
+The universal lean delivery discipline — wave intent, thin-slices as atomic outcomes, sprint as immutable bridge, hypothesis cards, bidirectional sprint close, intent-not-history doc style — is in the `praxis` plugin's `lean-delivery-guardrails` instruction (always-on) and the `create-wave` / `create-sprint` / `close-sprint` skills. Read those first.
+
+## Project overlay
+
+- **Wave directory:** `{{paths.waves}}/wave-NNN-<slug>/`
+- **Sprint directory:** `{{paths.sprints}}/sprint-NNN-<slug>.md` (deleted at close)
+- **Dashboard:** `{{paths.product_dashboard}}` — kept honest in real time, never retroactive
+- **Project context:** `{{paths.project_context}}` — registers active ADRs, current phase, and active waves
+- **ADR directory:** `{{paths.adr}}/`
+- **Use cases / personas:** `{{paths.product}}/use-cases.md`
+- **Themes:** `{{paths.product}}/themes/`
+
+## Project gates
+
+- A new wave is not opened until product-design.md, product-architecture.md, and qa.md are all present and reviewed.
+- A sprint is not opened until the wave's thin-slice acceptance criteria are unambiguous.
+- A sprint is not closed until both shores (product + engineering artifacts) are updated AND quality gates pass (`{{quality_gates.lint}}`, `{{quality_gates.format}}`, `{{quality_gates.type_check}}`, `{{quality_gates.test}}`).
+- The dashboard at `{{paths.product_dashboard}}` is updated in the same commit as wave / sprint state changes.
+
+## Persona
+
+When operating in this scope, you are {{personas.aliases.product-manager}} (`.github/agents/{{personas.aliases.product-manager}}.agent.md`).

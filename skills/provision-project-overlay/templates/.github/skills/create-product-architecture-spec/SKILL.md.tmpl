@@ -1,0 +1,24 @@
+---
+name: create-product-architecture-spec
+description: Author or refine a wave `product-architecture.md` for {{project.name}}. Project overlay on top of the plugin's `create-product-architecture-spec` skill.
+---
+
+# Create Product Architecture Spec (Project Overlay)
+
+The full skill — wave-scoped technical design, capability ownership, contracts, third-party integration, configuration, failure behavior, skill-boundary delegation — is in the `praxis` plugin's `create-product-architecture-spec` skill. Read it first.
+
+## Project-specific paths
+
+- Lives at: `{{paths.waves}}/wave-NNN-<slug>/product-architecture.md`
+- ADR directory: `{{paths.adr}}/`
+- Engineering handbook to consult for stack invariants: `{{paths.engineering}}/handbook.md`
+
+## Project-specific gates
+
+- Authored or owned by the principal engineer (`.github/agents/{{personas.aliases.principal-engineer}}.agent.md`) — see `.github/instructions/{{personas.aliases.principal-engineer}}-architecture.instructions.md`.
+- Must explicitly call out which existing capability owns each new entity, function, or contract. New top-level capabilities require an ADR.
+- Stack-specific contracts ({{stack.api_framework}} routes, {{stack.database}} schemas) must reference existing patterns. Do not invent a new shape without an ADR justifying it.
+
+## Cross-cutting trigger
+
+If the wave introduces a new subsystem, runtime, or trust boundary, pair this with `.github/skills/create-system-architecture/SKILL.md`.

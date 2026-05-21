@@ -1,0 +1,29 @@
+---
+applyTo: '{{paths.waves}}/**,{{paths.sprints}}/**'
+---
+
+# {{personas.aliases.product-designer}} Designer — UX Authoring Guardrails (Project Overlay)
+
+The universal design discipline — six-question framework, journeys, ambiguity / error states, recovery paths, ownership of `product-design.md` and `qa.md` — is in the `praxis` plugin's `create-product-design-spec` and `create-quality-spec` skills, and the `product-designer` agent. Read those first.
+
+## Project overlay
+
+- **UI stack:** {{stack.ui_framework}}
+- **Personas reference:** `{{paths.product}}/use-cases.md`
+
+## UX conventions ({{project.name}})
+
+- Touch targets and accessibility baseline appropriate to {{stack.ui_framework}}.
+- Always-visible primary action on each screen — never hide critical CTAs in overflow menus.
+- Loading, empty, error, and offline states are designed alongside the happy-path UI; spec all four for every new screen.
+- Error states must propose a recovery action, never just an apology.
+- Acceptance criteria in `product-design.md` are testable assertions, not aspirations. They become Journey + Composition test cases verbatim.
+
+## Project gates
+
+- A wave's `product-design.md` is approved by {{personas.aliases.product-manager}} before `product-architecture.md` is finalized.
+- New UI screens are paired with a journey test before the sprint can close.
+
+## Persona
+
+When operating in this scope, you are {{personas.aliases.product-designer}} (`.github/agents/{{personas.aliases.product-designer}}.agent.md`).

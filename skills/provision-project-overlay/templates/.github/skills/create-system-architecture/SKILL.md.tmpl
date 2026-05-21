@@ -1,0 +1,27 @@
+---
+name: create-system-architecture
+description: Define cross-cutting system architecture for a {{project.name}} wave that introduces a new subsystem, integration, runtime boundary, or platform-wide constraint. Project overlay on top of the plugin's `design-system-architecture` skill.
+---
+
+# Create System Architecture (Project Overlay)
+
+The full skill — topology, resilience patterns, contract-first APIs, polyglot persistence, expand/contract migrations — is in the `praxis` plugin's `design-system-architecture` skill. Read it first.
+
+## When to invoke
+
+Pair this with the wave's `product-architecture.md` (see `.github/skills/create-product-architecture-spec/SKILL.md`) when the wave introduces:
+
+- A new external integration (third-party API, identity provider, payment processor)
+- A new runtime or deployment surface (worker, scheduled job, event consumer)
+- A new trust boundary (B2B tenant, partner API, public webhook)
+- A platform-wide constraint (data residency, encryption, retention)
+
+## Project-specific paths
+
+- Output location: a new ADR under `{{paths.adr}}/` capturing the durable system decisions.
+- Existing system docs to read first: `{{paths.engineering}}/handbook.md`.
+- Active deployment topology: {{stack.deployment_target}}.
+
+## Hand-off
+
+The system architecture decisions must be recorded as one or more ADRs (use `.github/skills/create-adr/SKILL.md`). The wave's `product-architecture.md` then references those ADRs rather than restating the decisions inline.

@@ -1,0 +1,29 @@
+---
+name: close-sprint
+description: Close a completed sprint for {{project.name}} with bidirectional learning capture, then delete the sprint file. Project overlay on top of the plugin's `close-sprint` skill.
+---
+
+# Close Sprint (Project Overlay)
+
+The full skill — bidirectional outflow to product AND engineering shores, hypothesis decision, sprint-file deletion — is in the `praxis` plugin's `close-sprint` skill. Read it first.
+
+## Project-specific paths
+
+- Sprint file: `{{paths.sprints}}/sprint-NNN-<slug>.md` (delete at close)
+- Product-side updates:
+  - The relevant wave at `{{paths.waves}}/wave-NNN-<slug>/`
+  - Dashboard at `{{paths.product_dashboard}}`
+- Engineering-side updates:
+  - New or amended ADRs at `{{paths.adr}}/`
+  - Capability layout updates in the source tree
+  - `{{paths.engineering}}/handbook.md` if a new convention emerged
+
+## Project-specific gates
+
+- Owned by the product manager (`.github/agents/{{personas.aliases.product-manager}}.agent.md`).
+- Both shores **must** be updated before the sprint file is deleted. A one-sided close is not a close.
+- Hypothesis card outcome (continue / pivot / stop) is recorded in the wave README's progress log, not the dashboard.
+
+## Quality gates before close
+
+The sprint cannot close until: `{{quality_gates.lint}}`, `{{quality_gates.format}}`, `{{quality_gates.type_check}}`, and `{{quality_gates.test}}` all pass.

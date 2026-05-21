@@ -1,0 +1,46 @@
+# {{project.name}} — Project Context
+
+> {{project.description}}
+
+This file is the single entry point to the project's documentation. Start here.
+
+## Stack
+
+- **Language:** {{stack.language}}
+- **Runtime:** {{stack.runtime}}
+- **API framework:** {{stack.api_framework}}
+- **Database:** {{stack.database}}
+- **UI framework:** {{stack.ui_framework}}
+- **Deployment target:** {{stack.deployment_target}}
+
+## Documentation map
+
+| Topic | Location |
+|---|---|
+| Product vision & dashboard | {{paths.product_dashboard}} |
+| Architecture decisions | {{paths.adr}}/ |
+| Wave docs | {{paths.waves}}/ |
+| Sprint docs | {{paths.sprints}}/ |
+| Engineering handbook | {{paths.engineering}}/handbook.md |
+| Use cases / personas | {{paths.product}}/use-cases.md |
+
+## Active ADRs
+
+| ID | Title | Status |
+|---|---|---|
+| ADR-001 | Technology Stack | Accepted |
+
+(Append new ADRs here as they are created.)
+
+## Quality gates
+
+```bash
+{{quality_gates.lint}}
+{{quality_gates.format}}
+{{quality_gates.type_check}}
+{{quality_gates.test}}
+```
+
+## Agent operating manual
+
+`.github/instructions/README.md` — overlay for AI agents (Copilot, Claude). Universal personas and methodology come from the `praxis` plugin; this repo's overlay supplies stack and paths.

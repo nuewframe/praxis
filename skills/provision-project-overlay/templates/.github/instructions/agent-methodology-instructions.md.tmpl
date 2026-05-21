@@ -1,0 +1,46 @@
+# Product Development Methodology (Project Overlay)
+
+The universal lean wave-based delivery methodology — waves as intent, thin-slices as atomic outcomes, sprints as immutable bridges, hypothesis cards, bidirectional sprint close, intent-not-history doc style — is in the `praxis` plugin's `lean-delivery-guardrails` always-on instruction. Read it first.
+
+The detailed runbooks are in the plugin skills:
+
+- Wave creation → `create-wave`
+- Wave product design spec → `create-product-design-spec`
+- Wave product architecture spec → `create-product-architecture-spec`
+- Wave quality spec → `create-quality-spec`
+- Code contribution intake → `intake-code-contribution`
+- Sprint creation → `create-sprint`
+- Sprint close → `close-sprint`
+- ADR → `create-adr`
+- Pyramid Test Strategy → `test-by-ownership`
+
+For the project-specific overlay (paths, gates, project alias personas), see the matching `.github/skills/<skill>/SKILL.md` files in this repo.
+
+## Project-specific paths
+
+| Artifact | Location |
+|---|---|
+| Wave docs | `{{paths.waves}}/wave-NNN-<slug>/` |
+| Sprint docs | `{{paths.sprints}}/sprint-NNN-<slug>.md` |
+| Dashboard | `{{paths.product_dashboard}}` |
+| Project context | `{{paths.project_context}}` |
+| ADRs | `{{paths.adr}}/` |
+| Use cases / personas | `{{paths.product}}/use-cases.md` |
+| Themes | `{{paths.product}}/themes/` |
+
+## Project-specific gates (in addition to the plugin's universal gates)
+
+- All four wave files (`README.md`, `product-design.md`, `product-architecture.md`, `qa.md`) must exist and be reviewed before any sprint opens against the wave.
+- Implementation cannot start until code contribution intake identifies the wave, thin-slice, sprint bridge, current code touchpoints, and red/green test posture.
+- Sprint cannot close without `{{quality_gates.lint}}`, `{{quality_gates.format}}`, `{{quality_gates.type_check}}`, and `{{quality_gates.test}}` all passing.
+- Dashboard is updated in the same commit as wave / sprint state changes.
+
+## Persona ownership
+
+| Phase | Owner |
+|---|---|
+| Wave intent + thin-slices | `.github/agents/{{personas.aliases.product-designer}}.agent.md` |
+| Wave architecture | `.github/agents/{{personas.aliases.principal-engineer}}.agent.md` |
+| Wave registration + sprint sequencing | `.github/agents/{{personas.aliases.product-manager}}.agent.md` |
+| Sprint implementation | `.github/agents/{{personas.aliases.principal-engineer}}.agent.md` |
+| Sprint close | `.github/agents/{{personas.aliases.product-manager}}.agent.md` (with the engineering and design owners on each shore) |
