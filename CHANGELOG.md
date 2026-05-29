@@ -4,6 +4,8 @@ All notable changes to the Praxis plugin are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.1.2] — 2026-05-28
+
 ### Changed
 
 - Unified ADR file naming to `ADR.<ID>-descriptive-name.md` across ADR workflows and examples.
