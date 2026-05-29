@@ -94,7 +94,7 @@ Forbidden choice: leave it in `utils/` "for now."
 
 Write an ADR per migrated capability:
 
-- "ADR-NNN: Extract `<capability>` from layered structure"
+- "ADR.<ID>: Extract `<capability>` from layered structure"
 - Reference the source files, the new location, the migration steps taken, and the callers updated.
 
 ### Step 8 — Wire the anti-dumping linter
@@ -133,8 +133,8 @@ Maintain a `MIGRATION.md` at the repo root:
 
 ## Capabilities extracted
 
-- [x] order-processing — ADR-NNN, completed YYYY-MM-DD
-- [x] billing — ADR-NNN, completed YYYY-MM-DD
+- [x] order-processing — ADR.<ID>, completed YYYY-MM-DD
+- [x] billing — ADR.<ID>, completed YYYY-MM-DD
 - [ ] shipping — in progress
 - [ ] notifications — not started
 

@@ -2,7 +2,7 @@
   "name": "praxis",
   "displayName": "Praxis",
   "description": "Lean wave-based product delivery unified with Principal Engineer discipline. Three-mode engineer persona, mechanical Design Approval, capability-driven architecture, anti-dumping, ADRs, Pyramid Test Strategy, defensive patterns, TDD verification.",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "author": {
     "name": "Nuewframe"
   },

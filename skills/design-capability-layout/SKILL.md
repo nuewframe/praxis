@@ -92,14 +92,14 @@ If two capabilities are calling each other in both directions, that is a smell. 
 
 ### Step 5 — Produce the ADR
 
-Write an Architecture Decision Record using this template. Number it sequentially in the project's ADR directory.
+Write an Architecture Decision Record using this template. Use the ADR ID convention from `create-adr` in the project's ADR directory.
 
 ```markdown
-# ADR-NNN: <decision title>
+# ADR.<ID>: <decision title>
 
 ## Status
 
-Proposed | Accepted | Superseded by ADR-MMM
+Proposed | Accepted | Superseded by ADR.<ID>
 
 ## Context
 

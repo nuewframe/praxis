@@ -203,11 +203,11 @@ If this sprint corrects or reopens a thin-slice, describe the changed outcome he
 
 This is the **mechanical gate** between architect mode and implementer mode for Major-tier changes. Implementer mode does not start until both signals are present:
 
-- **ADR status:** `Accepted` for ADR-NNN at `<adr path>` — verified by reading the file's status field.
+- **ADR status:** `Accepted` for ADR.<ID> at `<adr path>` — verified by reading the file's status field.
 - **Design Approval line:** filled in below by the human approver.
 ```
 
-Design Approval Approver: <name or role> Date: YYYY-MM-DD ADR(s): ADR-NNN (status: Accepted) Notes: <one-line summary of what was approved>
+Design Approval Approver: <name or role> Date: YYYY-MM-DD ADR(s): ADR.<ID> (status: Accepted) Notes: <one-line summary of what was approved>
 
 ```
 If the sprint is Trivial- or Standard-tier, write `n/a (tier: <Trivial|Standard>)` here. Reviewer mode verifies this section before approving any Major-tier PR.

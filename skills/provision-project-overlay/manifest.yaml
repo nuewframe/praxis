@@ -95,45 +95,45 @@ managed_files:
   # ---------------------------------------------------------------------------
   # Engineering persona
   - template: templates/.github/agents/role-engineer.agent.md.tmpl
-    target: .github/agents/{{personas.aliases.principal-engineer}}.agent.md
+    target: .github/agents/{{personas.aliases.principal_engineer}}.agent.md
     condition: personas.use_aliases == true
 
   - template: templates/.github/instructions/role-engineer.md.tmpl
-    target: .github/instructions/{{personas.aliases.principal-engineer}}-engineer.md
+    target: .github/instructions/{{personas.aliases.principal_engineer}}-engineer.md
     condition: personas.use_aliases == true
 
   - template: templates/.github/instructions/role-engineer.instructions.md.tmpl
-    target: .github/instructions/{{personas.aliases.principal-engineer}}-engineer.instructions.md
+    target: .github/instructions/{{personas.aliases.principal_engineer}}-engineer.instructions.md
     condition: personas.use_aliases == true
 
   - template: templates/.github/instructions/role-architecture.instructions.md.tmpl
-    target: .github/instructions/{{personas.aliases.principal-engineer}}-architecture.instructions.md
+    target: .github/instructions/{{personas.aliases.principal_engineer}}-architecture.instructions.md
     condition: personas.use_aliases == true
 
   # Product manager persona
   - template: templates/.github/agents/role-pm.agent.md.tmpl
-    target: .github/agents/{{personas.aliases.product-manager}}.agent.md
+    target: .github/agents/{{personas.aliases.product_manager}}.agent.md
     condition: personas.use_aliases == true
 
   - template: templates/.github/instructions/role-pm.md.tmpl
-    target: .github/instructions/{{personas.aliases.product-manager}}-wave.md
+    target: .github/instructions/{{personas.aliases.product_manager}}-wave.md
     condition: personas.use_aliases == true
 
   - template: templates/.github/instructions/role-pm.instructions.md.tmpl
-    target: .github/instructions/{{personas.aliases.product-manager}}-wave.instructions.md
+    target: .github/instructions/{{personas.aliases.product_manager}}-wave.instructions.md
     condition: personas.use_aliases == true
 
   # Product designer persona
   - template: templates/.github/agents/role-designer.agent.md.tmpl
-    target: .github/agents/{{personas.aliases.product-designer}}.agent.md
+    target: .github/agents/{{personas.aliases.product_designer}}.agent.md
     condition: personas.use_aliases == true
 
   - template: templates/.github/instructions/role-designer.md.tmpl
-    target: .github/instructions/{{personas.aliases.product-designer}}-designer.md
+    target: .github/instructions/{{personas.aliases.product_designer}}-designer.md
     condition: personas.use_aliases == true
 
   - template: templates/.github/instructions/role-designer.instructions.md.tmpl
-    target: .github/instructions/{{personas.aliases.product-designer}}-designer.instructions.md
+    target: .github/instructions/{{personas.aliases.product_designer}}-designer.instructions.md
     condition: personas.use_aliases == true
 
   # ---------------------------------------------------------------------------
@@ -245,7 +245,7 @@ managed_files:
     condition: bootstrap.generate_product_dashboard == true
 
   - template: templates/docs/product/adr/ADR-001-technology-stack.md.tmpl
-    target: "{{paths.adr}}/ADR-001-technology-stack.md"
+    target: "{{paths.adr}}/ADR.{{bootstrap.first_adr_id}}-technology-stack.md"
     condition: bootstrap.generate_first_adr == true
 
   # ---------------------------------------------------------------------------
