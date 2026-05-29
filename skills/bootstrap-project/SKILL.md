@@ -49,7 +49,7 @@ Create this layout (paths adapted to the language):
 ├── docs/
 │   ├── project-context.md               # single entry point — how to navigate this repo
 │   ├── adr/
-│   │   └── ADR-001-initial-architecture.md
+│   │   └── ADR.<ID>-initial-architecture.md
 │   ├── product/
 │   │   └── waves/
 │   │       └── wave-000-bootstrap/
@@ -190,7 +190,7 @@ Single entry point. Read this first.
 
 ## Architecture
 
-See [docs/adr/ADR-001-initial-architecture.md](adr/ADR-001-initial-architecture.md).
+See [docs/adr/ADR.<ID>-initial-architecture.md](adr/ADR.<ID>-initial-architecture.md).
 
 ## Conventions
 
@@ -208,9 +208,9 @@ See [docs/adr/ADR-001-initial-architecture.md](adr/ADR-001-initial-architecture.
 - `<test command>`
 ```
 
-### Step 7 — Generate `docs/adr/ADR-001-initial-architecture.md`
+### Step 7 — Generate `docs/adr/ADR.<ID>-initial-architecture.md`
 
-Use the ADR template from `design-capability-layout`. Fill in:
+Use the ADR template from `design-capability-layout` and apply the `create-adr` ID convention for this first ADR as well. Fill in:
 
 - The capability list from Step 2.
 - The stack choices from Step 1.
@@ -281,7 +281,7 @@ This project was scaffolded by the `praxis` plugin's `bootstrap-project` skill o
 - `.github/copilot-instructions.md`
 - `.claude/CLAUDE.md`
 - `docs/project-context.md`
-- `docs/adr/ADR-001-initial-architecture.md`
+- `docs/adr/ADR.<ID>-initial-architecture.md`
 - `src/<capability>/` skeletons for: <list>
 - `scripts/check-anti-dumping.sh`
 - `.anti-dumping.json`
@@ -314,6 +314,6 @@ Do not write feature code as part of bootstrap.
 ## Anti-patterns
 
 - Generating `src/utils/` or `src/controllers/` because the language convention "expects it." It doesn't.
-- Skipping ADR-001 because "we'll write ADRs later." ADR-001 captures the bootstrap decision itself.
+- Skipping the first ADR because "we'll write ADRs later." The first ADR captures the bootstrap decision itself and establishes the ADR registry.
 - Generating sample code that violates the capability-driven structure as a "starter."
 - Writing `.github/copilot-instructions.md` that re-states everything from the plugin instead of referencing it. Keep the project file lean.

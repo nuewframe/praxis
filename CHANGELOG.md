@@ -2,6 +2,14 @@
 
 All notable changes to the Praxis plugin are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this plugin uses semantic versioning (see [project-context.md](project-context.md) for the policy).
 
+## [Unreleased]
+
+### Changed
+
+- Unified ADR file naming to `ADR.<ID>-descriptive-name.md` across ADR workflows and examples.
+- Removed the ADR-001 bootstrap exception; first ADR generation now follows the same `create-adr` ID convention as all subsequent ADRs.
+- Updated provision overlay scaffolding to accept `bootstrap.first_adr_id` and emit `ADR.{{bootstrap.first_adr_id}}-technology-stack.md`.
+
 ## [0.1.0] — 2026-05-20
 
 Initial public release.
@@ -50,4 +58,4 @@ Praxis installs natively into Claude Code, Codex CLI, Codex App, Cursor, Gemini 
 
 ### Project overlay
 
-- `provision-project-overlay` — interview-driven scaffolding of a project-specific `.github/` overlay (skills, agents, prompts, persona instructions) on top of any repo that has installed Praxis. Writes `praxis.config.yaml`, emits managed files from plugin templates, optionally bootstraps `docs/project-context.md`, `docs/product/PRODUCT.md`, and `ADR-001-technology-stack.md`. Idempotent.
+- `provision-project-overlay` — interview-driven scaffolding of a project-specific `.github/` overlay (skills, agents, prompts, persona instructions) on top of any repo that has installed Praxis. Writes `praxis.config.yaml`, emits managed files from plugin templates, optionally bootstraps `docs/project-context.md`, `docs/product/PRODUCT.md`, and a first technology-stack ADR file. Idempotent.

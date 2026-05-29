@@ -1,6 +1,6 @@
 ---
 name: provision-project-overlay
-description: Generate a project-specific `.github/` overlay (skills, agents, prompts, persona instructions) on top of an existing repo that has just installed the praxis plugin. Interview the human for stack, paths, persona aliases, and quality gates; write `praxis.config.yaml`; emit a managed set of overlay files from the plugin templates with placeholders substituted; optionally bootstrap `docs/project-context.md`, `docs/product/PRODUCT.md`, and `ADR-001-technology-stack.md`. Idempotent — re-running with `--reconfigure` re-runs the interview; re-running without it regenerates managed files from the current config and shows diffs for human-edited files before overwriting.
+description: Generate a project-specific `.github/` overlay (skills, agents, prompts, persona instructions) on top of an existing repo that has just installed the praxis plugin. Interview the human for stack, paths, persona aliases, and quality gates; write `praxis.config.yaml`; emit a managed set of overlay files from the plugin templates with placeholders substituted; optionally bootstrap `docs/project-context.md`, `docs/product/PRODUCT.md`, and a first ADR file that follows `create-adr` ID rules. Idempotent — re-running with `--reconfigure` re-runs the interview; re-running without it regenerates managed files from the current config and shows diffs for human-edited files before overwriting.
 ---
 
 # Provision Project Overlay
@@ -93,9 +93,10 @@ If yes, ask one alias per role. If no, set `personas.use_aliases: false` and ski
 
 1. Generate `docs/project-context.md` skeleton? (default: yes if file does not exist)
 2. Generate `docs/product/PRODUCT.md` skeleton? (default: yes if file does not exist)
-3. Generate `docs/product/adr/ADR-001-technology-stack.md` from the stack answers? (default: yes if file does not exist)
-4. Generate `.claude/system-prompt.md` for Claude API / agentic use (Bedrock, Cursor, custom CLIs)? (default: no — only needed if the team uses Claude outside Claude Code)
-5. Generate `.githooks/pre-commit` (anti-dumping + lint + format + type-check)? (default: yes; user must still run `git config core.hooksPath .githooks` to activate)
+3. Generate `docs/product/adr/ADR.<ID>-technology-stack.md` from the stack answers? (default: yes if file does not exist)
+4. If yes, what is the first ADR `<ID>`? (must follow `create-adr` convention)
+5. Generate `.claude/system-prompt.md` for Claude API / agentic use (Bedrock, Cursor, custom CLIs)? (default: no — only needed if the team uses Claude outside Claude Code)
+6. Generate `.githooks/pre-commit` (anti-dumping + lint + format + type-check)? (default: yes; user must still run `git config core.hooksPath .githooks` to activate)
 
 ### Step 3 — Write `praxis.config.yaml`
 
@@ -107,7 +108,7 @@ For each entry in `manifest.yaml`:
 
 1. Evaluate `condition` (see manifest spec). Skip if false.
 2. Read `template_path`. Apply substitution: every `{{key.path}}` is replaced with the value from `praxis.config.yaml` (dotted path lookup).
-3. If the placeholder resolves to an alias-bearing path (e.g., `target_path: .github/agents/{{personas.aliases.principal-engineer}}.agent.md`), substitute in the **target path** as well.
+3. If the placeholder resolves to an alias-bearing path (e.g., `target_path: .github/agents/{{personas.aliases.principal_engineer}}.agent.md`), substitute in the **target path** as well.
 4. Compute action vs the existing file:
    - **No file** → write
    - **File matches expected output** → skip (already current)
@@ -168,7 +169,7 @@ managed_files:
     condition: always
 
   - template: templates/.github/agents/role-engineer.agent.md.tmpl
-    target: .github/agents/{{personas.aliases.principal-engineer}}.agent.md
+    target: .github/agents/{{personas.aliases.principal_engineer}}.agent.md
     condition: personas.use_aliases == true
 
   # ... etc
@@ -193,7 +194,7 @@ Anything more complex is a sign the design is wrong — split the template.
 | `{{project.name}}`                        | `praxis.config.yaml` → `project.name`                              |
 | `{{stack.runtime}}`                       | `praxis.config.yaml` → `stack.runtime`                             |
 | `{{paths.adr}}`                           | `praxis.config.yaml` → `paths.adr`                                 |
-| `{{personas.aliases.principal-engineer}}` | If `personas.use_aliases: true`, the alias; else `principal-engineer` |
+| `{{personas.aliases.principal_engineer}}` | If `personas.use_aliases: true`, the alias; else `principal-engineer` |
 | `{{quality_gates.test}}`                  | `praxis.config.yaml` → `quality_gates.test`                        |
 
 Unrecognized placeholders are a hard error — do not emit silent empties.

@@ -143,7 +143,7 @@ One paragraph. What changed and why.
 ## Capability and ADR
 
 - Capability: `<name>`
-- ADR: ADR-NNN (link)
+- ADR: ADR.<ID> (link)
 
 ## Architectural changes
 

@@ -155,7 +155,7 @@ Tier: Trivial Reason: [why this qualifies — LOC, single capability, no contrac
 ```markdown
 ## Code Contribution Intake
 
-Tier: Standard | Major Wave: [name + path] Thin-slice: [TS-NNN + title] Sprint: [sprint file] Wave specs: [README/product-design/product-architecture/qa status] Design approval (Major only): [ADR-NNN status: Accepted | Pending | n/a] + [sprint Design Approval line ref]
+Tier: Standard | Major Wave: [name + path] Thin-slice: [TS-NNN + title] Sprint: [sprint file] Wave specs: [README/product-design/product-architecture/qa status] Design approval (Major only): [ADR.<ID> status: Accepted | Pending | n/a] + [sprint Design Approval line ref]
 
 Current code touchpoints:
 
