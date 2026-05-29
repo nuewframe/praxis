@@ -1,6 +1,6 @@
 {
   "name": "praxis",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Lean wave-based product delivery unified with Principal Engineer discipline: planning, design, capability-driven architecture, defensive implementation, and TDD verification.",
   "author": {
     "name": "Nuewframe",

@@ -4,6 +4,12 @@ All notable changes to the Praxis plugin are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.1.3] — 2026-05-29
+
+### Fixed
+
+- Removed duplicate `hooks` declaration from `.claude-plugin/plugin.json`. Claude Code auto-loads `hooks/hooks.json` from the plugin root; declaring it again in `manifest.hooks` caused a "Duplicate hooks file detected" plugin load error.
+
 ## [0.1.2] — 2026-05-28
 
 ### Changed
