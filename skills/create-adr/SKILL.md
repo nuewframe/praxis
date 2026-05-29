@@ -31,7 +31,7 @@ This skill assumes the host project defines:
 
 - An **ADR directory** (commonly `docs/product/adr/` or `docs/adr/`)
 - An **ADR index** (commonly a table in `project-context.md` or a dedicated `README.md` in the ADR directory)
-- ADR file naming: `ADR-NNN-descriptive-name.md`
+- ADR file naming: `ADR-ID_descriptive-name.md`
 
 If those don't exist, define them in the project's own context first.
 
@@ -53,18 +53,40 @@ Create an ADR for a decision that:
 
 ## Step 1 — Determine the Next ADR Number
 
-List the ADR directory and find the highest `ADR-NNN`. Increment by 1. No gaps, no duplicates.
+The `ID` is identified using the pattern `<YYMMDD>[.<HH>[MM[SS]]][.<seq>]`. No duplicates.
+
+- `YYMMDD` — required. Two-digit year, month, day (UTC creation date).
+- `.HH` — optional. Two-digit hour (24h, UTC). Added on day collision.
+- `MM` — optional. Two-digit minute. Added on hour collision (always paired with `HH` → written as `.HHMM`).
+- `SS` — optional. Two-digit second. Added on minute collision (always paired with `HHMM` → written as `.HHMMSS`).
+- `.<seq>` — optional, **final tiebreaker**. Zero-padded decimal sequence starting at `01`. Width grows as needed (`.01`..`.99`, then `.100`, `.101`, …). Added only when the precision ladder above is exhausted *or* when sub-second resolution is unavailable.
+
+### Collision Escalation Rules
+
+When registering a new ADR, check the `adr/` folder for existing IDs and pick the **shortest** suffix that is unique. Always extend left-to-right along the precision ladder, then fall through to the sequence tiebreaker:
+
+1. **No same-day ADR exists.** Use `YYMMDD` only.
+   - Example: `ADR.260527-Data-Architecture`
+2. **Day collision; different hour.** Add `.HH`.
+   - Example: existing `ADR.260527`; new ADR at 03:00 UTC → `ADR.260527.03-Data-Architecture`. Promote the prior plain `ADR.260527` to `ADR.260527.<HH>` so both carry the disambiguator.
+3. **Hour collision; different minute.** Extend to `.HHMM`.
+   - Example: existing `ADR.260527.03`; new ADR at 03:17 → `ADR.260527.0317-Data-Architecture`. Promote the prior `.03` likewise.
+4. **Minute collision; different second.** Extend to `.HHMMSS`.
+   - Example: existing `ADR.260527.0317`; new ADR at 03:17:45 → `ADR.260527.031745-Data-Architecture`. Promote the prior `.0317` likewise.
+5. **Second collision (or no sub-second clock available).** Append the sequence tiebreaker `.<seq>`, starting at `.01` and incrementing to the next free slot. The sequence grows beyond two digits when needed (`.99` → `.100`).
+   - Example: 100 people create an ADR in the same second → `ADR.260527.031745.01`, `ADR.260527.031745.02`, …, `ADR.260527.031745.99`, `ADR.260527.031745.100`.
+6. **Never rewrite history on a colliding peer beyond what rules 2–4 require.** Rules 2–4 promote the prior ADR's precision so both siblings carry the same suffix length. Rule 5 only moves the **new** ADR.
 
 ---
 
 ## Step 2 — Create the File
 
-`ADR-NNN-descriptive-name.md` — kebab-case, concise.
+`ADR-ID_descriptive-name.md` — kebab-case, concise.
 
 ```markdown
-# ADR-NNN: [Decision Title]
+# ADR-ID: [Decision Title]
 
-**Status:** Proposed | Accepted | Deprecated | Superseded by ADR-NNN **Date:** YYYY-MM-DD **Deciders:** [Names or roles]
+**Status:** Proposed | Accepted | Deprecated | Superseded by ADR-ID **Date:** YYYY-MM-DD **Deciders:** [Names or roles]
 
 > **Approval mechanics:** `status` is the mechanical gate between architect mode and implementer mode for Major-tier changes. Implementer mode REJECTS the work if `status` is not `Accepted`. Pair this status with a signed Design Approval line in the active sprint file (see `create-sprint`). Both signals are required.
 
@@ -148,7 +170,7 @@ List the ADR directory and find the highest `ADR-NNN`. Increment by 1. No gaps, 
 Add the ADR to the project's index (e.g. table in `project-context.md`):
 
 ```markdown
-| [ADR-NNN: Decision Title](path/ADR-NNN-descriptive-name.md) | [Brief purpose, e.g., "Real-time sync strategy (Accepted)"] |
+| [ADR-ID: Decision Title](path/ADR-ID_descriptive-name.md) | [Brief purpose, e.g., "Real-time sync strategy (Accepted)"] |
 ```
 
 ---
@@ -159,7 +181,7 @@ If the ADR represents a significant architectural milestone, link it from:
 
 - The product dashboard under the relevant wave or platform section
 - The wave `product-architecture.md` that triggered the decision
-- Any superseded ADR (mark the older one as `Superseded by ADR-NNN`)
+- Any superseded ADR (mark the older one as `Superseded by ADR-ID`)
 
 ---
 
@@ -173,7 +195,7 @@ If the ADR represents a significant architectural milestone, link it from:
 - [ ] Alternatives comparison table present with at least 2 alternatives
 - [ ] Consequences cover both positive **and** negative outcomes
 - [ ] Registered in the ADR index
-- [ ] File named correctly: `ADR-NNN-descriptive-name.md`
+- [ ] File named correctly: `ADR-ID_descriptive-name.md`
 - [ ] When this ADR is paired with a Major-tier sprint, the sprint file's Design Approval line references this ADR by number
 
 ---
