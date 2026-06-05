@@ -85,6 +85,18 @@ If you find yourself asserting the **same property** at two layers, delete the h
 
 ---
 
+## Property over example at high-risk seams
+
+An example test proves the behavior holds for *one* input. At a high-risk seam that is not enough — the failure modes that matter (a retry that double-charges, two writers that interleave, a key that collides) live in the inputs you did not hand-pick. For an acceptance criterion that is **high-risk** (Impact = High in the sprint risk register) **and** exercises a seam, assert a **property**, not a single example:
+
+- **Idempotency ∀ keys** — for any key, replaying the operation returns the stored response and causes no second effect.
+- **Retry-safe ∀ attempts** — for any number of retries within the budget, the observable outcome is the one successful application.
+- **Concurrent ops linearizable** — for any interleaving of two simultaneous operations, the result equals some sequential order the Port promises.
+
+Use a property-based runner (fast-check, Hypothesis, jqwik, QuickCheck, …) or a contract test that enumerates the equivalence classes. This **sharpens** the AC↔test matrix `create-sprint` produces — it does not replace it; ordinary ACs are still fine with example tests. `verify-and-assemble-pr`'s adversarial seam review is where a high-risk seam AC backed only by an example gets bounced back.
+
+---
+
 ## Layer-by-layer discipline
 
 ### Logic

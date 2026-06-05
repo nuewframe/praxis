@@ -63,6 +63,7 @@ Applies to `src/**`, `packages/**`, `services/**`, `apps/**`, `libs/**`, `module
 - Cross-capability calls go through an explicit public surface. No deep imports across capabilities.
 - Every external call declares timeout, retry policy, fallback, and (for hot paths) circuit breaker.
 - Every cross-process path produces structured logs with correlation ID, plus latency / throughput / error metrics.
+- Two units may be built concurrently only if disjoint across capability/files, persistent resources, and config keys, and each depends only on a frozen `<name>@vN` contract.
 
 ### Code Contribution Intake — `instructions/code-contribution-intake.instructions.md`
 
@@ -84,10 +85,12 @@ Skills are grouped by phase. Load the SKILL.md file of any skill you intend to f
 | `create-product-design-spec` | Authoring `product-design.md` — user journeys, ambiguity handling, recovery paths |
 | `create-product-architecture-spec` | Authoring wave-scoped `product-architecture.md` — domain ownership, contracts, integrations |
 | `create-quality-spec` | Authoring `qa.md` — risk tiers, test layer mapping, coverage matrix, observable DoD |
+| `start-thin-slice` | Front door for slice work ("Work on TS-NNN"); checks dependency/status preconditions, provisional tier, then routes to create-sprint vs. the architect path |
 | `create-sprint` | Locking the immutable bridge: thin-slice intent + engineering current-state snapshot + hypothesis card + test plan |
 | `intake-code-contribution` | Pre-implementation gate; mandatory before any code change |
 | `close-sprint` | Distilling learnings bidirectionally into product AND engineering artifacts; deletes the sprint file |
 | `create-adr` | A decision binds future work; ADR with alternatives table required |
+| `define-seam-contract` | A wave/slice crosses a boundary that must be honored executably; produces Shape + Behavior suite + frozen `<name>@vN` id |
 
 ### Engineering discipline — phased delivery
 
@@ -113,7 +116,26 @@ Praxis ships generic, configurable enforcement scripts. Wire them into the proje
 | `scripts/check-no-skipped-tests.sh` | Committed `.skip(`, `xit(`, `@Disabled`, `@pytest.mark.skip` markers |
 | `scripts/check-no-sleep-waits.sh` | `Thread.sleep`, `time.sleep`, `waitForTimeout` |
 | `scripts/check-port-adapter-parity.sh` | `*.ports.*` with no adapter; warns if no in-memory test double |
+| `scripts/check-seam-contract-parity.sh` | A seam in `.seam-contracts.json` missing its Shape or Behavior suite; warn-first, mode-promoted |
+| `scripts/check-config-externalized.sh` | Hardcoded remote URLs, endpoints, or secret literals (Configurable anchor); warn-first, reviewed per-line opt-out |
+| `scripts/check-observability-at-seams.sh` | A boundary call with no log/metric/trace/correlation-id (Observable anchor); warn-first, reviewed per-file opt-out |
+| `scripts/check-stateless-request-path.sh` | Node-local mutable state on the request path (Horizontally-scalable anchor); warn-first, reviewed per-line opt-out |
+| `scripts/check-resilient-boundary.sh` | A boundary call with no timeout/retry/circuit-breaker/fallback (Resilient anchor); warn-first, reviewed per-file opt-out |
+| `scripts/check-sprint-id-collision.sh` | Two active sprint files sharing an id token (parallel-creation collision); exact, warn-first via `.sprint-coordination.json` |
 | `scripts/validate-plugin.sh` | Plugin self-test (run from this repo) |
+
+---
+
+## Emergent parallelism — the three-axis disjointness rule
+
+Praxis never schedules parallel work. Parallelism is an **emergent permission**, exercised by the human or an orchestration runtime — never forced by the method, never an artifact Praxis produces. A unit of work (a slice/sprint) may run concurrently with another **only if all four conditions hold**:
+
+1. **Capability/file disjoint** — they touch no source file or capability in common.
+2. **Persistent-resource disjoint** — they write no shared table, topic, queue, cache, or migration in common.
+3. **Config-key disjoint** — they mutate no shared configuration key in common.
+4. **Frozen-contract dependent** — each depends only on a frozen `<name>@vN` seam contract (`define-seam-contract`), never on the other's in-flight internals.
+
+Capability-disjointness **alone is not sufficient**: two slices in different capabilities still collide if they share a table, a config key, or one consumes the other's unfrozen surface. All three axes *plus* the frozen-contract rule must hold. If any axis overlaps, the units are sequential, not parallel. The collision-safe coordination artifacts (`create-sprint`) and the staleness re-anchor at intake (`intake-code-contribution`) are what make a permitted parallel run *safe*.
 
 ---
 

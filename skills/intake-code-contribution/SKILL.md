@@ -93,6 +93,14 @@ Confirm:
 - Test plan
 - Acceptance criteria copied from the wave README
 
+**Sprint Plan Approval gate (Standard & Major).** Confirm the sprint's `Sprint Plan Approval` line is signed (`Reviewed by` / `Date` / `Scope confirmed`). If it is blank, **stop** — implementation does not start until a human signs it. Trivial-tier sprints carry `n/a (tier: Trivial)` and skip this gate.
+
+**Acceptance ↔ test traceability gate.** Confirm every acceptance criterion has at least one mapped test in the sprint's traceability matrix. If any AC is unmapped, **stop** and add the missing test rows before coding — an unmapped AC ships uncovered.
+
+**Production-Readiness conformance gate.** Confirm the sprint's Production-Readiness conformance block names the seam(s) the slice touches and marks each of the four anchors (observable, configurable, horizontally scalable, resilient) as conforming to the wave posture or carrying a reviewed deviation. If the block is blank or an anchor is unaddressed, **stop** — the slice must declare how it preserves the wave's posture before coding (the probes enforce it at `verify`, but the conformance is decided here).
+
+**Snapshot staleness re-anchor gate (parallel-safe).** If this sprint sat queued while sibling slices merged, the engineering current-state snapshot and the seam contracts this slice depends on may have moved since the bridge was frozen. Before coding, re-check: has any `<name>@vN` seam contract this slice depends on, or any current-state fact in the Step-3 snapshot, changed since the sprint froze? If yes, **stop and re-anchor** — re-read the changed contract/snapshot and confirm the slice's plan still holds — before writing code. This is the price of parallelism touching the immutable bridge: paid as a re-anchor *check*, never by editing the frozen scope in place. If a depended-on contract changed incompatibly, the slice's scope is invalid — close the sprint and create a new one rather than coding against a stale freeze.
+
 If no sprint exists, use `create-sprint`. If the sprint exists but does not match the work, do not edit scope in place; close or descope it and create a new sprint.
 
 ---
@@ -100,6 +108,8 @@ If no sprint exists, use `create-sprint`. If the sprint exists but does not matc
 ## Step 4 - Correlate Against Current Code
 
 Inspect the current repository before changing files.
+
+**Resume from the progress ledger first.** If a `sprint-NNN-*.ledger.md` exists for this sprint, read it before re-deriving anything. Restore: which plan phase is in progress, the current red/green test posture, the verify-attempt counter, and what's left. This prevents context amnesia across sessions — do not reconstruct progress from scratch when the ledger already records it.
 
 Record:
 
@@ -208,6 +218,9 @@ In every tier:
 - [ ] (Standard/Major) Thin-slice acceptance criteria are testable
 - [ ] (Standard/Major) All four wave specs exist and are specific enough
 - [ ] (Standard/Major) Sprint bridge exists and matches the requested work
+- [ ] (Standard/Major) Sprint Plan Approval line is signed (or `n/a (tier: Trivial)`)
+- [ ] (Standard/Major) Every acceptance criterion maps to ≥1 test in the traceability matrix
+- [ ] (Standard/Major) Production-Readiness conformance block present; seams named and each anchor conforming or a reviewed deviation recorded
 - [ ] (Major) Mechanical Design Approval present: ADR `status: Accepted` and signed Design Approval line in active sprint file
 - [ ] Engineering current-state snapshot read or refreshed
 - [ ] Current code touchpoints inspected
@@ -223,6 +236,8 @@ In every tier:
 - Fabricating a wave / thin-slice / sprint to satisfy Standard/Major intake when the change is genuinely Trivial
 - Coding directly from the user's prompt without finding the wave and thin-slice (Standard/Major)
 - Treating a sprint as optional because the task seems obvious (Standard/Major)
+- Starting Standard/Major implementation before the Sprint Plan Approval line is signed
+- Leaving an acceptance criterion with no mapped test and proceeding anyway
 - Letting missing `product-design.md`, `product-architecture.md`, or `qa.md` become implementation guesswork
 - Starting Major-tier implementation before mechanical Design Approval is recorded
 - Implementer silently editing an Accepted ADR mid-flight instead of bouncing back to architect mode

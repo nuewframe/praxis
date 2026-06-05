@@ -78,13 +78,21 @@ The entry point must run, in order, and abort on first failure:
 5. **No-skipped-tests linter** — `scripts/check-no-skipped-tests.sh` (this plugin).
 6. **No-sleep-waits linter** — `scripts/check-no-sleep-waits.sh` (this plugin).
 7. **Port/Adapter parity gate** — `scripts/check-port-adapter-parity.sh` (this plugin).
-8. **Logic tests** — fast, pure-function unit tests.
-9. **Composition tests** — service + API + in-memory Port adapters wired together.
-10. **Adapter Contract tests** — shared suite run against both the in-memory and real-backend adapters of each touched Port.
-11. **Integration boundary tests** — wrapper code (timeout/retry/circuit breaker) against contract-tested fakes or sandboxes.
-12. **Journey tests** — for changes that affect a user-facing flow.
+8. **Seam-contract parity gate** — `scripts/check-seam-contract-parity.sh` (this plugin). Every seam declared in `.seam-contracts.json` has a machine-readable Shape and a shared Behavior suite on disk.
+9. **Config-externalization probe** — `scripts/check-config-externalized.sh` (this plugin). Production-readiness: Configurable anchor.
+10. **Observability-at-seams probe** — `scripts/check-observability-at-seams.sh` (this plugin). Production-readiness: Observable anchor — a boundary call with no log/metric/trace/correlation-id.
+11. **Stateless-request-path probe** — `scripts/check-stateless-request-path.sh` (this plugin). Production-readiness: Horizontally-scalable anchor — node-local mutable state on the request path.
+12. **Resilient-boundary probe** — `scripts/check-resilient-boundary.sh` (this plugin). Production-readiness: Resilient anchor — a boundary call with no timeout/retry/circuit-breaker/fallback.
+13. **Logic tests** — fast, pure-function unit tests.
+14. **Composition tests** — service + API + in-memory Port adapters wired together.
+15. **Adapter Contract tests** — shared suite run against both the in-memory and real-backend adapters of each touched Port.
+16. **Seam Behavior tests** — each touched seam's shared contract suite (`*.contract.test.*`) run against **both** sides (consumer-driven). Parity (Shape + suite exist) is checked structurally by step 8; this step proves the suite actually **ran and passed**.
+17. **Integration boundary tests** — wrapper code (timeout/retry/circuit breaker) against contract-tested fakes or sandboxes.
+18. **Journey tests** — for changes that affect a user-facing flow.
 
 Capture exit code and the last lines of output. If anything fails, **bounce back** — implementer mode fixes; reviewer mode does not edit code. Re-run the entire `verify` entry point after the fix. Partial reruns are not evidence.
+
+**Acceptance ↔ test traceability check.** Cross-reference the sprint's Acceptance ↔ Test Traceability matrix against the captured `verify` output. Every mapped test must have actually run. If a mapped test did not execute (filtered out, file renamed, silently skipped), treat it as a missing-coverage failure and bounce back — a green run that never exercised an AC's test is not evidence the AC holds.
 
 **Reviewer evidence requirement:** the PR must include the captured `verify` output. A bare checkbox is not evidence; reviewer mode REJECTS the PR if the output is missing.
 
@@ -100,6 +108,29 @@ Journey tests run against an Integration Env that may include systems you do not
 
 **TTL:** a test `BLOCKED` >5 times in 7 days is escalated; >10 times in 14 days is auto-archived with a tracking issue. `BLOCKED` is never a permanent state.
 
+#### Debugging Loop Budget (self-applied discipline)
+
+An unsupervised agent will happily "fix code" against a failure that is not a code regression — burning a session editing against, say, a platform that simply is not running. This is a **self-applied stop rule**, not runtime enforcement. (Per Praxis's stated boundary, hard runtime circuit-breakers — process kill, automatic escalation — belong to an orchestration runtime such as MPM. Praxis owns the discipline; the runtime owns the mechanism.)
+
+Before **every** retry of the `verify` entry point after a failure:
+
+1. **Classify the failure as `FAIL` vs `BLOCKED`** using the table above. A `BLOCKED` failure (environment unreachable, dependency not running) is **not** a reason to edit code — fix or escalate the environment instead.
+2. **Increment the verify-attempt counter** in the progress ledger (`sprint-NNN-*.ledger.md`), scoped to the current root cause.
+
+**Stop rule:** after **3 consecutive failed verify cycles on the same cause** (Praxis default; a project may override the number in its own context), **HALT**. Do not attempt a 4th code edit. Produce a halt summary and escalate to the human:
+
+```markdown
+## Debugging Halt — budget reached
+
+Cause (unchanged across N attempts): …
+Attempts: [what was tried each cycle]
+Current FAIL/BLOCKED determination: [FAIL | BLOCKED + which dependency]
+Hypothesis: …
+Asking the human: [environment fix needed? scope/AC wrong? design flaw → bounce to architect?]
+```
+
+Reset the counter to 0 only when the root cause changes (a genuinely new failure), not when the same failure recurs with a tweaked patch.
+
 ### Step 4 — Refactor decision matrix (reviewer mode lens)
 
 Reviewer mode reads the diff with two lenses: correctness (does it match the plan?) and **maintainability** (will this still be well-shaped six months from now?). The matrix below is the only allowed way to escalate a refactor opportunity into PR scope. Anything not marked **Block PR** is a follow-up by default — it does **not** expand this PR.
@@ -109,6 +140,9 @@ Reviewer mode reads the diff with two lenses: correctness (does it match the pla
 | Cross-capability deep import introduced                                       |    ✅    |                 |                       |
 | Forbidden dumping ground introduced (`utils/`, `helpers/`, etc.)              |    ✅    |                 |                       |
 | Port without parity (only one adapter, or contract suite missing)             |    ✅    |                 |                       |
+| Declared seam without a Shape or Behavior suite (`check-seam-contract-parity`) |    ✅    |                 |                       |
+| Dependent built against an unversioned/unfrozen seam (no `<name>@vN`)          |    ✅    |                 |                       |
+| Touched seam whose shared Behavior suite did not run in `verify`              |    ✅    |                 |                       |
 | Same property asserted at two pyramid layers                                  |    ✅    |                 |                       |
 | Public-contract change without an `Accepted` ADR                              |    ✅    |                 |                       |
 | Missing telemetry on a new boundary call                                      |    ✅    |                 |                       |
@@ -131,7 +165,24 @@ Reviewer mode reads the diff with two lenses: correctness (does it match the pla
 
 **Drift policy:** if the diff drifts from product intent (changed user-visible behavior beyond the thin-slice scope, removed acceptance-criteria coverage), flag it but do not gate. PM gates intent drift at intake and at `close-sprint`.
 
-### Step 5 — PR narrative
+### Step 5 — Adversarial seam-behavior review
+
+The refactor matrix (Step 4) checks *structure*. This step attacks *behavior at each seam the diff touches* — the one thing a fast generator most plausibly fakes (a green-looking test that asserts nothing, a `// idempotent` comment with no test behind it). It is an **adversarial gate**, not an implementer self-check: the reviewer's job here is to disbelieve the claim and demand the test that proves it.
+
+**Who runs it — a different head.** This review defaults to a **genuinely separate session or agent** — or an orchestration runtime (e.g. MPM) dispatching a second head — so the reviewer is not the author defending its own work. When a separate head is unavailable, perform an **explicit reviewer-mode switch with a fresh read of the full diff** rather than relying on author-side memory of intent. Record which path was used in the progress ledger (`sprint-NNN-*.ledger.md`): a self-review carries less assurance than an independent one, and the PR reader must know which they are trusting.
+
+**The attack.** For **each seam this diff touches** (every `<name>@vN` named in the sprint's Production-Readiness conformance block), demand the test — by file and name — that proves the behavioral property. The finding is the *absence of the test*, not the presence of a bug:
+
+- **Resilience** — show the test where the upstream **circuit opens mid-call** or the dependency **times out**, and the caller degrades as the wave posture promises. "It has a timeout configured" is not the evidence; the test that exercises the timeout is.
+- **Idempotency** — prove the handler is **idempotent under retry**: the same key replayed returns the stored response and causes no second effect.
+- **Observability** — point to where the **correlation id crosses the seam** in the emitted log/trace, not merely that a logger is imported.
+- **Concurrency** — for a seam with shared state, show the test that two simultaneous operations are **linearizable** (or behave exactly as the Port promises).
+
+Map each demand back to the Step 2 coverage scenarios; this step turns that list from a self-attested checklist into an adversarial gate run by an independent head.
+
+**Verdict.** For a **high-risk AC at a seam** (Impact = High in the sprint risk register), a single happy-path example is **insufficient** — `create-sprint`'s AC↔test matrix requires a property/contract test there, and this step **rejects** the PR if only an example exists. For every touched seam, either name the passing behavioral test or **bounce back** — implementer mode adds it; reviewer mode does not write the test. A seam whose behavioral property is asserted only in prose is treated as unproven.
+
+### Step 6 — PR narrative
 
 Produce a Pull Request description with these sections:
 
@@ -167,9 +218,15 @@ One paragraph. What changed and why.
 - [x] No skipped tests linter (`scripts/check-no-skipped-tests.sh`)
 - [x] No sleep-waits linter (`scripts/check-no-sleep-waits.sh`)
 - [x] Port/Adapter parity gate (`scripts/check-port-adapter-parity.sh`) — every touched Port has both in-memory and real adapter passing the shared contract suite
+- [x] Seam-contract parity gate (`scripts/check-seam-contract-parity.sh`) — every declared seam has a Shape and a Behavior suite
+- [x] Config-externalization probe (`scripts/check-config-externalized.sh`) — Configurable anchor
+- [x] Observability-at-seams probe (`scripts/check-observability-at-seams.sh`) — Observable anchor
+- [x] Stateless-request-path probe (`scripts/check-stateless-request-path.sh`) — Horizontally-scalable anchor
+- [x] Resilient-boundary probe (`scripts/check-resilient-boundary.sh`) — Resilient anchor
 - [x] Logic tests (N tests, N pass)
 - [x] Composition tests (N tests, N pass)
 - [x] Adapter Contract tests (N tests, N pass — in-memory + real backend)
+- [x] Seam Behavior tests (N tests, N pass — both sides, consumer-driven)
 - [x] Integration boundary tests (N tests, N pass)
 - [x] Journey tests (N pass, N blocked-with-reason)
 ```
@@ -182,6 +239,14 @@ One paragraph. What changed and why.
 - Block-PR rows triggered: [list, or "none"]
 - Follow-up rows triggered: [link the issue, or "none"]
 - Inline change requests: [list, or "none"]
+
+## Adversarial seam review
+
+- Reviewer head: [separate session/agent | same-agent reviewer-mode switch with fresh diff read]
+- Seams attacked: [`<name>@vN`, … — or "none touched"]
+- Behavioral evidence: [per seam: property → passing test file/name]
+- High-risk seam ACs proven by a property/contract test (not an example): [list, or "none"]
+- Bounce-backs filed: [list, or "none"]
 
 ## Telemetry
 
@@ -205,7 +270,7 @@ One paragraph. What changed and why.
 - Tracked separately as: …
 ```
 
-### Step 6 — Final self-correction
+### Step 7 — Final self-correction
 
 Before submitting, re-read the diff one more time. Check for:
 
@@ -225,5 +290,9 @@ Before submitting, re-read the diff one more time. Check for:
 - Adding only an in-memory adapter (or only a real one). The parity gate requires both.
 - Hand-rolled stubs of third-party APIs without a contract test verifying them on a schedule. Stubs rot silently.
 - `BLOCKED` used as a permanent state to hide a real failure. Enforce the TTL.
+- Editing code against a `BLOCKED` (environment) failure instead of fixing the environment.
+- Exceeding the debugging-loop budget — a 4th code edit against an unchanged failing cause instead of halting and escalating.
+- Skipping the adversarial seam review, or running it as author self-review without recording in the ledger that no separate head was available.
+- Accepting a high-risk seam AC backed only by a single happy-path example where a property/contract test is required.
 - "Rollback: revert the commit." Spell out the procedure including data implications.
 - A PR description that doesn't name the trade-off the reviewer should evaluate.
