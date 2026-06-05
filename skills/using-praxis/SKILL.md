@@ -89,6 +89,7 @@ Skills are grouped by phase. Load the SKILL.md file of any skill you intend to f
 | `intake-code-contribution` | Pre-implementation gate; mandatory before any code change |
 | `close-sprint` | Distilling learnings bidirectionally into product AND engineering artifacts; deletes the sprint file |
 | `create-adr` | A decision binds future work; ADR with alternatives table required |
+| `define-seam-contract` | A wave/slice crosses a boundary that must be honored executably; produces Shape + Behavior suite + frozen `<name>@vN` id |
 
 ### Engineering discipline — phased delivery
 
@@ -114,6 +115,7 @@ Praxis ships generic, configurable enforcement scripts. Wire them into the proje
 | `scripts/check-no-skipped-tests.sh` | Committed `.skip(`, `xit(`, `@Disabled`, `@pytest.mark.skip` markers |
 | `scripts/check-no-sleep-waits.sh` | `Thread.sleep`, `time.sleep`, `waitForTimeout` |
 | `scripts/check-port-adapter-parity.sh` | `*.ports.*` with no adapter; warns if no in-memory test double |
+| `scripts/check-seam-contract-parity.sh` | A seam in `.seam-contracts.json` missing its Shape or Behavior suite; warn-first, mode-promoted |
 | `scripts/check-config-externalized.sh` | Hardcoded remote URLs, endpoints, or secret literals (Configurable anchor); warn-first, reviewed per-line opt-out |
 | `scripts/validate-plugin.sh` | Plugin self-test (run from this repo) |
 

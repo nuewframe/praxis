@@ -15,8 +15,9 @@
 #   5. no skipped tests
 #   6. no sleep waits
 #   7. port/adapter parity
-#   8. config externalized (production-readiness: Configurable anchor)
-#   9. unit + integration tests
+#   8. seam-contract parity (Shape + Behavior suite for every declared seam)
+#   9. config externalized (production-readiness: Configurable anchor)
+#  10. unit + integration tests
 #
 # Each step is a function. Override or skip by setting:
 #   VERIFY_SKIP="format,lint"   # comma-separated step names
@@ -63,6 +64,7 @@ step_anti_dumping() { bash scripts/check-anti-dumping.sh; }
 step_no_skipped()   { bash scripts/check-no-skipped-tests.sh .; }
 step_no_sleeps()    { bash scripts/check-no-sleep-waits.sh .; }
 step_port_parity()  { bash scripts/check-port-adapter-parity.sh .; }
+step_seam_parity()  { bash scripts/check-seam-contract-parity.sh .; }  # warn by default; set mode=enforce in .seam-contracts.json once every declared seam is in parity
 step_config_extern() { bash scripts/check-config-externalized.sh .; }  # warn by default; set mode=enforce in .config-externalization.json once clean
 step_tests()        { :; }   # e.g.: npm test          |  pytest              |  ./gradlew test
 
@@ -75,6 +77,7 @@ run_step anti-dumping step_anti_dumping
 run_step no-skipped   step_no_skipped
 run_step no-sleeps    step_no_sleeps
 run_step port-parity  step_port_parity
+run_step seam-parity  step_seam_parity
 run_step config-extern step_config_extern
 run_step tests        step_tests
 

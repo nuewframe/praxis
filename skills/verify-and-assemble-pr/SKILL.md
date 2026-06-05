@@ -78,11 +78,14 @@ The entry point must run, in order, and abort on first failure:
 5. **No-skipped-tests linter** — `scripts/check-no-skipped-tests.sh` (this plugin).
 6. **No-sleep-waits linter** — `scripts/check-no-sleep-waits.sh` (this plugin).
 7. **Port/Adapter parity gate** — `scripts/check-port-adapter-parity.sh` (this plugin).
-8. **Logic tests** — fast, pure-function unit tests.
-9. **Composition tests** — service + API + in-memory Port adapters wired together.
-10. **Adapter Contract tests** — shared suite run against both the in-memory and real-backend adapters of each touched Port.
-11. **Integration boundary tests** — wrapper code (timeout/retry/circuit breaker) against contract-tested fakes or sandboxes.
-12. **Journey tests** — for changes that affect a user-facing flow.
+8. **Seam-contract parity gate** — `scripts/check-seam-contract-parity.sh` (this plugin). Every seam declared in `.seam-contracts.json` has a machine-readable Shape and a shared Behavior suite on disk.
+9. **Config-externalization probe** — `scripts/check-config-externalized.sh` (this plugin).
+10. **Logic tests** — fast, pure-function unit tests.
+11. **Composition tests** — service + API + in-memory Port adapters wired together.
+12. **Adapter Contract tests** — shared suite run against both the in-memory and real-backend adapters of each touched Port.
+13. **Seam Behavior tests** — each touched seam's shared contract suite (`*.contract.test.*`) run against **both** sides (consumer-driven). Parity (Shape + suite exist) is checked structurally by step 8; this step proves the suite actually **ran and passed**.
+14. **Integration boundary tests** — wrapper code (timeout/retry/circuit breaker) against contract-tested fakes or sandboxes.
+15. **Journey tests** — for changes that affect a user-facing flow.
 
 Capture exit code and the last lines of output. If anything fails, **bounce back** — implementer mode fixes; reviewer mode does not edit code. Re-run the entire `verify` entry point after the fix. Partial reruns are not evidence.
 
@@ -134,6 +137,9 @@ Reviewer mode reads the diff with two lenses: correctness (does it match the pla
 | Cross-capability deep import introduced                                       |    ✅    |                 |                       |
 | Forbidden dumping ground introduced (`utils/`, `helpers/`, etc.)              |    ✅    |                 |                       |
 | Port without parity (only one adapter, or contract suite missing)             |    ✅    |                 |                       |
+| Declared seam without a Shape or Behavior suite (`check-seam-contract-parity`) |    ✅    |                 |                       |
+| Dependent built against an unversioned/unfrozen seam (no `<name>@vN`)          |    ✅    |                 |                       |
+| Touched seam whose shared Behavior suite did not run in `verify`              |    ✅    |                 |                       |
 | Same property asserted at two pyramid layers                                  |    ✅    |                 |                       |
 | Public-contract change without an `Accepted` ADR                              |    ✅    |                 |                       |
 | Missing telemetry on a new boundary call                                      |    ✅    |                 |                       |
@@ -192,9 +198,12 @@ One paragraph. What changed and why.
 - [x] No skipped tests linter (`scripts/check-no-skipped-tests.sh`)
 - [x] No sleep-waits linter (`scripts/check-no-sleep-waits.sh`)
 - [x] Port/Adapter parity gate (`scripts/check-port-adapter-parity.sh`) — every touched Port has both in-memory and real adapter passing the shared contract suite
+- [x] Seam-contract parity gate (`scripts/check-seam-contract-parity.sh`) — every declared seam has a Shape and a Behavior suite
+- [x] Config-externalization probe (`scripts/check-config-externalized.sh`)
 - [x] Logic tests (N tests, N pass)
 - [x] Composition tests (N tests, N pass)
 - [x] Adapter Contract tests (N tests, N pass — in-memory + real backend)
+- [x] Seam Behavior tests (N tests, N pass — both sides, consumer-driven)
 - [x] Integration boundary tests (N tests, N pass)
 - [x] Journey tests (N pass, N blocked-with-reason)
 ```

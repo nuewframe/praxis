@@ -81,6 +81,7 @@ plugin/
 │   ├── create-sprint/
 │   ├── close-sprint/
 │   ├── create-adr/
+│   ├── define-seam-contract/
 │   ├── discovery-and-ambiguity-log/
 │   ├── design-system-architecture/
 │   ├── design-capability-layout/
@@ -91,6 +92,7 @@ plugin/
 ├── scripts/                                     # generic enforcement tooling capability
 │   ├── check-anti-dumping.sh
 │   ├── check-config-externalized.sh            # production-readiness probe (Configurable anchor)
+│   ├── check-seam-contract-parity.sh           # seam-contract parity gate (Shape + Behavior suite)
 │   ├── bump-version.sh                          # version-parity tool across manifests
 │   └── validate-plugin.sh                       # plugin self-test
 ├── AGENTS.md                                    # bootstrap pointer for AGENTS.md-aware harnesses

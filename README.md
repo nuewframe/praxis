@@ -38,6 +38,7 @@ Give your agent Praxis: [Claude Code](#claude-code) · [Codex CLI](#codex-cli) �
 | `skills/create-sprint/`                    | Lock the immutable bridge: thin-slice intent + engineering current-state snapshot + hypothesis card + test plan.             |
 | `skills/close-sprint/`                     | Bidirectional outflow: distill learnings into both product artifacts AND engineering artifacts, then delete the sprint file. |
 | `skills/create-adr/`                       | Architecture Decision Records with mandatory alternatives table.                                                             |
+| `skills/define-seam-contract/`             | Define a Seam Contract for a boundary: machine-readable Shape + shared Behavior suite + frozen `<name>@vN` id in `.seam-contracts.json`. |
 
 ### Skills — Principal Engineer discipline (phased delivery + bootstrap)
 
@@ -61,6 +62,7 @@ Give your agent Praxis: [Claude Code](#claude-code) · [Codex CLI](#codex-cli) �
 | `scripts/check-no-skipped-tests.sh`    | Fails on committed `.skip(` / `xit(` / `@Disabled` / `@pytest.mark.skip` markers — quarantined tests should never reach `main`.           |
 | `scripts/check-no-sleep-waits.sh`      | Fails on `Thread.sleep`, `time.sleep`, `waitForTimeout` — hard-wait sleeps hide race conditions and slow suites.                          |
 | `scripts/check-port-adapter-parity.sh` | For every `*.ports.*` ensures at least one adapter exists; warns if no in-memory test double is present.                                  |
+| `scripts/check-seam-contract-parity.sh` | For every seam declared in `.seam-contracts.json`, ensures a machine-readable Shape and a shared Behavior suite exist. Warn-first, mode-promoted once clean. |
 | `scripts/check-config-externalized.sh` | Production-readiness probe (Configurable anchor): fails on hardcoded remote URLs, endpoints, or secret literals. Warn-first via `.config-externalization.json`, reviewed per-line opt-out. |
 | `scripts/validate-plugin.sh`           | Plugin self-test: SKILL.md frontmatter validity, JSON/YAML parse, cross-reference integrity, enforcement-script syntax.                   |
 

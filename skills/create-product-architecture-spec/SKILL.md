@@ -99,6 +99,20 @@ Document the technical contracts implementation must satisfy:
 
 Type and interface sketches are allowed when they reduce ambiguity. Keep illustrative, not exhaustive.
 
+### Declare the wave's seams
+
+A **seam** is any boundary this wave introduces or changes where one unit depends on another's promise — a public HTTP/RPC API, a published event, a capability ↔ adapter Port, or a CLI contract. Seams are where the runtime anchors (observable, configurable, scalable, resilient) actually live, so the cross-boundary view must get an owner **here, before slices fork** — otherwise each slice re-decides the boundary in isolation (the boundary-blind parallelism failure).
+
+For each seam the wave introduces or changes, name:
+
+- **Seam name + frozen contract id** — `<name>@vN` (e.g. `publish-api@v1`). The version is frozen *before* the producer's internals are done, so a dependent slice can build against the promise instead of waiting for the producer slice.
+- **Kind** — `http` | `event` | `port` | `cli`.
+- **Producer and consumer(s)** — who makes the promise, who depends on it.
+- **Shape** — where the machine-readable interface lives (OpenAPI / JSON-Schema / typed Port).
+- **Behavior suite** — where the shared contract test suite lives.
+
+Define each seam's contract with the `define-seam-contract` skill, which records it in `.seam-contracts.json` and is enforced by `check-seam-contract-parity.sh`. List the wave's seams in this document so sprint planning can point each slice at a frozen `<name>@vN` rather than at another in-flight slice.
+
 ---
 
 ## Step 5 — Show the Data and Control Flow
@@ -206,6 +220,14 @@ A wave architecture doc references decisions; durable technical policy belongs i
 
 **What it is**: [Purpose] **Contracts**: [Routes, interfaces] **Flow**: [Stepwise explanation or diagram] **Failure modes**: [Failure mode and behavior]
 
+## Seam Contracts
+
+| Seam (`<name>@vN`) | Kind | Producer | Consumer(s) | Shape | Behavior suite |
+| ------------------ | ---- | -------- | ----------- | ----- | -------------- |
+| `publish-api@v1`   | http | [domain] | [domain]    | [path to OpenAPI] | [path to `*.contract.test.*`] |
+
+[Or note that this wave introduces no new seams.]
+
 ## Security Considerations
 
 - [Auth requirement]
@@ -239,6 +261,7 @@ A wave architecture doc references decisions; durable technical policy belongs i
 - [ ] Spec explains how the wave works technically, not how to code it line by line
 - [ ] Domain ownership is explicit and non-overlapping
 - [ ] User-visible flows from `product-design.md` are supported by concrete contracts
+- [ ] Every seam the wave introduces or changes is named with a frozen `<name>@vN` id, kind, producer, consumer(s), Shape, and Behavior suite
 - [ ] Every third-party dependency has an abstraction boundary, timeout, fallback, and data-minimization rule
 - [ ] Configuration, environment variables, and secrets are documented per environment
 - [ ] Deployable health criteria are concrete enough to verify in CI or monitoring

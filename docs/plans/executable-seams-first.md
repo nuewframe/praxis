@@ -1,6 +1,6 @@
 # Plan — Executable Seams First, Parallelism as Emergent
 
-**Status:** Decisions resolved (§9 signed) — awaiting go-ahead to build B3-config
+**Status:** Shipped — B3-config (`check-config-externalized.sh`) and the Bundle A keystone (`define-seam-contract` + `check-seam-contract-parity.sh` + architecture-spec seam declaration + verify wiring). Next per build order: rest of A → B1/B2 → remaining B3 probes → C → D.
 **Author:** Principal Engineer (architect mode)
 **Supersedes the roadmap of:** `thin-slice-loop-hardening.md` (Bundles 1–3, already shipped) — this is the Phase 2 direction.
 **Deliverable of this doc:** an implementation plan only. No skill/script/template changes until approved.
