@@ -175,7 +175,22 @@ If the wave changes nothing about configuration or deployment, state that explic
 
 ---
 
-## Step 9 — Record ADR Triggers and Open Constraints
+## Step 9 — Declare the Production-Readiness Posture (Four Anchors)
+
+The four runtime anchors — **observable, configurable, horizontally scalable, resilient** — are *cross-boundary* properties that live at seams, not inside any one slice. Decide them **once, here, with the whole wave in view**, so each slice *conforms to* a central posture instead of re-deciding it in isolation (the boundary-blind failure mode). Each anchor maps to an executable probe that holds slices to this posture.
+
+For each anchor, state the wave's posture:
+
+- **Observable** — the correlation/trace contract: which id propagates across every boundary call, what each new boundary call must log (structured), and the metric(s) a new boundary emits. Probe: `check-observability-at-seams.sh`.
+- **Configurable** — the config & secrets strategy: what is environment-injected vs. compiled in, where secrets come from, and what must never appear as a source literal. Probe: `check-config-externalized.sh`.
+- **Horizontally scalable** — the statelessness boundary: where request-scoped state may live and where it may **not** (no node-local mutable state on the request path), and where shared state is externalized (datastore, cache, queue). Probe: `check-stateless-request-path.sh`.
+- **Resilient** — the cross-slice failure model: timeout / retry / fallback defaults for every external or boundary call, and the degraded behavior the user sees when a dependency is down. Probe: `check-resilient-boundary.sh`.
+
+This posture is the spine every sprint's **Production-Readiness conformance** block (in `create-sprint`) points back to — slices *preserve* it, they do not re-litigate it. If the wave genuinely changes one anchor's posture from the platform default, say so explicitly here and link an ADR when the change is durable.
+
+---
+
+## Step 10 — Record ADR Triggers and Open Constraints
 
 A wave architecture doc references decisions; durable technical policy belongs in ADRs. Create an ADR via `create-adr` when the wave introduces:
 
@@ -187,7 +202,7 @@ A wave architecture doc references decisions; durable technical policy belongs i
 
 ---
 
-## Step 10 — Use This Structure
+## Step 11 — Use This Structure
 
 ```markdown
 # [Wave Name]: Product Architecture
@@ -228,6 +243,15 @@ A wave architecture doc references decisions; durable technical policy belongs i
 
 [Or note that this wave introduces no new seams.]
 
+## Production-Readiness Posture
+
+| Anchor | Wave posture | Probe |
+| ------ | ------------ | ----- |
+| Observable | [correlation id + what each boundary logs/meters] | `check-observability-at-seams.sh` |
+| Configurable | [env-injected vs. compiled; secret source] | `check-config-externalized.sh` |
+| Horizontally scalable | [where request-scoped state may/may not live] | `check-stateless-request-path.sh` |
+| Resilient | [timeout/retry/fallback defaults; degraded UX] | `check-resilient-boundary.sh` |
+
 ## Security Considerations
 
 - [Auth requirement]
@@ -262,6 +286,7 @@ A wave architecture doc references decisions; durable technical policy belongs i
 - [ ] Domain ownership is explicit and non-overlapping
 - [ ] User-visible flows from `product-design.md` are supported by concrete contracts
 - [ ] Every seam the wave introduces or changes is named with a frozen `<name>@vN` id, kind, producer, consumer(s), Shape, and Behavior suite
+- [ ] The Production-Readiness posture is stated for all four anchors (observable, configurable, horizontally scalable, resilient) so slices conform rather than re-decide
 - [ ] Every third-party dependency has an abstraction boundary, timeout, fallback, and data-minimization rule
 - [ ] Configuration, environment variables, and secrets are documented per environment
 - [ ] Deployable health criteria are concrete enough to verify in CI or monitoring

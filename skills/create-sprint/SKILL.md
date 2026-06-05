@@ -219,6 +219,21 @@ A production-grade plan names how the work behaves when things go wrong, not onl
 - [ ] **Version pinning / reproducibility** — exact versions pinned, never `latest`: [reason, or N/A]
 - [ ] **Partial-failure recovery** — resume or roll back half-completed work: [reason, or N/A]
 
+### Production-Readiness Conformance (Four Anchors)
+
+The wave's `product-architecture.md` declared a **Production-Readiness posture** for the four anchors. A slice does **not** re-decide that posture — it names the seam(s) it touches and confirms it *preserves* the wave posture. This is conformance to a central decision, not a per-slice litigation (which is what produces `N/A` theater).
+
+**Seams this slice touches:** [`<name>@vN`, … — or "none"]
+
+For each anchor, confirm conformance or declare a reviewed deviation:
+
+- [ ] **Observable** — emits the wave's correlation id and the required structured log/metric on every boundary this slice adds: [conforms / deviation + reason]
+- [ ] **Configurable** — no new source-literal config or secret; values are environment-injected per the wave strategy: [conforms / deviation + reason]
+- [ ] **Horizontally scalable** — adds no node-local mutable state on the request path; shared state is externalized per the wave's statelessness boundary: [conforms / deviation + reason]
+- [ ] **Resilient** — every external/boundary call this slice adds carries the wave's timeout/retry/fallback defaults: [conforms / deviation + reason]
+
+A deviation is a reviewed, recorded exception — not silence. The matching probes (`check-observability-at-seams.sh`, `check-config-externalized.sh`, `check-stateless-request-path.sh`, `check-resilient-boundary.sh`) enforce these at `verify`.
+
 ---
 
 ## Sprint Plan Approval (Standard & Major tiers)
@@ -374,6 +389,7 @@ _Mutable execution state. Survives session death. Deleted at `close-sprint` afte
 - [ ] Risk register seeded (top risks with likelihood/impact/mitigation, or `n/a (tier: Trivial)`)
 - [ ] Implementation plan has specific file names and function names
 - [ ] Resilience / failure-mode checklist filled or each item marked N/A with reason
+- [ ] Production-Readiness conformance block present; seams named and each anchor confirmed conforming or a reviewed deviation recorded
 - [ ] Test plan written in TDD format (tests before implementation), categorized by layer
 - [ ] Acceptance ↔ test traceability matrix present; every AC maps to ≥1 test
 - [ ] Acceptance criteria match the wave README exactly

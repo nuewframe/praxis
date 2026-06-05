@@ -97,6 +97,8 @@ Confirm:
 
 **Acceptance ↔ test traceability gate.** Confirm every acceptance criterion has at least one mapped test in the sprint's traceability matrix. If any AC is unmapped, **stop** and add the missing test rows before coding — an unmapped AC ships uncovered.
 
+**Production-Readiness conformance gate.** Confirm the sprint's Production-Readiness conformance block names the seam(s) the slice touches and marks each of the four anchors (observable, configurable, horizontally scalable, resilient) as conforming to the wave posture or carrying a reviewed deviation. If the block is blank or an anchor is unaddressed, **stop** — the slice must declare how it preserves the wave's posture before coding (the probes enforce it at `verify`, but the conformance is decided here).
+
 If no sprint exists, use `create-sprint`. If the sprint exists but does not match the work, do not edit scope in place; close or descope it and create a new sprint.
 
 ---
@@ -216,6 +218,7 @@ In every tier:
 - [ ] (Standard/Major) Sprint bridge exists and matches the requested work
 - [ ] (Standard/Major) Sprint Plan Approval line is signed (or `n/a (tier: Trivial)`)
 - [ ] (Standard/Major) Every acceptance criterion maps to ≥1 test in the traceability matrix
+- [ ] (Standard/Major) Production-Readiness conformance block present; seams named and each anchor conforming or a reviewed deviation recorded
 - [ ] (Major) Mechanical Design Approval present: ADR `status: Accepted` and signed Design Approval line in active sprint file
 - [ ] Engineering current-state snapshot read or refreshed
 - [ ] Current code touchpoints inspected
