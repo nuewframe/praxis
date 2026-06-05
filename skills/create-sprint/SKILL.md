@@ -138,6 +138,18 @@ _[One sentence: what user value will this sprint deliver?]_
 
 ---
 
+## Risks (Pre-Mortem Seed)
+
+Seeded from the `start-thin-slice` pre-mortem (Standard tier) or the `discovery-and-ambiguity-log` risk pass (Major tier). Assume this sprint failed six months out — what went wrong? List the top risks before locking scope.
+
+| Risk | Likelihood | Impact | Mitigation / trigger |
+| ---- | ---------- | ------ | -------------------- |
+| [What could fail] | L/M/H | L/M/H | [How we prevent it, or the signal that we pivot] |
+
+If this is a Trivial-tier sprint with no meaningful risk, write `n/a (tier: Trivial)`.
+
+---
+
 ## Scope (Immutable Once Started)
 
 ### Thin-Slices Included
@@ -197,6 +209,30 @@ If this sprint corrects or reopens a thin-slice, describe the changed outcome he
 
 - [ ] [Specific change with file path]
 
+### Resilience / Failure-Mode Checklist
+
+A production-grade plan names how the work behaves when things go wrong, not only on the happy path. Fill each item, or mark `N/A` with a one-line reason. These map directly to the capability guardrails (timeout / retry / fallback / circuit breaker).
+
+- [ ] **Idempotency** — repeated execution is safe because: [reason, or N/A]
+- [ ] **Concurrency** — behavior under two simultaneous executions: [reason, or N/A]
+- [ ] **Offline / degraded dependency** — detection + behavior when a dependency is unreachable: [reason, or N/A]
+- [ ] **Version pinning / reproducibility** — exact versions pinned, never `latest`: [reason, or N/A]
+- [ ] **Partial-failure recovery** — resume or roll back half-completed work: [reason, or N/A]
+
+---
+
+## Sprint Plan Approval (Standard & Major tiers)
+
+This is the mechanical home for the "pause here for me to review" checkpoint. For Standard- and Major-tier sprints, implementation does not start until this line is filled in. `intake-code-contribution` refuses to pass to implementation without it.
+
+```
+Reviewed by: <name or role>
+Date: YYYY-MM-DD
+Scope confirmed: <one line — plan reviewed, scope + risks + failure modes understood>
+```
+
+If this sprint is Trivial-tier, write `n/a (tier: Trivial)`. This gate is distinct from and additional to the Major-only Design Approval below.
+
 ---
 
 ## Design Approval (Major-tier sprints only)
@@ -235,6 +271,18 @@ Per the Pyramid Test Strategy in `test-by-ownership`, specify Logic / Compositio
 
 ---
 
+## Acceptance ↔ Test Traceability
+
+Every acceptance criterion maps to at least one test. This matrix is the link the test plan and acceptance criteria otherwise lack — without it, "all tests pass" can be true while an AC is silently uncovered. `intake-code-contribution` checks every AC has a mapped test before implementation; `verify-and-assemble-pr` checks every mapped test actually ran.
+
+| AC ID | Acceptance criterion | Test layer | Test file / name | Status |
+| ----- | -------------------- | ---------- | ---------------- | ------ |
+| AC-1 | [Given/when/then] | Logic/Composition/Journey | [file → test name] | ⚪ / 🔴 / 🟢 |
+
+Rule: no AC may be left without a mapped test. If a criterion is genuinely unverifiable by an automated test, state the manual verification method explicitly in the row.
+
+---
+
 ## Acceptance Criteria
 
 Derived verbatim from the wave README thin-slices. Sprint is complete when ALL are satisfied:
@@ -265,6 +313,56 @@ _Capture decisions, discoveries, and scope clarifications during the sprint. The
 
 ---
 
+## Step 6 — Create the Progress Ledger
+
+The sprint file is the **immutable bridge** — it does not change once work starts. Execution state, however, must survive session death so a multi-session feature does not reconstruct (and drift) its progress from scratch. That state lives in a separate, **mutable** ledger file alongside the sprint:
+
+```
+<sprint-dir>/sprint-NNN-<description>.ledger.md
+```
+
+Three artifacts, three lifecycles — do not conflate them:
+
+| Artifact | Mutability | Holds |
+|---|---|---|
+| `sprint-NNN-*.md` | Immutable once started | Scope, AC, hypothesis, test plan, approvals |
+| `sprint-NNN-*.ledger.md` | Mutable every session | Plan-phase progress, current test posture, verify-attempt counter |
+| Working Notes (in the sprint file) | Mutable scratch | Free-form discoveries, distilled at close |
+
+Create the ledger from this template:
+
+```markdown
+# Sprint NNN — Progress Ledger
+
+_Mutable execution state. Survives session death. Deleted at `close-sprint` after learnings are distilled. This is NOT the immutable bridge — never record scope or acceptance-criteria changes here._
+
+## Plan Phase Progress
+
+- [ ] Phase 1: [name]
+- [ ] Phase 2: [name]
+- [ ] Phase 3: [name]
+
+## Current Test Posture
+
+| Behavior | Layer | State (🔴/🟢) | Last run |
+| -------- | ----- | ------------- | -------- |
+| [name]   | …     | ⚪            | —        |
+
+## Verify Attempts
+
+- Consecutive failed verifies on the current cause: 0
+- Last verify exit code + cause: —
+- Stop-rule budget: 3 consecutive failed verifies on the same cause → HALT and escalate (project may override)
+
+## What's Left
+
+- [next concrete step]
+```
+
+`intake-code-contribution` restores state from this ledger when resuming; `close-sprint` deletes it after distillation.
+
+---
+
 ## Quality Checklist
 
 - [ ] Sprint number is sequential
@@ -273,11 +371,16 @@ _Capture decisions, discoveries, and scope clarifications during the sprint. The
 - [ ] **Engineering current-state snapshot captured (codebase, toolchain, integrations, ADRs, debt)**
 - [ ] Gap analysis closes the gap between target state and the snapshot — not just copied from design docs
 - [ ] Hypothesis card included (hypothesis + validation method + continue/pivot/stop rule)
+- [ ] Risk register seeded (top risks with likelihood/impact/mitigation, or `n/a (tier: Trivial)`)
 - [ ] Implementation plan has specific file names and function names
+- [ ] Resilience / failure-mode checklist filled or each item marked N/A with reason
 - [ ] Test plan written in TDD format (tests before implementation), categorized by layer
+- [ ] Acceptance ↔ test traceability matrix present; every AC maps to ≥1 test
 - [ ] Acceptance criteria match the wave README exactly
+- [ ] Sprint Plan Approval line present (signed for Standard/Major, `n/a (tier: Trivial)` otherwise)
 - [ ] Scope is realistic (1–2 thin-slices typical)
 - [ ] Out-of-scope section explicitly documents excluded work
+- [ ] Progress ledger file created alongside the sprint (`sprint-NNN-*.ledger.md`)
 
 ---
 
@@ -288,4 +391,7 @@ _Capture decisions, discoveries, and scope clarifications during the sprint. The
 - Letting acceptance criteria drift from the wave README
 - Inventing replacement thin-slice IDs for corrections
 - Writing implementation tasks before tests
+- Leaving acceptance criteria with no mapped test in the traceability matrix
+- Listing happy-path tasks only and skipping the resilience / failure-mode checklist
+- Starting Standard/Major implementation before the Sprint Plan Approval line is signed
 - Using sprint working notes as a permanent decision log (they are deleted at close)

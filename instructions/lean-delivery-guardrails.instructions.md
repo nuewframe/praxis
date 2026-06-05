@@ -39,8 +39,9 @@ A sprint locks **product intent** against **engineering current state** at a fix
 
 - Use `create-sprint` to author any sprint. Capture the engineering current-state snapshot — codebase, toolchain, integrations, active ADRs, known debt.
 - Scope is **immutable** once a sprint starts. To change scope, close the sprint and create a new one.
-- Sprint files are **ephemeral** — they live in a sprint directory, not woven into permanent docs.
+- Sprint files are **ephemeral** — they live in a sprint directory, not woven into permanent docs. Mutable execution state lives in a separate `sprint-NNN-*.ledger.md` that survives sessions and is deleted at close.
 - Every sprint includes a hypothesis card: hypothesis, validation method, continue/pivot/stop rule.
+- Standard- and Major-tier sprints carry a signed **Sprint Plan Approval** line; implementation does not start until it is signed (Trivial writes `n/a`).
 
 ---
 
@@ -68,6 +69,7 @@ Each wave has a `qa.md` authored via `create-quality-spec`. It is a **planning a
 
 Before any user story, feature, thin-slice, behavior-changing contribution, or non-trivial refactor reaches implementation, use `intake-code-contribution`.
 
+- For slice work, start at the front door with `start-thin-slice`: check dependency/status preconditions and route by tier before a sprint exists.
 - Locate the wave and thin-slice first. A chat prompt is not enough product intent.
 - Confirm `README.md`, `product-design.md`, `product-architecture.md`, and `qa.md` exist and are specific enough.
 - Confirm or create the sprint bridge before writing code.

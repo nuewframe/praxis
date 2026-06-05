@@ -93,6 +93,10 @@ Confirm:
 - Test plan
 - Acceptance criteria copied from the wave README
 
+**Sprint Plan Approval gate (Standard & Major).** Confirm the sprint's `Sprint Plan Approval` line is signed (`Reviewed by` / `Date` / `Scope confirmed`). If it is blank, **stop** — implementation does not start until a human signs it. Trivial-tier sprints carry `n/a (tier: Trivial)` and skip this gate.
+
+**Acceptance ↔ test traceability gate.** Confirm every acceptance criterion has at least one mapped test in the sprint's traceability matrix. If any AC is unmapped, **stop** and add the missing test rows before coding — an unmapped AC ships uncovered.
+
 If no sprint exists, use `create-sprint`. If the sprint exists but does not match the work, do not edit scope in place; close or descope it and create a new sprint.
 
 ---
@@ -100,6 +104,8 @@ If no sprint exists, use `create-sprint`. If the sprint exists but does not matc
 ## Step 4 - Correlate Against Current Code
 
 Inspect the current repository before changing files.
+
+**Resume from the progress ledger first.** If a `sprint-NNN-*.ledger.md` exists for this sprint, read it before re-deriving anything. Restore: which plan phase is in progress, the current red/green test posture, the verify-attempt counter, and what's left. This prevents context amnesia across sessions — do not reconstruct progress from scratch when the ledger already records it.
 
 Record:
 
@@ -208,6 +214,8 @@ In every tier:
 - [ ] (Standard/Major) Thin-slice acceptance criteria are testable
 - [ ] (Standard/Major) All four wave specs exist and are specific enough
 - [ ] (Standard/Major) Sprint bridge exists and matches the requested work
+- [ ] (Standard/Major) Sprint Plan Approval line is signed (or `n/a (tier: Trivial)`)
+- [ ] (Standard/Major) Every acceptance criterion maps to ≥1 test in the traceability matrix
 - [ ] (Major) Mechanical Design Approval present: ADR `status: Accepted` and signed Design Approval line in active sprint file
 - [ ] Engineering current-state snapshot read or refreshed
 - [ ] Current code touchpoints inspected
@@ -223,6 +231,8 @@ In every tier:
 - Fabricating a wave / thin-slice / sprint to satisfy Standard/Major intake when the change is genuinely Trivial
 - Coding directly from the user's prompt without finding the wave and thin-slice (Standard/Major)
 - Treating a sprint as optional because the task seems obvious (Standard/Major)
+- Starting Standard/Major implementation before the Sprint Plan Approval line is signed
+- Leaving an acceptance criterion with no mapped test and proceeding anyway
 - Letting missing `product-design.md`, `product-architecture.md`, or `qa.md` become implementation guesswork
 - Starting Major-tier implementation before mechanical Design Approval is recorded
 - Implementer silently editing an Accepted ADR mid-flight instead of bouncing back to architect mode

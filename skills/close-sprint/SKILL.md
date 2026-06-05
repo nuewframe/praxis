@@ -154,9 +154,10 @@ In the project's product dashboard (e.g. `PRODUCT.md`):
 
 ```
 rm <sprint-dir>/sprint-NNN-<description>.md
+rm -f <sprint-dir>/sprint-NNN-<description>.ledger.md
 ```
 
-The sprint file is ephemeral collaboration space. Once both shores are updated, delete it.
+The sprint file is ephemeral collaboration space. Once both shores are updated, delete it. Delete the progress ledger too — it is execution state, not a durable record. Any learning worth keeping has already flowed into the product and engineering artifacts in Steps 4–5.
 
 ---
 
@@ -169,6 +170,7 @@ The sprint file is ephemeral collaboration space. Once both shores are updated, 
 - [ ] Thin-slices marked ✅ Complete in wave README
 - [ ] Product dashboard reflects current reality
 - [ ] Sprint file deleted
+- [ ] Progress ledger deleted (after learnings distilled)
 
 ---
 
@@ -179,3 +181,4 @@ The sprint file is ephemeral collaboration space. Once both shores are updated, 
 - Skipping ADR creation for a durable decision because "we'll do it later"
 - Letting a descoped thin-slice silently disappear — it must move back to `⚪ Not Started` with intent intact
 - Archiving the sprint file instead of deleting it — the bridge dissolves on close
+- Leaving the progress ledger behind after close — it is execution state, not a record; distill then delete

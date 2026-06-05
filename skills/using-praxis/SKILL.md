@@ -84,6 +84,7 @@ Skills are grouped by phase. Load the SKILL.md file of any skill you intend to f
 | `create-product-design-spec` | Authoring `product-design.md` — user journeys, ambiguity handling, recovery paths |
 | `create-product-architecture-spec` | Authoring wave-scoped `product-architecture.md` — domain ownership, contracts, integrations |
 | `create-quality-spec` | Authoring `qa.md` — risk tiers, test layer mapping, coverage matrix, observable DoD |
+| `start-thin-slice` | Front door for slice work ("Work on TS-NNN"); checks dependency/status preconditions, provisional tier, then routes to create-sprint vs. the architect path |
 | `create-sprint` | Locking the immutable bridge: thin-slice intent + engineering current-state snapshot + hypothesis card + test plan |
 | `intake-code-contribution` | Pre-implementation gate; mandatory before any code change |
 | `close-sprint` | Distilling learnings bidirectionally into product AND engineering artifacts; deletes the sprint file |

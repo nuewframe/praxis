@@ -4,6 +4,16 @@ All notable changes to the Praxis plugin are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- **`start-thin-slice` skill** — front-door triage and routing for slice work ("Work on TS-NNN"). Checks dependency/status preconditions, runs a provisional tier classification by reference to `intake-code-contribution` Step 0 (single source of truth, no forked table), runs a lightweight ambiguity log + pre-mortem for Standard work, and deterministically routes to `create-sprint` vs. the architect path.
+- **Sprint Plan Approval gate** in `create-sprint` — a signed checkpoint for Standard- and Major-tier sprints (distinct from the Major-only Design Approval). `intake-code-contribution` refuses to pass to implementation until it is signed; Trivial writes `n/a`.
+- **Resilience / failure-mode checklist** in the `create-sprint` implementation plan — idempotency, concurrency, offline/degraded dependency, version pinning, partial-failure recovery. Defines the "production-grade plan" bar.
+- **Acceptance ↔ test traceability matrix** in `create-sprint` — every acceptance criterion maps to ≥1 test. Checked at intake (every AC mapped) and at verify (every mapped test actually ran).
+- **Risk register (pre-mortem seed)** in `create-sprint`, seeded from `start-thin-slice` (Standard) or `discovery-and-ambiguity-log` (Major).
+- **Progress ledger** (`sprint-NNN-*.ledger.md`) — a mutable, session-surviving execution-state file alongside the immutable sprint bridge. Created by `create-sprint`, restored by `intake-code-contribution` on resume, deleted by `close-sprint` after distillation.
+- **Debugging-loop budget** in `verify-and-assemble-pr` — a self-applied stop rule (default 3 consecutive failed verifies on the same cause → halt + escalate) with an explicit FAIL-vs-BLOCKED determination before each retry. Shipped as discipline, not runtime enforcement, per Praxis's stated boundary.
+
 ## [0.1.3] — 2026-05-29
 
 ### Fixed

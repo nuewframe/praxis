@@ -86,6 +86,8 @@ The entry point must run, in order, and abort on first failure:
 
 Capture exit code and the last lines of output. If anything fails, **bounce back** — implementer mode fixes; reviewer mode does not edit code. Re-run the entire `verify` entry point after the fix. Partial reruns are not evidence.
 
+**Acceptance ↔ test traceability check.** Cross-reference the sprint's Acceptance ↔ Test Traceability matrix against the captured `verify` output. Every mapped test must have actually run. If a mapped test did not execute (filtered out, file renamed, silently skipped), treat it as a missing-coverage failure and bounce back — a green run that never exercised an AC's test is not evidence the AC holds.
+
 **Reviewer evidence requirement:** the PR must include the captured `verify` output. A bare checkbox is not evidence; reviewer mode REJECTS the PR if the output is missing.
 
 #### Environment Blocked ≠ Test Failed
@@ -99,6 +101,29 @@ Journey tests run against an Integration Env that may include systems you do not
 | External returned an error that the system handled correctly | `PASS`    | The Integration boundary layer earned its keep |
 
 **TTL:** a test `BLOCKED` >5 times in 7 days is escalated; >10 times in 14 days is auto-archived with a tracking issue. `BLOCKED` is never a permanent state.
+
+#### Debugging Loop Budget (self-applied discipline)
+
+An unsupervised agent will happily "fix code" against a failure that is not a code regression — burning a session editing against, say, a platform that simply is not running. This is a **self-applied stop rule**, not runtime enforcement. (Per Praxis's stated boundary, hard runtime circuit-breakers — process kill, automatic escalation — belong to an orchestration runtime such as MPM. Praxis owns the discipline; the runtime owns the mechanism.)
+
+Before **every** retry of the `verify` entry point after a failure:
+
+1. **Classify the failure as `FAIL` vs `BLOCKED`** using the table above. A `BLOCKED` failure (environment unreachable, dependency not running) is **not** a reason to edit code — fix or escalate the environment instead.
+2. **Increment the verify-attempt counter** in the progress ledger (`sprint-NNN-*.ledger.md`), scoped to the current root cause.
+
+**Stop rule:** after **3 consecutive failed verify cycles on the same cause** (Praxis default; a project may override the number in its own context), **HALT**. Do not attempt a 4th code edit. Produce a halt summary and escalate to the human:
+
+```markdown
+## Debugging Halt — budget reached
+
+Cause (unchanged across N attempts): …
+Attempts: [what was tried each cycle]
+Current FAIL/BLOCKED determination: [FAIL | BLOCKED + which dependency]
+Hypothesis: …
+Asking the human: [environment fix needed? scope/AC wrong? design flaw → bounce to architect?]
+```
+
+Reset the counter to 0 only when the root cause changes (a genuinely new failure), not when the same failure recurs with a tweaked patch.
 
 ### Step 4 — Refactor decision matrix (reviewer mode lens)
 
@@ -225,5 +250,7 @@ Before submitting, re-read the diff one more time. Check for:
 - Adding only an in-memory adapter (or only a real one). The parity gate requires both.
 - Hand-rolled stubs of third-party APIs without a contract test verifying them on a schedule. Stubs rot silently.
 - `BLOCKED` used as a permanent state to hide a real failure. Enforce the TTL.
+- Editing code against a `BLOCKED` (environment) failure instead of fixing the environment.
+- Exceeding the debugging-loop budget — a 4th code edit against an unchanged failing cause instead of halting and escalating.
 - "Rollback: revert the commit." Spell out the procedure including data implications.
 - A PR description that doesn't name the trade-off the reviewer should evaluate.
