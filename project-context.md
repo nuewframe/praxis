@@ -90,6 +90,7 @@ plugin/
 │   └── refactor-layered-to-capability/
 ├── scripts/                                     # generic enforcement tooling capability
 │   ├── check-anti-dumping.sh
+│   ├── check-config-externalized.sh            # production-readiness probe (Configurable anchor)
 │   ├── bump-version.sh                          # version-parity tool across manifests
 │   └── validate-plugin.sh                       # plugin self-test
 ├── AGENTS.md                                    # bootstrap pointer for AGENTS.md-aware harnesses

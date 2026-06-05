@@ -114,6 +114,7 @@ Praxis ships generic, configurable enforcement scripts. Wire them into the proje
 | `scripts/check-no-skipped-tests.sh` | Committed `.skip(`, `xit(`, `@Disabled`, `@pytest.mark.skip` markers |
 | `scripts/check-no-sleep-waits.sh` | `Thread.sleep`, `time.sleep`, `waitForTimeout` |
 | `scripts/check-port-adapter-parity.sh` | `*.ports.*` with no adapter; warns if no in-memory test double |
+| `scripts/check-config-externalized.sh` | Hardcoded remote URLs, endpoints, or secret literals (Configurable anchor); warn-first, reviewed per-line opt-out |
 | `scripts/validate-plugin.sh` | Plugin self-test (run from this repo) |
 
 ---

@@ -160,6 +160,8 @@ import os, re, sys
 # Match relative refs to skills/<name>, agents/<name>, instructions/<name>,
 # scripts/<name>. Only check existence of the directory or file root, not deep
 # anchors. Backtick-wrapped paths are fine; angle-bracket links too.
+# docs/plans/* is excluded: planning docs are forward-looking and legitimately
+# reference not-yet-built artifacts.
 patterns = [
     re.compile(r'`(skills/[A-Za-z0-9_./-]+)`'),
     re.compile(r'`(agents/[A-Za-z0-9_./-]+)`'),
@@ -174,7 +176,7 @@ allowed_missing = {
 }
 
 problems = []
-md_files = [p for p in os.popen("find . -type f -name '*.md' -not -path './node_modules/*' -not -path './.git/*'").read().splitlines() if p]
+md_files = [p for p in os.popen("find . -type f -name '*.md' -not -path './node_modules/*' -not -path './.git/*' -not -path './docs/plans/*'").read().splitlines() if p]
 
 for path in sorted(md_files):
     try:
@@ -222,6 +224,29 @@ if [[ -x "scripts/bump-version.sh" && -f ".version-bump.json" ]] && command -v j
   fi
 else
   echo "  skipped (jq or bump-version.sh missing)"
+fi
+
+# 6. Enforcement script syntax + executability (meta-loop: the quality
+#    instruments are themselves under validation — see executable-seams-first.md D5).
+echo "validate-plugin: checking enforcement scripts..."
+ENFORCE_REPORT=""
+ENFORCE_FAIL=0
+for s in scripts/check-*.sh; do
+  [[ -e "$s" ]] || continue
+  if ! bash -n "$s" 2>/dev/null; then
+    ENFORCE_REPORT="${ENFORCE_REPORT}  $s: syntax error"$'\n'
+    ENFORCE_FAIL=1
+  fi
+  if [[ ! -x "$s" ]]; then
+    ENFORCE_REPORT="${ENFORCE_REPORT}  $s: not executable (chmod +x)"$'\n'
+    ENFORCE_FAIL=1
+  fi
+done
+if [[ $ENFORCE_FAIL -ne 0 ]]; then
+  printf '%s' "$ENFORCE_REPORT" >&2
+  FAILED=$((FAILED + 1))
+else
+  echo "  ok"
 fi
 
 if [[ $FAILED -gt 0 ]]; then
