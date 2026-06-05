@@ -121,6 +121,7 @@ Praxis ships generic, configurable enforcement scripts. Wire them into the proje
 | `scripts/check-observability-at-seams.sh` | A boundary call with no log/metric/trace/correlation-id (Observable anchor); warn-first, reviewed per-file opt-out |
 | `scripts/check-stateless-request-path.sh` | Node-local mutable state on the request path (Horizontally-scalable anchor); warn-first, reviewed per-line opt-out |
 | `scripts/check-resilient-boundary.sh` | A boundary call with no timeout/retry/circuit-breaker/fallback (Resilient anchor); warn-first, reviewed per-file opt-out |
+| `scripts/check-sprint-id-collision.sh` | Two active sprint files sharing an id token (parallel-creation collision); exact, warn-first via `.sprint-coordination.json` |
 | `scripts/validate-plugin.sh` | Plugin self-test (run from this repo) |
 
 ---

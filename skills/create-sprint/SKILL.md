@@ -68,6 +68,8 @@ Find the highest existing `sprint-NNN-*.md` and increment by 1.
 
 **Per-slice status, not a shared-table race.** Do not record this sprint's live progress by editing a status row that other in-flight slices also edit — the wave README's thin-slice table is a coordination chokepoint under parallelism. Each slice owns its own status surface: its sprint file header `Status` line and its `sprint-NNN-*.ledger.md`. The shared wave README table is reconciled from those per-slice records at `close-sprint`, not raced during the sprint.
 
+The collision invariant is mechanically enforced: `scripts/check-sprint-id-collision.sh` (wired into `verify`) fails when two active sprint files share an id token. It is exact, not heuristic — warn-first via `.sprint-coordination.json`, promote to `enforce` once the team routinely creates sprints in parallel.
+
 ---
 
 ## Step 2 — Select Thin-Slices to Deliver

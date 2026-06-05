@@ -1,6 +1,6 @@
 # Plan — Executable Seams First, Parallelism as Emergent
 
-**Status:** Shipped — B3-config (`check-config-externalized.sh`), the Bundle A keystone (`define-seam-contract` + `check-seam-contract-parity.sh` + architecture-spec seam declaration + verify wiring), Bundle B B1/B2 (wave Production-Readiness posture + per-slice conformance block + intake gate), the remaining B3 anchor probes (`check-observability-at-seams.sh`, `check-stateless-request-path.sh`, `check-resilient-boundary.sh` — all four anchors now executable and wired through `verify`), Bundle C (adversarial seam-behavior review in `verify-and-assemble-pr` + property-over-example at high-risk seams in `create-sprint`/`test-by-ownership`), and Bundle D (three-axis disjointness rule + collision-safe coordination artifacts + snapshot-staleness re-anchor — emergent parallelism made safe, no scheduler). **All four bundles shipped; plan complete.**
+**Status:** Shipped — B3-config (`check-config-externalized.sh`), the Bundle A keystone (`define-seam-contract` + `check-seam-contract-parity.sh` + architecture-spec seam declaration + verify wiring), Bundle B B1/B2 (wave Production-Readiness posture + per-slice conformance block + intake gate), the remaining B3 anchor probes (`check-observability-at-seams.sh`, `check-stateless-request-path.sh`, `check-resilient-boundary.sh` — all four anchors now executable and wired through `verify`), Bundle C (adversarial seam-behavior review in `verify-and-assemble-pr` + property-over-example at high-risk seams in `create-sprint`/`test-by-ownership`), and Bundle D (three-axis disjointness rule + collision-safe coordination artifacts + snapshot-staleness re-anchor — emergent parallelism made safe, no scheduler). **All four bundles shipped; plan complete.** Post-ship hardening (decision D6, Option 4): D2 promoted to an executable gate (`check-sprint-id-collision.sh`, wired into `verify`); D1/D3 designed as a machine-readable sprint footprint + computed checkers, deferred to a named trigger (first real concurrent run); C deliberately left as prose (no trace gate — it would manufacture false confidence).
 **Author:** Principal Engineer (architect mode)
 **Supersedes the roadmap of:** `thin-slice-loop-hardening.md` (Bundles 1–3, already shipped) — this is the Phase 2 direction.
 **Deliverable of this doc:** an implementation plan only. No skill/script/template changes until approved.
@@ -119,6 +119,11 @@ Only the *safety* primitives, no scheduler:
 
 **Why last:** none of this is worth building until seams are executable (Bundle A). With A in place, D is small — disjointness + collision-safe ids + a staleness check — and parallelism becomes *permitted and safe*, exercised by the human or an orchestration runtime, never forced by Praxis.
 
+**Enforcement posture (decision D6 — Option 4, staged).** The three D primitives differ in *kind*, so they differ in how far enforcement can honestly go:
+
+- **D2 is mechanical and zero-judgment** → it ships as an executable gate now: `scripts/check-sprint-id-collision.sh` fails when two active sprint files share an id token, wired into `verify`, warn-first per `.sprint-coordination.json`. This is the one D primitive worth executing today because Praxis is used serially and a duplicate-id is the cheapest, most deterministic parallel hazard to catch.
+- **D1 and D3 are mechanical *in principle* but lack a machine-readable input today.** Computing capability/resource/config-key disjointness (D1) or contract-freshness since freeze (D3) requires a declared **sprint footprint**: a structured block per sprint listing touched capabilities/file-globs, persistent resources, config keys, and depended-on `<name>@vN` contracts. With that block, D1 becomes a set-intersection script (`check-sprint-disjointness.sh A B`) and D3 becomes a hash-compare against `.seam-contracts.json` (`check-contract-freshness.sh`). **Deferred, not abandoned** — building the footprint artifact + two scripts before a single real concurrent run is speculative generality. **Named trigger to build:** the first time two slices are dispatched concurrently against this method (a human running parallel worktrees, or an orchestration runtime fanning out). Until then D1/D3 remain prose discipline in the guardrails + intake gate.
+
 ---
 
 ## 6. Naming the conflations we are deliberately keeping separate
@@ -142,7 +147,7 @@ Six months out, it failed. Why, and the mitigation baked in:
 | Probes are too noisy → teams disable them | Conservative + explicit reviewed opt-out comment; silence fails, not legitimate exceptions. Ship one probe first, tune, then expand. |
 | Seam Contracts become bureaucratic overhead | Only *declared* seams (named in `product-architecture.md`) carry contracts; not every function. Reuse existing Port/Adapter suite machinery. |
 | Contract versioning ignored, deps still point at slices | The conformance gate (A2) fails if a dependent built against an unversioned/unfrozen seam — versioning is enforced, not encouraged. |
-| Adversarial review (C) seen as friction and skipped | It is a *gate by a different persona*, not a checkbox; PR rejected without it. Tension is intentional and owned. |
+| Adversarial review (C) seen as friction and skipped | It is a *gate by a different persona*, not a checkbox; PR rejected without it. Tension is intentional and owned. **Deliberately *not* backed by a trace/existence gate** (e.g. "ledger block non-empty"): a metric that proxies for judgment manufactures false confidence (Goodhart) — a block filled to pass the gate with no real review is worse than honest prose. C's only honest enforcement is a second head rejecting the PR; the ledger merely *records which head* (D4), it does not *certify the verdict*. |
 | We secretly rebuild a scheduler | §2 + §5 Bundle D scope-lock: safety primitives only, no orchestration. |
 | Probes give false confidence (heuristic ≠ proof) | Documented as heuristics; Bundle C's property tests carry the real proof at high-risk seams. Probes catch the careless; properties catch the subtle. |
 
@@ -196,3 +201,15 @@ Four decisions, signed. These are the answers to the open questions and govern i
 **Decision (added):** Every new `scripts/check-*.sh` (the four anchor probes and `check-seam-contract-parity.sh`) is registered the same way the existing four enforcement scripts are, and is covered by `validate-plugin.sh`.
 
 **Rationale:** The rails that enforce code quality must themselves be under the plugin's own validation — otherwise a broken or unregistered gate silently stops gating. Small, but it closes the meta-loop: the quality system validates its own quality instruments.
+
+### D6 — Bundle D enforcement: execute the mechanical primitive, defer the speculative ones, refuse the dishonest one
+
+**Decision (added, post-ship sparring):** Of the three D primitives, **only D2 ships as an executable gate now** (`check-sprint-id-collision.sh`). **D1 and D3 are designed but deferred** behind a machine-readable sprint-footprint artifact, to be built on a named trigger (first real concurrent run). **C is deliberately left as prose** — no trace/existence gate is added.
+
+**Rationale:** Enforceability splits three ways and each D/C primitive lands differently:
+
+- *Computation on declared inputs* (D1 disjointness, D3 freshness) is genuinely mechanizable — but only once the inputs (sprint footprint: capabilities, resources, config keys, depended-on `@vN`) are declared. Building that artifact + two checkers before any slice actually runs concurrently is speculative generality (YAGNI); the value is zero until the second concurrent slice exists. So: design now, build on trigger.
+- *Exact invariant on existing artifacts* (D2 duplicate id) needs no new input — the sprint filenames already carry the id. It is the cheapest, most deterministic parallel hazard, mechanical and zero-judgment. So: ship it.
+- *Judgment* (C adversarial verdict) cannot be mechanized without manufacturing false confidence. A trace gate (\"the review block is filled in\") proxies presence for quality and invites checkbox theater — the precise §7 failure mode, inverted. So: refuse the gate; keep C honest as a different-head rejection, with the ledger recording only *which head* (D4), never *certifying the verdict*.
+
+This keeps Praxis in its lane (artifact discipline, build-time checks) and out of the scheduler it disclaims, while spending enforcement effort only where it buys real assurance.

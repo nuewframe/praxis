@@ -96,6 +96,7 @@ plugin/
 │   ├── check-stateless-request-path.sh         # production-readiness probe (Horizontally-scalable anchor)
 │   ├── check-resilient-boundary.sh             # production-readiness probe (Resilient anchor)
 │   ├── check-seam-contract-parity.sh           # seam-contract parity gate (Shape + Behavior suite)
+│   ├── check-sprint-id-collision.sh            # coordination-artifact gate (parallel sprint-id collision)
 │   ├── bump-version.sh                          # version-parity tool across manifests
 │   └── validate-plugin.sh                       # plugin self-test
 ├── AGENTS.md                                    # bootstrap pointer for AGENTS.md-aware harnesses

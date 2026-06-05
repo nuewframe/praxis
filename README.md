@@ -67,6 +67,7 @@ Give your agent Praxis: [Claude Code](#claude-code) Â· [Codex CLI](#codex-cli) Â
 | `scripts/check-observability-at-seams.sh` | Production-readiness probe (Observable anchor): flags a file that makes a boundary call but carries no log/metric/trace/correlation-id. Warn-first via `.observability.json`, reviewed per-file opt-out. |
 | `scripts/check-stateless-request-path.sh` | Production-readiness probe (Horizontally-scalable anchor): flags node-local mutable state (module-level/static cache/session/registry) on the request path. Warn-first via `.statelessness.json`, reviewed per-line opt-out. |
 | `scripts/check-resilient-boundary.sh` | Production-readiness probe (Resilient anchor): flags a file that makes a boundary call but declares no timeout/retry/circuit-breaker/fallback. Warn-first via `.resilience.json`, reviewed per-file opt-out. |
+| `scripts/check-sprint-id-collision.sh` | Coordination-artifact gate (emergent parallelism): fails when two active sprint files share an id token, the collision a bare `NNN+1` increment causes under parallel sprint creation. Exact, not heuristic. Warn-first via `.sprint-coordination.json`. |
 | `scripts/validate-plugin.sh`           | Plugin self-test: SKILL.md frontmatter validity, JSON/YAML parse, cross-reference integrity, enforcement-script syntax.                   |
 
 ## How the two halves compose

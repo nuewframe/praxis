@@ -20,7 +20,8 @@
 #  10. observability at seams (production-readiness: Observable anchor)
 #  11. stateless request path (production-readiness: Horizontally-scalable anchor)
 #  12. resilient boundary (production-readiness: Resilient anchor)
-#  13. unit + integration tests
+#  13. sprint-id collision (coordination artifact: parallel sprint-id safety)
+#  14. unit + integration tests
 #
 # Each step is a function. Override or skip by setting:
 #   VERIFY_SKIP="format,lint"   # comma-separated step names
@@ -72,6 +73,7 @@ step_config_extern() { bash scripts/check-config-externalized.sh .; }  # warn by
 step_observability() { bash scripts/check-observability-at-seams.sh .; }  # warn by default; set mode=enforce in .observability.json once clean
 step_statelessness() { bash scripts/check-stateless-request-path.sh .; }  # warn by default; set mode=enforce in .statelessness.json once clean
 step_resilience()    { bash scripts/check-resilient-boundary.sh .; }  # warn by default; set mode=enforce in .resilience.json once clean
+step_sprint_ids()    { bash scripts/check-sprint-id-collision.sh .; }  # warn by default; set mode=enforce in .sprint-coordination.json once sprints are created in parallel
 step_tests()        { :; }   # e.g.: npm test          |  pytest              |  ./gradlew test
 
 # --- Pipeline. ---
@@ -88,6 +90,7 @@ run_step config-extern step_config_extern
 run_step observability step_observability
 run_step statelessness step_statelessness
 run_step resilience   step_resilience
+run_step sprint-ids   step_sprint_ids
 run_step tests        step_tests
 
 echo "verify: all steps passed"
