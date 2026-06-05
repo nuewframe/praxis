@@ -17,7 +17,10 @@
 #   7. port/adapter parity
 #   8. seam-contract parity (Shape + Behavior suite for every declared seam)
 #   9. config externalized (production-readiness: Configurable anchor)
-#  10. unit + integration tests
+#  10. observability at seams (production-readiness: Observable anchor)
+#  11. stateless request path (production-readiness: Horizontally-scalable anchor)
+#  12. resilient boundary (production-readiness: Resilient anchor)
+#  13. unit + integration tests
 #
 # Each step is a function. Override or skip by setting:
 #   VERIFY_SKIP="format,lint"   # comma-separated step names
@@ -66,6 +69,9 @@ step_no_sleeps()    { bash scripts/check-no-sleep-waits.sh .; }
 step_port_parity()  { bash scripts/check-port-adapter-parity.sh .; }
 step_seam_parity()  { bash scripts/check-seam-contract-parity.sh .; }  # warn by default; set mode=enforce in .seam-contracts.json once every declared seam is in parity
 step_config_extern() { bash scripts/check-config-externalized.sh .; }  # warn by default; set mode=enforce in .config-externalization.json once clean
+step_observability() { bash scripts/check-observability-at-seams.sh .; }  # warn by default; set mode=enforce in .observability.json once clean
+step_statelessness() { bash scripts/check-stateless-request-path.sh .; }  # warn by default; set mode=enforce in .statelessness.json once clean
+step_resilience()    { bash scripts/check-resilient-boundary.sh .; }  # warn by default; set mode=enforce in .resilience.json once clean
 step_tests()        { :; }   # e.g.: npm test          |  pytest              |  ./gradlew test
 
 # --- Pipeline. ---
@@ -79,6 +85,9 @@ run_step no-sleeps    step_no_sleeps
 run_step port-parity  step_port_parity
 run_step seam-parity  step_seam_parity
 run_step config-extern step_config_extern
+run_step observability step_observability
+run_step statelessness step_statelessness
+run_step resilience   step_resilience
 run_step tests        step_tests
 
 echo "verify: all steps passed"

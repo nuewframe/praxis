@@ -79,13 +79,16 @@ The entry point must run, in order, and abort on first failure:
 6. **No-sleep-waits linter** — `scripts/check-no-sleep-waits.sh` (this plugin).
 7. **Port/Adapter parity gate** — `scripts/check-port-adapter-parity.sh` (this plugin).
 8. **Seam-contract parity gate** — `scripts/check-seam-contract-parity.sh` (this plugin). Every seam declared in `.seam-contracts.json` has a machine-readable Shape and a shared Behavior suite on disk.
-9. **Config-externalization probe** — `scripts/check-config-externalized.sh` (this plugin).
-10. **Logic tests** — fast, pure-function unit tests.
-11. **Composition tests** — service + API + in-memory Port adapters wired together.
-12. **Adapter Contract tests** — shared suite run against both the in-memory and real-backend adapters of each touched Port.
-13. **Seam Behavior tests** — each touched seam's shared contract suite (`*.contract.test.*`) run against **both** sides (consumer-driven). Parity (Shape + suite exist) is checked structurally by step 8; this step proves the suite actually **ran and passed**.
-14. **Integration boundary tests** — wrapper code (timeout/retry/circuit breaker) against contract-tested fakes or sandboxes.
-15. **Journey tests** — for changes that affect a user-facing flow.
+9. **Config-externalization probe** — `scripts/check-config-externalized.sh` (this plugin). Production-readiness: Configurable anchor.
+10. **Observability-at-seams probe** — `scripts/check-observability-at-seams.sh` (this plugin). Production-readiness: Observable anchor — a boundary call with no log/metric/trace/correlation-id.
+11. **Stateless-request-path probe** — `scripts/check-stateless-request-path.sh` (this plugin). Production-readiness: Horizontally-scalable anchor — node-local mutable state on the request path.
+12. **Resilient-boundary probe** — `scripts/check-resilient-boundary.sh` (this plugin). Production-readiness: Resilient anchor — a boundary call with no timeout/retry/circuit-breaker/fallback.
+13. **Logic tests** — fast, pure-function unit tests.
+14. **Composition tests** — service + API + in-memory Port adapters wired together.
+15. **Adapter Contract tests** — shared suite run against both the in-memory and real-backend adapters of each touched Port.
+16. **Seam Behavior tests** — each touched seam's shared contract suite (`*.contract.test.*`) run against **both** sides (consumer-driven). Parity (Shape + suite exist) is checked structurally by step 8; this step proves the suite actually **ran and passed**.
+17. **Integration boundary tests** — wrapper code (timeout/retry/circuit breaker) against contract-tested fakes or sandboxes.
+18. **Journey tests** — for changes that affect a user-facing flow.
 
 Capture exit code and the last lines of output. If anything fails, **bounce back** — implementer mode fixes; reviewer mode does not edit code. Re-run the entire `verify` entry point after the fix. Partial reruns are not evidence.
 
@@ -199,7 +202,10 @@ One paragraph. What changed and why.
 - [x] No sleep-waits linter (`scripts/check-no-sleep-waits.sh`)
 - [x] Port/Adapter parity gate (`scripts/check-port-adapter-parity.sh`) — every touched Port has both in-memory and real adapter passing the shared contract suite
 - [x] Seam-contract parity gate (`scripts/check-seam-contract-parity.sh`) — every declared seam has a Shape and a Behavior suite
-- [x] Config-externalization probe (`scripts/check-config-externalized.sh`)
+- [x] Config-externalization probe (`scripts/check-config-externalized.sh`) — Configurable anchor
+- [x] Observability-at-seams probe (`scripts/check-observability-at-seams.sh`) — Observable anchor
+- [x] Stateless-request-path probe (`scripts/check-stateless-request-path.sh`) — Horizontally-scalable anchor
+- [x] Resilient-boundary probe (`scripts/check-resilient-boundary.sh`) — Resilient anchor
 - [x] Logic tests (N tests, N pass)
 - [x] Composition tests (N tests, N pass)
 - [x] Adapter Contract tests (N tests, N pass — in-memory + real backend)

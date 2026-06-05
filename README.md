@@ -64,6 +64,9 @@ Give your agent Praxis: [Claude Code](#claude-code) Â· [Codex CLI](#codex-cli) Â
 | `scripts/check-port-adapter-parity.sh` | For every `*.ports.*` ensures at least one adapter exists; warns if no in-memory test double is present.                                  |
 | `scripts/check-seam-contract-parity.sh` | For every seam declared in `.seam-contracts.json`, ensures a machine-readable Shape and a shared Behavior suite exist. Warn-first, mode-promoted once clean. |
 | `scripts/check-config-externalized.sh` | Production-readiness probe (Configurable anchor): fails on hardcoded remote URLs, endpoints, or secret literals. Warn-first via `.config-externalization.json`, reviewed per-line opt-out. |
+| `scripts/check-observability-at-seams.sh` | Production-readiness probe (Observable anchor): flags a file that makes a boundary call but carries no log/metric/trace/correlation-id. Warn-first via `.observability.json`, reviewed per-file opt-out. |
+| `scripts/check-stateless-request-path.sh` | Production-readiness probe (Horizontally-scalable anchor): flags node-local mutable state (module-level/static cache/session/registry) on the request path. Warn-first via `.statelessness.json`, reviewed per-line opt-out. |
+| `scripts/check-resilient-boundary.sh` | Production-readiness probe (Resilient anchor): flags a file that makes a boundary call but declares no timeout/retry/circuit-breaker/fallback. Warn-first via `.resilience.json`, reviewed per-file opt-out. |
 | `scripts/validate-plugin.sh`           | Plugin self-test: SKILL.md frontmatter validity, JSON/YAML parse, cross-reference integrity, enforcement-script syntax.                   |
 
 ## How the two halves compose

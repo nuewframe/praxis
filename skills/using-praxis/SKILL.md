@@ -117,6 +117,9 @@ Praxis ships generic, configurable enforcement scripts. Wire them into the proje
 | `scripts/check-port-adapter-parity.sh` | `*.ports.*` with no adapter; warns if no in-memory test double |
 | `scripts/check-seam-contract-parity.sh` | A seam in `.seam-contracts.json` missing its Shape or Behavior suite; warn-first, mode-promoted |
 | `scripts/check-config-externalized.sh` | Hardcoded remote URLs, endpoints, or secret literals (Configurable anchor); warn-first, reviewed per-line opt-out |
+| `scripts/check-observability-at-seams.sh` | A boundary call with no log/metric/trace/correlation-id (Observable anchor); warn-first, reviewed per-file opt-out |
+| `scripts/check-stateless-request-path.sh` | Node-local mutable state on the request path (Horizontally-scalable anchor); warn-first, reviewed per-line opt-out |
+| `scripts/check-resilient-boundary.sh` | A boundary call with no timeout/retry/circuit-breaker/fallback (Resilient anchor); warn-first, reviewed per-file opt-out |
 | `scripts/validate-plugin.sh` | Plugin self-test (run from this repo) |
 
 ---
