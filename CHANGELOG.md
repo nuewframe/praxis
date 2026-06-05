@@ -4,6 +4,8 @@ All notable changes to the Praxis plugin are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.2.0] — 2026-06-05
+
 ### Added
 
 - **Bundle D enforcement hardening (decision D6, post-ship sparring)** — splits Bundle D's three primitives by *enforceability* and acts on each honestly (plan: `docs/plans/executable-seams-first.md`, §7 + decision D6).
