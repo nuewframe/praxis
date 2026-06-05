@@ -165,7 +165,24 @@ Reviewer mode reads the diff with two lenses: correctness (does it match the pla
 
 **Drift policy:** if the diff drifts from product intent (changed user-visible behavior beyond the thin-slice scope, removed acceptance-criteria coverage), flag it but do not gate. PM gates intent drift at intake and at `close-sprint`.
 
-### Step 5 — PR narrative
+### Step 5 — Adversarial seam-behavior review
+
+The refactor matrix (Step 4) checks *structure*. This step attacks *behavior at each seam the diff touches* — the one thing a fast generator most plausibly fakes (a green-looking test that asserts nothing, a `// idempotent` comment with no test behind it). It is an **adversarial gate**, not an implementer self-check: the reviewer's job here is to disbelieve the claim and demand the test that proves it.
+
+**Who runs it — a different head.** This review defaults to a **genuinely separate session or agent** — or an orchestration runtime (e.g. MPM) dispatching a second head — so the reviewer is not the author defending its own work. When a separate head is unavailable, perform an **explicit reviewer-mode switch with a fresh read of the full diff** rather than relying on author-side memory of intent. Record which path was used in the progress ledger (`sprint-NNN-*.ledger.md`): a self-review carries less assurance than an independent one, and the PR reader must know which they are trusting.
+
+**The attack.** For **each seam this diff touches** (every `<name>@vN` named in the sprint's Production-Readiness conformance block), demand the test — by file and name — that proves the behavioral property. The finding is the *absence of the test*, not the presence of a bug:
+
+- **Resilience** — show the test where the upstream **circuit opens mid-call** or the dependency **times out**, and the caller degrades as the wave posture promises. "It has a timeout configured" is not the evidence; the test that exercises the timeout is.
+- **Idempotency** — prove the handler is **idempotent under retry**: the same key replayed returns the stored response and causes no second effect.
+- **Observability** — point to where the **correlation id crosses the seam** in the emitted log/trace, not merely that a logger is imported.
+- **Concurrency** — for a seam with shared state, show the test that two simultaneous operations are **linearizable** (or behave exactly as the Port promises).
+
+Map each demand back to the Step 2 coverage scenarios; this step turns that list from a self-attested checklist into an adversarial gate run by an independent head.
+
+**Verdict.** For a **high-risk AC at a seam** (Impact = High in the sprint risk register), a single happy-path example is **insufficient** — `create-sprint`'s AC↔test matrix requires a property/contract test there, and this step **rejects** the PR if only an example exists. For every touched seam, either name the passing behavioral test or **bounce back** — implementer mode adds it; reviewer mode does not write the test. A seam whose behavioral property is asserted only in prose is treated as unproven.
+
+### Step 6 — PR narrative
 
 Produce a Pull Request description with these sections:
 
@@ -223,6 +240,14 @@ One paragraph. What changed and why.
 - Follow-up rows triggered: [link the issue, or "none"]
 - Inline change requests: [list, or "none"]
 
+## Adversarial seam review
+
+- Reviewer head: [separate session/agent | same-agent reviewer-mode switch with fresh diff read]
+- Seams attacked: [`<name>@vN`, … — or "none touched"]
+- Behavioral evidence: [per seam: property → passing test file/name]
+- High-risk seam ACs proven by a property/contract test (not an example): [list, or "none"]
+- Bounce-backs filed: [list, or "none"]
+
 ## Telemetry
 
 - Logs added: …
@@ -245,7 +270,7 @@ One paragraph. What changed and why.
 - Tracked separately as: …
 ```
 
-### Step 6 — Final self-correction
+### Step 7 — Final self-correction
 
 Before submitting, re-read the diff one more time. Check for:
 
@@ -267,5 +292,7 @@ Before submitting, re-read the diff one more time. Check for:
 - `BLOCKED` used as a permanent state to hide a real failure. Enforce the TTL.
 - Editing code against a `BLOCKED` (environment) failure instead of fixing the environment.
 - Exceeding the debugging-loop budget — a 4th code edit against an unchanged failing cause instead of halting and escalating.
+- Skipping the adversarial seam review, or running it as author self-review without recording in the ledger that no separate head was available.
+- Accepting a high-risk seam AC backed only by a single happy-path example where a property/contract test is required.
 - "Rollback: revert the commit." Spell out the procedure including data implications.
 - A PR description that doesn't name the trade-off the reviewer should evaluate.

@@ -1,6 +1,6 @@
 # Plan — Executable Seams First, Parallelism as Emergent
 
-**Status:** Shipped — B3-config (`check-config-externalized.sh`), the Bundle A keystone (`define-seam-contract` + `check-seam-contract-parity.sh` + architecture-spec seam declaration + verify wiring), Bundle B B1/B2 (wave Production-Readiness posture + per-slice conformance block + intake gate), and the remaining B3 anchor probes (`check-observability-at-seams.sh`, `check-stateless-request-path.sh`, `check-resilient-boundary.sh` — all four anchors now executable and wired through `verify`). Next per build order: C → D.
+**Status:** Shipped — B3-config (`check-config-externalized.sh`), the Bundle A keystone (`define-seam-contract` + `check-seam-contract-parity.sh` + architecture-spec seam declaration + verify wiring), Bundle B B1/B2 (wave Production-Readiness posture + per-slice conformance block + intake gate), the remaining B3 anchor probes (`check-observability-at-seams.sh`, `check-stateless-request-path.sh`, `check-resilient-boundary.sh` — all four anchors now executable and wired through `verify`), and Bundle C (adversarial seam-behavior review in `verify-and-assemble-pr` + property-over-example at high-risk seams in `create-sprint`/`test-by-ownership`). Next per build order: D.
 **Author:** Principal Engineer (architect mode)
 **Supersedes the roadmap of:** `thin-slice-loop-hardening.md` (Bundles 1–3, already shipped) — this is the Phase 2 direction.
 **Deliverable of this doc:** an implementation plan only. No skill/script/template changes until approved.

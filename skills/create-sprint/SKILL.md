@@ -290,11 +290,13 @@ Per the Pyramid Test Strategy in `test-by-ownership`, specify Logic / Compositio
 
 Every acceptance criterion maps to at least one test. This matrix is the link the test plan and acceptance criteria otherwise lack — without it, "all tests pass" can be true while an AC is silently uncovered. `intake-code-contribution` checks every AC has a mapped test before implementation; `verify-and-assemble-pr` checks every mapped test actually ran.
 
-| AC ID | Acceptance criterion | Test layer | Test file / name | Status |
-| ----- | -------------------- | ---------- | ---------------- | ------ |
-| AC-1 | [Given/when/then] | Logic/Composition/Journey | [file → test name] | ⚪ / 🔴 / 🟢 |
+| AC ID | Acceptance criterion | Test layer | Test file / name | Evidence | Status |
+| ----- | -------------------- | ---------- | ---------------- | -------- | ------ |
+| AC-1 | [Given/when/then] | Logic/Composition/Journey | [file → test name] | example / property | ⚪ / 🔴 / 🟢 |
 
 Rule: no AC may be left without a mapped test. If a criterion is genuinely unverifiable by an automated test, state the manual verification method explicitly in the row.
+
+**Property over example at high-risk seams.** For an AC whose Impact is **High** in the risk register **and** which exercises a seam (`<name>@vN`), a single happy-path example is **insufficient** — map it to a **property/contract test** (idempotency ∀ keys, retry-safe ∀ attempts, concurrent ops linearizable) and mark the Evidence column `property`. Example tests remain appropriate for ordinary ACs. This sharpens — it does not replace — the matrix; `verify-and-assemble-pr`'s adversarial seam review (Step 5) rejects a high-risk seam AC backed only by an example.
 
 ---
 
@@ -369,6 +371,10 @@ _Mutable execution state. Survives session death. Deleted at `close-sprint` afte
 - Last verify exit code + cause: —
 - Stop-rule budget: 3 consecutive failed verifies on the same cause → HALT and escalate (project may override)
 
+## Adversarial Seam Review
+
+- Reviewer head used: [separate session/agent | same-agent reviewer-mode switch with fresh diff read] — recorded per the adversarial-review decision; a separate head carries more assurance than a self-review.
+
 ## What's Left
 
 - [next concrete step]
@@ -392,6 +398,7 @@ _Mutable execution state. Survives session death. Deleted at `close-sprint` afte
 - [ ] Production-Readiness conformance block present; seams named and each anchor confirmed conforming or a reviewed deviation recorded
 - [ ] Test plan written in TDD format (tests before implementation), categorized by layer
 - [ ] Acceptance ↔ test traceability matrix present; every AC maps to ≥1 test
+- [ ] High-risk seam ACs (Impact = H, touching a `<name>@vN` seam) mapped to a property/contract test, not a single example
 - [ ] Acceptance criteria match the wave README exactly
 - [ ] Sprint Plan Approval line present (signed for Standard/Major, `n/a (tier: Trivial)` otherwise)
 - [ ] Scope is realistic (1–2 thin-slices typical)
