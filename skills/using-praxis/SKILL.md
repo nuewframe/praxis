@@ -63,6 +63,7 @@ Applies to `src/**`, `packages/**`, `services/**`, `apps/**`, `libs/**`, `module
 - Cross-capability calls go through an explicit public surface. No deep imports across capabilities.
 - Every external call declares timeout, retry policy, fallback, and (for hot paths) circuit breaker.
 - Every cross-process path produces structured logs with correlation ID, plus latency / throughput / error metrics.
+- Two units may be built concurrently only if disjoint across capability/files, persistent resources, and config keys, and each depends only on a frozen `<name>@vN` contract.
 
 ### Code Contribution Intake — `instructions/code-contribution-intake.instructions.md`
 
@@ -121,6 +122,19 @@ Praxis ships generic, configurable enforcement scripts. Wire them into the proje
 | `scripts/check-stateless-request-path.sh` | Node-local mutable state on the request path (Horizontally-scalable anchor); warn-first, reviewed per-line opt-out |
 | `scripts/check-resilient-boundary.sh` | A boundary call with no timeout/retry/circuit-breaker/fallback (Resilient anchor); warn-first, reviewed per-file opt-out |
 | `scripts/validate-plugin.sh` | Plugin self-test (run from this repo) |
+
+---
+
+## Emergent parallelism — the three-axis disjointness rule
+
+Praxis never schedules parallel work. Parallelism is an **emergent permission**, exercised by the human or an orchestration runtime — never forced by the method, never an artifact Praxis produces. A unit of work (a slice/sprint) may run concurrently with another **only if all four conditions hold**:
+
+1. **Capability/file disjoint** — they touch no source file or capability in common.
+2. **Persistent-resource disjoint** — they write no shared table, topic, queue, cache, or migration in common.
+3. **Config-key disjoint** — they mutate no shared configuration key in common.
+4. **Frozen-contract dependent** — each depends only on a frozen `<name>@vN` seam contract (`define-seam-contract`), never on the other's in-flight internals.
+
+Capability-disjointness **alone is not sufficient**: two slices in different capabilities still collide if they share a table, a config key, or one consumes the other's unfrozen surface. All three axes *plus* the frozen-contract rule must hold. If any axis overlaps, the units are sequential, not parallel. The collision-safe coordination artifacts (`create-sprint`) and the staleness re-anchor at intake (`intake-code-contribution`) are what make a permitted parallel run *safe*.
 
 ---
 

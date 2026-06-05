@@ -162,3 +162,14 @@ For any non-trivial change, follow the phased workflow defined by this plugin's 
 5. `verify-and-assemble-pr` — TDD verification (per `test-by-ownership`), Port/Adapter parity, PR narrative.
 
 Skip a phase only with explicit human approval.
+
+## 14. Emergent parallelism — the three-axis disjointness rule
+
+Two units of work may be built concurrently **only if all four conditions hold**:
+
+1. **Capability/file disjoint** — no source file or capability in common.
+2. **Persistent-resource disjoint** — no shared table, topic, queue, cache, or migration written by both.
+3. **Config-key disjoint** — no shared configuration key mutated by both.
+4. **Frozen-contract dependent** — each depends only on a frozen `<name>@vN` seam contract, never on the other's in-flight internals.
+
+Capability-disjointness **alone is not safe**: two slices in different capabilities still collide if they share a table, a config key, or one consumes the other's unfrozen surface. If any axis overlaps, the units are sequential, not parallel. Praxis never schedules this — parallelism is a permission the human or an orchestration runtime exercises, granted only when these conditions are met.

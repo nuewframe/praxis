@@ -64,6 +64,10 @@ If those don't exist, define them in the project's own context first.
 
 Find the highest existing `sprint-NNN-*.md` and increment by 1.
 
+**Collision-safe ids (parallel-safe).** When sprints may be created concurrently — siblings worked in parallel sessions or dispatched by an orchestration runtime — a bare increment collides: two slices both grab the same next `NNN`. Mirror the ADR collision scheme (`create-adr`): the base id is the next free `NNN`; if that `NNN` is already taken when you go to write the file, append the shortest unique tiebreaker suffix `.<seq>` (`.01`, `.02`, …) rather than renaming the sibling. Existing sprint ids are immutable; collision handling applies to the new sprint only.
+
+**Per-slice status, not a shared-table race.** Do not record this sprint's live progress by editing a status row that other in-flight slices also edit — the wave README's thin-slice table is a coordination chokepoint under parallelism. Each slice owns its own status surface: its sprint file header `Status` line and its `sprint-NNN-*.ledger.md`. The shared wave README table is reconciled from those per-slice records at `close-sprint`, not raced during the sprint.
+
 ---
 
 ## Step 2 — Select Thin-Slices to Deliver

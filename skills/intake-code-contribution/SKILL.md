@@ -99,6 +99,8 @@ Confirm:
 
 **Production-Readiness conformance gate.** Confirm the sprint's Production-Readiness conformance block names the seam(s) the slice touches and marks each of the four anchors (observable, configurable, horizontally scalable, resilient) as conforming to the wave posture or carrying a reviewed deviation. If the block is blank or an anchor is unaddressed, **stop** — the slice must declare how it preserves the wave's posture before coding (the probes enforce it at `verify`, but the conformance is decided here).
 
+**Snapshot staleness re-anchor gate (parallel-safe).** If this sprint sat queued while sibling slices merged, the engineering current-state snapshot and the seam contracts this slice depends on may have moved since the bridge was frozen. Before coding, re-check: has any `<name>@vN` seam contract this slice depends on, or any current-state fact in the Step-3 snapshot, changed since the sprint froze? If yes, **stop and re-anchor** — re-read the changed contract/snapshot and confirm the slice's plan still holds — before writing code. This is the price of parallelism touching the immutable bridge: paid as a re-anchor *check*, never by editing the frozen scope in place. If a depended-on contract changed incompatibly, the slice's scope is invalid — close the sprint and create a new one rather than coding against a stale freeze.
+
 If no sprint exists, use `create-sprint`. If the sprint exists but does not match the work, do not edit scope in place; close or descope it and create a new sprint.
 
 ---
