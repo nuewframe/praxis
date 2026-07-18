@@ -4,6 +4,17 @@ All notable changes to the Praxis plugin are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- **Inventory-parity check in `validate-plugin.sh`** (check #7) — fails when any `skills/<name>/`, `scripts/*.sh`, or `instructions/*.instructions.md` on disk is not referenced in the canonical self-describing docs (README.md, project-context.md, and — for instructions — `using-praxis`). Makes documentation drift behind the file tree a build-time failure rather than a silent gap.
+
+### Fixed
+
+- **Documentation drift across canonical docs** — `project-context.md` status now reads `v0.2.0`; README's always-on-guardrails table now lists all three instruction sets (adds `code-contribution-intake`); README skills tables + the compose diagram now include `start-thin-slice` and `provision-project-overlay`; `project-context.md` architecture tree now lists all 21 skills and all 12 scripts; `using-praxis` guardrail count corrected from "two" to "three".
+- **Anti-dumping policy parity** — the linter's forbidden-name set (`.anti-dumping.json` + the `check-anti-dumping.sh` suggested config) now includes `lib` and `handlers`, matching the documented capability-driven guardrail (`lib.*` and the `handlers/` silo were previously documented as forbidden but not enforced).
+- **Stale `docs/adr/**` glob** removed from the lean-delivery guardrail `applyTo` (and its `using-praxis` mirror); ADRs live under `docs/architecture/**`.
+- **`LICENSE` file added** (MIT) — previously referenced by `package.json` and README but absent from the tree.
+
 ## [0.2.0] — 2026-06-05
 
 ### Added
@@ -96,7 +107,7 @@ Praxis installs natively into Claude Code, Codex CLI, Codex App, Cursor, Gemini 
 
 ### Tooling
 
-- `scripts/verify.sh` — universal verification entry point copied into every project by `bootstrap-project`.
+- `scripts/verify.sh` — universal verification entry point generated into each project from the plugin's `verify.sh.tmpl` template by `bootstrap-project` (the plugin ships the template, not a root `scripts/verify.sh`).
 - `scripts/check-anti-dumping.sh`, `check-no-skipped-tests.sh`, `check-no-sleep-waits.sh`, `check-port-adapter-parity.sh` — enforcement scripts wired through `verify.sh`.
 - `scripts/validate-plugin.sh` — plugin self-test (SKILL.md frontmatter, JSON/YAML parse, cross-references, manifest version parity).
 - `scripts/bump-version.sh` + `.version-bump.json` — single-source version-bump tool with drift detection.

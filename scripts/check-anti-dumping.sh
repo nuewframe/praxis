@@ -50,8 +50,8 @@ Create one with:
   "scanPaths": ["src/**"],
   "forbiddenNames": [
     "utils", "util", "helpers", "helper",
-    "common", "shared", "misc", "general",
-    "controllers", "services", "models", "views"
+    "common", "shared", "misc", "general", "lib",
+    "controllers", "services", "models", "views", "handlers"
   ],
   "exemptions": []
 }

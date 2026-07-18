@@ -24,6 +24,7 @@ Give your agent Praxis: [Claude Code](#claude-code) · [Codex CLI](#codex-cli) �
 | ----------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
 | `instructions/lean-delivery-guardrails.instructions.md`     | Wave methodology, sprint-as-immutable-bridge, hypothesis cards, intent-not-history doc style, bidirectional sprint close. |
 | `instructions/capability-driven-guardrails.instructions.md` | Capability-driven layout, anti-dumping policy, functional core / imperative shell, ADR discipline, telemetry baseline.    |
+| `instructions/code-contribution-intake.instructions.md`     | Pre-implementation intake gate: anchor every code change to wave, thin-slice, specs, sprint, current code state, and red/green test posture before implementing. |
 
 ### Skills — Lean delivery (planning artifacts)
 
@@ -35,6 +36,7 @@ Give your agent Praxis: [Claude Code](#claude-code) · [Codex CLI](#codex-cli) �
 | `skills/create-quality-spec/`              | Author `qa.md` — risk tiers, test layer mapping, security coverage matrix, observable definition-of-done.                    |
 | `skills/test-by-ownership/`                | Universal Pyramid Test Strategy: Logic base through Journey tip, with "one property of a behavior, one layer" rule.          |
 | `skills/intake-code-contribution/`         | Pre-implementation GenAI contribution gate: wave, thin-slice, specs, sprint, current code, and red/green test posture.       |
+| `skills/start-thin-slice/`                 | Front door for slice work ("Work on TS-NNN"): checks dependency/status preconditions, runs a provisional tier + lightweight ambiguity/pre-mortem, then routes to `create-sprint` or the architect path. |
 | `skills/create-sprint/`                    | Lock the immutable bridge: thin-slice intent + engineering current-state snapshot + hypothesis card + test plan.             |
 | `skills/close-sprint/`                     | Bidirectional outflow: distill learnings into both product artifacts AND engineering artifacts, then delete the sprint file. |
 | `skills/author-user-docs/`                 | TEACH phase — render a validated capability record into Diátaxis user guides (`docs/guides/`); product-designer-owned.       |
@@ -53,13 +55,14 @@ Give your agent Praxis: [Claude Code](#claude-code) · [Codex CLI](#codex-cli) �
 | `skills/implement-with-defensive-patterns/` | Phase 5 — composition over inheritance, shift-left security, structured telemetry.                                   |
 | `skills/verify-and-assemble-pr/`            | Phase 6 — TDD verification, integration boundary tests, PR narrative.                                                |
 | `skills/bootstrap-project/`                 | Greenfield scaffolder — generates `.github/` + `.claude/` + capability-driven `src/` skeleton.                       |
+| `skills/provision-project-overlay/`         | Generate a project-specific `.github/` overlay (skills, agents, prompts, persona instructions) on an existing repo that just installed Praxis; interview-driven, idempotent. |
 | `skills/refactor-layered-to-capability/`    | Migrate a legacy `controllers/` + `services/` + `utils/` codebase into vertical slices.                              |
 
 ### Tooling
 
 | Script                                 | Purpose                                                                                                                                   |
 | -------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| `scripts/check-anti-dumping.sh`        | Linter that fails on `utils/`, `helpers/`, `common/`, `shared/`, `misc.*` inside capability roots. Configurable via `.anti-dumping.json`. |
+| `scripts/check-anti-dumping.sh`        | Linter that fails on catch-all names (`utils/`, `helpers/`, `common/`, `shared/`, `misc.*`, `lib.*`) inside capability roots. Configurable via `.anti-dumping.json`. |
 | `scripts/check-no-skipped-tests.sh`    | Fails on committed `.skip(` / `xit(` / `@Disabled` / `@pytest.mark.skip` markers — quarantined tests should never reach `main`.           |
 | `scripts/check-no-sleep-waits.sh`      | Fails on `Thread.sleep`, `time.sleep`, `waitForTimeout` — hard-wait sleeps hide race conditions and slow suites.                          |
 | `scripts/check-port-adapter-parity.sh` | For every `*.ports.*` ensures at least one adapter exists; warns if no in-memory test double is present.                                  |
@@ -69,7 +72,7 @@ Give your agent Praxis: [Claude Code](#claude-code) · [Codex CLI](#codex-cli) �
 | `scripts/check-stateless-request-path.sh` | Production-readiness probe (Horizontally-scalable anchor): flags node-local mutable state (module-level/static cache/session/registry) on the request path. Warn-first via `.statelessness.json`, reviewed per-line opt-out. |
 | `scripts/check-resilient-boundary.sh` | Production-readiness probe (Resilient anchor): flags a file that makes a boundary call but declares no timeout/retry/circuit-breaker/fallback. Warn-first via `.resilience.json`, reviewed per-file opt-out. |
 | `scripts/check-sprint-id-collision.sh` | Coordination-artifact gate (emergent parallelism): fails when two active sprint files share an id token, the collision a bare `NNN+1` increment causes under parallel sprint creation. Exact, not heuristic. Warn-first via `.sprint-coordination.json`. |
-| `scripts/validate-plugin.sh`           | Plugin self-test: SKILL.md frontmatter validity, JSON/YAML parse, cross-reference integrity, enforcement-script syntax.                   |
+| `scripts/validate-plugin.sh`           | Plugin self-test: SKILL.md frontmatter validity, JSON/YAML parse, cross-reference integrity, manifest version parity, enforcement-script syntax, and inventory parity (every skill/script/instruction is documented in README + project-context). |
 
 ## How the two halves compose
 
@@ -82,6 +85,8 @@ create-product-design-spec                        ↓
 create-product-architecture-spec  ←──────────── design-system-architecture (cross-cutting)
 create-quality-spec               ←──────────── test-by-ownership
   ↓                                             design-capability-layout
+start-thin-slice (triage + route)                 ↓
+  ↓                                             ↓
 create-sprint (immutable bridge)                  ↓
   ↓                                             ↓
 intake-code-contribution                         ↓
