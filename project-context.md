@@ -4,7 +4,7 @@ This is the single entry point for understanding what this plugin is, what belon
 
 ## Identity
 
-**Name:** `praxis` **Purpose:** Encode universal, lean wave-based product delivery **and** Principal-Software-Engineer discipline as installable, versioned guidance for Claude Code, Codex, Cursor, Gemini CLI, OpenCode, and GitHub Copilot, applicable to any language, framework, or runtime. **Status:** v0.2.0 — multi-harness installable plugin.
+**Name:** `praxis` **Purpose:** Encode universal, lean wave-based product delivery **and** Principal-Software-Engineer discipline as installable, versioned guidance for Claude Code, Codex, Cursor, Gemini CLI, OpenCode, and GitHub Copilot, applicable to any language, framework, or runtime. **Status:** v0.3.0 — multi-harness installable plugin.
 
 ## Scope rule (the litmus test)
 
