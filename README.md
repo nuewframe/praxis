@@ -31,13 +31,13 @@ Give your agent Praxis: [Claude Code](#claude-code) · [Codex CLI](#codex-cli) �
 | ------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------- |
 | `skills/create-wave/`                      | Scaffold a new wave with the four-document pattern (README, design, architecture, qa).                                       |
 | `skills/create-product-design-spec/`       | Author `product-design.md` — user journeys, ambiguity handling, recovery paths.                                              |
-| `skills/create-product-architecture-spec/` | Author wave-scoped `product-architecture.md` — domain ownership, contracts, third-party integrations, configuration.         |
+| `skills/create-product-architecture-spec/` | Author wave-scoped `product-architecture.md` — the wave's **bet**: domain ownership, contracts, seams, integrations, pointing into the durable capability records.         |
 | `skills/create-quality-spec/`              | Author `qa.md` — risk tiers, test layer mapping, security coverage matrix, observable definition-of-done.                    |
 | `skills/test-by-ownership/`                | Universal Pyramid Test Strategy: Logic base through Journey tip, with "one property of a behavior, one layer" rule.          |
 | `skills/intake-code-contribution/`         | Pre-implementation GenAI contribution gate: wave, thin-slice, specs, sprint, current code, and red/green test posture.       |
 | `skills/create-sprint/`                    | Lock the immutable bridge: thin-slice intent + engineering current-state snapshot + hypothesis card + test plan.             |
 | `skills/close-sprint/`                     | Bidirectional outflow: distill learnings into both product artifacts AND engineering artifacts, then delete the sprint file. |
-| `skills/create-adr/`                       | Architecture Decision Records with mandatory alternatives table.                                                             |
+| `skills/create-adr/`                       | Immutable Architecture Decision Records (with an as-of-decision diagram + mandatory alternatives table), homed in the durable architecture tree `docs/architecture/<capability>/adr/`. |
 | `skills/define-seam-contract/`             | Define a Seam Contract for a boundary: machine-readable Shape + shared Behavior suite + frozen `<name>@vN` id in `.seam-contracts.json`. |
 
 ### Skills — Principal Engineer discipline (phased delivery + bootstrap)

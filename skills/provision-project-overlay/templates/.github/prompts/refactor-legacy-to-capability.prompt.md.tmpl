@@ -151,8 +151,9 @@ rows, not the whole approach.
 ## Step 7 — ADR per extracted capability
 
 Write an Architecture Decision Record for the extraction. One per capability,
-numbered sequentially in the project's ADR directory
-(typically `docs/adr/` or `docs/product/adr/`).
+homed at `{{paths.architecture}}/<capability>/adr/` following the `create-adr` ID
+convention, and update the capability record at
+`{{paths.architecture}}/<capability>/README.md` to the post-migration current-state.
 
 ```markdown
 # ADR-NNN: Extract `<capability>` from layered structure

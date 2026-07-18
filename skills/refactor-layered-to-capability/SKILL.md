@@ -90,9 +90,9 @@ Forbidden choice: leave it in `utils/` "for now."
 - Tests for moved functions get moved with the function.
 - Run the full test suite after each step. Green before proceeding.
 
-### Step 7 — Update the ADR registry
+### Step 7 — Update the durable architecture tree
 
-Write an ADR per migrated capability:
+Write an ADR per migrated capability, homed at `docs/architecture/<capability>/adr/`, and update (or create) the capability record at `docs/architecture/<capability>/README.md` to the post-migration current-state:
 
 - "ADR.<ID>: Extract `<capability>` from layered structure"
 - Reference the source files, the new location, the migration steps taken, and the callers updated.

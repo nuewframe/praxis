@@ -17,10 +17,12 @@ A **wave** is the unit of intent in the Nuewframe Method — a coherent slice of
 This skill creates the wave scaffold. After the scaffold exists:
 
 - Use `create-product-design-spec` to author `product-design.md`
-- Use `create-product-architecture-spec` to author `product-architecture.md`
+- Use `create-product-architecture-spec` to author `product-architecture.md` (the wave's **bet**, not the durable record)
 - Use `create-quality-spec` to author `qa.md`
-- Use `design-system-architecture` when the wave introduces a new subsystem, runtime boundary, or platform-wide constraint
+- Use `design-system-architecture` when the wave introduces a new subsystem, runtime boundary, or platform-wide constraint — it persists the durable architecture into `docs/architecture/`
 - Use `create-adr` when the wave makes a durable technical decision
+
+**Wave = bet; capability record = truth.** The wave's `product-architecture.md` is a planning-stage hypothesis. The living, validated architecture lives in the durable tree — `docs/architecture/README.md` (system overview) and `docs/architecture/<capability>/` (capability records) — and is promoted there by `close-sprint`.
 
 ## Project conventions
 
@@ -145,7 +147,7 @@ Create empty stubs with file titles. Author each through its dedicated skill:
 - `product-architecture.md` → `create-product-architecture-spec`
 - `qa.md` → `create-quality-spec`
 
-If the wave introduces system-wide concerns (new subsystem, integration, runtime boundary), also invoke `design-system-architecture` and pair with `create-adr`.
+If the wave introduces system-wide concerns (new subsystem, integration, runtime boundary), also invoke `design-system-architecture` — which writes the durable topology and resilience posture into `docs/architecture/` — and pair with `create-adr`. The wave documents stay the bet; the durable record lives under `docs/architecture/`.
 
 ---
 

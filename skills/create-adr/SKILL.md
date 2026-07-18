@@ -27,13 +27,23 @@ Use this skill when making a significant technical decision that needs durable d
 
 ## Project Conventions
 
-This skill assumes the host project defines:
+ADRs live in the durable architecture tree, homed at the **altitude of the decision**:
 
-- An **ADR directory** (commonly `docs/product/adr/` or `docs/adr/`)
-- An **ADR index** (commonly a table in `project-context.md` or a dedicated `README.md` in the ADR directory)
-- ADR file naming: `ADR.<ID>-descriptive-name.md`
+- **Capability-scoped decision** → `docs/architecture/<capability>/adr/ADR.<ID>-descriptive-name.md`
+- **Cross-capability / system-wide decision** → `docs/architecture/adr/ADR.<ID>-descriptive-name.md`
 
-If those don't exist, define them in the project's own context first.
+Each ADR is registered in an **ADR index** — a table in the capability record (`docs/architecture/<capability>/README.md`), or in the system overview (`docs/architecture/README.md`) for cross-capability decisions.
+
+### ADR (immutable) vs. capability record (living)
+
+An ADR is an **immutable decision point**. It records *why* a durable choice was made, with a diagram of the shape **as of that decision**. It never mutates to track drift — a superseding ADR replaces it.
+
+The **living, current-state** architecture lives elsewhere and is edited in place:
+
+- **Capability record** (`docs/architecture/<capability>/`) — the truth for one capability.
+- **System overview** (`docs/architecture/README.md`) — the cross-capability topology and product-wide posture.
+
+The wave `product-architecture.md` is the **hypothesis** (the bet); the capability record is the **truth**. An ADR is the frozen decision between them. If these homes don't exist yet, define them in the project's own context first.
 
 ---
 
@@ -117,6 +127,26 @@ When registering a new ADR, check the project's ADR directory for existing IDs a
 
 ---
 
+## Architecture Snapshot (as of this decision)
+
+<!-- The shape this decision commits to, frozen at decision time. This is a
+     point-in-time snapshot, NOT the living architecture. Current-state topology
+     lives in the capability record (docs/architecture/<capability>/). -->
+
+```mermaid
+flowchart LR
+  %% Boxes = capabilities/components this decision commits to.
+  %% Edges = call types (sync REST/gRPC, async event). Mark trust boundaries.
+```
+
+Resilience posture committed by this decision (only if the decision sets one):
+
+| Boundary call | Timeout | Retry           | Fallback / degraded behavior |
+| ------------- | ------- | --------------- | ---------------------------- |
+| [call]        | [e.g. 2s] | [e.g. 3x, jitter] | [what the user sees on failure] |
+
+---
+
 ## Alternatives Considered
 
 <!-- MANDATORY: Every ADR must include a comparison table with at least 2 alternatives -->
@@ -158,27 +188,30 @@ When registering a new ADR, check the project's ADR directory for existing IDs a
 
 ## Related Documents
 
+- **Capability record (living architecture this decision shapes):** `docs/architecture/<capability>/README.md` — REQUIRED
+- **Supersedes / Superseded by:** ADR.<ID> (if any)
 - [Link to related ADRs]
-- [Link to relevant handbook section]
-- [Link to wave or sprint that implements this]
+- [Link to the wave or sprint that triggered this decision]
 ```
 
 ---
 
 ## Step 3 — Register in the ADR Index
 
-Add the ADR to the project's index (e.g. table in `project-context.md`):
+Add the ADR to the index at its altitude — the capability record for a capability-scoped decision, or the system overview for a cross-capability one:
 
 ```markdown
-| [ADR.<ID>: Decision Title](path/ADR.<ID>-descriptive-name.md) | [Brief purpose, e.g., "Real-time sync strategy (Accepted)"] |
+| [ADR.<ID>: Decision Title](adr/ADR.<ID>-descriptive-name.md) | [Brief purpose, e.g., "Real-time sync strategy (Accepted)"] |
 ```
 
 ---
 
 ## Step 4 — Cross-Reference if Strategic
 
-If the ADR represents a significant architectural milestone, link it from:
+Every ADR links to the **capability record it shapes**. If the ADR represents a significant architectural milestone, also link it from:
 
+- The capability record (`docs/architecture/<capability>/README.md`) — always; update the record's current-state to reflect the decision
+- The system overview (`docs/architecture/README.md`) when the decision is cross-capability
 - The product dashboard under the relevant wave or platform section
 - The wave `product-architecture.md` that triggered the decision
 - Any superseded ADR (mark the older one as `Superseded by ADR.<ID>`)
@@ -192,9 +225,11 @@ If the ADR represents a significant architectural milestone, link it from:
 - [ ] Status field is **machine-readable on a single line** (`**Status:** Accepted`) so the validator and implementer-mode gate can parse it
 - [ ] Context explains the _why_, not the solution
 - [ ] Decision statement is unambiguous
+- [ ] Architecture snapshot diagram included (the shape as of this decision)
 - [ ] Alternatives comparison table present with at least 2 alternatives
 - [ ] Consequences cover both positive **and** negative outcomes
-- [ ] Registered in the ADR index
+- [ ] Links to the capability record it shapes; that record is updated to current-state
+- [ ] Registered in the ADR index (capability record, or system overview if cross-capability)
 - [ ] File named correctly: `ADR.<ID>-descriptive-name.md`
 - [ ] When this ADR is paired with a Major-tier sprint, the sprint file's Design Approval line references this ADR by number
 
@@ -207,4 +242,6 @@ If the ADR represents a significant architectural milestone, link it from:
 - Omitting negative consequences ("there are no downsides")
 - Marking everything `Accepted` without a deciders field
 - Embedding implementation code instead of pattern guidance
+- Editing a published ADR to track architecture drift instead of superseding it and updating the capability record in place
+- Duplicating the living current-state topology into the ADR — the snapshot is frozen as-of-decision; the capability record owns current-state
 - Implementer mode flipping `status` from `Proposed` to `Accepted` to unblock itself — only architect mode + a human approver may set `Accepted`

@@ -48,8 +48,13 @@ Create this layout (paths adapted to the language):
 │   └── CLAUDE.md                        # mirrors copilot-instructions; entry point for Claude Code
 ├── docs/
 │   ├── project-context.md               # single entry point — how to navigate this repo
-│   ├── adr/
-│   │   └── ADR.<ID>-initial-architecture.md
+│   ├── architecture/                     # durable architecture tree (living = the truth)
+│   │   ├── README.md                     # system overview: cross-capability topology + posture
+│   │   ├── adr/
+│   │   │   └── ADR.<ID>-technology-stack.md   # cross-capability decisions
+│   │   └── <capability-1>/
+│   │       ├── README.md                 # capability record (current-state truth)
+│   │       └── adr/                       # capability-scoped decisions
 │   ├── product/
 │   │   └── waves/
 │   │       └── wave-000-bootstrap/
@@ -151,7 +156,7 @@ The pipeline is:
 1. Capability-driven layout — no `controllers/`, `services/`, `models/` silos.
 2. Anti-dumping — no `utils/`, `helpers/`, `common/`, `shared/`, `misc.*`.
 3. Functional core, imperative shell — business logic does not depend on I/O.
-4. ADR for every significant decision in `docs/adr/`.
+4. ADR for every significant decision, homed in the durable architecture tree (`docs/architecture/<capability>/adr/`, or `docs/architecture/adr/` for cross-capability decisions).
 5. Tests live with the capability, not in a separate tree.
 6. Telemetry: structured logs, p95/p99 metrics, trace propagation. No `console.log` / `print`.
 ```
@@ -190,7 +195,7 @@ Single entry point. Read this first.
 
 ## Architecture
 
-See [docs/adr/ADR.<ID>-initial-architecture.md](adr/ADR.<ID>-initial-architecture.md).
+Durable architecture lives in [docs/architecture/](architecture/): the system overview ([README.md](architecture/README.md)), per-capability records (`<capability>/README.md`, the current-state truth), and ADRs (`architecture/adr/` for cross-capability, `<capability>/adr/` for capability-scoped). Start at [docs/architecture/adr/ADR.<ID>-technology-stack.md](architecture/adr/ADR.<ID>-technology-stack.md).
 
 ## Conventions
 
@@ -208,9 +213,9 @@ See [docs/adr/ADR.<ID>-initial-architecture.md](adr/ADR.<ID>-initial-architectur
 - `<test command>`
 ```
 
-### Step 7 — Generate `docs/adr/ADR.<ID>-initial-architecture.md`
+### Step 7 — Generate the durable architecture tree
 
-Use the ADR template from `design-capability-layout` and apply the `create-adr` ID convention for this first ADR as well. Fill in:
+Create `docs/architecture/README.md` (system overview stub: capability list + a placeholder cross-capability topology and product-wide posture) and the first ADR at `docs/architecture/adr/ADR.<ID>-technology-stack.md` (a cross-capability decision). Use the ADR template from `create-adr` (which carries an as-of-decision diagram) and apply its ID convention. Fill in:
 
 - The capability list from Step 2.
 - The stack choices from Step 1.
@@ -281,7 +286,7 @@ This project was scaffolded by the `praxis` plugin's `bootstrap-project` skill o
 - `.github/copilot-instructions.md`
 - `.claude/CLAUDE.md`
 - `docs/project-context.md`
-- `docs/adr/ADR.<ID>-initial-architecture.md`
+- `docs/architecture/README.md` and `docs/architecture/adr/ADR.<ID>-technology-stack.md`
 - `src/<capability>/` skeletons for: <list>
 - `scripts/check-anti-dumping.sh`
 - `.anti-dumping.json`
@@ -314,6 +319,6 @@ Do not write feature code as part of bootstrap.
 ## Anti-patterns
 
 - Generating `src/utils/` or `src/controllers/` because the language convention "expects it." It doesn't.
-- Skipping the first ADR because "we'll write ADRs later." The first ADR captures the bootstrap decision itself and establishes the ADR registry.
+- Skipping the first ADR because "we'll write ADRs later." The first ADR captures the bootstrap decision itself and establishes the durable architecture tree (`docs/architecture/`).
 - Generating sample code that violates the capability-driven structure as a "starter."
 - Writing `.github/copilot-instructions.md` that re-states everything from the plugin instead of referencing it. Keep the project file lean.

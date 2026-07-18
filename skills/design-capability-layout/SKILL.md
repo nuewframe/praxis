@@ -92,7 +92,7 @@ If two capabilities are calling each other in both directions, that is a smell. 
 
 ### Step 5 — Produce the ADR
 
-Write an Architecture Decision Record using this template. Use the ADR ID convention from `create-adr` in the project's ADR directory.
+Write an Architecture Decision Record using this template. Use the ADR ID convention from `create-adr`, homed in the durable architecture tree at `docs/architecture/<capability>/adr/` (or `docs/architecture/adr/` for a cross-capability decision), and link it to the capability record it shapes.
 
 ```markdown
 # ADR.<ID>: <decision title>

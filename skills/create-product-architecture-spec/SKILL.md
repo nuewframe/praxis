@@ -29,12 +29,30 @@ For broader concerns, pair this skill with:
 | Per-capability folder layout and functional core / imperative shell mapping | `design-capability-layout`    |
 | Durable technical decision the wave makes                                   | `create-adr`                  |
 | Phase-1 unknowns that must be resolved before architecture can land         | `discovery-and-ambiguity-log` |
+| The living, current-state architecture of a capability                      | capability record — `docs/architecture/<capability>/` |
+| The cross-capability topology and product-wide posture                      | system overview — `docs/architecture/README.md` |
+
+---
+
+## Wave = Bet, Not Record
+
+This document is the wave's **hypothesis** — the technical shape you *bet* will deliver the wave's intent, drawn at planning time, before you have built or measured anything. It is provisional and intent-coupled by design.
+
+It is **not** the durable architecture record. The living, validated current-state lives in the durable architecture tree:
+
+- **Capability record** (`docs/architecture/<capability>/`) — the truth for one capability.
+- **System overview** (`docs/architecture/README.md`) — cross-capability topology + product-wide posture.
+- **ADRs** (`docs/architecture/<capability>/adr/`) — immutable decisions.
+
+So this spec is **forward-looking and pointer-heavy**: it names the bet, the seams it introduces, and the decisions that will need ADRs — and it **points into** the durable records rather than duplicating their current-state topology. When a sprint validates the bet, `close-sprint` promotes the learning into the capability record and system overview. **Wave = bet; capability record = truth.**
+
+The moment this document starts describing current-state topology as settled fact, it has drifted into the capability record's job — link out instead.
 
 ---
 
 ## What This Skill Produces
 
-A planning-stage wave-level technical architecture spec. Not implementation code. Not a sprint execution plan. The wave README remains the only place that tracks thin-slice status or correction notes.
+A planning-stage wave-level technical architecture **hypothesis** — the bet. Not implementation code. Not a sprint execution plan. Not the durable architecture record (that is the capability record + system overview, promoted on `close-sprint`). The wave README remains the only place that tracks thin-slice status or correction notes.
 
 A strong `product-architecture.md` answers:
 
@@ -225,6 +243,8 @@ A wave architecture doc references decisions; durable technical policy belongs i
 
 \`\`\`text [Context or flow diagram] \`\`\`
 
+> Point into the durable record for current-state: capability record(s) at `docs/architecture/<capability>/` and the system overview at `docs/architecture/README.md`. Sketch here only the *change* this wave bets on.
+
 ## Domain Structure
 
 [Affected domains, new modules, responsibility boundaries.]
@@ -275,7 +295,12 @@ A wave architecture doc references decisions; durable technical policy belongs i
 
 ## ADR Reference
 
-- [ADR link or note that ADR is required]
+- [Link to ADRs in `docs/architecture/<capability>/adr/`, or note which durable decisions this wave will require an ADR for]
+
+## Durable Architecture Pointers
+
+- Capability record(s): `docs/architecture/<capability>/`
+- System overview: `docs/architecture/README.md`
 ```
 
 ---

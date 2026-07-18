@@ -1,5 +1,5 @@
 ---
-applyTo: "docs/product/**, docs/waves/**, docs/sprints/**, docs/adr/**"
+applyTo: "docs/product/**, docs/architecture/**, docs/waves/**, docs/sprints/**, docs/adr/**"
 description: >
   Always-on lean delivery guardrails: wave methodology, sprint as immutable bridge, hypothesis
   cards, intent-not-history doc style, bidirectional sprint close. Pairs with

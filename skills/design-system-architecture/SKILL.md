@@ -120,16 +120,39 @@ For any data change, prefer the **expand / contract** pattern (zero downtime):
 
 State the steps explicitly per change. Name the rollback point at each step.
 
-### Step 7 — Stop
+### Step 7 — Persist to the durable architecture tree
 
-Output, in order:
+The outputs above are the durable architecture record. **They must not evaporate into chat.** Write them into `docs/architecture/` so the topology and resilience posture survive the session. Three homes, by altitude:
 
-1. Topology diagram.
-2. Sync vs. async decisions with rationale.
-3. Resilience table.
-4. Contract specs (one per interface).
-5. Storage choices with rationale.
-6. Schema evolution plan (if any data change).
+**Whole-system overview** → `docs/architecture/README.md` (living)
+
+- The cross-capability topology diagram — the edges *between* capabilities (no single capability owns an edge, so it lives here).
+- The product-wide four-anchor posture (observable, configurable, horizontally scalable, resilient).
+- An index of capabilities and system-level ADRs.
+
+**Per-capability record** → `docs/architecture/<capability>/README.md` (living)
+
+- The capability's current-state topology, call types, and resilience table.
+- Storage engine + rationale; schema evolution state.
+- Contract / seam references (`<name>@vN`).
+- An index of the capability's ADRs.
+- Write it to be legible to a **docs author** (what the capability does, its concepts) as well as an engineer (how it is built). This record is the source the user-facing docs (how-tos, tutorials, product concepts) are generated from downstream.
+
+**Decisions** → one ADR per durable choice — sync/async boundary, storage engine, resilience strategy, trust boundary — via `create-adr`, each carrying a diagram *as of that decision*.
+
+These are **living** documents. On later waves, edit the overview and capability records **in place** to reflect the current truth; spawn a **superseding** ADR when a durable decision changes. The wave `product-architecture.md` stays the **hypothesis** (the bet) and only points into these records — it never duplicates current-state topology (**Wave = bet; capability record = truth**).
+
+### Step 8 — Stop
+
+Confirm what was written, in order:
+
+1. Topology diagram → system overview and/or capability record.
+2. Sync vs. async decisions with rationale → capability record.
+3. Resilience table → capability record; product-wide posture → system overview.
+4. Contract specs (one per interface) → capability record + seam manifest.
+5. Storage choices with rationale → capability record.
+6. Schema evolution plan (if any data change) → capability record.
+7. ADRs spawned for durable decisions.
 
 Then say: **"Please review the architecture. Approve before I proceed to Phase 4 (capability layout)."**
 
@@ -143,3 +166,4 @@ Do not write component file structures or code yet.
 - API contracts without an error envelope.
 - "We'll add tracing later" — design it in now.
 - Schema migrations that require downtime when expand/contract is feasible.
+- Leaving the topology and resilience table in chat only — if Step 7 didn't write them into `docs/architecture/`, the architecture record evaporates.

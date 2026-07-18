@@ -111,7 +111,7 @@ Every significant technical decision produces an Architecture Decision Record. "
 - A change to a public contract.
 - A trade-off where a reasonable engineer could pick differently.
 
-Use the project's ADR location (typically `docs/adr/` or `docs/product/adr/`). Number sequentially.
+Homed in the durable architecture tree by decision altitude: `docs/architecture/<capability>/adr/` for capability-scoped decisions, `docs/architecture/adr/` for cross-capability ones. An ADR is an immutable decision point (with a diagram as of that decision); the living current-state architecture lives in the capability record (`docs/architecture/<capability>/`) and system overview (`docs/architecture/README.md`).
 
 ## 10. Composition over inheritance
 
