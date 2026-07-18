@@ -4,13 +4,15 @@ All notable changes to the Praxis plugin are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.3.0] — 2026-07-18
+
 ### Added
 
 - **Inventory-parity check in `validate-plugin.sh`** (check #7) — fails when any `skills/<name>/`, `scripts/*.sh`, or `instructions/*.instructions.md` on disk is not referenced in the canonical self-describing docs (README.md, project-context.md, and — for instructions — `using-praxis`). Makes documentation drift behind the file tree a build-time failure rather than a silent gap.
 
 ### Fixed
 
-- **Documentation drift across canonical docs** — `project-context.md` status now reads `v0.2.0`; README's always-on-guardrails table now lists all three instruction sets (adds `code-contribution-intake`); README skills tables + the compose diagram now include `start-thin-slice` and `provision-project-overlay`; `project-context.md` architecture tree now lists all 21 skills and all 12 scripts; `using-praxis` guardrail count corrected from "two" to "three".
+- **Documentation drift across canonical docs** — `project-context.md` status now tracks the shipped manifest version; README's always-on-guardrails table now lists all three instruction sets (adds `code-contribution-intake`); README skills tables + the compose diagram now include `start-thin-slice` and `provision-project-overlay`; `project-context.md` architecture tree now lists all 21 skills and all 12 scripts; `using-praxis` guardrail count corrected from "two" to "three".
 - **Anti-dumping policy parity** — the linter's forbidden-name set (`.anti-dumping.json` + the `check-anti-dumping.sh` suggested config) now includes `lib` and `handlers`, matching the documented capability-driven guardrail (`lib.*` and the `handlers/` silo were previously documented as forbidden but not enforced).
 - **Stale `docs/adr/**` glob** removed from the lean-delivery guardrail `applyTo` (and its `using-praxis` mirror); ADRs live under `docs/architecture/**`.
 - **`LICENSE` file added** (MIT) — previously referenced by `package.json` and README but absent from the tree.
