@@ -39,7 +39,7 @@ A sprint locks **product intent** against **engineering current state** at a fix
 
 - Use `create-sprint` to author any sprint. Capture the engineering current-state snapshot — codebase, toolchain, integrations, active ADRs, known debt.
 - Scope is **immutable** once a sprint starts. To change scope, close the sprint and create a new one.
-- Sprint files are **ephemeral** — they live in a sprint directory, not woven into permanent docs. Mutable execution state lives in a separate `sprint-NNN-*.ledger.md` that survives sessions and is deleted at close.
+- Sprint files are **ephemeral** — they live in a sprint directory, not woven into permanent docs. Mutable execution state lives in a separate `SPRINT.<ID>-*.ledger.md` that survives sessions and is deleted at close.
 - Every sprint includes a hypothesis card: hypothesis, validation method, continue/pivot/stop rule.
 - Standard- and Major-tier sprints carry a signed **Sprint Plan Approval** line; implementation does not start until it is signed (Trivial writes `n/a`).
 
@@ -50,7 +50,7 @@ A sprint locks **product intent** against **engineering current state** at a fix
 When a sprint closes, learnings flow to **both** product artifacts AND engineering artifacts. Closing only one side loses half the learning.
 
 - Use `close-sprint`. Verify acceptance criteria, record outcome evidence, distill learnings into wave docs (intent only) and engineering artifacts (handbook, ADRs, capability layouts, refactor records), update the dashboard, then **delete** the sprint file.
-- Wave docs after close: clean present tense, no `Sprint NNN discovered…`, no `Updated after sprint`, no sprint references, no passive history. Rewrite the section to reflect the current correct intent.
+- Wave docs after close: clean present tense, no `SPRINT.<ID> discovered…`, no `Updated after sprint`, no sprint references, no passive history. Rewrite the section to reflect the current correct intent.
 
 ---
 

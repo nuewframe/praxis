@@ -94,7 +94,7 @@ Update the wave documents and dashboard. Apply learnings as **corrections to int
 ### Tone rules — non-negotiable
 
 - Write in clean present tense as if this was always the design
-- No `Sprint NNN discovered…`, `Note:`, `TODO:`, or `Updated after sprint`
+- No `SPRINT.<ID> discovered…`, `Note:`, `TODO:`, or `Updated after sprint`
 - No sprint number or date references in wave content
 - No passive-voice history (`was changed to`, `previously`)
 - If the architecture evolved, rewrite the section to reflect the current correct design
@@ -171,8 +171,8 @@ In the project's product dashboard (e.g. `PRODUCT.md`):
 ## Step 9 — Delete the Sprint File
 
 ```
-rm <sprint-dir>/sprint-NNN-<description>.md
-rm -f <sprint-dir>/sprint-NNN-<description>.ledger.md
+rm <sprint-dir>/SPRINT.<ID>-<slug>.md
+rm -f <sprint-dir>/SPRINT.<ID>-<slug>.ledger.md
 ```
 
 The sprint file is ephemeral collaboration space. Once both shores are updated, delete it. Delete the progress ledger too — it is execution state, not a durable record. Any learning worth keeping has already flowed into the product and engineering artifacts in Steps 4–6.

@@ -59,14 +59,14 @@ Create this layout (paths adapted to the language):
 │   │   ├── <capability-1>/                # capability guide: concepts + how-tos
 │   │   └── tutorials/                     # cross-capability journey tutorials
 │   ├── product/
-│   │   └── waves/
-│   │       └── wave-000-bootstrap/
-│   │           ├── brief.md
-│   │           ├── design.md
-│   │           ├── architecture.md
-│   │           ├── quality.md
-│   │           └── sprints/
-│   │               └── TS-001-placeholder.md
+│   │   ├── waves/
+│   │   │   └── wave-000-bootstrap/
+│   │   │       ├── brief.md
+│   │   │       ├── design.md
+│   │   │       ├── architecture.md
+│   │   │       └── quality.md
+│   │   └── sprints/                       # flat, ephemeral — SPRINT.<ID>-<slug>.md, never nested in a wave
+│   │       └── SPRINT.<ID>-placeholder.md
 │   └── README.md
 ├── src/                                 # or services/ or pkg/ depending on language convention
 │   ├── <capability-1>/
@@ -273,7 +273,7 @@ Create `docs/product/waves/wave-000-bootstrap/` with four placeholder docs:
 
 And one sprint placeholder:
 
-- `sprints/TS-001-placeholder.md` — a Trivial-tier sprint stub the team can either fill in for the first real change or delete. Includes the Design Approval section (n/a since Trivial) so the create-sprint mechanics are visible from day one.
+- `docs/product/sprints/SPRINT.<ID>-placeholder.md` — a Trivial-tier sprint stub the team can either fill in for the first real change or delete. Sprints live **flat** under `docs/product/sprints/`, never nested in a wave, and are deleted at close. Use the collision-safe `SPRINT.<ID>` id convention from `create-adr`. Includes the Design Approval section (n/a since Trivial) so the create-sprint mechanics are visible from day one.
 
 These stubs make the workflow legible to a new contributor without forcing them to learn the persona-mode model first.
 
