@@ -82,7 +82,8 @@ Before any user story, feature, thin-slice, behavior-changing contribution, or n
 
 Use `create-adr` whenever a sprint or wave makes a decision that binds future work — technology selection, architectural pattern, security or infrastructure approach, supersession of a prior decision.
 
-- Sequential numbering, no gaps.
+- Collision-safe date-based IDs (`ADR.<YYMMDD>[.HH…][.seq]`) per `create-adr` — **not** sequential numbering.
+- Immutable once published; supersede with a new ADR rather than editing in place.
 - Mandatory alternatives table with at least two options.
 - Consequences cover both positive **and** negative outcomes.
 

@@ -222,7 +222,7 @@ export { createOrderService } from "./order-processing.service";
 ### ADR (excerpt)
 
 ```markdown
-# ADR-007: Introduce `order-processing` capability
+# ADR.260527: Introduce `order-processing` capability
 
 ## Status
 
@@ -478,12 +478,12 @@ await withTimeout(
 ```markdown
 ## Summary
 
-Introduces `order-processing` capability per ADR-007. Accepts orders with idempotency, calculates tax in a pure functional core, persists to Postgres, and emits `OrderPlaced` on `orders.placed.v1`.
+Introduces `order-processing` capability per ADR.260527. Accepts orders with idempotency, calculates tax in a pure functional core, persists to Postgres, and emits `OrderPlaced` on `orders.placed.v1`.
 
 ## Capability and ADR
 
 - Capability: `order-processing` (new)
-- ADR: ADR-007
+- ADR: ADR.260527
 
 ## Verification
 

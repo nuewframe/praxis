@@ -244,7 +244,7 @@ managed_files:
     target: "{{paths.product_dashboard}}"
     condition: bootstrap.generate_product_dashboard == true
 
-  - template: templates/docs/product/adr/ADR-001-technology-stack.md.tmpl
+  - template: templates/docs/architecture/adr/ADR-technology-stack.md.tmpl
     target: "{{paths.adr}}/ADR.{{bootstrap.first_adr_id}}-technology-stack.md"
     condition: bootstrap.generate_first_adr == true
 
