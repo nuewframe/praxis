@@ -11,10 +11,11 @@
 #
 # Unlike the anchor probes, this is NOT a heuristic — it is an exact, zero-
 # judgment invariant: no two active (non-ledger) sprint files may share the
-# same id token. The id token is the `<id>` in `sprint-<id>-<description>.md`,
-# where `<id>` is `NNN` or the ADR-style collision-safe `NNN.<seq>` form
-# (e.g. `007` or `007.01`). A sprint and its own `*.ledger.md` are not a
-# collision (the ledger is excluded).
+# same id token. The id token is the `<id>` in `SPRINT.<id>-<description>.md`
+# (legacy `sprint-<id>-<description>.md` is also recognized), where `<id>` is
+# the ADR-style collision-safe grammar `<YYMMDD>[.HH[MM[SS]]][.seq]` (or a
+# legacy `NNN[.seq]`), e.g. `260718`, `260718.03`, or `007.01`. A sprint and
+# its own `*.ledger.md` are not a collision (the ledger is excluded).
 #
 # Mode (decision D3 — warn-first, mechanical promotion to fail-closed):
 #   Read from .sprint-coordination.json `mode`:
@@ -88,11 +89,12 @@ fi
 
 # ---- Collect id tokens ------------------------------------------------------
 #
-# Each active sprint is `sprint-<id>-<description>.md`. Exclude `*.ledger.md`
+# Each active sprint is `SPRINT.<id>-<description>.md` (legacy
+# `sprint-<id>-<description>.md` also recognized). Exclude `*.ledger.md`
 # (a ledger shares its sprint's id by design and is not a collision).
 
 set +e
-FILES=$(find "$ROOT/$SPRINT_DIR" -type f -name 'sprint-*.md' ! -name '*.ledger.md' 2>/dev/null)
+FILES=$(find "$ROOT/$SPRINT_DIR" -type f \( -name 'SPRINT.*.md' -o -name 'sprint-*.md' \) ! -name '*.ledger.md' 2>/dev/null)
 FIND_RC=$?
 set -e 2>/dev/null || true
 
@@ -107,12 +109,17 @@ while IFS= read -r f; do
   [[ -z "$f" ]] && continue
   base="${f##*/}"
   stem="${base%.md}"
-  rest="${stem#sprint-}"
-  [[ "$rest" == "$stem" ]] && continue          # did not start with sprint-
+  if [[ "$stem" == SPRINT.* ]]; then
+    rest="${stem#SPRINT.}"
+  elif [[ "$stem" == sprint-* ]]; then
+    rest="${stem#sprint-}"
+  else
+    continue                                    # not a sprint file
+  fi
   id="${rest%%-*}"
   [[ "$id" == "$rest" ]] && continue            # no description segment; skip
-  # id must be NNN or NNN.seq (ADR-style collision-safe form).
-  if ! printf '%s' "$id" | grep -Eq '^[0-9]+(\.[0-9]+)?$'; then
+  # id must be the ADR-style date grammar YYMMDD[.HH...][.seq] or legacy NNN[.seq].
+  if ! printf '%s' "$id" | grep -Eq '^[0-9]+(\.[0-9]+)*$'; then
     continue
   fi
   rel="${f#"$ROOT"/}"
@@ -147,10 +154,10 @@ fi
   echo
   cat <<'EOF'
 Two or more active sprint files share the same id token. Under parallel sprint
-creation a bare "highest NNN + 1" increment double-allocates. Resolve by giving
-the newer sprint the shortest unique ADR-style tiebreaker suffix '.<seq>'
-(e.g. sprint-007.01-...) — existing ids are immutable; rename the new one only
-(plan: create-sprint Step 1, Bundle D / D2).
+creation, two slices can compute the same date-based id in the same instant.
+Resolve by giving the newer sprint the shortest unique ADR-style tiebreaker
+suffix '.<seq>' (e.g. SPRINT.260718.01-...) — existing ids are immutable;
+rename the new one only (plan: create-sprint Step 1, Bundle D / D2).
 
 Mode is 'warn'. Set "mode": "enforce" in .sprint-coordination.json once the
 team routinely creates sprints in parallel (plan decision D3).

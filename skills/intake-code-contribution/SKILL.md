@@ -109,7 +109,7 @@ If no sprint exists, use `create-sprint`. If the sprint exists but does not matc
 
 Inspect the current repository before changing files.
 
-**Resume from the progress ledger first.** If a `sprint-NNN-*.ledger.md` exists for this sprint, read it before re-deriving anything. Restore: which plan phase is in progress, the current red/green test posture, the verify-attempt counter, and what's left. This prevents context amnesia across sessions — do not reconstruct progress from scratch when the ledger already records it.
+**Resume from the progress ledger first.** If a `SPRINT.<ID>-*.ledger.md` exists for this sprint, read it before re-deriving anything. Restore: which plan phase is in progress, the current red/green test posture, the verify-attempt counter, and what's left. This prevents context amnesia across sessions — do not reconstruct progress from scratch when the ledger already records it.
 
 Record:
 

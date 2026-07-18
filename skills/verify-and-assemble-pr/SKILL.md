@@ -115,7 +115,7 @@ An unsupervised agent will happily "fix code" against a failure that is not a co
 Before **every** retry of the `verify` entry point after a failure:
 
 1. **Classify the failure as `FAIL` vs `BLOCKED`** using the table above. A `BLOCKED` failure (environment unreachable, dependency not running) is **not** a reason to edit code — fix or escalate the environment instead.
-2. **Increment the verify-attempt counter** in the progress ledger (`sprint-NNN-*.ledger.md`), scoped to the current root cause.
+2. **Increment the verify-attempt counter** in the progress ledger (`SPRINT.<ID>-*.ledger.md`), scoped to the current root cause.
 
 **Stop rule:** after **3 consecutive failed verify cycles on the same cause** (Praxis default; a project may override the number in its own context), **HALT**. Do not attempt a 4th code edit. Produce a halt summary and escalate to the human:
 
@@ -169,7 +169,7 @@ Reviewer mode reads the diff with two lenses: correctness (does it match the pla
 
 The refactor matrix (Step 4) checks *structure*. This step attacks *behavior at each seam the diff touches* — the one thing a fast generator most plausibly fakes (a green-looking test that asserts nothing, a `// idempotent` comment with no test behind it). It is an **adversarial gate**, not an implementer self-check: the reviewer's job here is to disbelieve the claim and demand the test that proves it.
 
-**Who runs it — a different head.** This review defaults to a **genuinely separate session or agent** — or an orchestration runtime (e.g. MPM) dispatching a second head — so the reviewer is not the author defending its own work. When a separate head is unavailable, perform an **explicit reviewer-mode switch with a fresh read of the full diff** rather than relying on author-side memory of intent. Record which path was used in the progress ledger (`sprint-NNN-*.ledger.md`): a self-review carries less assurance than an independent one, and the PR reader must know which they are trusting.
+**Who runs it — a different head.** This review defaults to a **genuinely separate session or agent** — or an orchestration runtime (e.g. MPM) dispatching a second head — so the reviewer is not the author defending its own work. When a separate head is unavailable, perform an **explicit reviewer-mode switch with a fresh read of the full diff** rather than relying on author-side memory of intent. Record which path was used in the progress ledger (`SPRINT.<ID>-*.ledger.md`): a self-review carries less assurance than an independent one, and the PR reader must know which they are trusting.
 
 **The attack.** For **each seam this diff touches** (every `<name>@vN` named in the sprint's Production-Readiness conformance block), demand the test — by file and name — that proves the behavioral property. The finding is the *absence of the test*, not the presence of a bug:
 

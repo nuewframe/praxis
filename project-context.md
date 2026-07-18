@@ -4,7 +4,7 @@ This is the single entry point for understanding what this plugin is, what belon
 
 ## Identity
 
-**Name:** `praxis` **Purpose:** Encode universal, lean wave-based product delivery **and** Principal-Software-Engineer discipline as installable, versioned guidance for Claude Code, Codex, Cursor, Gemini CLI, OpenCode, and GitHub Copilot, applicable to any language, framework, or runtime. **Status:** v0.1.0 — initial public release; multi-harness installable plugin.
+**Name:** `praxis` **Purpose:** Encode universal, lean wave-based product delivery **and** Principal-Software-Engineer discipline as installable, versioned guidance for Claude Code, Codex, Cursor, Gemini CLI, OpenCode, and GitHub Copilot, applicable to any language, framework, or runtime. **Status:** v0.2.0 — multi-harness installable plugin.
 
 ## Scope rule (the litmus test)
 
@@ -78,8 +78,10 @@ plugin/
 │   ├── create-quality-spec/
 │   ├── test-by-ownership/
 │   ├── intake-code-contribution/
+│   ├── start-thin-slice/
 │   ├── create-sprint/
 │   ├── close-sprint/
+│   ├── author-user-docs/
 │   ├── create-adr/
 │   ├── define-seam-contract/
 │   ├── discovery-and-ambiguity-log/
@@ -88,9 +90,13 @@ plugin/
 │   ├── implement-with-defensive-patterns/
 │   ├── verify-and-assemble-pr/
 │   ├── bootstrap-project/
+│   ├── provision-project-overlay/
 │   └── refactor-layered-to-capability/
 ├── scripts/                                     # generic enforcement tooling capability
 │   ├── check-anti-dumping.sh
+│   ├── check-no-skipped-tests.sh               # test-hygiene gate (no committed skipped tests)
+│   ├── check-no-sleep-waits.sh                 # test-hygiene gate (no hard-wait sleeps)
+│   ├── check-port-adapter-parity.sh            # port/adapter parity gate
 │   ├── check-config-externalized.sh            # production-readiness probe (Configurable anchor)
 │   ├── check-observability-at-seams.sh         # production-readiness probe (Observable anchor)
 │   ├── check-stateless-request-path.sh         # production-readiness probe (Horizontally-scalable anchor)

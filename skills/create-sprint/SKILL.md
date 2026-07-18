@@ -52,21 +52,23 @@ hypothesis card                • engineering current-state snapshot   current 
 
 This skill assumes the host project defines:
 
-- A **sprint directory** (commonly `docs/product/sprints/`)
-- A **sprint file naming** convention: `sprint-NNN-<short-description>.md`
+- A **sprint directory** (commonly `docs/product/sprints/`) — flat and ephemeral; sprints never nest under a wave and are deleted at close
+- A **sprint file naming** convention: `SPRINT.<ID>-<short-description>.md`, where `<ID>` uses the collision-safe date-based grammar from `create-adr` (`<YYMMDD>[.HH[MM[SS]]][.seq]`)
 - A wave directory with at least one wave README containing thin-slices
 
 If those don't exist, define them in the project's own context first.
 
 ---
 
-## Step 1 — Identify the Sprint Number
+## Step 1 — Assign the Sprint ID
 
-Find the highest existing `sprint-NNN-*.md` and increment by 1.
+A sprint is **ephemeral and unreferenced** — nothing durable links to it, and it is deleted at close. It does not carry a memorable sequence number; it carries a collision-safe id so concurrent sprints never clash.
 
-**Collision-safe ids (parallel-safe).** When sprints may be created concurrently — siblings worked in parallel sessions or dispatched by an orchestration runtime — a bare increment collides: two slices both grab the same next `NNN`. Mirror the ADR collision scheme (`create-adr`): the base id is the next free `NNN`; if that `NNN` is already taken when you go to write the file, append the shortest unique tiebreaker suffix `.<seq>` (`.01`, `.02`, …) rather than renaming the sibling. Existing sprint ids are immutable; collision handling applies to the new sprint only.
+Use the **collision-safe date-based grammar from `create-adr`**: `<YYMMDD>[.HH[MM[SS]]][.seq]` (UTC). Today's base id is `<YYMMDD>`; if a sprint file with that id already exists when you go to write, extend along the precision ladder (`.HH` → `.HHMM` → `.HHMMSS`) and fall through to the `.seq` tiebreaker (`.01`, `.02`, …). The file is `SPRINT.<ID>-<slug>.md`.
 
-**Per-slice status, not a shared-table race.** Do not record this sprint's live progress by editing a status row that other in-flight slices also edit — the wave README's thin-slice table is a coordination chokepoint under parallelism. Each slice owns its own status surface: its sprint file header `Status` line and its `sprint-NNN-*.ledger.md`. The shared wave README table is reconciled from those per-slice records at `close-sprint`, not raced during the sprint.
+**Why not a sequential number.** When sprints may be created concurrently — siblings worked in parallel sessions or dispatched by an orchestration runtime — a bare `highest + 1` increment collides: two slices both grab the same next number and race the coordination layer before they ever race the code. Date-based ids make that collision rare; the atomic registry (`.sprint-coordination.json`) is the same-instant backstop. Existing sprint ids are immutable; collision handling applies to the new sprint only.
+
+**Per-slice status, not a shared-table race.** Do not record this sprint's live progress by editing a status row that other in-flight slices also edit — the wave README's thin-slice table is a coordination chokepoint under parallelism. Each slice owns its own status surface: its sprint file header `Status` line and its `SPRINT.<ID>-*.ledger.md`. The shared wave README table is reconciled from those per-slice records at `close-sprint`, not raced during the sprint.
 
 The collision invariant is mechanically enforced: `scripts/check-sprint-id-collision.sh` (wired into `verify`) fails when two active sprint files share an id token. It is exact, not heuristic — warn-first via `.sprint-coordination.json`, promote to `enforce` once the team routinely creates sprints in parallel.
 
@@ -114,7 +116,7 @@ Document the gap explicitly. The sprint plan closes this specific gap.
 ## Step 5 — Create the Sprint File
 
 ```markdown
-# Sprint NNN: [Sprint Title]
+# SPRINT.<ID>: [Sprint Title]
 
 **Status:** 🔄 In Progress | ✅ Complete\
 **Wave:** [wave-category-name]\
@@ -341,21 +343,21 @@ _Capture decisions, discoveries, and scope clarifications during the sprint. The
 The sprint file is the **immutable bridge** — it does not change once work starts. Execution state, however, must survive session death so a multi-session feature does not reconstruct (and drift) its progress from scratch. That state lives in a separate, **mutable** ledger file alongside the sprint:
 
 ```
-<sprint-dir>/sprint-NNN-<description>.ledger.md
+<sprint-dir>/SPRINT.<ID>-<slug>.ledger.md
 ```
 
 Three artifacts, three lifecycles — do not conflate them:
 
 | Artifact | Mutability | Holds |
 |---|---|---|
-| `sprint-NNN-*.md` | Immutable once started | Scope, AC, hypothesis, test plan, approvals |
-| `sprint-NNN-*.ledger.md` | Mutable every session | Plan-phase progress, current test posture, verify-attempt counter |
+| `SPRINT.<ID>-*.md` | Immutable once started | Scope, AC, hypothesis, test plan, approvals |
+| `SPRINT.<ID>-*.ledger.md` | Mutable every session | Plan-phase progress, current test posture, verify-attempt counter |
 | Working Notes (in the sprint file) | Mutable scratch | Free-form discoveries, distilled at close |
 
 Create the ledger from this template:
 
 ```markdown
-# Sprint NNN — Progress Ledger
+# SPRINT.<ID> — Progress Ledger
 
 _Mutable execution state. Survives session death. Deleted at `close-sprint` after learnings are distilled. This is NOT the immutable bridge — never record scope or acceptance-criteria changes here._
 
@@ -392,7 +394,7 @@ _Mutable execution state. Survives session death. Deleted at `close-sprint` afte
 
 ## Quality Checklist
 
-- [ ] Sprint number is sequential
+- [ ] Sprint ID uses the collision-safe date-based grammar (`SPRINT.<ID>`), not a sequential number
 - [ ] Thin-slices referenced from a wave README
 - [ ] Corrections or reopens keep the original thin-slice ID
 - [ ] **Engineering current-state snapshot captured (codebase, toolchain, integrations, ADRs, debt)**
@@ -409,7 +411,7 @@ _Mutable execution state. Survives session death. Deleted at `close-sprint` afte
 - [ ] Sprint Plan Approval line present (signed for Standard/Major, `n/a (tier: Trivial)` otherwise)
 - [ ] Scope is realistic (1–2 thin-slices typical)
 - [ ] Out-of-scope section explicitly documents excluded work
-- [ ] Progress ledger file created alongside the sprint (`sprint-NNN-*.ledger.md`)
+- [ ] Progress ledger file created alongside the sprint (`SPRINT.<ID>-*.ledger.md`)
 
 ---
 

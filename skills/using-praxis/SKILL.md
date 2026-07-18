@@ -18,7 +18,7 @@ This file is your map. Read it once at session start. Load specific skills on de
 1. **Identify the moment.** Is the human asking you to plan, design, implement, review, refactor, or ship?
 2. **Pick the persona.** Three roles, each with a single responsibility (`agents/*.agent.md`).
 3. **Pick the skill.** Each skill is a focused, repeatable workflow (`skills/<name>/SKILL.md`).
-4. **Honor the guardrails.** Two always-on rule sets shape every decision (`instructions/*.instructions.md`).
+4. **Honor the guardrails.** Three always-on rule sets shape every decision (`instructions/*.instructions.md`).
 5. **When the host repo is silent, follow the plugin defaults. When it speaks, the host repo wins.**
 
 ---
@@ -43,7 +43,7 @@ These are loaded automatically by harnesses that support `applyTo`-scoped instru
 
 ### Lean Delivery Guardrails — `instructions/lean-delivery-guardrails.instructions.md`
 
-Applies to `docs/product/**`, `docs/waves/**`, `docs/sprints/**`, `docs/adr/**`.
+Applies to `docs/product/**`, `docs/architecture/**`, `docs/guides/**`, `docs/waves/**`, `docs/sprints/**`.
 
 - Waves are intent, not bigger sprints. Each wave has four documents: README, product-design, product-architecture, qa.
 - Thin-slices are atomic user outcomes with stable IDs (`TS-NNN`). Corrections keep the same ID.
@@ -89,6 +89,7 @@ Skills are grouped by phase. Load the SKILL.md file of any skill you intend to f
 | `create-sprint` | Locking the immutable bridge: thin-slice intent + engineering current-state snapshot + hypothesis card + test plan |
 | `intake-code-contribution` | Pre-implementation gate; mandatory before any code change |
 | `close-sprint` | Distilling learnings bidirectionally into product AND engineering artifacts; deletes the sprint file |
+| `author-user-docs` | TEACH phase — rendering a validated capability record into Diátaxis user guides in `docs/guides/` (product-designer-owned) |
 | `create-adr` | A decision binds future work; ADR with alternatives table required |
 | `define-seam-contract` | A wave/slice crosses a boundary that must be honored executably; produces Shape + Behavior suite + frozen `<name>@vN` id |
 
@@ -174,4 +175,4 @@ Ask the human partner:
 
 > "Tell me about your praxis."
 
-If you can name the three personas, the two always-on guardrail sets, and at least four skills with their triggers, the bootstrap is loaded correctly.
+If you can name the three personas, the three always-on guardrail sets, and at least four skills with their triggers, the bootstrap is loaded correctly.

@@ -9,9 +9,10 @@ The full skill — ADR template, mandatory alternatives table, content disciplin
 
 ## Project-specific paths
 
-- ADR directory: `{{paths.adr}}/`
-- Filename: `ADR-NNN-<kebab-slug>.md` where `NNN` is the next sequential number across the **whole project** (not per-domain).
-- Registration: add the ADR title and one-line summary to `{{paths.project_context}}` under the active ADR list.
+- Durable architecture tree: `{{paths.architecture}}/` — system overview (`README.md`) and per-capability records (`<capability>/README.md`, the current-state truth).
+- ADR home by decision altitude: `{{paths.architecture}}/<capability>/adr/` (capability-scoped) or `{{paths.adr}}/` (cross-capability).
+- Filename + ID: follow the plugin's collision-safe `ADR.<ID>-<kebab-slug>.md` convention.
+- Registration: add the ADR to the capability record's ADR index (or the system overview for a cross-capability decision).
 
 ## When an ADR is mandatory
 
@@ -25,5 +26,5 @@ The full skill — ADR template, mandatory alternatives table, content disciplin
 ## Project-specific gates
 
 - Authored or owned by the principal engineer (`.github/agents/{{personas.aliases.principal-engineer}}.agent.md`).
-- Must be referenced from the relevant wave's `product-architecture.md` if it was driven by wave work.
-- Status transitions (`Proposed` → `Accepted` → `Superseded`) update both the ADR file and `{{paths.project_context}}` in the same commit.
+- Must be referenced from the relevant wave's `product-architecture.md` if it was driven by wave work, and from the capability record it shapes.
+- Status transitions (`Proposed` → `Accepted` → `Superseded`) update the ADR file and its index (capability record or system overview) in the same commit.

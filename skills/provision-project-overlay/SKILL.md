@@ -62,7 +62,9 @@ If the human is unsure on any of these, push back. They shape the overlay; do no
 | Key                       | Default                   |
 | ------------------------- | ------------------------- |
 | `paths.product`           | `docs/product`            |
-| `paths.adr`               | `docs/product/adr`        |
+| `paths.architecture`      | `docs/architecture`       |
+| `paths.guides`            | `docs/guides`             |
+| `paths.adr`               | `docs/architecture/adr`   |
 | `paths.waves`             | `docs/product/waves`      |
 | `paths.sprints`           | `docs/product/sprints`    |
 | `paths.engineering`       | `docs/engineering`        |
@@ -93,7 +95,7 @@ If yes, ask one alias per role. If no, set `personas.use_aliases: false` and ski
 
 1. Generate `docs/project-context.md` skeleton? (default: yes if file does not exist)
 2. Generate `docs/product/PRODUCT.md` skeleton? (default: yes if file does not exist)
-3. Generate `docs/product/adr/ADR.<ID>-technology-stack.md` from the stack answers? (default: yes if file does not exist)
+3. Generate `docs/architecture/adr/ADR.<ID>-technology-stack.md` from the stack answers? (default: yes if file does not exist)
 4. If yes, what is the first ADR `<ID>`? (must follow `create-adr` convention)
 5. Generate `.claude/system-prompt.md` for Claude API / agentic use (Bedrock, Cursor, custom CLIs)? (default: no — only needed if the team uses Claude outside Claude Code)
 6. Generate `.githooks/pre-commit` (anti-dumping + lint + format + type-check)? (default: yes; user must still run `git config core.hooksPath .githooks` to activate)

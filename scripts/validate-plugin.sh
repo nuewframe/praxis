@@ -7,6 +7,12 @@
 #   3. Every YAML file in the repo parses cleanly.
 #   4. Every cross-reference (`<plugin-root>/...`, `skills/<name>/...`,
 #      `agents/<name>...`, `instructions/<name>...`) resolves to a real file.
+#   5. Manifest versions are in parity across all declared manifests.
+#   6. Every enforcement script parses and is executable.
+#   7. Inventory parity: every skill, script, and instruction on disk is
+#      referenced in the canonical self-describing docs (README.md,
+#      project-context.md, and — for instructions — using-praxis), so the
+#      docs cannot silently drift behind the file tree.
 #
 # Compatible with bash 3.2+ (macOS default). Requires python3.
 #
@@ -244,6 +250,72 @@ for s in scripts/check-*.sh; do
 done
 if [[ $ENFORCE_FAIL -ne 0 ]]; then
   printf '%s' "$ENFORCE_REPORT" >&2
+  FAILED=$((FAILED + 1))
+else
+  echo "  ok"
+fi
+
+# 7. Inventory parity: every skill, script, and instruction on disk must be
+#    referenced in the canonical self-describing docs, so the docs cannot
+#    silently drift behind the file tree.
+#      - skills/<name>/        → README.md AND project-context.md
+#      - scripts/check-*.sh    → README.md AND project-context.md
+#      - scripts/*.sh (others) → project-context.md (README allowlist below)
+#      - instructions/*.md     → README.md, project-context.md, using-praxis
+echo "validate-plugin: checking inventory parity..."
+INV_REPORT=$(python3 <<'PY'
+import os, sys
+
+def read(path):
+    try:
+        return open(path).read()
+    except Exception:
+        return ''
+
+readme = read('README.md')
+context = read('project-context.md')
+bootstrap = read('skills/using-praxis/SKILL.md')
+
+problems = []
+
+# README-optional scripts: release/dev tooling not wired into target projects.
+readme_optional_scripts = {'bump-version.sh'}
+
+# Skills — each must appear in README and project-context.
+for skill in sorted(d for d in os.listdir('skills') if os.path.isdir(os.path.join('skills', d))):
+    if not os.path.isfile(os.path.join('skills', skill, 'SKILL.md')):
+        continue
+    if skill not in readme:
+        problems.append(f'skills/{skill}: not referenced in README.md')
+    if skill not in context:
+        problems.append(f'skills/{skill}: not referenced in project-context.md')
+
+# Scripts — every script must appear in project-context; check-*.sh + others
+# (minus the release allowlist) must also appear in README.
+for script in sorted(f for f in os.listdir('scripts') if f.endswith('.sh')):
+    if script not in context:
+        problems.append(f'scripts/{script}: not referenced in project-context.md')
+    if script not in readme_optional_scripts and script not in readme:
+        problems.append(f'scripts/{script}: not referenced in README.md')
+
+# Instructions — each always-on guardrail must appear in README, project-context,
+# and the bootstrap skill index, so the guardrail count never diverges.
+for instr in sorted(f for f in os.listdir('instructions') if f.endswith('.instructions.md')):
+    if instr not in readme:
+        problems.append(f'instructions/{instr}: not referenced in README.md')
+    if instr not in context:
+        problems.append(f'instructions/{instr}: not referenced in project-context.md')
+    if instr not in bootstrap:
+        problems.append(f'instructions/{instr}: not referenced in skills/using-praxis/SKILL.md')
+
+for p in problems:
+    print(p)
+sys.exit(1 if problems else 0)
+PY
+)
+INV_RC=$?
+if [[ $INV_RC -ne 0 ]]; then
+  echo "$INV_REPORT" >&2
   FAILED=$((FAILED + 1))
 else
   echo "  ok"
