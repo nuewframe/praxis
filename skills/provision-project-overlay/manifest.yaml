@@ -171,6 +171,10 @@ managed_files:
     target: .github/skills/create-adr/SKILL.md
     condition: always
 
+  - template: templates/.github/skills/author-user-docs/SKILL.md.tmpl
+    target: .github/skills/author-user-docs/SKILL.md
+    condition: always
+
   - template: templates/.github/skills/implement-capability-change/SKILL.md.tmpl
     target: .github/skills/implement-capability-change/SKILL.md
     condition: always

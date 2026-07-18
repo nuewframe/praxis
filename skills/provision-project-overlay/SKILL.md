@@ -63,6 +63,7 @@ If the human is unsure on any of these, push back. They shape the overlay; do no
 | ------------------------- | ------------------------- |
 | `paths.product`           | `docs/product`            |
 | `paths.architecture`      | `docs/architecture`       |
+| `paths.guides`            | `docs/guides`             |
 | `paths.adr`               | `docs/architecture/adr`   |
 | `paths.waves`             | `docs/product/waves`      |
 | `paths.sprints`           | `docs/product/sprints`    |

@@ -37,6 +37,7 @@ Give your agent Praxis: [Claude Code](#claude-code) · [Codex CLI](#codex-cli) �
 | `skills/intake-code-contribution/`         | Pre-implementation GenAI contribution gate: wave, thin-slice, specs, sprint, current code, and red/green test posture.       |
 | `skills/create-sprint/`                    | Lock the immutable bridge: thin-slice intent + engineering current-state snapshot + hypothesis card + test plan.             |
 | `skills/close-sprint/`                     | Bidirectional outflow: distill learnings into both product artifacts AND engineering artifacts, then delete the sprint file. |
+| `skills/author-user-docs/`                 | TEACH phase — render a validated capability record into Diátaxis user guides (`docs/guides/`); product-designer-owned.       |
 | `skills/create-adr/`                       | Immutable Architecture Decision Records (with an as-of-decision diagram + mandatory alternatives table), homed in the durable architecture tree `docs/architecture/<capability>/adr/`. |
 | `skills/define-seam-contract/`             | Define a Seam Contract for a boundary: machine-readable Shape + shared Behavior suite + frozen `<name>@vN` id in `.seam-contracts.json`. |
 

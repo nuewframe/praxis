@@ -43,7 +43,7 @@ These are loaded automatically by harnesses that support `applyTo`-scoped instru
 
 ### Lean Delivery Guardrails — `instructions/lean-delivery-guardrails.instructions.md`
 
-Applies to `docs/product/**`, `docs/waves/**`, `docs/sprints/**`, `docs/adr/**`.
+Applies to `docs/product/**`, `docs/architecture/**`, `docs/guides/**`, `docs/waves/**`, `docs/sprints/**`, `docs/adr/**`.
 
 - Waves are intent, not bigger sprints. Each wave has four documents: README, product-design, product-architecture, qa.
 - Thin-slices are atomic user outcomes with stable IDs (`TS-NNN`). Corrections keep the same ID.
@@ -89,6 +89,7 @@ Skills are grouped by phase. Load the SKILL.md file of any skill you intend to f
 | `create-sprint` | Locking the immutable bridge: thin-slice intent + engineering current-state snapshot + hypothesis card + test plan |
 | `intake-code-contribution` | Pre-implementation gate; mandatory before any code change |
 | `close-sprint` | Distilling learnings bidirectionally into product AND engineering artifacts; deletes the sprint file |
+| `author-user-docs` | TEACH phase — rendering a validated capability record into Diátaxis user guides in `docs/guides/` (product-designer-owned) |
 | `create-adr` | A decision binds future work; ADR with alternatives table required |
 | `define-seam-contract` | A wave/slice crosses a boundary that must be honored executably; produces Shape + Behavior suite + frozen `<name>@vN` id |
 

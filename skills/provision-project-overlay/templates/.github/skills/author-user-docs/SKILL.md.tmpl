@@ -1,0 +1,22 @@
+---
+name: author-user-docs
+description: Author or refresh user-facing docs (TEACH) for {{project.name}} from the capability record. Project overlay on top of the plugin's `author-user-docs` skill.
+---
+
+# Author User Docs — TEACH (Project Overlay)
+
+The full skill — the two altitudes, the record-is-source genre boundary, the Diátaxis four quadrants, and the validated-behavior-only rule — is in the `praxis` plugin's `author-user-docs` skill. Read it first.
+
+## Project-specific paths
+
+- Capability guides: `{{paths.guides}}/<capability>/` (concepts + how-tos)
+- Journey tutorials: `{{paths.guides}}/tutorials/` (cross-capability walkthroughs)
+- Source of truth: the capability record at `{{paths.architecture}}/<capability>/`
+- User voice / journeys: the wave `product-design.md` under `{{paths.waves}}/`
+
+## Project-specific gates
+
+- Owned by the product designer (`.github/agents/{{personas.aliases.product-designer}}.agent.md`); the principal engineer reviews technical accuracy.
+- Author only after the behavior has shipped and the capability record reflects it — never teach a hypothesis.
+- Fires from `close-sprint` only when user-observable behavior changed; a pure refactor skips TEACH.
+- Each guide carries `source:` and `last-validated:` front-matter and links back from the capability record.

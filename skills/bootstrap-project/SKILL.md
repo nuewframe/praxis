@@ -55,6 +55,9 @@ Create this layout (paths adapted to the language):
 │   │   └── <capability-1>/
 │   │       ├── README.md                 # capability record (current-state truth)
 │   │       └── adr/                       # capability-scoped decisions
+│   ├── guides/                        # user-facing docs (TEACH) — rendered from capability records
+│   │   ├── <capability-1>/                # capability guide: concepts + how-tos
+│   │   └── tutorials/                     # cross-capability journey tutorials
 │   ├── product/
 │   │   └── waves/
 │   │       └── wave-000-bootstrap/
@@ -287,6 +290,7 @@ This project was scaffolded by the `praxis` plugin's `bootstrap-project` skill o
 - `.claude/CLAUDE.md`
 - `docs/project-context.md`
 - `docs/architecture/README.md` and `docs/architecture/adr/ADR.<ID>-technology-stack.md`
+- `docs/guides/` (user-facing docs home — TEACH; populated once capabilities ship)
 - `src/<capability>/` skeletons for: <list>
 - `scripts/check-anti-dumping.sh`
 - `.anti-dumping.json`

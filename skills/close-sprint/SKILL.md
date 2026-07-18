@@ -33,6 +33,7 @@ product-design.md                 capability record (docs/architecture/<capabili
 product-architecture.md (the bet) ADRs (new or superseded)
 qa.md                             capability layout docs
 PRODUCT dashboard                 refactor records / anti-dumping baseline
+user guides (docs/guides/, TEACH) ← rendered from the capability record
 ```
 
 The wave `product-architecture.md` is the bet; the **capability record is the truth**. Promoting validated learning into the capability record is also what feeds the *next* phase downstream — user docs (how-tos, tutorials, product concepts) are generated from the capability record, not from sprint notes.
@@ -80,6 +81,7 @@ Read the sprint working notes and any deviations from the original plan. Ask in 
 - Did capability ownership shift? Does the capability layout doc need to update?
 - Did the work surface anti-dumping or layout debt that should be tracked?
 - Were there refactor moves worth recording for future similar work?
+- Did user-observable behavior change? If so, which capability guide or journey tutorial must be re-derived (TEACH)?
 
 If nothing changed on a side, skip its updates. But always check both sides.
 
@@ -132,7 +134,19 @@ Engineering artifacts are not just docs — they bind future work. The capabilit
 
 ---
 
-## Step 6 — Mark Thin-Slices Complete
+## Step 6 — Refresh User Docs (TEACH)
+
+If this sprint changed **user-observable behavior**, promote the validated learning one more step: into user-facing teaching. A pure refactor with no observable effect skips this step.
+
+- Refresh the affected **capability guide** (`docs/guides/<capability>/`) and any **journey tutorial** (`docs/guides/tutorials/`) that traverses the changed capability, using `author-user-docs`.
+- Derive from the now-updated capability record — never from sprint notes or the wave `product-architecture.md` bet.
+- Same tone rules: clean present tense, no sprint history. Update each guide's `last-validated` date.
+
+This is the phase the capability record exists to feed. A record updated in Step 5 but a guide left stale means the next user learns yesterday's behavior.
+
+---
+
+## Step 7 — Mark Thin-Slices Complete
 
 In the wave README, update each delivered thin-slice status:
 
@@ -143,7 +157,7 @@ For any descoped thin-slice, leave as `⚪ Not Started`.
 
 ---
 
-## Step 7 — Update the Product Dashboard
+## Step 8 — Update the Product Dashboard
 
 In the project's product dashboard (e.g. `PRODUCT.md`):
 
@@ -154,14 +168,14 @@ In the project's product dashboard (e.g. `PRODUCT.md`):
 
 ---
 
-## Step 8 — Delete the Sprint File
+## Step 9 — Delete the Sprint File
 
 ```
 rm <sprint-dir>/sprint-NNN-<description>.md
 rm -f <sprint-dir>/sprint-NNN-<description>.ledger.md
 ```
 
-The sprint file is ephemeral collaboration space. Once both shores are updated, delete it. Delete the progress ledger too — it is execution state, not a durable record. Any learning worth keeping has already flowed into the product and engineering artifacts in Steps 4–5.
+The sprint file is ephemeral collaboration space. Once both shores are updated, delete it. Delete the progress ledger too — it is execution state, not a durable record. Any learning worth keeping has already flowed into the product and engineering artifacts in Steps 4–6.
 
 ---
 
@@ -171,6 +185,7 @@ The sprint file is ephemeral collaboration space. Once both shores are updated, 
 - [ ] Outcome evidence recorded and continue/pivot/stop decision documented
 - [ ] **Product-side artifacts updated — intent only, no annotations, no sprint references**
 - [ ] **Engineering-side artifacts updated — capability record + system overview (`docs/architecture/`), ADRs, capability layout, refactor record as applicable**
+- [ ] **User docs refreshed (TEACH) when user-observable behavior changed — capability guide / journey tutorial re-derived via `author-user-docs`**
 - [ ] Thin-slices marked ✅ Complete in wave README
 - [ ] Product dashboard reflects current reality
 - [ ] Sprint file deleted
@@ -184,6 +199,7 @@ The sprint file is ephemeral collaboration space. Once both shores are updated, 
 - Annotating wave docs with sprint history instead of rewriting intent
 - Skipping ADR creation for a durable decision because "we'll do it later"
 - Updating ADRs but leaving the capability record stale — the record is the source of truth *and* of the downstream user docs; a stale record misleads the next sprint and the docs author
+- Updating the capability record but leaving the user guide stale after user-observable behavior changed — TEACH is the phase the record exists to feed
 - Letting a descoped thin-slice silently disappear — it must move back to `⚪ Not Started` with intent intact
 - Archiving the sprint file instead of deleting it — the bridge dissolves on close
 - Leaving the progress ledger behind after close — it is execution state, not a record; distill then delete

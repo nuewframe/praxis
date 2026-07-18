@@ -21,6 +21,7 @@ This skill creates the wave scaffold. After the scaffold exists:
 - Use `create-quality-spec` to author `qa.md`
 - Use `design-system-architecture` when the wave introduces a new subsystem, runtime boundary, or platform-wide constraint — it persists the durable architecture into `docs/architecture/`
 - Use `create-adr` when the wave makes a durable technical decision
+- Use `author-user-docs` (TEACH) once a capability's behavior ships, to render the capability record into user guides in `docs/guides/`
 
 **Wave = bet; capability record = truth.** The wave's `product-architecture.md` is a planning-stage hypothesis. The living, validated architecture lives in the durable tree — `docs/architecture/README.md` (system overview) and `docs/architecture/<capability>/` (capability records) — and is promoted there by `close-sprint`.
 
@@ -127,6 +128,7 @@ Wave is complete when:
 
 - [ ] All thin-slices are ✅ Complete
 - [ ] Journey tests pass for all primary scenarios
+- [ ] User guides updated (TEACH) for capabilities whose user-observable behavior changed — via `author-user-docs`
 - [ ] Product dashboard updated to reflect completion
 
 ---
