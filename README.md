@@ -1,6 +1,6 @@
 # Praxis
 
-A portable agent plugin that fuses **lean wave-based product delivery** with **Principal Engineer discipline** into a single composable method. Universal across languages, frameworks, and runtimes; installable into Claude Code, Codex (CLI and App), Cursor, Gemini CLI, OpenCode, and GitHub Copilot (CLI and VS Code).
+A portable agent plugin that fuses **lean wave-based product delivery** with **Principal Engineer discipline** into a single composable method. Language-, framework-, and runtime-agnostic in doctrine (static enforcement is best-effort per language — see [docs/coverage-matrix.md](docs/coverage-matrix.md)); installable into Claude Code, Codex (CLI and App), Cursor, Gemini CLI, OpenCode, and GitHub Copilot (CLI and VS Code).
 
 Praxis is universal: it does not assume any stack. Project-specific rules belong in the project's own `.github/` and `.claude/` files and override anything here.
 
@@ -74,6 +74,7 @@ Give your agent Praxis: [Claude Code](#claude-code) · [Codex CLI](#codex-cli) �
 | `scripts/check-sprint-id-collision.sh` | Coordination-artifact gate (emergent parallelism): fails when two active sprint files share an id token, the collision a bare `NNN+1` increment causes under parallel sprint creation. Exact, not heuristic. Warn-first via `.sprint-coordination.json`. |
 | `scripts/validate-plugin.sh`           | Plugin self-test: SKILL.md frontmatter validity (incl. single-line `tools:`), JSON/YAML parse, cross-reference integrity, manifest version parity, enforcement-script syntax, inventory parity, agent-frontmatter validity, and fenced-code balance. |
 | `scripts/test-probes.sh`               | Self-test for the guardrail probes' language coverage: runs `check-no-skipped-tests.sh` and `check-no-sleep-waits.sh` against multi-language fixtures and asserts the expected verdicts. |
+| `scripts/gen-coverage-matrix.sh`       | Generates / checks `docs/coverage-matrix.md` from each probe's `--include` list, so the language-coverage claim cannot drift from reality. |
 
 ## How the two halves compose
 

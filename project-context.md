@@ -105,6 +105,7 @@ plugin/
 │   ├── check-sprint-id-collision.sh            # coordination-artifact gate (parallel sprint-id collision)
 │   ├── bump-version.sh                          # version-parity tool across manifests
 │   ├── test-probes.sh                           # self-test: probe language coverage (fixtures)
+│   ├── gen-coverage-matrix.sh                   # generate/check docs/coverage-matrix.md from probe includes
 │   └── validate-plugin.sh                       # plugin self-test
 ├── AGENTS.md                                    # bootstrap pointer for AGENTS.md-aware harnesses
 ├── CLAUDE.md                                    # bootstrap pointer for Claude Code

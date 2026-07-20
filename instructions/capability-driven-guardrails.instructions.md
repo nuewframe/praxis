@@ -1,6 +1,6 @@
 ---
 applyTo: "src/**,packages/**,services/**,apps/**,libs/**,modules/**"
-description: Engineering guardrails for source code — capability-driven architecture, anti-dumping policy, functional core / imperative shell, ADR discipline, defensive implementation, and structured telemetry. Universal across languages, frameworks, and runtimes; scoped to source trees so docs, configs, and tooling files aren't constrained by code-shape rules.
+description: Engineering guardrails for source code — capability-driven architecture, anti-dumping policy, functional core / imperative shell, ADR discipline, defensive implementation, and structured telemetry. Language-agnostic in doctrine (static probes cover the languages in docs/coverage-matrix.md); scoped to source trees so docs, configs, and tooling files aren't constrained by code-shape rules.
 ---
 
 # Capability-Driven Engineering Guardrails

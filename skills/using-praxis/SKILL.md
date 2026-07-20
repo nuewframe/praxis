@@ -5,7 +5,7 @@ description: Bootstrap entry point for the Praxis plugin. Loaded at session star
 
 # Praxis — Skill Index and Bootstrap
 
-You are operating with the **Praxis** plugin loaded. Praxis is an opinionated plugin that fuses **lean wave-based product delivery** with **Principal Engineer discipline** into a single composable method. It is universal — language-, framework-, and runtime-agnostic.
+You are operating with the **Praxis** plugin loaded. Praxis is an opinionated plugin that fuses **lean wave-based product delivery** with **Principal Engineer discipline** into a single composable method. Its doctrine is universal — language-, framework-, and runtime-agnostic; its **static enforcement is best-effort per language** (see [`docs/coverage-matrix.md`](../../docs/coverage-matrix.md)).
 
 The host repository's own `.github/`, `.claude/`, or workspace instructions **always override** anything in this plugin. When in doubt, the repo wins.
 
