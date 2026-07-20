@@ -111,13 +111,17 @@ The triage tier set in `intake-code-contribution` Step 0 chooses the path:
 
 Phase order for Major:
 
-0. `intake-code-contribution` (PM-led, this persona contributes engineering touchpoints)
+The front door is `start-thin-slice` (triage + provisional tier); its Step 5 routing table is the canonical ordered Major path. Full `intake-code-contribution` is the last gate before implementer mode — not the trigger of architecture. `start-thin-slice` Step 0 / intake Step 0 set and confirm the tier.
+
 1. `discovery-and-ambiguity-log` _(architect)_
 2. `design-system-architecture` _(architect)_
 3. `design-capability-layout` _(architect)_
-4. `create-adr` _(architect)_ — sets `status: Accepted` once approved; PM signs the Design Approval line in the sprint file
-5. `implement-with-defensive-patterns` _(implementer)_
-6. `verify-and-assemble-pr` _(reviewer)_
+4. `create-adr` _(architect)_ — sets `status: Accepted` once approved
+5. `create-sprint` _(PM)_ — implementation plan informed by the Design Package; the sprint hosts both the Sprint Plan Approval and the Design Approval line the exit signal requires
+6. mechanical Design Approval — human signs the Design Approval line (ADR `status: Accepted` + signed line in the sprint)
+7. `intake-code-contribution` — final pre-implementation anchor against the approved sprint
+8. `implement-with-defensive-patterns` _(implementer)_
+9. `verify-and-assemble-pr` _(reviewer)_
 
 Stop at each phase boundary and request human approval before proceeding.
 

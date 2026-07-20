@@ -31,7 +31,7 @@ Before any other intake work, classify the change into one of three tiers. The t
 | ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
 | **Trivial**  | ≤ ~20 LOC, single capability, no public contract change, no new dependency, no behavior change. Examples: typo, log-line fix, dependency bump, internal rename. | Step 4 (current code touchpoints) and Step 5 (test posture: green-baseline) only.     | Skip architect + full implementer rituals → run `verify-and-assemble-pr`. |
 | **Standard** | Within an existing capability and an active thin-slice; no new capability, no new ADR-level decision; existing wave specs cover the intent.                     | Steps 1-6. Skip Step 2 if wave specs are already current.                             | Skip architect mode. `implement-with-defensive-patterns` → reviewer mode. |
-| **Major**    | New capability; new external dependency; public contract change; cross-cutting trade-off; any change that should produce an ADR.                                | All steps 1-6, including a refreshed Ambiguity Log and architect mode design package. | Architect mode (Phases 1-4) → implementer mode → reviewer mode.           |
+| **Major**    | New capability; new external dependency; public contract change; cross-cutting trade-off; any change that should produce an ADR.                                | All steps 1-6, including a refreshed Ambiguity Log and architect mode design package. | Architect mode (Phases 1–4) → `create-sprint` (plan informed by the Design Package) → mechanical Design Approval → implementer mode → reviewer mode. |
 
 ### Tier Decision Rules
 
@@ -102,6 +102,8 @@ Confirm:
 **Snapshot staleness re-anchor gate (parallel-safe).** If this sprint sat queued while sibling slices merged, the engineering current-state snapshot and the seam contracts this slice depends on may have moved since the bridge was frozen. Before coding, re-check: has any `<name>@vN` seam contract this slice depends on, or any current-state fact in the Step-3 snapshot, changed since the sprint froze? If yes, **stop and re-anchor** — re-read the changed contract/snapshot and confirm the slice's plan still holds — before writing code. This is the price of parallelism touching the immutable bridge: paid as a re-anchor *check*, never by editing the frozen scope in place. If a depended-on contract changed incompatibly, the slice's scope is invalid — close the sprint and create a new one rather than coding against a stale freeze.
 
 If no sprint exists, use `create-sprint`. If the sprint exists but does not match the work, do not edit scope in place; close or descope it and create a new sprint.
+
+**Major-tier ordering.** A Major sprint's implementation plan must be informed by an Accepted ADR — the sprint is created *after* the architect phase (`create-sprint` runs after `create-adr`) so the plan reflects the Design Package, and the sprint is the home of the Design Approval line the architect-mode exit signal requires. If you reached this step on a Major change with **no** Design Package or Accepted ADR, **stop** and run the architect phase first (`discovery-and-ambiguity-log` → `design-system-architecture` → `design-capability-layout` → `create-adr` → `create-sprint`), then resume intake. Do not fabricate a sprint plan ahead of the design.
 
 ---
 
@@ -199,9 +201,9 @@ After intake is complete, hand off according to the declared tier. The principal
 
 | Tier     | Hand-off path                                                                                                                                                                                                                                                                                                                                    |
 | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Trivial  | → `verify-and-assemble-pr` (reviewer mode). Skip architect and implementer ceremonies.                                                                                                                                                                                                                                                           |
+| Trivial  | → `verify-and-assemble-pr` (reviewer mode). Skip architect and implementer ceremonies.                                                                                                                                                                                                                                                          |
 | Standard | → `implement-with-defensive-patterns` (implementer mode) → `verify-and-assemble-pr` (reviewer mode). Existing wave specs are the design package.                                                                                                                                                                                                 |
-| Major    | → `discovery-and-ambiguity-log` → `design-system-architecture` → `design-capability-layout` → `create-adr` (architect mode) → wait for **mechanical Design Approval** (`status: Accepted` ADR + signed Design Approval line in sprint file) → `implement-with-defensive-patterns` (implementer mode) → `verify-and-assemble-pr` (reviewer mode). |
+| Major    | Intake is the **last gate before implementer mode**, not the trigger of architecture. By the time you reach here on a Major change, the architect phase, `create-sprint`, and the signed Design Approval must already be complete (Steps 2–3 verify this). Then → `implement-with-defensive-patterns` (implementer mode) → `verify-and-assemble-pr` (reviewer mode). **Cold-entry redirect:** if you were invoked directly on a Major change with no Design Package, **stop** and run the architect-first path — `discovery-and-ambiguity-log` → `design-system-architecture` → `design-capability-layout` → `create-adr` → `create-sprint` → sign Design Approval — then resume intake. The canonical ordered Major path is defined in `start-thin-slice` Step 5. |
 
 In every tier:
 
@@ -218,6 +220,7 @@ In every tier:
 - [ ] (Standard/Major) Thin-slice acceptance criteria are testable
 - [ ] (Standard/Major) All four wave specs exist and are specific enough
 - [ ] (Standard/Major) Sprint bridge exists and matches the requested work
+- [ ] (Major) Sprint created after the ADR and before the Design Approval gate, with its plan informed by the Design Package
 - [ ] (Standard/Major) Sprint Plan Approval line is signed (or `n/a (tier: Trivial)`)
 - [ ] (Standard/Major) Every acceptance criterion maps to ≥1 test in the traceability matrix
 - [ ] (Standard/Major) Production-Readiness conformance block present; seams named and each anchor conforming or a reviewed deviation recorded
@@ -240,6 +243,7 @@ In every tier:
 - Leaving an acceptance criterion with no mapped test and proceeding anyway
 - Letting missing `product-design.md`, `product-architecture.md`, or `qa.md` become implementation guesswork
 - Starting Major-tier implementation before mechanical Design Approval is recorded
+- Routing a Major change to the Design Approval gate before `create-sprint` has created the sprint that hosts the Design Approval line
 - Implementer silently editing an Accepted ADR mid-flight instead of bouncing back to architect mode
 - Writing production code before red-first tests for changed behavior
 - Refactoring without green-baseline evidence

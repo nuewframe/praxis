@@ -262,6 +262,8 @@ If this sprint is Trivial-tier, write `n/a (tier: Trivial)`. This gate is distin
 
 This is the **mechanical gate** between architect mode and implementer mode for Major-tier changes. Implementer mode does not start until both signals are present:
 
+On the Major path this sprint is created **after** the ADR is Accepted (`create-adr` → `create-sprint`), so its implementation plan reflects the Design Package. This sprint is the home of the Design Approval line that architect mode's exit signal requires — without it the gate below has nowhere to be signed.
+
 - **ADR status:** `Accepted` for ADR.<ID> at `<adr path>` — verified by reading the file's status field.
 - **Design Approval line:** filled in below by the human approver.
 ```
