@@ -13,6 +13,8 @@ disable-model-invocation: false
 
 Use this skill when starting a new sprint from a wave's thin-slices, or to take on a correction or improvement that needs the full sprint discipline.
 
+**Trivial changes do not require a sprint** (see `start-thin-slice` — Trivial routes straight to implementation with no bridge). The `n/a (tier: Trivial)` placeholders in this template apply only when a Trivial slice is folded into an existing Standard/Major sprint — they are not a reason to create one.
+
 ---
 
 ## Core Mental Model — Sprint as Immutable Bridge

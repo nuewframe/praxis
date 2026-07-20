@@ -290,7 +290,7 @@ Use the exact filenames the wave skills own — a stub under any other name is n
 
 And one sprint placeholder:
 
-- `docs/product/sprints/SPRINT.<ID>-placeholder.md` — a Trivial-tier sprint stub the team can either fill in for the first real change or delete. Sprints live **flat** under `docs/product/sprints/`, never nested in a wave, and are deleted at close. Use the collision-safe `SPRINT.<ID>` id convention from `create-adr`. Includes the Design Approval section (n/a since Trivial) so the create-sprint mechanics are visible from day one.
+- `docs/product/sprints/SPRINT.<ID>-placeholder.md` — a sprint **template** stub the team fills in for its first Standard/Major change or deletes. Trivial changes do not get a sprint (see `start-thin-slice` — Trivial routes straight to implementation with no bridge); this placeholder exists only to make the `create-sprint` mechanics visible from day one. Sprints live **flat** under `docs/product/sprints/`, never nested in a wave, and are deleted at close. Use the collision-safe `SPRINT.<ID>` id convention from `create-adr`.
 
 These stubs make the workflow legible to a new contributor without forcing them to learn the persona-mode model first.
 

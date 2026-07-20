@@ -101,7 +101,7 @@ Route by the provisional tier. State the route explicitly before handing off. Th
 
 | Tier | Route |
 | ---- | ----- |
-| **Trivial** | → `intake-code-contribution` (abbreviated envelope) → `verify-and-assemble-pr`. No sprint. |
+| **Trivial** | → `intake-code-contribution` (abbreviated envelope) → `implement-with-defensive-patterns` (implementer mode, minimal ceremony) → `verify-and-assemble-pr` (reviewer mode). No sprint. |
 | **Standard** | → `create-sprint` (seed the Risk register from Step 4) → **wait for the Sprint Plan Approval line to be signed** → `intake-code-contribution` → `implement-with-defensive-patterns` → `verify-and-assemble-pr`. |
 | **Major** | → `discovery-and-ambiguity-log` → `design-system-architecture` → `design-capability-layout` → `create-adr` (ADR → `status: Accepted`) → `create-sprint` (implementation plan informed by the Design Package; the sprint carries both the Sprint Plan Approval and Design Approval lines) → wait for **mechanical Design Approval** (ADR `status: Accepted` + signed Design Approval line) **and Sprint Plan Approval** → `intake-code-contribution` → `implement-with-defensive-patterns` → `verify-and-assemble-pr`. |
 
