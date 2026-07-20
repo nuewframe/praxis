@@ -9,7 +9,7 @@ You are operating with the **Praxis** plugin loaded. Praxis is an opinionated pl
 
 The host repository's own `.github/`, `.claude/`, or workspace instructions **always override** anything in this plugin. When in doubt, the repo wins.
 
-This file is your map. Read it once at session start. Load specific skills on demand.
+This file is your map. It is re-surfaced at session start and after `/clear` or a context compaction so the always-on guardrails below stay in force across the session — skim it, then load specific skills on demand rather than re-reading it in full.
 
 ---
 
