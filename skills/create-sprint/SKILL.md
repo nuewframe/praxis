@@ -244,7 +244,7 @@ For each anchor, confirm conformance or declare a reviewed deviation:
 - [ ] **Horizontally scalable** — adds no node-local mutable state on the request path; shared state is externalized per the wave's statelessness boundary: [conforms / deviation + reason]
 - [ ] **Resilient** — every external/boundary call this slice adds carries the wave's timeout/retry/fallback defaults: [conforms / deviation + reason]
 
-A deviation is a reviewed, recorded exception — not silence. The matching probes (`check-observability-at-seams.sh`, `check-config-externalized.sh`, `check-stateless-request-path.sh`, `check-resilient-boundary.sh`) enforce these at `verify`.
+A deviation is a reviewed, recorded exception — not silence. The matching probes (`check-observability-at-seams.sh`, `check-config-externalized.sh`, `check-stateless-request-path.sh`, `check-resilient-boundary.sh`) check these at `verify`. They are **warn-first by default** (report, exit 0) and only fail the build once the project flips each anchor's config to `"mode": "enforce"` — so until then this block is a discipline the reviewer upholds, not a hard gate. Flip to enforce per anchor once a wave closes clean.
 
 ---
 

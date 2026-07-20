@@ -70,6 +70,13 @@ EOF
   exit 2
 fi
 
+# Fail loudly on a malformed config rather than silently parsing to empty arrays
+# (which would surface later as a misleading "no scanPaths" error).
+if ! jq empty "$CONFIG_FILE" 2>/dev/null; then
+  echo "error: $CONFIG_FILE is not valid JSON" >&2
+  exit 2
+fi
+
 # Parse config (portable for bash 3.2 on macOS — no `mapfile`).
 SCAN_PATHS=()
 while IFS= read -r line; do SCAN_PATHS+=("$line"); done < <(jq -r '.scanPaths[]'      "$CONFIG_FILE")
