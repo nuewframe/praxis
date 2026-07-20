@@ -86,10 +86,12 @@ When registering a new ADR, check the project's ADR directory for existing IDs a
 
 `ADR.<ID>-descriptive-name.md` — kebab-case, concise.
 
-```markdown
+````markdown
 # ADR.<ID>: [Decision Title]
 
-**Status:** Proposed | Accepted | Deprecated | Superseded by ADR.<ID> **Date:** YYYY-MM-DD **Deciders:** [Names or roles]
+**Status:** Proposed | Accepted | Deprecated | Superseded by ADR.<ID>
+**Date:** YYYY-MM-DD
+**Deciders:** [Names or roles]
 
 > **Approval mechanics:** `status` is the mechanical gate between architect mode and implementer mode for Major-tier changes. Implementer mode REJECTS the work if `status` is not `Accepted`. Pair this status with a signed Design Approval line in the active sprint file (see `create-sprint`). Both signals are required.
 
@@ -185,7 +187,7 @@ Resilience posture committed by this decision (only if the decision sets one):
 - **Supersedes / Superseded by:** ADR.<ID> (if any)
 - [Link to related ADRs]
 - [Link to the wave or sprint that triggered this decision]
-```
+````
 
 ---
 

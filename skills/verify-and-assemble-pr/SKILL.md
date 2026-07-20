@@ -186,7 +186,7 @@ Map each demand back to the Step 2 coverage scenarios; this step turns that list
 
 Produce a Pull Request description with these sections:
 
-```markdown
+````markdown
 ## Summary
 
 One paragraph. What changed and why.
@@ -268,7 +268,7 @@ One paragraph. What changed and why.
 ## Follow-ups
 
 - Tracked separately as: …
-```
+````
 
 ### Step 7 — Final self-correction
 

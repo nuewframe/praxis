@@ -115,7 +115,7 @@ Document the gap explicitly. The sprint plan closes this specific gap.
 
 ## Step 5 — Create the Sprint File
 
-```markdown
+````markdown
 # SPRINT.<ID>: [Sprint Title]
 
 **Status:** 🔄 In Progress | ✅ Complete\
@@ -266,11 +266,14 @@ On the Major path this sprint is created **after** the ADR is Accepted (`create-
 
 - **ADR status:** `Accepted` for ADR.<ID> at `<adr path>` — verified by reading the file's status field.
 - **Design Approval line:** filled in below by the human approver.
-```
-
-Design Approval Approver: <name or role> Date: YYYY-MM-DD ADR(s): ADR.<ID> (status: Accepted) Notes: <one-line summary of what was approved>
 
 ```
+Approver: <name or role>
+Date: YYYY-MM-DD
+ADR(s): ADR.<ID> (status: Accepted)
+Notes: <one-line summary of what was approved>
+```
+
 If the sprint is Trivial- or Standard-tier, write `n/a (tier: <Trivial|Standard>)` here. Reviewer mode verifies this section before approving any Major-tier PR.
 
 ---
@@ -336,7 +339,7 @@ _When done, use `close-sprint` to record outcome evidence, distill learnings int
 ## Working Notes (Ephemeral)
 
 _Capture decisions, discoveries, and scope clarifications during the sprint. These are deleted when the sprint closes — distilled learnings flow into wave documents and engineering artifacts._
-```
+````
 
 ---
 

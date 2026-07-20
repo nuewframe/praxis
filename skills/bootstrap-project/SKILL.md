@@ -100,7 +100,7 @@ Create this layout (paths adapted to the language):
 
 Use this template, filling in `<placeholders>`:
 
-```markdown
+````markdown
 # <project-name> — Copilot Instructions
 
 These instructions are mandatory. Repository rules override the `praxis` plugin defaults; plugin defaults apply where the repo is silent.
@@ -167,7 +167,7 @@ The pipeline is:
 4. ADR for every significant decision, homed in the durable architecture tree (`docs/architecture/<capability>/adr/`, or `docs/architecture/adr/` for cross-capability decisions).
 5. Tests live with the capability, not in a separate tree.
 6. Telemetry: structured logs, p95/p99 metrics, trace propagation. No `console.log` / `print`.
-```
+````
 
 ### Step 5 — Generate `.claude/CLAUDE.md`
 
