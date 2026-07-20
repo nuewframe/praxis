@@ -22,7 +22,7 @@ description: Generate a project-specific `.github/` overlay (skills, agents, pro
 - **Templates** — files in `plugin/skills/provision-project-overlay/templates/` ending in `.tmpl`. Pure markdown / YAML with `{{placeholder}}` substitution.
 - **Pointer-only overlays** — an overlay skill/instruction is a **thin pointer**: one paragraph naming the plugin skill it maps to ("read it first"), then project-specific paths, gates, and ownership. It must **never restate plugin doctrine** (tier tables, phase orders, the test pyramid, terminology) — that is what drifts. Two `validate-plugin.sh` lints enforce this: the terminology lint (forbidden legacy terms) and the placeholder-parity lint (every `{{…}}` resolves against the config). Keep overlays short; if one grows past ~40 lines, it is probably restating doctrine that belongs in the plugin skill.
 - **Manifest** — `plugin/skills/provision-project-overlay/manifest.yaml` listing every managed `(template_path, target_path, condition)`. Files not in the manifest are never touched.
-- **Adoption profile** — `profile` in `praxis.config.yaml`: `lite | standard | full`. It scales ceremony to team size. **lite** (solo/small) runs Trivial+Standard only, omits the hypothesis card and four-anchor conformance block, and uses single-doc waves. **standard** is the full default method. **full** adds the parallel-safe coordination artifacts and a genuinely separate reviewer head. Skills read the profile and scale their required sections to it — an honest `n/a (profile: lite)` where a section is dropped, never silence.
+- **Prompt-overlay templates** (`.github/prompts/*.prompt.md`) — unvalidated speculative generality: 11 templates for "non-skill chat surfaces" (ChatGPT web, JetBrains Copilot, github.com PR chat) with no evidence any adopter uses them. Kept for now, not expanded further, pending a real usage signal.
 - **Substitution** — plain `{{key.nested}}` string replace. No conditionals, no loops. If a template needs branching, ship two templates and gate them with manifest `condition`. The one non-config token is `{{TODAY}}`, a **runtime placeholder** substituted with the current date (e.g. an ADR `Date:` line); it is allowlisted in `.praxis-canon.json` `specialPlaceholders`. Every other `{{…}}` must resolve against `praxis.config.yaml`.
 
 ---
@@ -47,7 +47,6 @@ Ask exactly these question groups. Wait for answers between groups.
 
 1. Project name (kebab-case, e.g., `acme-billing`)
 2. One-line project description
-3. Adoption profile — `lite | standard | full` (default: `standard`). Pick `lite` for a solo/small repo that wants Trivial+Standard flow without the hypothesis card / four-anchor ceremony; `full` for multi-agent-at-scale. This sets `profile` in `praxis.config.yaml`.
 
 **Group B — Stack** (capture for placeholders and stack-conventions overlay)
 
@@ -105,7 +104,7 @@ If yes, ask one alias per role. If no, set `personas.use_aliases: false` and ski
 
 ### Step 3 — Write `praxis.config.yaml`
 
-Render `templates/praxis.config.yaml.tmpl` with the answers and write to `<repo-root>/praxis.config.yaml`. Set `plugin_version` from the installed plugin's `package.json` `version`, and `profile` from the Group A answer (default `standard`). If file exists and `--reconfigure` was passed, show a diff and ask before overwriting.
+Render `templates/praxis.config.yaml.tmpl` with the answers and write to `<repo-root>/praxis.config.yaml`. Set `plugin_version` from the installed plugin's `package.json` `version`. If file exists and `--reconfigure` was passed, show a diff and ask before overwriting.
 
 ### Step 4 — Emit overlay files
 

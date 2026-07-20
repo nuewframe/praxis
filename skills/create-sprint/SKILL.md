@@ -136,7 +136,7 @@ _[One sentence: what user value will this sprint deliver?]_
 
 ## Hypothesis Card (Lean Validation)
 
-_Scale to the slice's risk surface. A Major slice earns the full card. A small Standard change may collapse this to a one-line hypothesis + validation signal; a pure fix or refactor with no behavioral bet writes `n/a (tier: Standard — <reason>)`. An honest one-line `n/a (<reason>)` beats a padded block — but a **blank or reasonless N/A is the theater this method rejects**. The same rule governs the risk register and the four-anchor conformance block below: they shrink when the slice touches no seam or boundary, never to silence but to an explicit, reasoned `n/a`. Under `profile: lite` (see `praxis.config.yaml`) the hypothesis card and four-anchor block are omitted entirely — write `n/a (profile: lite)`._
+_Scale to the slice's risk surface. A Major slice earns the full card. A small Standard change may collapse this to a one-line hypothesis + validation signal; a pure fix or refactor with no behavioral bet writes `n/a (tier: Standard — <reason>)`. An honest one-line `n/a (<reason>)` beats a padded block — but a **blank or reasonless N/A is the theater this method rejects**. The same rule governs the risk register and the four-anchor conformance block below: they shrink when the slice touches no seam or boundary, never to silence but to an explicit, reasoned `n/a`._
 
 **Hypothesis:** We believe [doing X] will result in [observable outcome Y] for [user/system].
 

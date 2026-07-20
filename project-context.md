@@ -4,7 +4,7 @@ This is the single entry point for understanding what this plugin is, what belon
 
 ## Identity
 
-**Name:** `praxis` **Purpose:** Make an LLM coding agent execute disciplined, lean wave-based delivery and Principal-Software-Engineer practice with **fidelity** — producing trustworthy artifacts a human team can build on — instead of improvising. **Reach:** installable, versioned guidance delivered to Claude Code, Codex, Cursor, Gemini CLI, OpenCode, and GitHub Copilot, written to apply to any language, framework, or runtime. Reach is proven on Claude Code — the harness this repo is built and tested against — and remains aspirational on the others until validated per the evolution policy below. Breadth is how widely the value ships; it is not the value. **Status:** v0.3.0 — multi-harness installable plugin.
+**Name:** `praxis` **Purpose:** Make an LLM coding agent execute disciplined, lean wave-based delivery and Principal-Software-Engineer practice with **fidelity** — producing trustworthy artifacts a human team can build on — instead of improvising. **Reach:** installable, versioned guidance for Claude Code, Codex, Cursor, Gemini CLI, OpenCode, and GitHub Copilot, written to apply to any language, framework, or runtime. Wide availability across harnesses is a deliberate distribution goal, not a hedge to be earned into with usage evidence — that evidentiary bar applies to methodology-fidelity claims (see Problem, above), not to how many harnesses can install the same doctrine. Breadth is how widely the value ships; it is not the value itself. **Status:** v0.3.0 — multi-harness installable plugin.
 
 ## Problem
 
@@ -152,6 +152,7 @@ plugin/
 │   ├── check-resilient-boundary.sh             # production-readiness probe (Resilient anchor)
 │   ├── check-seam-contract-parity.sh           # seam-contract parity gate (Shape + Behavior suite)
 │   ├── check-sprint-id-collision.sh            # coordination-artifact gate (parallel sprint-id collision)
+│   ├── check-escape-hatch-usage.sh          # diff-scoped escape-hatch marker report (informational, never fails)
 │   ├── bump-version.sh                          # version-parity tool across manifests
 │   ├── test-probes.sh                           # self-test: probe language coverage (fixtures)
 │   ├── gen-coverage-matrix.sh                   # generate/check docs/coverage-matrix.md from probe includes

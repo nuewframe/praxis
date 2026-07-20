@@ -4,6 +4,10 @@ A portable agent plugin that fuses **lean wave-based product delivery** with **P
 
 Praxis is universal: it does not assume any stack. Project-specific rules belong in the project's own `.github/` and `.claude/` files and override anything here.
 
+## Enforcement, honestly
+
+Praxis ships three kinds of gate — **script-enforced, human-signed, and agent-attested** — and a green check does not mean all three are equally binding. Script-enforced gates (the `check-*.sh` probes wired into `verify.sh`, CI, or a git hook) fail closed. Human-signed gates (Sprint Plan Approval, Design Approval) block the next skill until a person signs. Agent-attested gates (tier classification, the intake envelope, the adversarial seam review) are honored in good faith — they are **not** mechanically compelled on a bare harness. See [`skills/using-praxis/SKILL.md`](skills/using-praxis/SKILL.md) § *Enforcement model* for the full breakdown. The production-readiness probes under `scripts/` are explicitly labeled heuristics, not proofs, in their own header comments — read one before trusting a green run as more than that.
+
 ## Quickstart
 
 Give your agent Praxis: [Claude Code](#claude-code) · [Codex CLI](#codex-cli) · [Codex App](#codex-app) · [Cursor](#cursor) · [Gemini CLI](#gemini-cli) · [OpenCode](#opencode) · [GitHub Copilot CLI](#github-copilot-cli) · [GitHub Copilot in VS Code](#github-copilot-in-vs-code).
@@ -60,6 +64,8 @@ Give your agent Praxis: [Claude Code](#claude-code) · [Codex CLI](#codex-cli) �
 
 ### Tooling
 
+These scripts check **shape and presence** — a file exists, a pattern matches, a count is right — not the substance of the reasoning behind it. Several are explicitly labeled heuristics in their own header comments; read a `check-*.sh` script's top comment before trusting a green run as more than that.
+
 | Script                                 | Purpose                                                                                                                                   |
 | -------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
 | `scripts/check-anti-dumping.sh`        | Linter that fails on catch-all names (`utils/`, `helpers/`, `common/`, `shared/`, `misc.*`, `lib.*`) inside capability roots. Configurable via `.anti-dumping.json`. |
@@ -72,6 +78,7 @@ Give your agent Praxis: [Claude Code](#claude-code) · [Codex CLI](#codex-cli) �
 | `scripts/check-stateless-request-path.sh` | Production-readiness probe (Horizontally-scalable anchor): flags node-local mutable state (module-level/static cache/session/registry) on the request path. Warn-first via `.statelessness.json`, reviewed per-line opt-out. |
 | `scripts/check-resilient-boundary.sh` | Production-readiness probe (Resilient anchor): flags a file that makes a boundary call but declares no timeout/retry/circuit-breaker/fallback. Warn-first via `.resilience.json`, reviewed per-file opt-out. |
 | `scripts/check-sprint-id-collision.sh` | Coordination-artifact gate (emergent parallelism): fails when two active sprint files share an id token, the collision a bare `NNN+1` increment causes under parallel sprint creation. Exact, not heuristic. Warn-first via `.sprint-coordination.json`. |
+| `scripts/check-escape-hatch-usage.sh` | Scans a diff for Praxis's `praxis:allow-*` escape-hatch markers and reports each by file:line. Informational only — never fails the build; the point is that using an opt-out is never silent to a reviewer. |
 | `scripts/validate-plugin.sh`           | Plugin self-test: SKILL.md frontmatter validity (incl. single-line `tools:`), JSON/YAML parse, cross-reference integrity, manifest version parity, enforcement-script syntax, inventory parity, agent-frontmatter validity, and fenced-code balance. |
 | `scripts/test-probes.sh`               | Self-test for the guardrail probes' language coverage: runs `check-no-skipped-tests.sh` and `check-no-sleep-waits.sh` against multi-language fixtures and asserts the expected verdicts. |
 | `scripts/gen-coverage-matrix.sh`       | Generates / checks `docs/coverage-matrix.md` from each probe's `--include` list, so the language-coverage claim cannot drift from reality. |

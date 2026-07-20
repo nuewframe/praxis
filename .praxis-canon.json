@@ -6,11 +6,16 @@
     { "pattern": "= bet;", "reason": "mantra is 'Wave = educated theory; capability record = truth'" },
     { "pattern": "three-axis disjointness", "reason": "renamed to 'four-condition disjointness' (the rule has four conditions)" },
     { "pattern": "principal-engineer plugin", "reason": "the plugin was renamed to 'praxis'" },
-    { "pattern": "Logic → Component →", "reason": "canonical test pyramid is Logic -> Composition -> Adapter Contract -> Integration -> Journey" }
+    { "pattern": "Logic → Component →", "reason": "canonical test pyramid is Logic -> Composition -> Adapter Contract -> Integration -> Journey" },
+    { "pattern": "profile:\\s*lite", "reason": "the lite/standard adoption profile dial was cut pre-release (never shipped in a tagged version, confirmed via git merge-base against v0.3.0) -- full is the only supported profile; do not reintroduce without real-repo evidence per the evolution policy" },
+    { "pattern": "lite \\| standard \\| full", "reason": "the three-way adoption-profile enum was cut pre-release; full is the only supported profile" }
   ],
   "terminologyScanDirs": ["skills", "instructions", "agents"],
   "terminologyAllowPaths": ["docs/plans", "CHANGELOG.md", ".praxis-canon.json"],
   "placeholderConfigTemplate": "skills/provision-project-overlay/templates/praxis.config.yaml.tmpl",
   "placeholderScanGlob": "skills/provision-project-overlay/templates",
-  "specialPlaceholders": ["TODAY"]
+  "specialPlaceholders": ["TODAY"],
+  "requiredPhrases": [
+    { "file": "README.md", "pattern": "script-enforced, human-signed, and agent-attested", "reason": "README's opening pitch must disclose the three-tier enforcement split so adopters don't over-trust a green check; see skills/using-praxis/SKILL.md's Enforcement model section (Course Correction Phase A1)." }
+  ]
 }

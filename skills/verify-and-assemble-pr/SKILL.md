@@ -182,9 +182,31 @@ Map each demand back to the Step 2 coverage scenarios; this step turns that list
 
 **Verdict.** For a **high-risk AC at a seam** (Impact = High in the sprint risk register), a single happy-path example is **insufficient** — `create-sprint`'s AC↔test matrix requires a property/contract test there, and this step **rejects** the PR if only an example exists. For every touched seam, either name the passing behavioral test or **bounce back** — implementer mode adds it; reviewer mode does not write the test. A seam whose behavioral property is asserted only in prose is treated as unproven.
 
-### Step 6 — PR narrative
+### Step 6 — Artifact-fidelity review (does the reasoning have substance?)
+
+Steps 4–5 check structure and seam behavior. This step attacks a different failure mode: an artifact that is structurally complete and passes every probe, but whose reasoning is hollow — a boilerplate ADR, a rubber-stamped Design Approval, an ambiguity log that says "none" out of habit. A bash probe can only check that a field exists; only a reader can tell whether it carries real reasoning. This is the one review a generator cannot fake by producing more text, because judging text quality is exactly what it checks.
+
+**Who runs it — same "different head" discipline as Step 5.** Defaults to a genuinely separate session or agent, or an orchestration runtime dispatching a second head. When unavailable, an explicit reviewer-mode switch with a fresh read — not reliance on author-side memory of intent. Record which path was used in the same ledger entry as the Step 5 disclosure: a self-review of your own artifacts carries less assurance, and the PR reader must know which they are trusting.
+
+**What it does NOT do.** It does not certify that a decision was *correct* — "was this the right architecture call" is unscriptable and stays with human judgment. It flags likely-hollow *reasoning*, not wrong conclusions. It is a warn-signal for the human, not a hard block — unlike Step 5, a hollow-reasoning finding here does not by itself bounce the PR back; the human reviewer decides whether it is acceptable at this slice's tier.
+
+**The rubric.** For each artifact the slice actually produced (per its tier — do not demand a Major-only artifact from a Trivial slice), read it and render one verdict: **Substantive**, **Likely hollow**, or **N/A (tier)**. Quote the specific passage that grounds the verdict — a bare label is not a review.
+
+| Artifact | Substantive looks like | Likely hollow looks like |
+|---|---|---|
+| ADR "Alternatives considered" | ≥2 genuinely different options, each with a trade-off specific to this decision | One real option plus a straw-man ("do nothing"), or trade-offs generic enough to paste into any ADR |
+| Design Approval signature line | A dated note naming the specific decisions it approves | A bare checkbox or "LGTM" with no reference to what was decided |
+| Ambiguity log | Named, specific unknowns tied to this slice's actual domain | "None found" applied as the default, or unknowns generic enough to apply to any slice |
+| Hypothesis card | A falsifiable claim with a stated validation signal | A restated feature description with no way to be wrong |
+| Risk register entries | Impact/likelihood tied to a specific mechanism ("X can silently corrupt Y under Z") | Boilerplate severity labels with no causal story |
+
+**Output.** A **Fidelity Review** block (see the PR narrative template, Step 7) listing each artifact reviewed, its verdict, and the quoted evidence. Never render a verdict from memory of having "seen it look fine" — re-read the artifact now.
+
+### Step 7 — PR narrative
 
 Produce a Pull Request description with these sections:
+
+**Trust receipt — assemble from script output, not memory.** Before writing the narrative, run `scripts/check-escape-hatch-usage.sh` and paste its output directly; do not recall escape-hatch usage from memory. The Trust Receipt section below combines three sourced facts into one block a human can read in a single pass without re-deriving them: (1) which gates this slice engaged, named by kind — script-enforced / human-signed / agent-attested — per `using-praxis`'s Enforcement model; (2) every escape-hatch marker (`praxis:allow-*`) this diff introduces, with file:line, from the script's output, or "none"; (3) Step 6's Fidelity Review verdicts. This block is the deliverable of Praxis's stated problem — trust transfer — letting a human trust the slice's work without re-deriving it. It does not make a gate harder to bypass; it makes bypassing it impossible to miss.
 
 ````markdown
 ## Summary
@@ -248,6 +270,17 @@ One paragraph. What changed and why.
 - High-risk seam ACs proven by a property/contract test (not an example): [list, or "none"]
 - Bounce-backs filed: [list, or "none"]
 
+## Fidelity Review
+
+- Reviewer head: [separate session/agent | same-agent reviewer-mode switch with fresh read]
+- Artifact verdicts (per Step 6's rubric): [artifact → Substantive / Likely hollow / N/A (tier), each with the quoted evidence]
+
+## Trust Receipt
+
+- Gates engaged this slice (kind — script-enforced / human-signed / agent-attested): [list, sourced from `using-praxis`'s Enforcement model]
+- Escape hatches used (`praxis:allow-*`): [file:line list from `scripts/check-escape-hatch-usage.sh`'s output, or "none"]
+- Fidelity Review verdicts (Step 6, summarized): [artifact → verdict, or "none applicable at this tier"]
+
 ## Telemetry
 
 - Logs added: …
@@ -270,7 +303,7 @@ One paragraph. What changed and why.
 - Tracked separately as: …
 ````
 
-### Step 7 — Final self-correction
+### Step 8 — Final self-correction
 
 Before submitting, re-read the diff one more time. Check for:
 
@@ -296,3 +329,5 @@ Before submitting, re-read the diff one more time. Check for:
 - Accepting a high-risk seam AC backed only by a single happy-path example where a property/contract test is required.
 - "Rollback: revert the commit." Spell out the procedure including data implications.
 - A PR description that doesn't name the trade-off the reviewer should evaluate.
+- Rendering a Fidelity Review verdict from memory ("it looked fine") instead of re-reading the artifact now.
+- Treating a Fidelity Review "Substantive" verdict as proof the underlying decision was *correct* — it only means the reasoning shown has real substance, not that the call was right.

@@ -20,7 +20,6 @@ This file is your map. It is re-surfaced at session start and after `/clear` or 
 3. **Pick the skill.** Each skill is a focused, repeatable workflow (`skills/<name>/SKILL.md`).
 4. **Honor the guardrails.** Three always-on rule sets shape every decision (`instructions/*.instructions.md`).
 5. **When the host repo is silent, follow the plugin defaults. When it speaks, the host repo wins.**
-6. **Scale to the profile.** If `praxis.config.yaml` sets `profile: lite`, run Trivial+Standard only and omit the hypothesis card and four-anchor block (write `n/a (profile: lite)`, never blank); `full` adds the parallel-safe coordination artifacts and a separate reviewer head. Absent or `standard` = the full default method.
 
 ---
 

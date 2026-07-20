@@ -498,6 +498,39 @@ else
   echo "  ok"
 fi
 
+# 12. Required-phrase presence — phrases that MUST appear in specific files
+#     (from .praxis-canon.json's requiredPhrases). Inverse of terminology
+#     drift: catches an honesty disclosure silently regressing, not a
+#     forbidden term reappearing.
+echo "validate-plugin: checking required phrases..."
+PHRASE_REPORT=$(python3 <<'PY'
+import json, os, re, sys
+if not os.path.isfile('.praxis-canon.json'):
+    print('skipped (no .praxis-canon.json)'); sys.exit(0)
+canon = json.load(open('.praxis-canon.json'))
+required = canon.get('requiredPhrases', [])
+problems = []
+for r in required:
+    path = r['file']
+    if not os.path.isfile(path):
+        problems.append("%s: required phrase check failed -- file not found" % path)
+        continue
+    text = open(path, errors='replace').read()
+    if not re.search(r['pattern'], text):
+        problems.append("%s: missing required phrase '%s' -- %s" % (path, r['pattern'], r['reason']))
+for p in problems:
+    print(p)
+sys.exit(1 if problems else 0)
+PY
+)
+PHRASE_RC=$?
+if [[ $PHRASE_RC -ne 0 ]]; then
+  echo "$PHRASE_REPORT" >&2
+  FAILED=$((FAILED + 1))
+else
+  echo "  ok"
+fi
+
 if [[ $FAILED -gt 0 ]]; then
   echo "validate-plugin: $FAILED check(s) failed" >&2
   exit 1
