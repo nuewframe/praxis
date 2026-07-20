@@ -17,13 +17,13 @@ A **wave** is the unit of intent in the Nuewframe Method — a coherent slice of
 This skill creates the wave scaffold. After the scaffold exists:
 
 - Use `create-product-design-spec` to author `product-design.md`
-- Use `create-product-architecture-spec` to author `product-architecture.md` (the wave's **bet**, not the durable record)
+- Use `create-product-architecture-spec` to author `product-architecture.md` (the wave's **educated theory**, not the durable record)
 - Use `create-quality-spec` to author `qa.md`
 - Use `design-system-architecture` when the wave introduces a new subsystem, runtime boundary, or platform-wide constraint — it persists the durable architecture into `docs/architecture/`
 - Use `create-adr` when the wave makes a durable technical decision
 - Use `author-user-docs` (TEACH) once a capability's behavior ships, to render the capability record into user guides in `docs/guides/`
 
-**Wave = bet; capability record = truth.** The wave's `product-architecture.md` is a planning-stage hypothesis. The living, validated architecture lives in the durable tree — `docs/architecture/README.md` (system overview) and `docs/architecture/<capability>/` (capability records) — and is promoted there by `close-sprint`.
+**Wave = educated theory; capability record = truth.** The wave's `product-architecture.md` is a planning-stage hypothesis. The living, validated architecture lives in the durable tree — `docs/architecture/README.md` (system overview) and `docs/architecture/<capability>/` (capability records) — and is promoted there by `close-sprint`.
 
 ## Project conventions
 
@@ -59,10 +59,18 @@ Examples: `wave-feature-home-shell`, `wave-platform-identity-access`, `wave-ext-
   qa.md
 ```
 
+All four documents open with the planning-stage banner directly under their title — it makes the "wave = educated theory" doctrine visible in the artifact itself, and authoring skills must preserve it when filling a stub in:
+
+```markdown
+> **Planning-stage document — an educated theory, not yet the truth.** The best approach given what we know today; current-state architecture lives in [docs/architecture/](../../../architecture/), promoted there by `close-sprint`.
+```
+
 ### `README.md` — Intent + Thin-Slice Tracking
 
 ```markdown
 # WAVE-[CATEGORY]: [Wave Name]
+
+> **Planning-stage document — an educated theory, not yet the truth.** The best approach given what we know today; current-state architecture lives in [docs/architecture/](../../../architecture/), promoted there by `close-sprint`.
 
 **Status:** ⚪ Not Started | 🔄 In Progress | ✅ Complete\
 **Goal:** [One sentence describing the user outcome this wave delivers.]
@@ -149,7 +157,7 @@ Create empty stubs with file titles. Author each through its dedicated skill:
 - `product-architecture.md` → `create-product-architecture-spec`
 - `qa.md` → `create-quality-spec`
 
-If the wave introduces system-wide concerns (new subsystem, integration, runtime boundary), also invoke `design-system-architecture` — which writes the durable topology and resilience posture into `docs/architecture/` — and pair with `create-adr`. The wave documents stay the bet; the durable record lives under `docs/architecture/`.
+If the wave introduces system-wide concerns (new subsystem, integration, runtime boundary), also invoke `design-system-architecture` — which writes the durable topology and resilience posture into `docs/architecture/` — and pair with `create-adr`. The wave documents stay the educated theory; the durable record lives under `docs/architecture/`.
 
 ---
 

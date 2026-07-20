@@ -43,7 +43,7 @@ The **living, current-state** architecture lives elsewhere and is edited in plac
 - **Capability record** (`docs/architecture/<capability>/`) — the truth for one capability.
 - **System overview** (`docs/architecture/README.md`) — the cross-capability topology and product-wide posture.
 
-The wave `product-architecture.md` is the **hypothesis** (the bet); the capability record is the **truth**. An ADR is the frozen decision between them. If these homes don't exist yet, define them in the project's own context first.
+The wave `product-architecture.md` is the **hypothesis** (the educated theory); the capability record is the **truth**. An ADR is the frozen decision between them. If these homes don't exist yet, define them in the project's own context first.
 
 ---
 
