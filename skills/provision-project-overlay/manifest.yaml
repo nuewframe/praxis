@@ -183,6 +183,18 @@ managed_files:
     target: .github/skills/write-tests/SKILL.md
     condition: always
 
+  - template: templates/.github/skills/create-quality-spec/SKILL.md.tmpl
+    target: .github/skills/create-quality-spec/SKILL.md
+    condition: always
+
+  - template: templates/.github/skills/start-thin-slice/SKILL.md.tmpl
+    target: .github/skills/start-thin-slice/SKILL.md
+    condition: always
+
+  - template: templates/.github/skills/verify-and-assemble-pr/SKILL.md.tmpl
+    target: .github/skills/verify-and-assemble-pr/SKILL.md
+    condition: always
+
   # ---------------------------------------------------------------------------
   # Prompt overlays (always — thin pointers)
   # ---------------------------------------------------------------------------

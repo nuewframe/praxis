@@ -1,0 +1,24 @@
+---
+name: create-quality-spec
+description: Author or refine a wave `qa.md` quality spec for {{project.name}}. Project overlay on top of the plugin's `create-quality-spec` skill.
+---
+
+# Create Quality Spec (Project Overlay)
+
+The full skill — risk tiers, behavior-to-test-layer mapping, security coverage, explicit out-of-scope, and an observable definition of done — is in the `praxis` plugin's `create-quality-spec` skill. Read it first.
+
+## Project-specific paths
+
+- Lives at: `{{paths.waves}}/wave-NNN-<slug>/qa.md`
+- Test layers and runners: `.github/skills/write-tests/SKILL.md` (the project's Pyramid Test Strategy specifics)
+- Acceptance-criteria source: the wave's `product-design.md` thin-slices
+
+## Project-specific gates
+
+- Led by the product designer (`.github/agents/{{personas.aliases.product_designer}}.agent.md`), paired with the principal engineer (`.github/agents/{{personas.aliases.principal_engineer}}.agent.md`) on technical risk and coverage; designer-owned when user-facing risk dominates.
+- No code in `qa.md` — it specifies *what* is tested and at which layer, never the test implementation.
+- Every risk-tiered behavior maps to a test layer per `.github/skills/write-tests/SKILL.md`. A high-risk seam requires a property/contract test, not a single example.
+
+## Definition of done
+
+The quality spec is complete when every acceptance criterion has a named test layer and an observable done-signal, and the out-of-scope list is explicit.

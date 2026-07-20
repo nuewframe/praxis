@@ -1,0 +1,23 @@
+---
+name: start-thin-slice
+description: Triage and route a thin-slice by ID for {{project.name}} ("Work on TS-NNN"). Project overlay on top of the plugin's `start-thin-slice` skill.
+---
+
+# Start Thin-Slice (Project Overlay)
+
+The full skill — the precondition gate, provisional tier classification (by reference to `intake-code-contribution` Step 0), the lightweight ambiguity log + pre-mortem for Standard work, and the canonical routing table — is in the `praxis` plugin's `start-thin-slice` skill. Read it first; do not restate the routing table here.
+
+## Project-specific paths
+
+- Thin-slices live in the wave README at `{{paths.waves}}/wave-NNN-<slug>/README.md`
+- Sprints created downstream: `{{paths.sprints}}/SPRINT.<ID>-<slug>.md`
+
+## Routing to project skills (entry points, per the plugin's Step 5 table)
+
+- **Trivial** → `.github/skills/intake-code-contribution/SKILL.md` (abbreviated) → `.github/skills/implement-capability-change/SKILL.md` (minimal ceremony) → `.github/skills/verify-and-assemble-pr/SKILL.md`. No sprint.
+- **Standard** → `.github/skills/create-sprint/SKILL.md` → wait for Sprint Plan Approval → intake → implement → verify.
+- **Major** → discovery → `.github/skills/create-system-architecture/SKILL.md` → capability layout → `.github/skills/create-adr/SKILL.md` → `.github/skills/create-sprint/SKILL.md` → mechanical Design Approval → intake → implement → verify.
+
+## Project-specific gate
+
+- Do not route a slice whose dependencies are not `✅ Complete`. A correction or reopen keeps the original slice ID — never invent a replacement.
