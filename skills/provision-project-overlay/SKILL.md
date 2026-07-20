@@ -22,6 +22,7 @@ description: Generate a project-specific `.github/` overlay (skills, agents, pro
 - **Templates** — files in `plugin/skills/provision-project-overlay/templates/` ending in `.tmpl`. Pure markdown / YAML with `{{placeholder}}` substitution.
 - **Pointer-only overlays** — an overlay skill/instruction is a **thin pointer**: one paragraph naming the plugin skill it maps to ("read it first"), then project-specific paths, gates, and ownership. It must **never restate plugin doctrine** (tier tables, phase orders, the test pyramid, terminology) — that is what drifts. Two `validate-plugin.sh` lints enforce this: the terminology lint (forbidden legacy terms) and the placeholder-parity lint (every `{{…}}` resolves against the config). Keep overlays short; if one grows past ~40 lines, it is probably restating doctrine that belongs in the plugin skill.
 - **Manifest** — `plugin/skills/provision-project-overlay/manifest.yaml` listing every managed `(template_path, target_path, condition)`. Files not in the manifest are never touched.
+- **Adoption profile** — `profile` in `praxis.config.yaml`: `lite | standard | full`. It scales ceremony to team size. **lite** (solo/small) runs Trivial+Standard only, omits the hypothesis card and four-anchor conformance block, and uses single-doc waves. **standard** is the full default method. **full** adds the parallel-safe coordination artifacts and a genuinely separate reviewer head. Skills read the profile and scale their required sections to it — an honest `n/a (profile: lite)` where a section is dropped, never silence.
 - **Substitution** — plain `{{key.nested}}` string replace. No conditionals, no loops. If a template needs branching, ship two templates and gate them with manifest `condition`. The one non-config token is `{{TODAY}}`, a **runtime placeholder** substituted with the current date (e.g. an ADR `Date:` line); it is allowlisted in `.praxis-canon.json` `specialPlaceholders`. Every other `{{…}}` must resolve against `praxis.config.yaml`.
 
 ---
@@ -46,6 +47,7 @@ Ask exactly these question groups. Wait for answers between groups.
 
 1. Project name (kebab-case, e.g., `acme-billing`)
 2. One-line project description
+3. Adoption profile — `lite | standard | full` (default: `standard`). Pick `lite` for a solo/small repo that wants Trivial+Standard flow without the hypothesis card / four-anchor ceremony; `full` for multi-agent-at-scale. This sets `profile` in `praxis.config.yaml`.
 
 **Group B — Stack** (capture for placeholders and stack-conventions overlay)
 
@@ -103,7 +105,7 @@ If yes, ask one alias per role. If no, set `personas.use_aliases: false` and ski
 
 ### Step 3 — Write `praxis.config.yaml`
 
-Render `templates/praxis.config.yaml.tmpl` with the answers and write to `<repo-root>/praxis.config.yaml`. If file exists and `--reconfigure` was passed, show a diff and ask before overwriting.
+Render `templates/praxis.config.yaml.tmpl` with the answers and write to `<repo-root>/praxis.config.yaml`. Set `plugin_version` from the installed plugin's `package.json` `version`, and `profile` from the Group A answer (default `standard`). If file exists and `--reconfigure` was passed, show a diff and ask before overwriting.
 
 ### Step 4 — Emit overlay files
 
@@ -181,6 +183,20 @@ Next step: review praxis.config.yaml, commit when satisfied.
 ```
 
 Do not auto-commit. Humans commit.
+
+---
+
+## Upgrade mode (`--upgrade`)
+
+Provisioned repos hold **copies** — the rendered overlays, the `check-*.sh` scripts, and `scripts/verify.sh`. When the plugin ships fixes (a probe bug, a template repair), those copies do not update themselves. `--upgrade` re-syncs them:
+
+1. Read `plugin_version` from `praxis.config.yaml` and compare it to the installed plugin's `package.json` `version`. If equal, report "up to date" and stop unless `--force`.
+2. Re-render every manifest entry from the current templates + existing config answers (no re-interview). For each file, apply the Step 4 action model: **write** if unchanged-from-last-render, **diff-and-prompt** if the human edited it.
+3. Re-copy every `check-*.sh` and `verify.sh` per Step 4b (these are verbatim, not templated — diff and prompt on local edits).
+4. Update `plugin_version` in `praxis.config.yaml` to the installed version.
+5. Print the Step 7 summary with an added `Upgraded: <old> -> <new>` line and the list of scripts/overlays that changed.
+
+The version field makes drift between a repo and the plugin **visible**; `--upgrade` makes it **resolvable** with a reviewable diff, never a silent overwrite.
 
 ---
 
