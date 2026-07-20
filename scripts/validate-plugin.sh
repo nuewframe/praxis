@@ -476,6 +476,7 @@ ph = re.compile(r'\{\{\s*([A-Za-z0-9_.]+)\s*\}\}')
 # The config template declares every substitutable key as `key: {{that.key}}`,
 # so its own placeholders enumerate exactly the valid dotted paths.
 valid = set(ph.findall(open(cfg_path, errors='replace').read()))
+valid |= set(canon.get('specialPlaceholders', []))  # runtime tokens (e.g. TODAY), not config keys
 problems = set()
 for path in sorted(p for p in os.popen("find %s -type f -name '*.tmpl'" % scan_root).read().splitlines() if p):
     if os.path.abspath(path) == os.path.abspath(cfg_path):

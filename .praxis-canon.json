@@ -11,5 +11,6 @@
   "terminologyScanDirs": ["skills", "instructions", "agents"],
   "terminologyAllowPaths": ["docs/plans", "CHANGELOG.md", ".praxis-canon.json"],
   "placeholderConfigTemplate": "skills/provision-project-overlay/templates/praxis.config.yaml.tmpl",
-  "placeholderScanGlob": "skills/provision-project-overlay/templates"
+  "placeholderScanGlob": "skills/provision-project-overlay/templates",
+  "specialPlaceholders": ["TODAY"]
 }

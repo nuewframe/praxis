@@ -21,7 +21,7 @@ description: Generate a project-specific `.github/` overlay (skills, agents, pro
 - **Config file** — `praxis.config.yaml` at repo root. Source of truth for all substitutions. Survives plugin upgrades.
 - **Templates** — files in `plugin/skills/provision-project-overlay/templates/` ending in `.tmpl`. Pure markdown / YAML with `{{placeholder}}` substitution.
 - **Manifest** — `plugin/skills/provision-project-overlay/manifest.yaml` listing every managed `(template_path, target_path, condition)`. Files not in the manifest are never touched.
-- **Substitution** — plain `{{key.nested}}` string replace. No conditionals, no loops. If a template needs branching, ship two templates and gate them with manifest `condition`.
+- **Substitution** — plain `{{key.nested}}` string replace. No conditionals, no loops. If a template needs branching, ship two templates and gate them with manifest `condition`. The one non-config token is `{{TODAY}}`, a **runtime placeholder** substituted with the current date (e.g. an ADR `Date:` line); it is allowlisted in `.praxis-canon.json` `specialPlaceholders`. Every other `{{…}}` must resolve against `praxis.config.yaml`.
 
 ---
 
