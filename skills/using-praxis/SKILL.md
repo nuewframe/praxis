@@ -39,7 +39,7 @@ The same engineer cannot self-approve. If you are the implementer, you cannot al
 
 ## Always-on guardrails
 
-These are loaded automatically by harnesses that support `applyTo`-scoped instructions (Claude Code, Copilot). For harnesses that do not, treat the rules below as in force whenever you touch the matching paths.
+These guardrails ship as `applyTo`-scoped `.instructions.md` files. **Copilot** auto-applies each one whenever you edit a file matching its `applyTo` glob. **Claude Code and other harnesses have no `applyTo` mechanism** and do not auto-load the plugin's `instructions/` directory — for those, the compressed summary below is the always-on surface (this file is loaded at session start), and you must treat each rule set as in force whenever you touch the matching paths. In a provisioned repo, `provision-project-overlay` copies these files into `.github/instructions/` so Copilot picks them up natively.
 
 ### Lean Delivery Guardrails — `instructions/lean-delivery-guardrails.instructions.md`
 
