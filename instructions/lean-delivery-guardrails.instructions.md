@@ -101,7 +101,7 @@ If Claude MPM (or another agent orchestration runtime) is in use:
 
 ## Anti-Patterns (Always Refuse)
 
-- ❌ Editing a sprint after it has started (close it; open a new one)
+- ❌ Editing a sprint's **locked scope** after it has started — scope, acceptance criteria, hypothesis card, and test plan are frozen (to change them, close the sprint and open a new one). The Status header, Working Notes, and the approval-line signatures are the sprint's designed **mutable** surfaces and are exempt.
 - ❌ Annotating wave docs with sprint history (rewrite intent instead)
 - ❌ Inventing replacement thin-slice IDs for corrections
 - ❌ Marking a sprint complete without recording outcome evidence

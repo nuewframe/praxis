@@ -30,7 +30,7 @@ Load the persona's full file before acting in that role.
 | Persona | When to be this persona | File |
 |---|---|---|
 | **Product Manager** | Wave planning, sprint creation as immutable bridges, sprint closing with bidirectional learning capture, dashboard honesty | `agents/product-manager.agent.md` |
-| **Product Designer** | User value, thin-slice acceptance criteria, authoring `product-design.md` and `qa.md` | `agents/product-designer.agent.md` |
+| **Product Designer** | User value, thin-slice acceptance criteria, authoring `product-design.md`; leads `qa.md` (paired with the engineer, designer-owned when user-facing risk dominates) | `agents/product-designer.agent.md` |
 | **Principal Engineer** | Capability-driven architecture, refactoring, cross-cutting decisions; operates in three modes — architect, implementer, reviewer — never two at once | `agents/principal-engineer.agent.md` |
 
 The same engineer cannot self-approve. If you are the implementer, you cannot also be the reviewer in the same session — switch personas explicitly or hand off.
@@ -103,7 +103,7 @@ Skills are grouped by phase. Load the SKILL.md file of any skill you intend to f
 | `implement-with-defensive-patterns` | 5 | Writing the implementation; composition over inheritance, shift-left security, structured telemetry |
 | `verify-and-assemble-pr` | 6 | TDD verification, integration boundary tests, PR narrative |
 | `refactor-layered-to-capability` | — | Migrating a legacy `controllers/` + `services/` codebase into vertical slices |
-| `test-by-ownership` | — | Picking the right test layer (Logic → Component → Integration → Journey) for each behavior |
+| `test-by-ownership` | — | Picking the right test layer (Logic → Composition → Adapter Contract → Integration → Journey) for each behavior |
 
 ---
 
@@ -127,7 +127,7 @@ Praxis ships generic, configurable enforcement scripts. Wire them into the proje
 
 ---
 
-## Emergent parallelism — the three-axis disjointness rule
+## Emergent parallelism — the four-condition disjointness rule
 
 Praxis never schedules parallel work. Parallelism is an **emergent permission**, exercised by the human or an orchestration runtime — never forced by the method, never an artifact Praxis produces. A unit of work (a slice/sprint) may run concurrently with another **only if all four conditions hold**:
 
@@ -136,13 +136,13 @@ Praxis never schedules parallel work. Parallelism is an **emergent permission**,
 3. **Config-key disjoint** — they mutate no shared configuration key in common.
 4. **Frozen-contract dependent** — each depends only on a frozen `<name>@vN` seam contract (`define-seam-contract`), never on the other's in-flight internals.
 
-Capability-disjointness **alone is not sufficient**: two slices in different capabilities still collide if they share a table, a config key, or one consumes the other's unfrozen surface. All three axes *plus* the frozen-contract rule must hold. If any axis overlaps, the units are sequential, not parallel. The collision-safe coordination artifacts (`create-sprint`) and the staleness re-anchor at intake (`intake-code-contribution`) are what make a permitted parallel run *safe*.
+Capability-disjointness **alone is not sufficient**: two slices in different capabilities still collide if they share a table, a config key, or one consumes the other's unfrozen surface. The three disjointness axes (conditions 1–3) *plus* the frozen-contract rule (condition 4) must all hold. If any condition fails, the units are sequential, not parallel. The collision-safe coordination artifacts (`create-sprint`) and the staleness re-anchor at intake (`intake-code-contribution`) are what make a permitted parallel run *safe*.
 
 ---
 
 ## Composition with orchestration runtimes (MPM and others)
 
-Praxis owns **artifact discipline**. It does not implement runtime mechanics — delegation, verification gates, ticketing, branch protection, circuit breakers as runtime checks. Those belong in an orchestration runtime such as [Claude MPM](https://github.com/anthropics/claude-mpm).
+Praxis owns **artifact discipline**. It does not implement runtime mechanics — delegation, verification gates, ticketing, branch protection, circuit breakers as runtime checks. Those belong in an orchestration runtime such as [Claude MPM](https://github.com/bobmatnyc/claude-mpm).
 
 When MPM is installed:
 

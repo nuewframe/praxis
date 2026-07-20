@@ -163,7 +163,7 @@ For any non-trivial change, follow the phased workflow defined by this plugin's 
 
 Skip a phase only with explicit human approval.
 
-## 14. Emergent parallelism — the three-axis disjointness rule
+## 14. Emergent parallelism — the four-condition disjointness rule
 
 Two units of work may be built concurrently **only if all four conditions hold**:
 
@@ -172,4 +172,4 @@ Two units of work may be built concurrently **only if all four conditions hold**
 3. **Config-key disjoint** — no shared configuration key mutated by both.
 4. **Frozen-contract dependent** — each depends only on a frozen `<name>@vN` seam contract, never on the other's in-flight internals.
 
-Capability-disjointness **alone is not safe**: two slices in different capabilities still collide if they share a table, a config key, or one consumes the other's unfrozen surface. If any axis overlaps, the units are sequential, not parallel. Praxis never schedules this — parallelism is a permission the human or an orchestration runtime exercises, granted only when these conditions are met.
+Capability-disjointness **alone is not safe**: two slices in different capabilities still collide if they share a table, a config key, or one consumes the other's unfrozen surface. The three disjointness axes (conditions 1–3) plus the frozen-contract rule (condition 4) must all hold; if any condition fails, the units are sequential, not parallel. Praxis never schedules this — parallelism is a permission the human or an orchestration runtime exercises, granted only when these conditions are met.

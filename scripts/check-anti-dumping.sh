@@ -164,7 +164,7 @@ done
 echo >&2
 cat >&2 <<EOF
 Forbidden 'dumping ground' names create catch-all files and folders that
-accumulate unrelated logic. See the principal-engineer plugin's
+accumulate unrelated logic. See the praxis plugin's
 'capability-driven-guardrails' instruction for what to do instead:
 
   - Move the code into the single capability that uses it, OR

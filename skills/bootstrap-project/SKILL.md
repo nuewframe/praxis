@@ -81,10 +81,7 @@ Create this layout (paths adapted to the language):
 │       └── …
 ├── scripts/
 │   ├── verify.sh                         # universal verification entry point
-│   ├── check-anti-dumping.sh             # symlink or copy from this plugin
-│   ├── check-no-skipped-tests.sh         # symlink or copy from this plugin
-│   ├── check-no-sleep-waits.sh           # symlink or copy from this plugin
-│   └── check-port-adapter-parity.sh      # symlink or copy from this plugin
+│   └── check-*.sh                        # every guardrail check, copied from this plugin (see Step 9)
 ├── .anti-dumping.json                   # config for the linter (paths to scan)
 ├── README.md
 ├── CONTRIBUTING.md
@@ -138,8 +135,9 @@ For non-trivial changes, run the principal-engineer phased skills in order:
 1. `discovery-and-ambiguity-log`
 2. `design-system-architecture`
 3. `design-capability-layout`
-4. `implement-with-defensive-patterns`
-5. `verify-and-assemble-pr`
+4. `create-adr`
+5. `implement-with-defensive-patterns`
+6. `verify-and-assemble-pr`
 
 ## Quality gates (mandatory before commit)
 
@@ -316,7 +314,7 @@ This project was scaffolded by the `praxis` plugin's `bootstrap-project` skill o
 
 1. Install dependencies for `<language and framework>`.
 2. Wire the quality gates into your task runner (`<runner>`).
-3. Run the first feature using the phased workflow: `intake-code-contribution` → `discovery-and-ambiguity-log` → `design-system-architecture` → `design-capability-layout` → `implement-with-defensive-patterns` → `verify-and-assemble-pr`.
+3. Run the first feature using the phased workflow: `intake-code-contribution` → `discovery-and-ambiguity-log` → `design-system-architecture` → `design-capability-layout` → `create-adr` → `implement-with-defensive-patterns` → `verify-and-assemble-pr`.
 4. Once the first feature ships, decide whether to add project-specific personas (in `.github/agents/`) or skills (in `.github/skills/`).
 
 ## Plugin precedence
