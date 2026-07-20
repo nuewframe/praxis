@@ -117,6 +117,30 @@ For each entry in `manifest.yaml`:
    - **File differs** → show unified diff and prompt: `[k]eep mine / [t]ake template / [m]erge manually`
 5. Record outcome in a per-run summary.
 
+### Step 4b — Copy the guardrail check scripts
+
+Step 4 emits `scripts/verify.sh`, but that skeleton **calls** every `check-*.sh` guardrail script. Those scripts are shipped verbatim by the plugin (not templates — no substitution) and are **not** in `manifest.yaml`, so they must be copied here. Skipping this leaves `verify.sh` dead on arrival: step 4 (anti-dumping) fails with `exit 127` the first time anyone runs `bash scripts/verify.sh`.
+
+Copy or symlink **every** `check-*.sh` from `<plugin-root>/scripts/` into the project's `scripts/`. Do not hand-pick a subset — `verify.sh` calls all of them, and a missing script breaks the quality gate on day one. (`validate-plugin.sh` is the one exception — it is a plugin self-test; copy it only if you want it.)
+
+```bash
+mkdir -p scripts
+for src in "<plugin-root>"/scripts/check-*.sh; do
+  cp "$src" scripts/
+done
+chmod +x scripts/check-*.sh scripts/verify.sh
+```
+
+Then run the parity check — every check `verify.sh` calls must exist on disk:
+
+```bash
+for s in $(grep -o 'check-[a-z-]*\.sh' scripts/verify.sh | sort -u); do
+  [ -f "scripts/$s" ] || echo "MISSING: scripts/$s"
+done
+```
+
+No output is the pass condition. Record the copied scripts in the per-run summary (`Scripts:` line).
+
 ### Step 5 — Validate inbound references
 
 Scan these well-known anchor files (if present) for path references to managed overlay files:
@@ -148,6 +172,7 @@ Config:    praxis.config.yaml (created | unchanged | reconfigured)
 Emitted:   <N> files
 Skipped:   <N> files (already current)
 Diffs:     <N> files (resolved: kept-mine=<a>, took-template=<b>, manual=<c>)
+Scripts:   verify.sh + <N> check-*.sh copied (parity: ok | MISSING listed above)
 Bootstrap: <list of bootstrap docs written>
 Inbound:   <N> references checked, <M> unresolved (see list above)
 Anti-dumping: clean | <N> violations
