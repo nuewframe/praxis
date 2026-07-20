@@ -104,6 +104,7 @@ plugin/
 │   ├── check-seam-contract-parity.sh           # seam-contract parity gate (Shape + Behavior suite)
 │   ├── check-sprint-id-collision.sh            # coordination-artifact gate (parallel sprint-id collision)
 │   ├── bump-version.sh                          # version-parity tool across manifests
+│   ├── test-probes.sh                           # self-test: probe language coverage (fixtures)
 │   └── validate-plugin.sh                       # plugin self-test
 ├── AGENTS.md                                    # bootstrap pointer for AGENTS.md-aware harnesses
 ├── CLAUDE.md                                    # bootstrap pointer for Claude Code

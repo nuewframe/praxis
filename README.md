@@ -72,7 +72,8 @@ Give your agent Praxis: [Claude Code](#claude-code) Â· [Codex CLI](#codex-cli) Â
 | `scripts/check-stateless-request-path.sh` | Production-readiness probe (Horizontally-scalable anchor): flags node-local mutable state (module-level/static cache/session/registry) on the request path. Warn-first via `.statelessness.json`, reviewed per-line opt-out. |
 | `scripts/check-resilient-boundary.sh` | Production-readiness probe (Resilient anchor): flags a file that makes a boundary call but declares no timeout/retry/circuit-breaker/fallback. Warn-first via `.resilience.json`, reviewed per-file opt-out. |
 | `scripts/check-sprint-id-collision.sh` | Coordination-artifact gate (emergent parallelism): fails when two active sprint files share an id token, the collision a bare `NNN+1` increment causes under parallel sprint creation. Exact, not heuristic. Warn-first via `.sprint-coordination.json`. |
-| `scripts/validate-plugin.sh`           | Plugin self-test: SKILL.md frontmatter validity, JSON/YAML parse, cross-reference integrity, manifest version parity, enforcement-script syntax, and inventory parity (every skill/script/instruction is documented in README + project-context). |
+| `scripts/validate-plugin.sh`           | Plugin self-test: SKILL.md frontmatter validity (incl. single-line `tools:`), JSON/YAML parse, cross-reference integrity, manifest version parity, enforcement-script syntax, inventory parity, agent-frontmatter validity, and fenced-code balance. |
+| `scripts/test-probes.sh`               | Self-test for the guardrail probes' language coverage: runs `check-no-skipped-tests.sh` and `check-no-sleep-waits.sh` against multi-language fixtures and asserts the expected verdicts. |
 
 ## How the two halves compose
 
