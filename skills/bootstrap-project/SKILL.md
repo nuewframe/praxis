@@ -243,13 +243,24 @@ Create `docs/architecture/README.md` (system overview stub: capability list + a 
     "models",
     "views"
   ],
+  "allowPatterns": [],
   "exemptions": []
 }
 ```
 
 (Adjust `scanPaths` to match the language convention — `services/`, `pkg/`, `apps/`, etc.)
 
-Leave `exemptions` empty. The sanctioned escape hatch for cross-capability code is **graduation** into a named capability (see the Architecture rules in `.github/copilot-instructions.md`), not an exemption — an exemption re-opens the dumping ground the linter exists to close.
+**Per-ecosystem `allowPatterns` (fill in for your stack).** `allowPatterns` are regexes matched against a **basename**, so they exempt a framework-mandated *file* while still blocking the dumping-ground *directory* of the same name. Add the row(s) for your stack so the day-one build does not trip the linter:
+
+| Stack | Add to `allowPatterns` | Exempts (idiomatic file) | Still blocked (silo dir) |
+| ----- | ---------------------- | ------------------------ | ------------------------ |
+| Rust (if `lib` is in `forbiddenNames`) | `"^lib\\.rs$"` | the mandatory crate root `lib.rs` | a `lib/` catch-all |
+| Django / Python | `"^models\\.py$"`, `"^views\\.py$"` | per-app `models.py` / `views.py` | `models/` / `views/` |
+| NestJS | (none) | `*.service.ts` already passes — its basename does not start with `service` | a bare `services/` |
+
+For a framework whose idiom is a whole *directory* (Angular `services/`, ASP.NET MVC `Controllers/`/`Models/`/`Views/`), prefer the capability-driven layout. If you must keep the convention, add that specific path to `exemptions` — but that re-opens the dumping ground the linter exists to close, so scope it tightly and revisit it.
+
+Leave `exemptions` empty for greenfield. The sanctioned escape hatch for cross-capability code is **graduation** into a named capability (see the Architecture rules in `.github/copilot-instructions.md`), not an exemption — an exemption re-opens the dumping ground the linter exists to close.
 
 ### Step 9 — Generate `scripts/`
 

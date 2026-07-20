@@ -14,13 +14,23 @@
 #   }
 #
 # Framework collisions:
-#   Some frameworks ship conventional folder names that overlap our forbidden
-#   list (e.g., Angular `services/`, NestJS `*.service.ts`, MVC `controllers/`,
-#   `models/`, `views/`). Two escape hatches are supported:
+#   Some frameworks ship conventional names that overlap our forbidden list
+#   (e.g., Angular `services/`, NestJS `*.service.ts`, MVC `controllers/`,
+#   `models/`, `views/`, Rust `lib.rs`, Django `models.py`/`views.py`). Two
+#   escape hatches are supported:
 #     - `exemptions` for whole-tree opt-out at known framework directories.
-#     - `allowPatterns` for regex escape-hatches against the BASENAME (e.g.
-#       `\\.service\\.ts$` to allow per-feature `*.service.ts` while still
-#       blocking a bare `services/` dumping ground).
+#     - `allowPatterns` for regex escape-hatches against the BASENAME.
+#
+#   allowPatterns match a basename, so they exempt a framework-mandated FILE
+#   while still blocking the dumping-ground DIRECTORY of the same name.
+#   Documented per-ecosystem defaults (add the ones for your stack):
+#     Rust           -> "^lib\\.rs$"                    (crate root; blocks lib/)
+#     Django/Python  -> "^models\\.py$", "^views\\.py$"  (per-app; blocks models//views/)
+#     NestJS         -> none needed: `user.service.ts` does not start with
+#                       `service`, so it never matches; only a bare `services/`
+#                       dir is blocked.
+#   A framework whose idiom is a whole directory (Angular `services/`, ASP.NET
+#   MVC `Controllers/`) uses `exemptions` for that specific path instead.
 #
 # Exit codes:
 #   0 — no violations
@@ -53,6 +63,7 @@ Create one with:
     "common", "shared", "misc", "general", "lib",
     "controllers", "services", "models", "views", "handlers"
   ],
+  "allowPatterns": [],
   "exemptions": []
 }
 EOF
