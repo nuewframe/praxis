@@ -19,6 +19,10 @@
 #      required keys.
 #   9. Fenced-code balance: every markdown/template file closes its fences, so a
 #      template broken by a nested bare fence cannot ship again.
+#  10. Terminology drift: forbidden legacy terms (.praxis-canon.json) must not
+#      reappear in the doctrine surfaces.
+#  11. Template placeholder parity: every {{key}} in an overlay template resolves
+#      against a key in praxis.config.yaml.tmpl.
 #
 # Compatible with bash 3.2+ (macOS default). Requires python3.
 #
@@ -416,6 +420,78 @@ PY
 FENCE_RC=$?
 if [[ $FENCE_RC -ne 0 ]]; then
   echo "$FENCE_REPORT" >&2
+  FAILED=$((FAILED + 1))
+else
+  echo "  ok"
+fi
+
+# 10. Terminology drift — forbidden legacy terms (from .praxis-canon.json) must
+#     not reappear in the doctrine surfaces. Single source of truth for terms.
+echo "validate-plugin: checking terminology..."
+TERM_REPORT=$(python3 <<'PY'
+import json, os, re, sys
+if not os.path.isfile('.praxis-canon.json'):
+    print('skipped (no .praxis-canon.json)'); sys.exit(0)
+canon = json.load(open('.praxis-canon.json'))
+terms = canon.get('forbiddenTerms', [])
+scan_dirs = canon.get('terminologyScanDirs', [])
+allow = tuple(canon.get('terminologyAllowPaths', []))
+files = []
+for d in scan_dirs:
+    files += os.popen("find %s -type f \\( -name '*.md' -o -name '*.md.tmpl' \\)" % d).read().splitlines()
+problems = []
+for path in sorted(f for f in files if f):
+    if any(a in path for a in allow):
+        continue
+    text = open(path, errors='replace').read()
+    for t in terms:
+        m = re.search(t['pattern'], text)
+        if m:
+            problems.append("%s: forbidden term '%s' -- %s" % (path, m.group(0), t['reason']))
+for p in problems:
+    print(p)
+sys.exit(1 if problems else 0)
+PY
+)
+TERM_RC=$?
+if [[ $TERM_RC -ne 0 ]]; then
+  echo "$TERM_REPORT" >&2
+  FAILED=$((FAILED + 1))
+else
+  echo "  ok"
+fi
+
+# 11. Template placeholder parity — every {{key.path}} in an overlay template
+#     must resolve against a key in praxis.config.yaml.tmpl. Permanent guard for
+#     the alias hyphen/underscore class of defect.
+echo "validate-plugin: checking template placeholder parity..."
+PH_REPORT=$(python3 <<'PY'
+import json, os, re, sys
+if not os.path.isfile('.praxis-canon.json'):
+    print('skipped (no .praxis-canon.json)'); sys.exit(0)
+canon = json.load(open('.praxis-canon.json'))
+cfg_path = canon['placeholderConfigTemplate']
+scan_root = canon['placeholderScanGlob']
+ph = re.compile(r'\{\{\s*([A-Za-z0-9_.]+)\s*\}\}')
+# The config template declares every substitutable key as `key: {{that.key}}`,
+# so its own placeholders enumerate exactly the valid dotted paths.
+valid = set(ph.findall(open(cfg_path, errors='replace').read()))
+problems = set()
+for path in sorted(p for p in os.popen("find %s -type f -name '*.tmpl'" % scan_root).read().splitlines() if p):
+    if os.path.abspath(path) == os.path.abspath(cfg_path):
+        continue
+    for m in ph.finditer(open(path, errors='replace').read()):
+        key = m.group(1)
+        if key not in valid:
+            problems.add("%s: placeholder {{%s}} has no matching key in %s" % (path, key, os.path.basename(cfg_path)))
+for p in sorted(problems):
+    print(p)
+sys.exit(1 if problems else 0)
+PY
+)
+PH_RC=$?
+if [[ $PH_RC -ne 0 ]]; then
+  echo "$PH_REPORT" >&2
   FAILED=$((FAILED + 1))
 else
   echo "  ok"

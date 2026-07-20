@@ -1,0 +1,15 @@
+{
+  "_comment": "Canonical-facts registry for Praxis. Machine-checkable single-source-of-truth guards consumed by validate-plugin.sh (Phase 1). Extend forbiddenTerms as terminology evolves.",
+  "forbiddenTerms": [
+    { "pattern": "\\bthe bet\\b", "reason": "wave product-architecture is 'the educated theory', not 'the bet'" },
+    { "pattern": "validated bet", "reason": "use 'validated educated theory'" },
+    { "pattern": "= bet;", "reason": "mantra is 'Wave = educated theory; capability record = truth'" },
+    { "pattern": "three-axis disjointness", "reason": "renamed to 'four-condition disjointness' (the rule has four conditions)" },
+    { "pattern": "principal-engineer plugin", "reason": "the plugin was renamed to 'praxis'" },
+    { "pattern": "Logic → Component →", "reason": "canonical test pyramid is Logic -> Composition -> Adapter Contract -> Integration -> Journey" }
+  ],
+  "terminologyScanDirs": ["skills", "instructions", "agents"],
+  "terminologyAllowPaths": ["docs/plans", "CHANGELOG.md", ".praxis-canon.json"],
+  "placeholderConfigTemplate": "skills/provision-project-overlay/templates/praxis.config.yaml.tmpl",
+  "placeholderScanGlob": "skills/provision-project-overlay/templates"
+}
