@@ -1,14 +1,7 @@
 ---
 name: design-system-architecture
 mode: architect
-tools: [
-  read_file,
-  file_search,
-  grep_search,
-  semantic_search,
-  create_file,
-  replace_string_in_file,
-]
+tools: [read_file, file_search, grep_search, semantic_search, create_file, replace_string_in_file]
 description: Phases 2 and 3 of the principal-engineer workflow (architect mode). Use after the Ambiguity Log is resolved to design topology, resilience patterns, contract-first APIs, and storage strategy. Stops for human approval before component layout. Architect mode forbids edits to source code.
 ---
 

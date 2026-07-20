@@ -1,14 +1,7 @@
 ---
 name: define-seam-contract
 mode: architect
-tools: [
-  read_file,
-  file_search,
-  grep_search,
-  semantic_search,
-  create_file,
-  replace_string_in_file,
-]
+tools: [read_file, file_search, grep_search, semantic_search, create_file, replace_string_in_file]
 description: >
   Define a Seam Contract for a boundary — the machine-checkable description of how one
   unit depends on another's promise. Architect-mode skill: produces a machine-readable

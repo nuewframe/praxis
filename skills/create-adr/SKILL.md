@@ -1,14 +1,7 @@
 ---
 name: create-adr
 mode: architect
-tools: [
-  read_file,
-  file_search,
-  grep_search,
-  semantic_search,
-  create_file,
-  replace_string_in_file,
-]
+tools: [read_file, file_search, grep_search, semantic_search, create_file, replace_string_in_file]
 description: >
   Create an Architecture Decision Record (ADR) for a durable technical decision. Architect-mode
    skill: writes are limited to the project's ADR directory. Includes collision-safe ADR IDs,
