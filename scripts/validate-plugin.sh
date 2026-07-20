@@ -2,7 +2,9 @@
 # validate-plugin.sh
 #
 # Repository self-test for the praxis plugin. Validates:
-#   1. Every SKILL.md has a parseable YAML frontmatter block with required keys.
+#   1. Every SKILL.md has a parseable YAML frontmatter block with required keys,
+#      and any `tools:` key is a single-line flow sequence (multi-line/block
+#      form silently breaks Claude Code skill registration).
 #   2. Every JSON file in the repo parses cleanly.
 #   3. Every YAML file in the repo parses cleanly.
 #   4. Every cross-reference (`<plugin-root>/...`, `skills/<name>/...`,
@@ -13,6 +15,10 @@
 #      referenced in the canonical self-describing docs (README.md,
 #      project-context.md, and — for instructions — using-praxis), so the
 #      docs cannot silently drift behind the file tree.
+#   8. Every agent (`agents/*.agent.md`) has parseable frontmatter with the
+#      required keys.
+#   9. Fenced-code balance: every markdown/template file closes its fences, so a
+#      template broken by a nested bare fence cannot ship again.
 #
 # Compatible with bash 3.2+ (macOS default). Requires python3.
 #
@@ -63,6 +69,22 @@ for path in sorted(p for p in os.popen('find skills -type f -name SKILL.md').rea
         problems.append(f'{path}: unterminated frontmatter')
         continue
     fm = text[3:end].lstrip('\n')
+
+    # Claude Code registration guard: a `tools:` key in SKILL.md must be a
+    # single-line flow sequence (tools: [a, b, c]). A multi-line flow sequence
+    # or a block sequence is valid YAML but silently prevents the skill from
+    # registering in Claude Code — the exact defect that disabled six skills.
+    # The known-good control case is a single-line flow sequence.
+    for line in fm.splitlines():
+        m = re.match(r'^tools:\s*(.*)$', line)
+        if m:
+            val = m.group(1).strip()
+            if not (val.startswith('[') and val.endswith(']')):
+                problems.append(f'{path}: `tools:` must be a single-line flow sequence '
+                                '(tools: [a, b, c]); a multi-line or block form breaks '
+                                'Claude Code skill registration')
+            break
+
     try:
         import yaml
         data = yaml.safe_load(fm) or {}
@@ -316,6 +338,84 @@ PY
 INV_RC=$?
 if [[ $INV_RC -ne 0 ]]; then
   echo "$INV_REPORT" >&2
+  FAILED=$((FAILED + 1))
+else
+  echo "  ok"
+fi
+
+# 8. Agent frontmatter — parseable, with required keys. Agent personas are a
+#    fourth surface the earlier checks never covered (where wrong tool names and
+#    missing keys can hide).
+echo "validate-plugin: checking agent frontmatter..."
+AGENT_REPORT=$(python3 <<'PY'
+import os, re, sys
+required = {'name', 'description'}
+problems = []
+for path in sorted(p for p in os.popen('find agents -type f -name "*.agent.md" 2>/dev/null').read().splitlines() if p):
+    text = open(path).read()
+    if not text.startswith('---'):
+        problems.append(f'{path}: missing YAML frontmatter'); continue
+    end = text.find('\n---', 3)
+    if end < 0:
+        problems.append(f'{path}: unterminated frontmatter'); continue
+    fm = text[3:end].lstrip('\n')
+    try:
+        import yaml
+        keys = set((yaml.safe_load(fm) or {}).keys())
+    except ImportError:
+        keys = set(m.group(1) for m in (re.match(r'^([A-Za-z_][\w-]*)\s*:', l) for l in fm.splitlines()) if m)
+    except Exception as e:
+        problems.append(f'{path}: yaml error: {e}'); continue
+    missing = required - keys
+    if missing:
+        problems.append(f'{path}: missing keys: {sorted(missing)}')
+for p in problems:
+    print(p)
+sys.exit(1 if problems else 0)
+PY
+)
+AGENT_RC=$?
+if [[ $AGENT_RC -ne 0 ]]; then
+  echo "$AGENT_REPORT" >&2
+  FAILED=$((FAILED + 1))
+else
+  echo "  ok"
+fi
+
+# 9. Fenced-code balance — every markdown/template file must close its fences.
+#    A CommonMark closing fence is bare (no info string) and has at least the
+#    opening tick count, so a ```markdown template broken by a nested ``` fence
+#    (the item-4 corruption) leaves a residual open fence this check catches.
+echo "validate-plugin: checking fenced-code balance..."
+FENCE_REPORT=$(python3 <<'PY'
+import os, re, sys
+problems = []
+files = os.popen(r"find . -type f \( -name '*.md' -o -name '*.md.tmpl' \) "
+                 r"-not -path './node_modules/*' -not -path './.git/*'").read().splitlines()
+for path in sorted(f for f in files if f):
+    stack = []
+    for line in open(path, errors='replace'):
+        m = re.match(r'^(`{3,})(.*)$', line.rstrip('\n'))
+        if not m:
+            continue
+        ticks, info = len(m.group(1)), m.group(2).strip()
+        if stack and info == '' and ticks >= stack[-1]:
+            stack.pop()
+        elif info != '':
+            stack.append(ticks)
+        elif not stack:
+            stack.append(ticks)
+    if stack:
+        problems.append(f'{path}: unbalanced code fence(s) (residual {stack}); use a '
+                        'four-backtick outer fence when a template embeds nested ``` fences')
+for p in problems:
+    print(p)
+sys.exit(1 if problems else 0)
+PY
+)
+FENCE_RC=$?
+if [[ $FENCE_RC -ne 0 ]]; then
+  echo "$FENCE_REPORT" >&2
   FAILED=$((FAILED + 1))
 else
   echo "  ok"
