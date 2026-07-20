@@ -127,6 +127,20 @@ Praxis ships generic, configurable enforcement scripts. Wire them into the proje
 
 ---
 
+## Enforcement model — what is mechanical vs. trusted
+
+Praxis has three kinds of gate. Knowing which is which is the difference between a guarantee and a good intention:
+
+| Gate kind | Enforced by | Examples | Fails closed? |
+|---|---|---|---|
+| **Script-enforced** | `verify.sh` / CI running the `check-*.sh` probes | anti-dumping, no-skipped-tests, no-sleep-waits, Port/Adapter parity, seam-contract parity, the four readiness anchors, sprint-id collision | Yes — once wired into CI or a git hook (several probes are warn-first until you set `mode: enforce`) |
+| **Human-signed** | a person filling an approval line | Sprint Plan Approval, Design Approval | The next skill refuses to proceed without the signature — but only a compliant agent checks |
+| **Agent-attested** | the agent following the skill | tier classification, the intake envelope, the four-anchor conformance *declaration*, red-first test posture, the adversarial seam review | **No** on a bare harness — trusted, not mechanically compelled |
+
+The honest consequence: on a bare harness (Claude Code, Copilot) the **script-enforced** gates are real only when the project runs `verify.sh` in CI or a git hook; the **human-signed** and **agent-attested** gates rest on compliance. Compelling the attested gates at runtime — forcing intake before code, dispatching a genuinely separate reviewer head — is the job of an orchestration runtime (see MPM composition below). Praxis ships the artifacts and the checks; it does not, by itself, force the agent to run them. Wire `verify.sh` into CI and a pre-push hook to make the script-enforced tier actually fail closed.
+
+---
+
 ## Emergent parallelism — the four-condition disjointness rule
 
 Praxis never schedules parallel work. Parallelism is an **emergent permission**, exercised by the human or an orchestration runtime — never forced by the method, never an artifact Praxis produces. A unit of work (a slice/sprint) may run concurrently with another **only if all four conditions hold**:

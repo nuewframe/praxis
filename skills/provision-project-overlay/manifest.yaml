@@ -62,6 +62,16 @@ managed_files:
     condition: bootstrap.generate_pre_commit_hook == true
 
   # ---------------------------------------------------------------------------
+  # Pre-push hook (opt-in, same flag as pre-commit)
+  #
+  # Runs the full `scripts/verify.sh` (incl. tests + every guardrail check) so
+  # the script-enforced gates fail closed before a push even without CI.
+  # ---------------------------------------------------------------------------
+  - template: templates/.githooks/pre-push.tmpl
+    target: .githooks/pre-push
+    condition: bootstrap.generate_pre_commit_hook == true
+
+  # ---------------------------------------------------------------------------
   # Always-on instructions
   # ---------------------------------------------------------------------------
   - template: templates/.github/instructions/README.md.tmpl
