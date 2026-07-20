@@ -1,9 +1,15 @@
 # Plan — Praxis Maturity Roadmap
 
-**Status:** Proposed (awaiting sign-off before implementation)
+**Status:** Implemented (Phases 0–5 landed; two items pragmatically deferred, noted below)
 **Author:** Principal Engineer (architect mode)
 **Scope:** Resolve the defects and structural shortcomings found in the post-fix review — the ones that survive after the critical/high/medium/low review items were closed. Sequenced by leverage, not by severity label.
 **Deliverable of this doc:** a roadmap only. No skill/script/template changes until a phase is approved.
+
+## Execution notes (2026-07-20)
+
+- **Phase 4.1** (extract per-language markers to a shared registry consumed by the probes) was **deferred** as an internal cleanup: Phase 0.2 already unified the `--include` extension set across all text probes, so the generated coverage matrix shows full coverage and the registry refactor is modest-ROI / real-regression-risk on six working probes.
+- **Phase 2** was **lighter than planned**: the audit found the overlays are already thin pointers (19–32 lines), so the work was to codify the pointer-only principle and rely on the new terminology + placeholder-parity lints to enforce non-divergence, rather than rewrite templates.
+- Everything else shipped as specified, each with a CI guard. Every phase commit passes `validate-plugin.sh` (now 11 checks) + `test-probes.sh` + `gen-coverage-matrix.sh --check`.
 
 ---
 
