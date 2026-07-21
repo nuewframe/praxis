@@ -1,7 +1,7 @@
 {
   "name": "praxis",
   "description": "Praxis — lean wave-based product delivery unified with Principal Engineer discipline. Three-mode engineer persona (architect / implementer / reviewer), three-tier change triage, mechanical Design Approval, waves, thin-slices, code contribution intake, immutable sprint bridges, hypothesis loops, capability-driven architecture, anti-dumping + sleep + skipped-test + port/adapter-parity enforcement, ADR discipline, Pyramid Test Strategy, defensive implementation, TDD verification.",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "author": {
     "name": "Nuewframe"
   },

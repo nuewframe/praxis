@@ -4,7 +4,7 @@ This is the single entry point for understanding what this plugin is, what belon
 
 ## Identity
 
-**Name:** `praxis` **Purpose:** Make an LLM coding agent execute disciplined, lean wave-based delivery and Principal-Software-Engineer practice with **fidelity** — producing trustworthy artifacts a human team can build on — instead of improvising. **Reach:** installable, versioned guidance for Claude Code, Codex, Cursor, Gemini CLI, OpenCode, and GitHub Copilot, written to apply to any language, framework, or runtime. Wide availability across harnesses is a deliberate distribution goal, not a hedge to be earned into with usage evidence — that evidentiary bar applies to methodology-fidelity claims (see Problem, above), not to how many harnesses can install the same doctrine. Breadth is how widely the value ships; it is not the value itself. **Status:** v0.3.0 — multi-harness installable plugin.
+**Name:** `praxis` **Purpose:** Make an LLM coding agent execute disciplined, lean wave-based delivery and Principal-Software-Engineer practice with **fidelity** — producing trustworthy artifacts a human team can build on — instead of improvising. **Reach:** installable, versioned guidance for Claude Code, Codex, Cursor, Gemini CLI, OpenCode, and GitHub Copilot, written to apply to any language, framework, or runtime. Wide availability across harnesses is a deliberate distribution goal, not a hedge to be earned into with usage evidence — that evidentiary bar applies to methodology-fidelity claims (see Problem, above), not to how many harnesses can install the same doctrine. Breadth is how widely the value ships; it is not the value itself. **Status:** v0.4.0 — multi-harness installable plugin.
 
 ## Problem
 
