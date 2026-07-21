@@ -64,13 +64,14 @@ if [[ ${#EXISTING[@]} -eq 0 ]]; then
   exit 0
 fi
 
-PATTERN='waitForTimeout\(|Thread\.sleep\(|(^|[^a-zA-Z_])time\.sleep\(|asyncio\.sleep\([0-9]'
+PATTERN='waitForTimeout\(|Thread\.sleep\(|Thread\.Sleep\(|Task\.Delay\(|(^|[^a-zA-Z_])time\.sleep\(|time\.Sleep\(|asyncio\.sleep\([0-9]|thread::sleep\(|tokio::time::sleep\(|std::thread::sleep\(|usleep\(|(^|[^a-zA-Z_])sleep\([0-9]|(^|[^a-zA-Z_.])sleep[[:space:]]+[0-9]'
 
 set +e
 MATCHES=$(grep -RIEn \
   --include='*.ts' --include='*.tsx' --include='*.js' --include='*.jsx' \
   --include='*.mjs' --include='*.cjs' --include='*.java' --include='*.kt' \
-  --include='*.py' \
+  --include='*.py' --include='*.go' --include='*.rb' --include='*.cs' \
+  --include='*.php' --include='*.rs' \
   --exclude-dir=node_modules --exclude-dir=.git --exclude-dir=dist \
   --exclude-dir=build --exclude-dir=.next --exclude-dir=target \
   --exclude-dir=__pycache__ --exclude-dir=.venv --exclude-dir=venv \

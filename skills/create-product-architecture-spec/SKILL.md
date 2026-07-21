@@ -34,9 +34,9 @@ For broader concerns, pair this skill with:
 
 ---
 
-## Wave = Bet, Not Record
+## Wave = Educated Theory, Not Record
 
-This document is the wave's **hypothesis** — the technical shape you *bet* will deliver the wave's intent, drawn at planning time, before you have built or measured anything. It is provisional and intent-coupled by design.
+This document is the wave's **hypothesis** — the technical shape that today's knowledge says will best deliver the wave's intent, drawn at planning time, before you have built or measured anything. It is provisional and intent-coupled by design.
 
 It is **not** the durable architecture record. The living, validated current-state lives in the durable architecture tree:
 
@@ -44,7 +44,7 @@ It is **not** the durable architecture record. The living, validated current-sta
 - **System overview** (`docs/architecture/README.md`) — cross-capability topology + product-wide posture.
 - **ADRs** (`docs/architecture/<capability>/adr/`) — immutable decisions.
 
-So this spec is **forward-looking and pointer-heavy**: it names the bet, the seams it introduces, and the decisions that will need ADRs — and it **points into** the durable records rather than duplicating their current-state topology. When a sprint validates the bet, `close-sprint` promotes the learning into the capability record and system overview. **Wave = bet; capability record = truth.**
+So this spec is **forward-looking and pointer-heavy**: it names the educated theory, the seams it introduces, and the decisions that will need ADRs — and it **points into** the durable records rather than duplicating their current-state topology. When a sprint validates the educated theory, `close-sprint` promotes the learning into the capability record and system overview. **Wave = educated theory; capability record = truth.**
 
 The moment this document starts describing current-state topology as settled fact, it has drifted into the capability record's job — link out instead.
 
@@ -52,7 +52,7 @@ The moment this document starts describing current-state topology as settled fac
 
 ## What This Skill Produces
 
-A planning-stage wave-level technical architecture **hypothesis** — the bet. Not implementation code. Not a sprint execution plan. Not the durable architecture record (that is the capability record + system overview, promoted on `close-sprint`). The wave README remains the only place that tracks thin-slice status or correction notes.
+A planning-stage wave-level technical architecture **hypothesis** — the educated theory. Not implementation code. Not a sprint execution plan. Not the durable architecture record (that is the capability record + system overview, promoted on `close-sprint`). The wave README remains the only place that tracks thin-slice status or correction notes.
 
 A strong `product-architecture.md` answers:
 
@@ -225,6 +225,8 @@ A wave architecture doc references decisions; durable technical policy belongs i
 ```markdown
 # [Wave Name]: Product Architecture
 
+> **Planning-stage document — an educated theory, not yet the truth.** The best approach given what we know today; current-state architecture lives in [docs/architecture/](../../../architecture/), promoted there by `close-sprint`.
+
 > **Wave**: wave-[category]-[name]\
 > **Version**: 1.0.0\
 > **Updated**: YYYY-MM-DD
@@ -243,7 +245,7 @@ A wave architecture doc references decisions; durable technical policy belongs i
 
 \`\`\`text [Context or flow diagram] \`\`\`
 
-> Point into the durable record for current-state: capability record(s) at `docs/architecture/<capability>/` and the system overview at `docs/architecture/README.md`. Sketch here only the *change* this wave bets on.
+> Point into the durable record for current-state: capability record(s) at `docs/architecture/<capability>/` and the system overview at `docs/architecture/README.md`. Sketch here only the *change* this wave proposes.
 
 ## Domain Structure
 

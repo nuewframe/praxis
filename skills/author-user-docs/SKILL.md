@@ -17,13 +17,13 @@ Use this skill to turn a validated capability into user-facing teaching. This is
 ```
 PLAN → BUILD → MEASURE → LEARN → TEACH
 wave    slices   ship+obs  capability   user guides
-(bet)                      record       (docs/guides/)
+(theory)                   record       (docs/guides/)
                            (truth) ─feeds→ this skill
 ```
 
 **Owner:** Product Designer (authoritative voice of the user). The Principal Engineer reviews technical accuracy; they do not author.
 
-**Teach validated behavior, never hypotheses.** Only author or refresh a guide once the behavior it describes has shipped and the capability record reflects it. If the record is still a bet, stop — there is nothing validated to teach yet.
+**Teach validated behavior, never hypotheses.** Only author or refresh a guide once the behavior it describes has shipped and the capability record reflects it. If the record is still an educated theory, stop — there is nothing validated to teach yet.
 
 ---
 
@@ -56,7 +56,7 @@ The capability record is **engineer-facing source**: how the capability is built
 
 - The guide **derives from and links to** the record. It never restates mechanics (schemas, resilience tables, topology).
 - When the record drifts, the guide is **re-derived**, not annotated with history.
-- Never teach from sprint notes or a wave `product-architecture.md` (that is the bet, not the truth).
+- Never teach from sprint notes or a wave `product-architecture.md` (that is the educated theory, not the truth).
 
 ---
 
@@ -146,7 +146,7 @@ Re-read the capability record and confirm every claim in the guide matches curre
 
 ## Anti-Patterns
 
-- Teaching from the wave `product-architecture.md` or sprint notes — that is the bet, not the truth
+- Teaching from the wave `product-architecture.md` or sprint notes — that is the educated theory, not the truth
 - Blending quadrants — a tutorial that turns into an API dump, or reference padded with narrative
 - Hand-copying a contract into reference where it will silently drift; link to the machine-readable source
 - Authoring guides for a hypothesis before the behavior shipped

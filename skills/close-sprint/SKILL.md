@@ -19,7 +19,7 @@ Use this skill when a sprint's thin-slices are complete or the work is done.
 
 ## Core Mental Model — Bidirectional Outflow
 
-A sprint is a bridge between product intent and engineering reality. When it closes, the bridge dissolves and learnings flow to **both** shores. This is the moment the wave's **hypothesis** (the bet) is promoted into the durable **record** (the truth) now that it has been built and measured:
+A sprint is a bridge between product intent and engineering reality. When it closes, the bridge dissolves and learnings flow to **both** shores. This is the moment the wave's **hypothesis** (the educated theory) is promoted into the durable **record** (the truth) now that it has been built and measured:
 
 ```
                     SPRINT (closing)
@@ -30,13 +30,13 @@ PRODUCT-side outflow              ENGINEERING-side outflow
 ─────────────────────             ──────────────────────────
 wave README                       system overview (docs/architecture/README.md)
 product-design.md                 capability record (docs/architecture/<capability>/)
-product-architecture.md (the bet) ADRs (new or superseded)
+product-architecture.md (theory)  ADRs (new or superseded)
 qa.md                             capability layout docs
 PRODUCT dashboard                 refactor records / anti-dumping baseline
 user guides (docs/guides/, TEACH) ← rendered from the capability record
 ```
 
-The wave `product-architecture.md` is the bet; the **capability record is the truth**. Promoting validated learning into the capability record is also what feeds the *next* phase downstream — user docs (how-tos, tutorials, product concepts) are generated from the capability record, not from sprint notes.
+The wave `product-architecture.md` is the educated theory; the **capability record is the truth**. Promoting validated learning into the capability record is also what feeds the *next* phase downstream — user docs (how-tos, tutorials, product concepts) are generated from the capability record, not from sprint notes.
 
 If a sprint only updates the product side, you've lost half the learning.
 
@@ -75,7 +75,7 @@ Read the sprint working notes and any deviations from the original plan. Ask in 
 
 ### Engineering-side learning prompts
 
-- Did the technical approach differ from the wave `product-architecture.md` bet? What is the correct picture now, and does the **capability record** (`docs/architecture/<capability>/`) need to be rewritten to that truth?
+- Did the technical approach differ from the wave `product-architecture.md` educated theory? What is the correct picture now, and does the **capability record** (`docs/architecture/<capability>/`) need to be rewritten to that truth?
 - Did the cross-capability topology or product-wide posture change? Update the **system overview** (`docs/architecture/README.md`).
 - Did this sprint make a durable technical decision that needs an ADR? Or supersede an existing one?
 - Did capability ownership shift? Does the capability layout doc need to update?
@@ -121,7 +121,7 @@ Update the engineering side artifacts. Same tone rules — intent only, no histo
 
 | What changed                                              | Update this artifact                                         |
 | --------------------------------------------------------- | ------------------------------------------------------------ |
-| Technical approach validated — the bet is now truth        | Capability record `docs/architecture/<capability>/` (rewrite current-state in place) |
+| Technical approach validated — the educated theory is now truth        | Capability record `docs/architecture/<capability>/` (rewrite current-state in place) |
 | Cross-capability topology or product-wide posture          | System overview `docs/architecture/README.md`                |
 | Durable technical decision (selection, pattern, boundary) | New ADR via `create-adr` (or supersede an existing one)      |
 | Capability ownership or vertical-slice layout             | Capability layout doc + `design-capability-layout` if needed |
@@ -139,7 +139,7 @@ Engineering artifacts are not just docs — they bind future work. The capabilit
 If this sprint changed **user-observable behavior**, promote the validated learning one more step: into user-facing teaching. A pure refactor with no observable effect skips this step.
 
 - Refresh the affected **capability guide** (`docs/guides/<capability>/`) and any **journey tutorial** (`docs/guides/tutorials/`) that traverses the changed capability, using `author-user-docs`.
-- Derive from the now-updated capability record — never from sprint notes or the wave `product-architecture.md` bet.
+- Derive from the now-updated capability record — never from sprint notes or the wave `product-architecture.md` educated theory.
 - Same tone rules: clean present tense, no sprint history. Update each guide's `last-validated` date.
 
 This is the phase the capability record exists to feed. A record updated in Step 5 but a guide left stale means the next user learns yesterday's behavior.

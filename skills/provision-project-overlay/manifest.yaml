@@ -62,6 +62,16 @@ managed_files:
     condition: bootstrap.generate_pre_commit_hook == true
 
   # ---------------------------------------------------------------------------
+  # Pre-push hook (opt-in, same flag as pre-commit)
+  #
+  # Runs the full `scripts/verify.sh` (incl. tests + every guardrail check) so
+  # the script-enforced gates fail closed before a push even without CI.
+  # ---------------------------------------------------------------------------
+  - template: templates/.githooks/pre-push.tmpl
+    target: .githooks/pre-push
+    condition: bootstrap.generate_pre_commit_hook == true
+
+  # ---------------------------------------------------------------------------
   # Always-on instructions
   # ---------------------------------------------------------------------------
   - template: templates/.github/instructions/README.md.tmpl
@@ -183,6 +193,18 @@ managed_files:
     target: .github/skills/write-tests/SKILL.md
     condition: always
 
+  - template: templates/.github/skills/create-quality-spec/SKILL.md.tmpl
+    target: .github/skills/create-quality-spec/SKILL.md
+    condition: always
+
+  - template: templates/.github/skills/start-thin-slice/SKILL.md.tmpl
+    target: .github/skills/start-thin-slice/SKILL.md
+    condition: always
+
+  - template: templates/.github/skills/verify-and-assemble-pr/SKILL.md.tmpl
+    target: .github/skills/verify-and-assemble-pr/SKILL.md
+    condition: always
+
   # ---------------------------------------------------------------------------
   # Prompt overlays (always — thin pointers)
   # ---------------------------------------------------------------------------
@@ -255,10 +277,13 @@ managed_files:
   # ---------------------------------------------------------------------------
   # Verification entry point (always)
   #
-  # `scripts/verify.sh` is the single command reviewer mode runs. The plugin
-  # ships a stack-agnostic skeleton; the project edits the per-step bodies
-  # (format, lint, type-check, test runner) to match its toolchain. The
-  # check-* scripts the skeleton calls live alongside it under `scripts/`.
+  # `scripts/verify.sh` is the single command reviewer mode runs. Ship the
+  # stack-agnostic skeleton here, then edit the per-step bodies (format, lint,
+  # type-check, test runner) to match the toolchain. Note: the check-* scripts
+  # the skeleton calls are NOT templates and do NOT belong in this manifest —
+  # copy them verbatim from `<plugin-root>/scripts/` into the project's
+  # `scripts/` in Step 4b. Skip that copy and verify.sh fails with exit 127 on
+  # the first run.
   # ---------------------------------------------------------------------------
   - template: templates/scripts/verify.sh.tmpl
     target: scripts/verify.sh

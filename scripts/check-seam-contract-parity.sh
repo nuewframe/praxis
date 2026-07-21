@@ -28,7 +28,9 @@
 #   }
 #
 # `shape` and `behavior` may each be an exact path or a glob (e.g.
-# "src/**/publish-api.contract.test.*"). At least one match must exist.
+# "src/**/publish-api.contract.test.*"). Globs are resolved with `find -path`,
+# so `*` and `**` both match across directory separators (portable on bash 3.2,
+# which lacks `globstar`). At least one non-empty match must exist.
 #
 # Default Shape form per kind (D2; project MAY override the file extension):
 #   http  -> OpenAPI       (.openapi.yaml / .openapi.json)
@@ -83,11 +85,12 @@ except Exception:
     print('warn')
 " "$MANIFEST")
 
-# Emit one tab-separated record per seam: id \t kind \t shape \t behavior
-SEAMS=()
-while IFS= read -r line; do
-  [[ -n "$line" ]] && SEAMS+=("$line")
-done < <(python3 -c "
+# Emit one tab-separated record per seam: id \t kind \t shape \t behavior.
+# Use command substitution (not process substitution) so the manifest-parse
+# exit code is captured: `$?` after `done < <(python3 ...)` reflects the while
+# loop, not python, which would let a corrupt manifest pass silently as "no
+# seams".
+SEAMS_RAW=$(python3 -c "
 import json, sys
 try:
     cfg = json.load(open(sys.argv[1]))
@@ -106,7 +109,15 @@ PY_RC=$?
 if [[ $PY_RC -eq 3 ]]; then
   echo "check-seam-contract-parity: invalid manifest" >&2
   exit 2
+elif [[ $PY_RC -ne 0 ]]; then
+  echo "check-seam-contract-parity: manifest read failed (exit $PY_RC)" >&2
+  exit 2
 fi
+
+SEAMS=()
+while IFS= read -r line; do
+  [[ -n "$line" ]] && SEAMS+=("$line")
+done <<< "$SEAMS_RAW"
 
 if [[ ${#SEAMS[@]} -eq 0 ]]; then
   echo "check-seam-contract-parity: manifest declares no seams; nothing to check"
@@ -118,14 +129,28 @@ fi
 VALID_KINDS='http event port cli'
 
 # Does at least one non-empty file match PATH_OR_GLOB (relative to ROOT)?
+# Globs are resolved with `find -path` so that `*` and `**` both match across
+# directory separators. bash 3.2 (the declared floor) has no `globstar`, so a
+# bare shell glob cannot honor the documented `src/**/x.contract.test.*` form;
+# find can.
 exists_nonempty() {
   local spec="$1"
   [[ -z "$spec" ]] && return 1
-  local m
-  for m in $ROOT/$spec; do
-    [[ -s "$m" ]] && return 0
-  done
-  return 1
+  case "$spec" in
+    *'*'*|*'?'*|*'['*)
+      # Glob: match the full path; find's `*`/`**` cross '/'.
+      local m
+      while IFS= read -r m; do
+        [[ -s "$m" ]] && return 0
+      done < <(find "$ROOT" -type f -path "$ROOT/$spec" 2>/dev/null)
+      return 1
+      ;;
+    *)
+      # Exact path: fast, unambiguous.
+      [[ -s "$ROOT/$spec" ]] && return 0
+      return 1
+      ;;
+  esac
 }
 
 # ---- Check ------------------------------------------------------------------

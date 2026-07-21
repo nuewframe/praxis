@@ -36,7 +36,11 @@ A strong `qa.md` answers six questions:
 
 ## Required Sections
 
-Every `qa.md` must include:
+Every `qa.md` opens with the planning-stage banner directly under its title (preserve it when refining an existing stub):
+
+> **Planning-stage document — an educated theory, not yet the truth.** The best approach given what we know today; current-state architecture lives in [docs/architecture/](../../../architecture/), promoted there by `close-sprint`.
+
+It must then include:
 
 | Section                      | What it contains                                                                                 |
 | ---------------------------- | ------------------------------------------------------------------------------------------------ |

@@ -18,12 +18,13 @@ description: Scaffold a new project from empty (greenfield) with capability-driv
 
 ### Step 1 — Interview the human
 
-Ask exactly these four questions. Wait for answers before proceeding.
+Ask exactly these five questions. Wait for answers before proceeding.
 
 1. **Project name** (e.g., `acme-billing`)
 2. **Primary language and runtime** (e.g., TypeScript + Deno, Python 3.13, Go 1.23, Rust)
 3. **Primary framework** (e.g., Hono, FastAPI, gRPC server, CLI, none)
-4. **Deployment target** (e.g., Cloud Run, Lambda, Kubernetes, single binary)
+4. **Primary storage** (e.g., Postgres, SQLite, DynamoDB, none)
+5. **Deployment target** (e.g., Cloud Run, Lambda, Kubernetes, single binary)
 
 If any answer is "I don't know yet," push back: those decisions shape the structure. Don't proceed with placeholders.
 
@@ -61,10 +62,10 @@ Create this layout (paths adapted to the language):
 │   ├── product/
 │   │   ├── waves/
 │   │   │   └── wave-000-bootstrap/
-│   │   │       ├── brief.md
-│   │   │       ├── design.md
-│   │   │       ├── architecture.md
-│   │   │       └── quality.md
+│   │   │       ├── README.md
+│   │   │       ├── product-design.md
+│   │   │       ├── product-architecture.md
+│   │   │       └── qa.md
 │   │   └── sprints/                       # flat, ephemeral — SPRINT.<ID>-<slug>.md, never nested in a wave
 │   │       └── SPRINT.<ID>-placeholder.md
 │   └── README.md
@@ -80,10 +81,7 @@ Create this layout (paths adapted to the language):
 │       └── …
 ├── scripts/
 │   ├── verify.sh                         # universal verification entry point
-│   ├── check-anti-dumping.sh             # symlink or copy from this plugin
-│   ├── check-no-skipped-tests.sh         # symlink or copy from this plugin
-│   ├── check-no-sleep-waits.sh           # symlink or copy from this plugin
-│   └── check-port-adapter-parity.sh      # symlink or copy from this plugin
+│   └── check-*.sh                        # every guardrail check, copied from this plugin (see Step 9)
 ├── .anti-dumping.json                   # config for the linter (paths to scan)
 ├── README.md
 ├── CONTRIBUTING.md
@@ -99,7 +97,7 @@ Create this layout (paths adapted to the language):
 
 Use this template, filling in `<placeholders>`:
 
-```markdown
+````markdown
 # <project-name> — Copilot Instructions
 
 These instructions are mandatory. Repository rules override the `praxis` plugin defaults; plugin defaults apply where the repo is silent.
@@ -107,7 +105,7 @@ These instructions are mandatory. Repository rules override the `praxis` plugin 
 ## Project identity
 
 - **Name:** <project-name>
-- **Stack:** <language and runtime> · <framework> · <deployment target>
+- **Stack:** <language and runtime> · <framework> · <storage> · <deployment target>
 - **Entry point:** [docs/project-context.md](../docs/project-context.md) — read first.
 
 ## Architecture
@@ -124,6 +122,11 @@ Per-capability file pattern:
 | `<capability>.api.<ext>`        | Transport adapter. Parse → validate → call service → format. |
 | `mod.<ext>`                     | Public surface. Other capabilities import only from here.    |
 
+Two rules keep this pattern healthy as the codebase grows:
+
+- **Splitting.** When a capability file no longer fits in one read (~400 lines is the smell threshold) or the capability serves more than one distinct sub-domain, split it into sub-capabilities (`billing/invoicing/`, `billing/settlement/`), each with its own `mod.<ext>`. Never relieve size pressure with a `utils` file — that recreates the dumping ground inside the sanctioned structure.
+- **Graduation.** Code needed by two or more capabilities never gets a `shared/` folder. Either it earns a business-domain name and becomes its own capability (`money/`, `audit/`) with a `mod.<ext>` surface and an owner, or it stays duplicated until it does. Duplication is the visible, reversible cost; a `shared/` folder is the invisible, compounding one.
+
 ## Workflow
 
 For non-trivial changes, run the principal-engineer phased skills in order:
@@ -132,8 +135,9 @@ For non-trivial changes, run the principal-engineer phased skills in order:
 1. `discovery-and-ambiguity-log`
 2. `design-system-architecture`
 3. `design-capability-layout`
-4. `implement-with-defensive-patterns`
-5. `verify-and-assemble-pr`
+4. `create-adr`
+5. `implement-with-defensive-patterns`
+6. `verify-and-assemble-pr`
 
 ## Quality gates (mandatory before commit)
 
@@ -148,11 +152,10 @@ The pipeline is:
 - Format: `<format command>`
 - Lint: `<lint command>`
 - Type check: `<type-check command>`
-- Anti-dumping: `bash scripts/check-anti-dumping.sh`
-- No skipped tests: `bash scripts/check-no-skipped-tests.sh`
-- No sleep waits: `bash scripts/check-no-sleep-waits.sh`
-- Port/adapter parity: `bash scripts/check-port-adapter-parity.sh`
+- Praxis guardrails: every `scripts/check-*.sh` (copied from the plugin — `verify.sh` runs them all)
 - Tests: `<test command>`
+
+`scripts/verify.sh` is the single source of truth for the pipeline. Do not restate the check list elsewhere; link here or to the script.
 
 ## Non-negotiables
 
@@ -162,7 +165,7 @@ The pipeline is:
 4. ADR for every significant decision, homed in the durable architecture tree (`docs/architecture/<capability>/adr/`, or `docs/architecture/adr/` for cross-capability decisions).
 5. Tests live with the capability, not in a separate tree.
 6. Telemetry: structured logs, p95/p99 metrics, trace propagation. No `console.log` / `print`.
-```
+````
 
 ### Step 5 — Generate `.claude/CLAUDE.md`
 
@@ -209,16 +212,12 @@ Durable architecture lives in [docs/architecture/](architecture/): the system ov
 
 ## Quality gates
 
-- `<format command>`
-- `<lint command>`
-- `<type-check command>`
-- `./scripts/check-anti-dumping.sh`
-- `<test command>`
+One command, mandatory before commit: `bash scripts/verify.sh`. The script is the single source of truth for the pipeline (format, lint, type check, praxis guardrail checks, tests) — see `.github/copilot-instructions.md` for the summary.
 ```
 
 ### Step 7 — Generate the durable architecture tree
 
-Create `docs/architecture/README.md` (system overview stub: capability list + a placeholder cross-capability topology and product-wide posture) and the first ADR at `docs/architecture/adr/ADR.<ID>-technology-stack.md` (a cross-capability decision). Use the ADR template from `create-adr` (which carries an as-of-decision diagram) and apply its ID convention. Fill in:
+Create `docs/architecture/README.md` (system overview stub: capability list + a placeholder cross-capability topology and product-wide posture) and the first ADR at `docs/architecture/adr/ADR.<ID>-technology-stack.md` (a cross-capability decision). The overview's first line states its authority: "This tree is current-state truth, promoted by `close-sprint`. Planning-stage intent lives in `docs/product/waves/`." The topology section is not optional decoration — it is the only home the cross-capability picture has; a stub is acceptable, an absent section is not. Use the ADR template from `create-adr` (which carries an as-of-decision diagram) and apply its ID convention. Fill in:
 
 - The capability list from Step 2.
 - The stack choices from Step 1.
@@ -244,36 +243,63 @@ Create `docs/architecture/README.md` (system overview stub: capability list + a 
     "models",
     "views"
   ],
+  "allowPatterns": [],
   "exemptions": []
 }
 ```
 
 (Adjust `scanPaths` to match the language convention — `services/`, `pkg/`, `apps/`, etc.)
 
+**Per-ecosystem `allowPatterns` (fill in for your stack).** `allowPatterns` are regexes matched against a **basename**, so they exempt a framework-mandated *file* while still blocking the dumping-ground *directory* of the same name. Add the row(s) for your stack so the day-one build does not trip the linter:
+
+| Stack | Add to `allowPatterns` | Exempts (idiomatic file) | Still blocked (silo dir) |
+| ----- | ---------------------- | ------------------------ | ------------------------ |
+| Rust (if `lib` is in `forbiddenNames`) | `"^lib\\.rs$"` | the mandatory crate root `lib.rs` | a `lib/` catch-all |
+| Django / Python | `"^models\\.py$"`, `"^views\\.py$"` | per-app `models.py` / `views.py` | `models/` / `views/` |
+| NestJS | (none) | `*.service.ts` already passes — its basename does not start with `service` | a bare `services/` |
+
+For a framework whose idiom is a whole *directory* (Angular `services/`, ASP.NET MVC `Controllers/`/`Models/`/`Views/`), prefer the capability-driven layout. If you must keep the convention, add that specific path to `exemptions` — but that re-opens the dumping ground the linter exists to close, so scope it tightly and revisit it.
+
+Leave `exemptions` empty for greenfield. The sanctioned escape hatch for cross-capability code is **graduation** into a named capability (see the Architecture rules in `.github/copilot-instructions.md`), not an exemption — an exemption re-opens the dumping ground the linter exists to close.
+
 ### Step 9 — Generate `scripts/`
 
-Copy or symlink from `<plugin-root>/scripts/`:
+Copy `scripts/verify.sh` from `<plugin-root>/skills/provision-project-overlay/templates/scripts/verify.sh.tmpl` and edit the `step_format`, `step_lint`, `step_typecheck`, and `step_tests` function bodies to call your project's actual commands.
 
-- `check-anti-dumping.sh`
-- `check-no-skipped-tests.sh`
-- `check-no-sleep-waits.sh`
-- `check-port-adapter-parity.sh`
-- `validate-plugin.sh` (optional — for plugin self-test)
+Then copy or symlink **every** `check-*.sh` from `<plugin-root>/scripts/` into `scripts/`. Do not hand-pick a subset: `verify.sh` calls all of them, and a missing script breaks the quality gate on day one. (`validate-plugin.sh` is the one exception — it is a plugin self-test, copy it only if you want it.)
 
-Also copy `scripts/verify.sh` from `<plugin-root>/skills/provision-project-overlay/templates/scripts/verify.sh.tmpl` and edit the `step_format`, `step_lint`, `step_typecheck`, and `step_tests` function bodies to call your project's actual commands. Make every script executable. Wire `bash scripts/verify.sh` into the project's task runner so it runs on every build and in CI.
+Before moving on, run the parity check — every check `verify.sh` calls must exist on disk:
+
+```sh
+for s in $(grep -o 'check-[a-z-]*\.sh' scripts/verify.sh | sort -u); do
+  [ -f "scripts/$s" ] || echo "MISSING: scripts/$s"
+done
+```
+
+No output is the pass condition. Make every script executable. Wire `bash scripts/verify.sh` into the project's task runner so it runs on every build and in CI.
 
 ### Step 9b — Scaffold the bootstrap wave
 
 Create `docs/product/waves/wave-000-bootstrap/` with four placeholder docs:
 
-- `brief.md` — product brief stub: name, purpose, primary user, success metric. The PM persona fills this in via `create-wave`.
-- `design.md` — design spec stub. Filled in via `create-product-design-spec`.
-- `architecture.md` — architecture spec stub. Filled in via `create-product-architecture-spec`.
-- `quality.md` — quality spec stub. Filled in via `create-quality-spec`.
+Every wave document — stub or filled — opens with the planning-stage banner directly under its title, so the durable-vs-planning split is visible in the artifact itself, not just in the skill definitions:
+
+```markdown
+> **Planning-stage document — an educated theory, not yet the truth.** The best approach given what we know today; current-state architecture lives in [docs/architecture/](../../../architecture/), promoted there by `close-sprint`.
+```
+
+The durable tree carries no banner: it *is* the truth, and says so in its overview (Step 7).
+
+Use the exact filenames the wave skills own — a stub under any other name is never picked up downstream:
+
+- `README.md` — wave intent stub: name, purpose, primary user, success metric, thin-slices. The PM persona fills this in via `create-wave`.
+- `product-design.md` — design spec stub. Filled in via `create-product-design-spec`.
+- `product-architecture.md` — architecture spec stub. Filled in via `create-product-architecture-spec`.
+- `qa.md` — quality spec stub. Filled in via `create-quality-spec`.
 
 And one sprint placeholder:
 
-- `docs/product/sprints/SPRINT.<ID>-placeholder.md` — a Trivial-tier sprint stub the team can either fill in for the first real change or delete. Sprints live **flat** under `docs/product/sprints/`, never nested in a wave, and are deleted at close. Use the collision-safe `SPRINT.<ID>` id convention from `create-adr`. Includes the Design Approval section (n/a since Trivial) so the create-sprint mechanics are visible from day one.
+- `docs/product/sprints/SPRINT.<ID>-placeholder.md` — a sprint **template** stub the team fills in for its first Standard/Major change or deletes. Trivial changes do not get a sprint (see `start-thin-slice` — Trivial routes straight to implementation with no bridge); this placeholder exists only to make the `create-sprint` mechanics visible from day one. Sprints live **flat** under `docs/product/sprints/`, never nested in a wave, and are deleted at close. Use the collision-safe `SPRINT.<ID>` id convention from `create-adr`.
 
 These stubs make the workflow legible to a new contributor without forcing them to learn the persona-mode model first.
 
@@ -292,14 +318,14 @@ This project was scaffolded by the `praxis` plugin's `bootstrap-project` skill o
 - `docs/architecture/README.md` and `docs/architecture/adr/ADR.<ID>-technology-stack.md`
 - `docs/guides/` (user-facing docs home — TEACH; populated once capabilities ship)
 - `src/<capability>/` skeletons for: <list>
-- `scripts/check-anti-dumping.sh`
+- `scripts/verify.sh` plus every `scripts/check-*.sh` from the plugin
 - `.anti-dumping.json`
 
 ## What to do next
 
 1. Install dependencies for `<language and framework>`.
 2. Wire the quality gates into your task runner (`<runner>`).
-3. Run the first feature using the phased workflow: `intake-code-contribution` → `discovery-and-ambiguity-log` → `design-system-architecture` → `design-capability-layout` → `implement-with-defensive-patterns` → `verify-and-assemble-pr`.
+3. Run the first feature using the phased workflow: `intake-code-contribution` → `discovery-and-ambiguity-log` → `design-system-architecture` → `design-capability-layout` → `create-adr` → `implement-with-defensive-patterns` → `verify-and-assemble-pr`.
 4. Once the first feature ships, decide whether to add project-specific personas (in `.github/agents/`) or skills (in `.github/skills/`).
 
 ## Plugin precedence

@@ -20,8 +20,10 @@ description: Generate a project-specific `.github/` overlay (skills, agents, pro
 
 - **Config file** — `praxis.config.yaml` at repo root. Source of truth for all substitutions. Survives plugin upgrades.
 - **Templates** — files in `plugin/skills/provision-project-overlay/templates/` ending in `.tmpl`. Pure markdown / YAML with `{{placeholder}}` substitution.
+- **Pointer-only overlays** — an overlay skill/instruction is a **thin pointer**: one paragraph naming the plugin skill it maps to ("read it first"), then project-specific paths, gates, and ownership. It must **never restate plugin doctrine** (tier tables, phase orders, the test pyramid, terminology) — that is what drifts. Two `validate-plugin.sh` lints enforce this: the terminology lint (forbidden legacy terms) and the placeholder-parity lint (every `{{…}}` resolves against the config). Keep overlays short; if one grows past ~40 lines, it is probably restating doctrine that belongs in the plugin skill.
 - **Manifest** — `plugin/skills/provision-project-overlay/manifest.yaml` listing every managed `(template_path, target_path, condition)`. Files not in the manifest are never touched.
-- **Substitution** — plain `{{key.nested}}` string replace. No conditionals, no loops. If a template needs branching, ship two templates and gate them with manifest `condition`.
+- **Prompt-overlay templates** (`.github/prompts/*.prompt.md`) — unvalidated speculative generality: 11 templates for "non-skill chat surfaces" (ChatGPT web, JetBrains Copilot, github.com PR chat) with no evidence any adopter uses them. Kept for now, not expanded further, pending a real usage signal.
+- **Substitution** — plain `{{key.nested}}` string replace. No conditionals, no loops. If a template needs branching, ship two templates and gate them with manifest `condition`. The one non-config token is `{{TODAY}}`, a **runtime placeholder** substituted with the current date (e.g. an ADR `Date:` line); it is allowlisted in `.praxis-canon.json` `specialPlaceholders`. Every other `{{…}}` must resolve against `praxis.config.yaml`.
 
 ---
 
@@ -102,7 +104,7 @@ If yes, ask one alias per role. If no, set `personas.use_aliases: false` and ski
 
 ### Step 3 — Write `praxis.config.yaml`
 
-Render `templates/praxis.config.yaml.tmpl` with the answers and write to `<repo-root>/praxis.config.yaml`. If file exists and `--reconfigure` was passed, show a diff and ask before overwriting.
+Render `templates/praxis.config.yaml.tmpl` with the answers and write to `<repo-root>/praxis.config.yaml`. Set `plugin_version` from the installed plugin's `package.json` `version`. If file exists and `--reconfigure` was passed, show a diff and ask before overwriting.
 
 ### Step 4 — Emit overlay files
 
@@ -116,6 +118,30 @@ For each entry in `manifest.yaml`:
    - **File matches expected output** → skip (already current)
    - **File differs** → show unified diff and prompt: `[k]eep mine / [t]ake template / [m]erge manually`
 5. Record outcome in a per-run summary.
+
+### Step 4b — Copy the guardrail check scripts
+
+Step 4 emits `scripts/verify.sh`, but that skeleton **calls** every `check-*.sh` guardrail script. Those scripts are shipped verbatim by the plugin (not templates — no substitution) and are **not** in `manifest.yaml`, so they must be copied here. Skipping this leaves `verify.sh` dead on arrival: step 4 (anti-dumping) fails with `exit 127` the first time anyone runs `bash scripts/verify.sh`.
+
+Copy or symlink **every** `check-*.sh` from `<plugin-root>/scripts/` into the project's `scripts/`. Do not hand-pick a subset — `verify.sh` calls all of them, and a missing script breaks the quality gate on day one. (`validate-plugin.sh` is the one exception — it is a plugin self-test; copy it only if you want it.)
+
+```bash
+mkdir -p scripts
+for src in "<plugin-root>"/scripts/check-*.sh; do
+  cp "$src" scripts/
+done
+chmod +x scripts/check-*.sh scripts/verify.sh
+```
+
+Then run the parity check — every check `verify.sh` calls must exist on disk:
+
+```bash
+for s in $(grep -o 'check-[a-z-]*\.sh' scripts/verify.sh | sort -u); do
+  [ -f "scripts/$s" ] || echo "MISSING: scripts/$s"
+done
+```
+
+No output is the pass condition. Record the copied scripts in the per-run summary (`Scripts:` line).
 
 ### Step 5 — Validate inbound references
 
@@ -148,6 +174,7 @@ Config:    praxis.config.yaml (created | unchanged | reconfigured)
 Emitted:   <N> files
 Skipped:   <N> files (already current)
 Diffs:     <N> files (resolved: kept-mine=<a>, took-template=<b>, manual=<c>)
+Scripts:   verify.sh + <N> check-*.sh copied (parity: ok | MISSING listed above)
 Bootstrap: <list of bootstrap docs written>
 Inbound:   <N> references checked, <M> unresolved (see list above)
 Anti-dumping: clean | <N> violations
@@ -155,6 +182,20 @@ Next step: review praxis.config.yaml, commit when satisfied.
 ```
 
 Do not auto-commit. Humans commit.
+
+---
+
+## Upgrade mode (`--upgrade`)
+
+Provisioned repos hold **copies** — the rendered overlays, the `check-*.sh` scripts, and `scripts/verify.sh`. When the plugin ships fixes (a probe bug, a template repair), those copies do not update themselves. `--upgrade` re-syncs them:
+
+1. Read `plugin_version` from `praxis.config.yaml` and compare it to the installed plugin's `package.json` `version`. If equal, report "up to date" and stop unless `--force`.
+2. Re-render every manifest entry from the current templates + existing config answers (no re-interview). For each file, apply the Step 4 action model: **write** if unchanged-from-last-render, **diff-and-prompt** if the human edited it.
+3. Re-copy every `check-*.sh` and `verify.sh` per Step 4b (these are verbatim, not templated — diff and prompt on local edits).
+4. Update `plugin_version` in `praxis.config.yaml` to the installed version.
+5. Print the Step 7 summary with an added `Upgraded: <old> -> <new>` line and the list of scripts/overlays that changed.
+
+The version field makes drift between a repo and the plugin **visible**; `--upgrade` makes it **resolvable** with a reviewable diff, never a silent overwrite.
 
 ---
 

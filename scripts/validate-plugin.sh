@@ -2,7 +2,9 @@
 # validate-plugin.sh
 #
 # Repository self-test for the praxis plugin. Validates:
-#   1. Every SKILL.md has a parseable YAML frontmatter block with required keys.
+#   1. Every SKILL.md has a parseable YAML frontmatter block with required keys,
+#      and any `tools:` key is a single-line flow sequence (multi-line/block
+#      form silently breaks Claude Code skill registration).
 #   2. Every JSON file in the repo parses cleanly.
 #   3. Every YAML file in the repo parses cleanly.
 #   4. Every cross-reference (`<plugin-root>/...`, `skills/<name>/...`,
@@ -13,6 +15,14 @@
 #      referenced in the canonical self-describing docs (README.md,
 #      project-context.md, and — for instructions — using-praxis), so the
 #      docs cannot silently drift behind the file tree.
+#   8. Every agent (`agents/*.agent.md`) has parseable frontmatter with the
+#      required keys.
+#   9. Fenced-code balance: every markdown/template file closes its fences, so a
+#      template broken by a nested bare fence cannot ship again.
+#  10. Terminology drift: forbidden legacy terms (.praxis-canon.json) must not
+#      reappear in the doctrine surfaces.
+#  11. Template placeholder parity: every {{key}} in an overlay template resolves
+#      against a key in praxis.config.yaml.tmpl.
 #
 # Compatible with bash 3.2+ (macOS default). Requires python3.
 #
@@ -63,6 +73,22 @@ for path in sorted(p for p in os.popen('find skills -type f -name SKILL.md').rea
         problems.append(f'{path}: unterminated frontmatter')
         continue
     fm = text[3:end].lstrip('\n')
+
+    # Claude Code registration guard: a `tools:` key in SKILL.md must be a
+    # single-line flow sequence (tools: [a, b, c]). A multi-line flow sequence
+    # or a block sequence is valid YAML but silently prevents the skill from
+    # registering in Claude Code — the exact defect that disabled six skills.
+    # The known-good control case is a single-line flow sequence.
+    for line in fm.splitlines():
+        m = re.match(r'^tools:\s*(.*)$', line)
+        if m:
+            val = m.group(1).strip()
+            if not (val.startswith('[') and val.endswith(']')):
+                problems.append(f'{path}: `tools:` must be a single-line flow sequence '
+                                '(tools: [a, b, c]); a multi-line or block form breaks '
+                                'Claude Code skill registration')
+            break
+
     try:
         import yaml
         data = yaml.safe_load(fm) or {}
@@ -316,6 +342,190 @@ PY
 INV_RC=$?
 if [[ $INV_RC -ne 0 ]]; then
   echo "$INV_REPORT" >&2
+  FAILED=$((FAILED + 1))
+else
+  echo "  ok"
+fi
+
+# 8. Agent frontmatter — parseable, with required keys. Agent personas are a
+#    fourth surface the earlier checks never covered (where wrong tool names and
+#    missing keys can hide).
+echo "validate-plugin: checking agent frontmatter..."
+AGENT_REPORT=$(python3 <<'PY'
+import os, re, sys
+required = {'name', 'description'}
+problems = []
+for path in sorted(p for p in os.popen('find agents -type f -name "*.agent.md" 2>/dev/null').read().splitlines() if p):
+    text = open(path).read()
+    if not text.startswith('---'):
+        problems.append(f'{path}: missing YAML frontmatter'); continue
+    end = text.find('\n---', 3)
+    if end < 0:
+        problems.append(f'{path}: unterminated frontmatter'); continue
+    fm = text[3:end].lstrip('\n')
+    try:
+        import yaml
+        keys = set((yaml.safe_load(fm) or {}).keys())
+    except ImportError:
+        keys = set(m.group(1) for m in (re.match(r'^([A-Za-z_][\w-]*)\s*:', l) for l in fm.splitlines()) if m)
+    except Exception as e:
+        problems.append(f'{path}: yaml error: {e}'); continue
+    missing = required - keys
+    if missing:
+        problems.append(f'{path}: missing keys: {sorted(missing)}')
+for p in problems:
+    print(p)
+sys.exit(1 if problems else 0)
+PY
+)
+AGENT_RC=$?
+if [[ $AGENT_RC -ne 0 ]]; then
+  echo "$AGENT_REPORT" >&2
+  FAILED=$((FAILED + 1))
+else
+  echo "  ok"
+fi
+
+# 9. Fenced-code balance — every markdown/template file must close its fences.
+#    A CommonMark closing fence is bare (no info string) and has at least the
+#    opening tick count, so a ```markdown template broken by a nested ``` fence
+#    (the item-4 corruption) leaves a residual open fence this check catches.
+echo "validate-plugin: checking fenced-code balance..."
+FENCE_REPORT=$(python3 <<'PY'
+import os, re, sys
+problems = []
+files = os.popen(r"find . -type f \( -name '*.md' -o -name '*.md.tmpl' \) "
+                 r"-not -path './node_modules/*' -not -path './.git/*'").read().splitlines()
+for path in sorted(f for f in files if f):
+    stack = []
+    for line in open(path, errors='replace'):
+        m = re.match(r'^(`{3,})(.*)$', line.rstrip('\n'))
+        if not m:
+            continue
+        ticks, info = len(m.group(1)), m.group(2).strip()
+        if stack and info == '' and ticks >= stack[-1]:
+            stack.pop()
+        elif info != '':
+            stack.append(ticks)
+        elif not stack:
+            stack.append(ticks)
+    if stack:
+        problems.append(f'{path}: unbalanced code fence(s) (residual {stack}); use a '
+                        'four-backtick outer fence when a template embeds nested ``` fences')
+for p in problems:
+    print(p)
+sys.exit(1 if problems else 0)
+PY
+)
+FENCE_RC=$?
+if [[ $FENCE_RC -ne 0 ]]; then
+  echo "$FENCE_REPORT" >&2
+  FAILED=$((FAILED + 1))
+else
+  echo "  ok"
+fi
+
+# 10. Terminology drift — forbidden legacy terms (from .praxis-canon.json) must
+#     not reappear in the doctrine surfaces. Single source of truth for terms.
+echo "validate-plugin: checking terminology..."
+TERM_REPORT=$(python3 <<'PY'
+import json, os, re, sys
+if not os.path.isfile('.praxis-canon.json'):
+    print('skipped (no .praxis-canon.json)'); sys.exit(0)
+canon = json.load(open('.praxis-canon.json'))
+terms = canon.get('forbiddenTerms', [])
+scan_dirs = canon.get('terminologyScanDirs', [])
+allow = tuple(canon.get('terminologyAllowPaths', []))
+files = []
+for d in scan_dirs:
+    files += os.popen("find %s -type f \\( -name '*.md' -o -name '*.md.tmpl' \\)" % d).read().splitlines()
+problems = []
+for path in sorted(f for f in files if f):
+    if any(a in path for a in allow):
+        continue
+    text = open(path, errors='replace').read()
+    for t in terms:
+        m = re.search(t['pattern'], text)
+        if m:
+            problems.append("%s: forbidden term '%s' -- %s" % (path, m.group(0), t['reason']))
+for p in problems:
+    print(p)
+sys.exit(1 if problems else 0)
+PY
+)
+TERM_RC=$?
+if [[ $TERM_RC -ne 0 ]]; then
+  echo "$TERM_REPORT" >&2
+  FAILED=$((FAILED + 1))
+else
+  echo "  ok"
+fi
+
+# 11. Template placeholder parity — every {{key.path}} in an overlay template
+#     must resolve against a key in praxis.config.yaml.tmpl. Permanent guard for
+#     the alias hyphen/underscore class of defect.
+echo "validate-plugin: checking template placeholder parity..."
+PH_REPORT=$(python3 <<'PY'
+import json, os, re, sys
+if not os.path.isfile('.praxis-canon.json'):
+    print('skipped (no .praxis-canon.json)'); sys.exit(0)
+canon = json.load(open('.praxis-canon.json'))
+cfg_path = canon['placeholderConfigTemplate']
+scan_root = canon['placeholderScanGlob']
+ph = re.compile(r'\{\{\s*([A-Za-z0-9_.]+)\s*\}\}')
+# The config template declares every substitutable key as `key: {{that.key}}`,
+# so its own placeholders enumerate exactly the valid dotted paths.
+valid = set(ph.findall(open(cfg_path, errors='replace').read()))
+valid |= set(canon.get('specialPlaceholders', []))  # runtime tokens (e.g. TODAY), not config keys
+problems = set()
+for path in sorted(p for p in os.popen("find %s -type f -name '*.tmpl'" % scan_root).read().splitlines() if p):
+    if os.path.abspath(path) == os.path.abspath(cfg_path):
+        continue
+    for m in ph.finditer(open(path, errors='replace').read()):
+        key = m.group(1)
+        if key not in valid:
+            problems.add("%s: placeholder {{%s}} has no matching key in %s" % (path, key, os.path.basename(cfg_path)))
+for p in sorted(problems):
+    print(p)
+sys.exit(1 if problems else 0)
+PY
+)
+PH_RC=$?
+if [[ $PH_RC -ne 0 ]]; then
+  echo "$PH_REPORT" >&2
+  FAILED=$((FAILED + 1))
+else
+  echo "  ok"
+fi
+
+# 12. Required-phrase presence — phrases that MUST appear in specific files
+#     (from .praxis-canon.json's requiredPhrases). Inverse of terminology
+#     drift: catches an honesty disclosure silently regressing, not a
+#     forbidden term reappearing.
+echo "validate-plugin: checking required phrases..."
+PHRASE_REPORT=$(python3 <<'PY'
+import json, os, re, sys
+if not os.path.isfile('.praxis-canon.json'):
+    print('skipped (no .praxis-canon.json)'); sys.exit(0)
+canon = json.load(open('.praxis-canon.json'))
+required = canon.get('requiredPhrases', [])
+problems = []
+for r in required:
+    path = r['file']
+    if not os.path.isfile(path):
+        problems.append("%s: required phrase check failed -- file not found" % path)
+        continue
+    text = open(path, errors='replace').read()
+    if not re.search(r['pattern'], text):
+        problems.append("%s: missing required phrase '%s' -- %s" % (path, r['pattern'], r['reason']))
+for p in problems:
+    print(p)
+sys.exit(1 if problems else 0)
+PY
+)
+PHRASE_RC=$?
+if [[ $PHRASE_RC -ne 0 ]]; then
+  echo "$PHRASE_REPORT" >&2
   FAILED=$((FAILED + 1))
 else
   echo "  ok"

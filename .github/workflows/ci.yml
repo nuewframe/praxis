@@ -1,0 +1,57 @@
+name: ci
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  self-test:
+    name: plugin self-test (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        # ubuntu ships bash 5; macos ships bash 3.2 — the declared floor.
+        os: [ubuntu-latest, macos-latest]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Show tool versions
+        run: |
+          bash --version | head -1
+          python3 --version
+          jq --version || true
+
+      - name: Ensure jq is available
+        run: |
+          if ! command -v jq >/dev/null 2>&1; then
+            if [ "$RUNNER_OS" = "Linux" ]; then sudo apt-get update && sudo apt-get install -y jq; fi
+          fi
+          jq --version
+
+      - name: validate-plugin (frontmatter, refs, fences, agents, inventory)
+        run: bash scripts/validate-plugin.sh
+
+      - name: anti-dumping (plugin scans itself)
+        run: bash scripts/check-anti-dumping.sh
+
+      - name: probe language-coverage self-test
+        run: bash scripts/test-probes.sh
+
+      - name: coverage matrix is current
+        run: bash scripts/gen-coverage-matrix.sh --check
+
+      - name: tier table is current
+        run: bash scripts/gen-tier-table.sh --check
+
+      - name: enforcement scripts parse under this bash
+        run: |
+          rc=0
+          for s in scripts/check-*.sh scripts/*.sh; do
+            bash -n "$s" || { echo "syntax error: $s"; rc=1; }
+          done
+          exit $rc

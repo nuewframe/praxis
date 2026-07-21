@@ -68,11 +68,20 @@ Before implementation, state the intake result concisely:
 ```markdown
 ## Code Contribution Intake
 
-Wave: [wave] Thin-slice: [TS-NNN] Sprint: [sprint file] Wave specs: README / product-design / product-architecture / qa Current code touchpoints: [files/capabilities] Behavior impact: changes behavior | preserves behavior | mixed Test posture:
+Wave: [wave]
+Thin-slice: [TS-NNN]
+Sprint: [sprint file]
+Wave specs: README / product-design / product-architecture / qa
+Current code touchpoints: [files/capabilities]
+Behavior impact: changes behavior | preserves behavior | mixed
+Test posture:
 
 - Red-first: [tests]
 - Green-baseline: [tests]
-- Missing coverage: [tests to add] Implementation boundary: [what is in scope] Verification commands: [format/lint/type/test/e2e as applicable]
+- Missing coverage: [tests to add]
+
+Implementation boundary: [what is in scope]
+Verification commands: [format/lint/type/test/e2e as applicable]
 ```
 
 Once the envelope is clear, continue with `implement-with-defensive-patterns`, then `verify-and-assemble-pr`.

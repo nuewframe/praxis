@@ -91,19 +91,21 @@ If any unknown is load-bearing enough that a wrong assumption would change scope
 Hand both artifacts to `create-sprint`, which carries them into its Risk register.
 
 - **Trivial** tier: skip this step.
-- **Major** tier: skip this lightweight pass and run the full `discovery-and-ambiguity-log` instead.
+- **Major** tier: skip this lightweight pass and run the full `discovery-and-ambiguity-log` instead. The Major path creates its sprint *after* the ADR is Accepted (Step 5), so its implementation plan is informed by the Design Package — no lightweight ambiguity log or pre-mortem is produced here.
 
 ---
 
 ## Step 5 — Deterministic Routing
 
-Route by the provisional tier. State the route explicitly before handing off.
+Route by the provisional tier. State the route explicitly before handing off. This table is the **canonical ordered path** per tier; `intake-code-contribution` Step 7 and `principal-engineer.agent.md` reference it rather than restate it.
 
+<!-- BEGIN GENERATED: tier-table (source: scripts/data/tier-classification.json; regenerate with scripts/gen-tier-table.sh --write) -->
 | Tier | Route |
 | ---- | ----- |
-| **Trivial** | → `intake-code-contribution` (abbreviated envelope) → `verify-and-assemble-pr`. No sprint. |
+| **Trivial** | → `intake-code-contribution` (abbreviated envelope) → `implement-with-defensive-patterns` (implementer mode, minimal ceremony) → `verify-and-assemble-pr` (reviewer mode). No sprint. |
 | **Standard** | → `create-sprint` (seed the Risk register from Step 4) → **wait for the Sprint Plan Approval line to be signed** → `intake-code-contribution` → `implement-with-defensive-patterns` → `verify-and-assemble-pr`. |
-| **Major** | → `discovery-and-ambiguity-log` → `design-system-architecture` → `design-capability-layout` → `create-adr` → wait for **mechanical Design Approval** → `intake-code-contribution` → `implement-with-defensive-patterns` → `verify-and-assemble-pr`. |
+| **Major** | → `discovery-and-ambiguity-log` → `design-system-architecture` → `design-capability-layout` → `create-adr` (ADR → `status: Accepted`) → `create-sprint` (implementation plan informed by the Design Package; the sprint carries both the Sprint Plan Approval and Design Approval lines) → wait for **mechanical Design Approval** (ADR `status: Accepted` + signed Design Approval line) **and Sprint Plan Approval** → `intake-code-contribution` → `implement-with-defensive-patterns` → `verify-and-assemble-pr`. |
+<!-- END GENERATED -->
 
 If a sprint and/or progress ledger already exist for this slice (resume case), route to `intake-code-contribution`, which restores state from the ledger before any code is written.
 
@@ -142,6 +144,7 @@ Route: [the Step 5 path]
 ## Anti-Patterns
 
 - Routing a slice whose dependencies are not yet `✅ Complete`
+- Routing a Major slice to the Design Approval gate before `create-sprint` has created the sprint that hosts the Design Approval line
 - Copying or paraphrasing the tier table instead of referencing intake Step 0 (two sources drift)
 - Treating a `✅ Complete` reopen as new work with a fresh slice ID
 - Skipping the ambiguity log for Standard work and discovering the unknown mid-implementation

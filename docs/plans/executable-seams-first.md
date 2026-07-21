@@ -2,7 +2,7 @@
 
 **Status:** Shipped — B3-config (`check-config-externalized.sh`), the Bundle A keystone (`define-seam-contract` + `check-seam-contract-parity.sh` + architecture-spec seam declaration + verify wiring), Bundle B B1/B2 (wave Production-Readiness posture + per-slice conformance block + intake gate), the remaining B3 anchor probes (`check-observability-at-seams.sh`, `check-stateless-request-path.sh`, `check-resilient-boundary.sh` — all four anchors now executable and wired through `verify`), Bundle C (adversarial seam-behavior review in `verify-and-assemble-pr` + property-over-example at high-risk seams in `create-sprint`/`test-by-ownership`), and Bundle D (three-axis disjointness rule + collision-safe coordination artifacts + snapshot-staleness re-anchor — emergent parallelism made safe, no scheduler). **All four bundles shipped; plan complete.** Post-ship hardening (decision D6, Option 4): D2 promoted to an executable gate (`check-sprint-id-collision.sh`, wired into `verify`); D1/D3 designed as a machine-readable sprint footprint + computed checkers, deferred to a named trigger (first real concurrent run); C deliberately left as prose (no trace gate — it would manufacture false confidence).
 **Author:** Principal Engineer (architect mode)
-**Supersedes the roadmap of:** `thin-slice-loop-hardening.md` (Bundles 1–3, already shipped) — this is the Phase 2 direction.
+**Supersedes the roadmap of:** `thin-slice-loop-hardening.md` (Bundles 1–3, already shipped; file deleted after this session's distillation confirmed all three bundles implemented) — this is the Phase 2 direction.
 **Deliverable of this doc:** an implementation plan only. No skill/script/template changes until approved.
 
 ---

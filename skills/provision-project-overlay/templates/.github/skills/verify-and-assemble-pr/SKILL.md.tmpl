@@ -1,0 +1,19 @@
+---
+name: verify-and-assemble-pr
+description: Verify a completed change and assemble the PR narrative for {{project.name}}. Project overlay on top of the plugin's `verify-and-assemble-pr` skill.
+---
+
+# Verify and Assemble PR (Project Overlay)
+
+The full skill — reviewer-mode verification, the debugging stop-rule, the refactor decision matrix, the adversarial seam-behavior review, and the PR narrative with rollback plan — is in the `praxis` plugin's `verify-and-assemble-pr` skill. Read it first.
+
+## Project-specific commands
+
+- Single verification entry point: `bash scripts/verify.sh` (runs format, lint, type-check, every guardrail `check-*.sh`, and tests).
+- Format: `{{quality_gates.format}}` · Lint: `{{quality_gates.lint}}` · Type-check: `{{quality_gates.type_check}}` · Tests: `{{quality_gates.test}}` · E2E (if applicable): `{{quality_gates.e2e}}`
+
+## Project-specific gates
+
+- Reviewer mode is read-only on source code — it files change requests; `.github/skills/implement-capability-change/SKILL.md` applies them.
+- Paste the captured `verify` output into the PR. A bare checkbox is not evidence.
+- For every seam the diff touches, name the passing behavioral test that proves its property (per the adversarial seam review) — a property asserted only in prose is unproven.

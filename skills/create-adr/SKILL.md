@@ -1,14 +1,7 @@
 ---
 name: create-adr
 mode: architect
-tools: [
-  read_file,
-  file_search,
-  grep_search,
-  semantic_search,
-  create_file,
-  replace_string_in_file,
-]
+tools: [read_file, file_search, grep_search, semantic_search, create_file, replace_string_in_file]
 description: >
   Create an Architecture Decision Record (ADR) for a durable technical decision. Architect-mode
    skill: writes are limited to the project's ADR directory. Includes collision-safe ADR IDs,
@@ -43,7 +36,7 @@ The **living, current-state** architecture lives elsewhere and is edited in plac
 - **Capability record** (`docs/architecture/<capability>/`) — the truth for one capability.
 - **System overview** (`docs/architecture/README.md`) — the cross-capability topology and product-wide posture.
 
-The wave `product-architecture.md` is the **hypothesis** (the bet); the capability record is the **truth**. An ADR is the frozen decision between them. If these homes don't exist yet, define them in the project's own context first.
+The wave `product-architecture.md` is the **hypothesis** (the educated theory); the capability record is the **truth**. An ADR is the frozen decision between them. If these homes don't exist yet, define them in the project's own context first.
 
 ---
 
@@ -69,7 +62,7 @@ The `ID` uses `<YYMMDD>[.<HH>[MM[SS]]][.<seq>]`. IDs must be unique.
 - `.HH` — optional. Two-digit hour (24h, UTC). Added on day collision.
 - `MM` — optional. Two-digit minute. Added on hour collision (always paired with `HH` → written as `.HHMM`).
 - `SS` — optional. Two-digit second. Added on minute collision (always paired with `HHMM` → written as `.HHMMSS`).
-- `.<seq>` — optional, **final tiebreaker**. Zero-padded decimal sequence starting at `01`. Width grows as needed (`.01`..`.99`, then `.100`, `.101`, …). Added only when the precision ladder above is exhausted *or* when sub-second resolution is unavailable.
+- `.<seq>` — optional, **final tiebreaker**. Zero-padded sequence starting at `01`, taking the next free slot. Used only when the precision ladder above can't disambiguate (identical timestamp, or no sub-second clock available).
 
 ### Collision Escalation Rules
 
@@ -83,8 +76,8 @@ When registering a new ADR, check the project's ADR directory for existing IDs a
    - Example: existing `ADR.260527.03`; new ADR at 03:17 → `ADR.260527.0317-data-architecture`.
 4. **Minute collision; different second.** Extend to `.HHMMSS`.
    - Example: existing `ADR.260527.0317`; new ADR at 03:17:45 → `ADR.260527.031745-data-architecture`.
-5. **Second collision (or no sub-second clock available).** Append the sequence tiebreaker `.<seq>`, starting at `.01` and incrementing to the next free slot. The sequence grows beyond two digits when needed (`.99` → `.100`).
-   - Example: 100 people create an ADR in the same second → `ADR.260527.031745.01`, `ADR.260527.031745.02`, …, `ADR.260527.031745.99`, `ADR.260527.031745.100`.
+5. **Same timestamp (or no sub-second clock available).** Append the sequence tiebreaker `.<seq>`, starting at `.01` and taking the next free slot.
+   - Example: two agents register an ADR in the same repo at the same second → `ADR.260527.031745.01` and `ADR.260527.031745.02`.
 6. **Do not rename older ADRs to match a new collision level.** Collision handling applies to the new ADR only.
 
 ---
@@ -93,10 +86,12 @@ When registering a new ADR, check the project's ADR directory for existing IDs a
 
 `ADR.<ID>-descriptive-name.md` — kebab-case, concise.
 
-```markdown
+````markdown
 # ADR.<ID>: [Decision Title]
 
-**Status:** Proposed | Accepted | Deprecated | Superseded by ADR.<ID> **Date:** YYYY-MM-DD **Deciders:** [Names or roles]
+**Status:** Proposed | Accepted | Deprecated | Superseded by ADR.<ID>
+**Date:** YYYY-MM-DD
+**Deciders:** [Names or roles]
 
 > **Approval mechanics:** `status` is the mechanical gate between architect mode and implementer mode for Major-tier changes. Implementer mode REJECTS the work if `status` is not `Accepted`. Pair this status with a signed Design Approval line in the active sprint file (see `create-sprint`). Both signals are required.
 
@@ -192,7 +187,7 @@ Resilience posture committed by this decision (only if the decision sets one):
 - **Supersedes / Superseded by:** ADR.<ID> (if any)
 - [Link to related ADRs]
 - [Link to the wave or sprint that triggered this decision]
-```
+````
 
 ---
 

@@ -4,17 +4,66 @@ This is the single entry point for understanding what this plugin is, what belon
 
 ## Identity
 
-**Name:** `praxis` **Purpose:** Encode universal, lean wave-based product delivery **and** Principal-Software-Engineer discipline as installable, versioned guidance for Claude Code, Codex, Cursor, Gemini CLI, OpenCode, and GitHub Copilot, applicable to any language, framework, or runtime. **Status:** v0.3.0 — multi-harness installable plugin.
+**Name:** `praxis` **Purpose:** Make an LLM coding agent execute disciplined, lean wave-based delivery and Principal-Software-Engineer practice with **fidelity** — producing trustworthy artifacts a human team can build on — instead of improvising. **Reach:** installable, versioned guidance for Claude Code, Codex, Cursor, Gemini CLI, OpenCode, and GitHub Copilot, written to apply to any language, framework, or runtime. Wide availability across harnesses is a deliberate distribution goal, not a hedge to be earned into with usage evidence — that evidentiary bar applies to methodology-fidelity claims (see Problem, above), not to how many harnesses can install the same doctrine. Breadth is how widely the value ships; it is not the value itself. **Status:** v0.3.0 — multi-harness installable plugin.
+
+## Problem
+
+GenAI coding agents, left unconstrained, default to improvising structure, skipping discovery, drifting scope, and producing plausible-looking artifacts with no substance behind them. Human engineering teams already have the discipline that prevents this — waves, ADRs, thin slices, test-by-ownership, a review firewall between the engineer who builds and the one who approves. That discipline is not in question, and it is not what this plugin invents.
+
+The problem is **trust transfer**. When a human engineer produces an architecture document, reviewers trust it reflects real reasoning. When an agent produces the identical document, that trust is unearned — the artifact looks the same whether the agent reasoned hard or pattern-matched a template. Agents now generate delivery artifacts at scale, so the gap between *looks like discipline happened* and *discipline happened* is newly acute and newly expensive.
+
+Praxis exists to close that gap: to make agent-generated delivery artifacts trustworthy enough that a human team can build on them without re-deriving the reasoning. Its primary output is therefore **execution fidelity** — the agent demonstrably did the disciplined work, and the places it did not are visible rather than hidden. Legibility (making the discipline explicit enough for an agent to follow it intentionally) is Praxis's half of that; runtime enforcement is a separate layer (see *Composes with orchestration runtimes*).
+
+## The method at a glance
+
+Praxis is not a toolbox of independent skills; it is one ordered pipeline that carries a unit of work from intent to shipped, verified, and closed — emitting, at each stage, the script-checkable artifact that makes the discipline visible. That emission is the fidelity story of the Problem above: a reviewer can *see* the work happened rather than trust that it did.
+
+This section is a map, not a specification. The **authoritative ordered path** is `start-thin-slice` Step 5; the **authoritative tier table** is `intake-code-contribution` Step 0. This view points at them and must not be treated as a second source — when they change, they win.
+
+**The spine (Standard tier):**
+
+```
+PLAN ──────────► TRIAGE ────────► BUILD ─────────────────────► LEARN ─────────► TEACH
+create-wave →    start-thin-      create-sprint → intake →      close-sprint     author-
+product docs:    slice            implement → verify            (bidirectional   user-docs
+the outcomes and (tier + hard                                   distillation,
+the educated     precondition                                   then the sprint
+theory of design gate)                                           is deleted)
+```
+
+PLAN produces the **product documents** — the intended product outcomes and the best **educated theory** of the proposed product design: its user experience (`product-design.md`) and product architecture (`product-architecture.md`). *Educated theory*, not settled truth — at PLAN these are the strongest reasoned proposal, validated only downstream. TRIAGE reads them to check a slice's preconditions and classify its tier, so PLAN is measured by whether the documents carry the outcomes and design a later decision needs, not by a document count; `intake` later verifies they are present and specific enough to build on.
+
+**Tier branching** — decided provisionally at `start-thin-slice`, authoritatively at `intake` Step 0:
+
+- **Trivial** — no sprint, no close: `intake` (abbreviated) → `implement-with-defensive-patterns` → `verify-and-assemble-pr`.
+- **Standard** — the full spine above.
+- **Major** — inserts the architect pipeline *before* the sprint: `discovery-and-ambiguity-log` → `design-system-architecture` → `design-capability-layout` → `create-adr` (**`status: Accepted`**) → then `create-sprint` onward. `define-seam-contract` is used wherever the design declares a boundary another slice will build against.
+
+Greenfield work starts at `bootstrap-project`; a legacy codebase enters through `refactor-layered-to-capability`, one shippable slice at a time.
+
+**Where fidelity is made.** Each stage emits a visible artifact or gate, so the discipline is checkable rather than assumed:
+
+| Stage | Emits (the visible proof) | Kind |
+|---|---|---|
+| Plan | the product documents — intended product outcomes and the best educated theory of the proposed product design (UX in `product-design.md`, architecture in `product-architecture.md`), holding the thin-slice definitions and acceptance criteria TRIAGE classifies from; presence and specificity verified at intake | script-checkable |
+| Triage | precondition hard-gate (status + dependencies `✅`) and the tier decision | script-checkable |
+| Architecture (Major) | ADR with a real alternatives table and `status: Accepted`; frozen seam contracts in `.seam-contracts.json` | script-checkable |
+| Sprint | signed Sprint Plan Approval (Standard+Major) and Design Approval (Major); Acceptance↔Test matrix; four production-readiness anchors | human-signed + script-checkable |
+| Verify | captured `verify` output — a bare checkbox is rejected — plus the adversarial seam-behavior review | script-checkable + agent-attested |
+| Close | outcome evidence and a continue / pivot / stop call, distilled back into product *and* engineering artifacts | agent-attested |
+
+The **Kind** column maps to `using-praxis` § *Enforcement model* and to *Script-checkable vs. runtime-enforced* below: script-enforced gates fail closed once wired into CI or a git hook; human-signed gates block the next skill; agent-attested gates are honored in good faith on a bare harness.
 
 ## Scope rule (the litmus test)
 
-A piece of guidance belongs in this plugin **only if** the answer to all three is yes:
+A piece of guidance belongs in this plugin **only if** the answer to all four is yes:
 
 1. Would it apply unchanged to a Rust CLI, a Python data pipeline, _and_ a TypeScript web app — across both engineering and product planning contexts?
 2. Is it about engineering or delivery discipline, not personal style?
 3. Would you defend it in a code review or planning review against any team?
+4. Does it measurably improve the agent's execution fidelity, or close a known agent failure mode?
 
-If any answer is no, it belongs in a project's `.github/` (project-specific) or in `~/.claude/` / VS Code user prompts (personal preference) — **not here**.
+The first three questions decide _where_ a rule belongs. If any of them is no, it belongs in a project's `.github/` (project-specific) or in `~/.claude/` / VS Code user prompts (personal preference) — **not here**. The fourth decides whether the rule is worth adding _at all_: if it is no, the rule does not belong in the plugin regardless of how universal it is. Universality is necessary but not sufficient — a rule can be universal, disciplined, and defensible while still adding more ceremony than value, and such a rule stays out.
 
 ### Examples
 
@@ -103,7 +152,12 @@ plugin/
 │   ├── check-resilient-boundary.sh             # production-readiness probe (Resilient anchor)
 │   ├── check-seam-contract-parity.sh           # seam-contract parity gate (Shape + Behavior suite)
 │   ├── check-sprint-id-collision.sh            # coordination-artifact gate (parallel sprint-id collision)
+│   ├── check-design-approval-gate.sh        # Major-tier Design Approval fail-closed gate (hard-fail, not warn-first)
+│   ├── check-escape-hatch-usage.sh          # diff-scoped escape-hatch marker report (informational, never fails)
 │   ├── bump-version.sh                          # version-parity tool across manifests
+│   ├── test-probes.sh                           # self-test: probe language coverage (fixtures)
+│   ├── gen-coverage-matrix.sh                   # generate/check docs/coverage-matrix.md from probe includes
+│   ├── gen-tier-table.sh                        # generate/check the tier table across 3 surfaces from scripts/data/tier-classification.json
 │   └── validate-plugin.sh                       # plugin self-test
 ├── AGENTS.md                                    # bootstrap pointer for AGENTS.md-aware harnesses
 ├── CLAUDE.md                                    # bootstrap pointer for Claude Code
@@ -146,6 +200,12 @@ Those concerns belong in an orchestration runtime such as [Claude MPM](https://g
 
 The two are orthogonal. Either can be used without the other; together they cover both "what to build" and "how the agents collaborate to build it".
 
+The Major-tier Design Approval gate illustrates how the composition would extend beyond a bare harness. `scripts/check-design-approval-gate.sh` is a plain script with no runtime dependency — on a bare harness it runs as a pre-push git hook and fails the push. The same mechanism generalizes: an orchestration runtime such as MPM could invoke this script as a pre-delegation gate, run before the PM agent dispatches implementer-mode work on a Major-tier slice, refusing to hand off the task at all if the check fails — a stronger enforcement point than blocking only at push time, since it stops the agent from ever starting the work. This is a documented composition pattern, not a built or tested MPM integration; Praxis ships the mechanism (the script), not the runtime wiring, consistent with this plugin's stated non-goal of not shipping executable agents or MCP servers.
+
+### Script-checkable vs. runtime-enforced
+
+Two things are easily confused. A **script-checkable artifact** — an ADR with `status: Accepted`, a signed sprint line, a non-empty alternatives table — is something a probe can verify exists and carries substance. That is Praxis's job. A **runtime-enforced gate** — the agent is actually prevented from proceeding until the check passes — requires an orchestration runtime and is not Praxis's job on a bare harness. When this document or a skill calls a gate "mechanical," it means script-checkable, not runtime-enforced. On a bare harness, honoring the gate is a self-enforced behavioral contract; with MPM or equivalent it can be made to fail closed. Claiming more than this is the one failure the trust-transfer problem cannot tolerate — false trust is worse than none.
+
 ## Layering and precedence
 
 The plugin is one tier in a four-tier system:
@@ -165,9 +225,9 @@ Repo guidance always overrides plugin guidance. The plugin should never assume i
 
 ### Adding a skill, instruction, or agent
 
-1. Pass the scope litmus test above. If it fails, do not add.
-2. Validate the rule by using it in at least one real repo first. Do not invent rules theoretically.
-3. Once proven, write the artifact, run the same skill/instruction against itself if possible (dogfood), and bump the minor version.
+1. Pass the scope litmus test above — all four questions. If it fails, do not add.
+2. Validate the rule by using it in at least one real repo first. This is the non-negotiable step, not a formality. Dogfooding the plugin on itself does not substitute: it proves internal consistency, not that the rule improves fidelity on real work. Do not invent rules theoretically.
+3. Only once real-repo validation exists: write the artifact, dogfood it against the plugin if possible, and bump the minor version. The `CHANGELOG.md` entry for that bump must cite the real-repo evidence from step 2; a bump that can only cite dogfooding does not qualify.
 
 ### Removing or breaking a rule
 

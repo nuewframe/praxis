@@ -60,13 +60,14 @@ if [[ ${#EXISTING[@]} -eq 0 ]]; then
   exit 0
 fi
 
-PATTERN='\.skip\(|xit\(|test\.skip|it\.skip|describe\.skip|@Disabled\b|@Ignore\b|@pytest\.mark\.skip|unittest\.skip|@skip\b'
+PATTERN='\.skip\(|xit\(|xdescribe\(|xcontext\(|test\.skip|it\.skip|describe\.skip|@Disabled\b|@Ignore\b|@pytest\.mark\.skip|unittest\.skip|@skip\b|t\.Skip\(|b\.Skip\(|\.SkipNow\(|#\[ignore|markTestSkipped\(|markTestIncomplete\(|\[Ignore|Skip[[:space:]]*=[[:space:]]*["'"'"']'
 
 set +e
 MATCHES=$(grep -RIEn \
   --include='*.ts' --include='*.tsx' --include='*.js' --include='*.jsx' \
   --include='*.mjs' --include='*.cjs' --include='*.java' --include='*.kt' \
-  --include='*.py' \
+  --include='*.py' --include='*.go' --include='*.rb' --include='*.cs' \
+  --include='*.php' --include='*.rs' \
   --exclude-dir=node_modules --exclude-dir=.git --exclude-dir=dist \
   --exclude-dir=build --exclude-dir=.next --exclude-dir=target \
   --exclude-dir=__pycache__ --exclude-dir=.venv --exclude-dir=venv \

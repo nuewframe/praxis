@@ -126,6 +126,8 @@ Do **not** include API endpoints, file paths, schema changes, service boundaries
 ```markdown
 # [Wave Name]: Product Design
 
+> **Planning-stage document — an educated theory, not yet the truth.** The best approach given what we know today; current-state architecture lives in [docs/architecture/](../../../architecture/), promoted there by `close-sprint`.
+
 > **Wave**: wave-[category]-[name]\
 > **Updated**: YYYY-MM-DD
 

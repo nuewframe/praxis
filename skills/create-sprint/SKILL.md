@@ -13,6 +13,8 @@ disable-model-invocation: false
 
 Use this skill when starting a new sprint from a wave's thin-slices, or to take on a correction or improvement that needs the full sprint discipline.
 
+**Trivial changes do not require a sprint** (see `start-thin-slice` — Trivial routes straight to implementation with no bridge). The `n/a (tier: Trivial)` placeholders in this template apply only when a Trivial slice is folded into an existing Standard/Major sprint — they are not a reason to create one.
+
 ---
 
 ## Core Mental Model — Sprint as Immutable Bridge
@@ -115,7 +117,7 @@ Document the gap explicitly. The sprint plan closes this specific gap.
 
 ## Step 5 — Create the Sprint File
 
-```markdown
+````markdown
 # SPRINT.<ID>: [Sprint Title]
 
 **Status:** 🔄 In Progress | ✅ Complete\
@@ -133,6 +135,8 @@ _[One sentence: what user value will this sprint deliver?]_
 ---
 
 ## Hypothesis Card (Lean Validation)
+
+_Scale to the slice's risk surface. A Major slice earns the full card. A small Standard change may collapse this to a one-line hypothesis + validation signal; a pure fix or refactor with no behavioral bet writes `n/a (tier: Standard — <reason>)`. An honest one-line `n/a (<reason>)` beats a padded block — but a **blank or reasonless N/A is the theater this method rejects**. The same rule governs the risk register and the four-anchor conformance block below: they shrink when the slice touches no seam or boundary, never to silence but to an explicit, reasoned `n/a`._
 
 **Hypothesis:** We believe [doing X] will result in [observable outcome Y] for [user/system].
 
@@ -240,7 +244,7 @@ For each anchor, confirm conformance or declare a reviewed deviation:
 - [ ] **Horizontally scalable** — adds no node-local mutable state on the request path; shared state is externalized per the wave's statelessness boundary: [conforms / deviation + reason]
 - [ ] **Resilient** — every external/boundary call this slice adds carries the wave's timeout/retry/fallback defaults: [conforms / deviation + reason]
 
-A deviation is a reviewed, recorded exception — not silence. The matching probes (`check-observability-at-seams.sh`, `check-config-externalized.sh`, `check-stateless-request-path.sh`, `check-resilient-boundary.sh`) enforce these at `verify`.
+A deviation is a reviewed, recorded exception — not silence. The matching probes (`check-observability-at-seams.sh`, `check-config-externalized.sh`, `check-stateless-request-path.sh`, `check-resilient-boundary.sh`) check these at `verify`. They are **warn-first by default** (report, exit 0) and only fail the build once the project flips each anchor's config to `"mode": "enforce"` — so until then this block is a discipline the reviewer upholds, not a hard gate. Flip to enforce per anchor once a wave closes clean.
 
 ---
 
@@ -262,13 +266,18 @@ If this sprint is Trivial-tier, write `n/a (tier: Trivial)`. This gate is distin
 
 This is the **mechanical gate** between architect mode and implementer mode for Major-tier changes. Implementer mode does not start until both signals are present:
 
+On the Major path this sprint is created **after** the ADR is Accepted (`create-adr` → `create-sprint`), so its implementation plan reflects the Design Package. This sprint is the home of the Design Approval line that architect mode's exit signal requires — without it the gate below has nowhere to be signed.
+
 - **ADR status:** `Accepted` for ADR.<ID> at `<adr path>` — verified by reading the file's status field.
 - **Design Approval line:** filled in below by the human approver.
-```
-
-Design Approval Approver: <name or role> Date: YYYY-MM-DD ADR(s): ADR.<ID> (status: Accepted) Notes: <one-line summary of what was approved>
 
 ```
+Approver: <name or role>
+Date: YYYY-MM-DD
+ADR(s): ADR.<ID> (status: Accepted)
+Notes: <one-line summary of what was approved>
+```
+
 If the sprint is Trivial- or Standard-tier, write `n/a (tier: <Trivial|Standard>)` here. Reviewer mode verifies this section before approving any Major-tier PR.
 
 ---
@@ -334,7 +343,7 @@ _When done, use `close-sprint` to record outcome evidence, distill learnings int
 ## Working Notes (Ephemeral)
 
 _Capture decisions, discoveries, and scope clarifications during the sprint. These are deleted when the sprint closes — distilled learnings flow into wave documents and engineering artifacts._
-```
+````
 
 ---
 

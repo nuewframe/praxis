@@ -1,8 +1,12 @@
 # Praxis
 
-A portable agent plugin that fuses **lean wave-based product delivery** with **Principal Engineer discipline** into a single composable method. Universal across languages, frameworks, and runtimes; installable into Claude Code, Codex (CLI and App), Cursor, Gemini CLI, OpenCode, and GitHub Copilot (CLI and VS Code).
+A portable agent plugin that fuses **lean wave-based product delivery** with **Principal Engineer discipline** into a single composable method. Language-, framework-, and runtime-agnostic in doctrine (static enforcement is best-effort per language — see [docs/coverage-matrix.md](docs/coverage-matrix.md)); installable into Claude Code, Codex (CLI and App), Cursor, Gemini CLI, OpenCode, and GitHub Copilot (CLI and VS Code).
 
 Praxis is universal: it does not assume any stack. Project-specific rules belong in the project's own `.github/` and `.claude/` files and override anything here.
+
+## Enforcement, honestly
+
+Praxis ships three kinds of gate — **script-enforced, human-signed, and agent-attested** — and a green check does not mean all three are equally binding. Script-enforced gates (the `check-*.sh` probes wired into `verify.sh`, CI, or a git hook) fail closed. Human-signed gates (Sprint Plan Approval, Design Approval) block the next skill until a person signs. Agent-attested gates (tier classification, the intake envelope, the adversarial seam review) are honored in good faith — they are **not** mechanically compelled on a bare harness. See [`skills/using-praxis/SKILL.md`](skills/using-praxis/SKILL.md) § *Enforcement model* for the full breakdown. The production-readiness probes under `scripts/` are explicitly labeled heuristics, not proofs, in their own header comments — read one before trusting a green run as more than that. One gate is no longer purely agent-attested: Major-tier Design Approval — `scripts/check-design-approval-gate.sh`, wired into the generated `verify.sh` and therefore into the optional pre-push git hook, makes it fail closed today, with no orchestration runtime required.
 
 ## Quickstart
 
@@ -32,7 +36,7 @@ Give your agent Praxis: [Claude Code](#claude-code) · [Codex CLI](#codex-cli) �
 | ------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------- |
 | `skills/create-wave/`                      | Scaffold a new wave with the four-document pattern (README, design, architecture, qa).                                       |
 | `skills/create-product-design-spec/`       | Author `product-design.md` — user journeys, ambiguity handling, recovery paths.                                              |
-| `skills/create-product-architecture-spec/` | Author wave-scoped `product-architecture.md` — the wave's **bet**: domain ownership, contracts, seams, integrations, pointing into the durable capability records.         |
+| `skills/create-product-architecture-spec/` | Author wave-scoped `product-architecture.md` — the wave's **educated theory**: domain ownership, contracts, seams, integrations, pointing into the durable capability records.         |
 | `skills/create-quality-spec/`              | Author `qa.md` — risk tiers, test layer mapping, security coverage matrix, observable definition-of-done.                    |
 | `skills/test-by-ownership/`                | Universal Pyramid Test Strategy: Logic base through Journey tip, with "one property of a behavior, one layer" rule.          |
 | `skills/intake-code-contribution/`         | Pre-implementation GenAI contribution gate: wave, thin-slice, specs, sprint, current code, and red/green test posture.       |
@@ -60,6 +64,8 @@ Give your agent Praxis: [Claude Code](#claude-code) · [Codex CLI](#codex-cli) �
 
 ### Tooling
 
+These scripts check **shape and presence** — a file exists, a pattern matches, a count is right — not the substance of the reasoning behind it. Several are explicitly labeled heuristics in their own header comments; read a `check-*.sh` script's top comment before trusting a green run as more than that.
+
 | Script                                 | Purpose                                                                                                                                   |
 | -------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
 | `scripts/check-anti-dumping.sh`        | Linter that fails on catch-all names (`utils/`, `helpers/`, `common/`, `shared/`, `misc.*`, `lib.*`) inside capability roots. Configurable via `.anti-dumping.json`. |
@@ -72,7 +78,12 @@ Give your agent Praxis: [Claude Code](#claude-code) · [Codex CLI](#codex-cli) �
 | `scripts/check-stateless-request-path.sh` | Production-readiness probe (Horizontally-scalable anchor): flags node-local mutable state (module-level/static cache/session/registry) on the request path. Warn-first via `.statelessness.json`, reviewed per-line opt-out. |
 | `scripts/check-resilient-boundary.sh` | Production-readiness probe (Resilient anchor): flags a file that makes a boundary call but declares no timeout/retry/circuit-breaker/fallback. Warn-first via `.resilience.json`, reviewed per-file opt-out. |
 | `scripts/check-sprint-id-collision.sh` | Coordination-artifact gate (emergent parallelism): fails when two active sprint files share an id token, the collision a bare `NNN+1` increment causes under parallel sprint creation. Exact, not heuristic. Warn-first via `.sprint-coordination.json`. |
-| `scripts/validate-plugin.sh`           | Plugin self-test: SKILL.md frontmatter validity, JSON/YAML parse, cross-reference integrity, manifest version parity, enforcement-script syntax, and inventory parity (every skill/script/instruction is documented in README + project-context). |
+| `scripts/check-design-approval-gate.sh` | For every Major-tier sprint, verifies the referenced ADR's status is `Accepted` and the sprint's Design Approval block is genuinely signed (not template placeholders) — **hard-fails** the build if not, unlike this repo's other warn-first probes. This is the one gate Praxis makes fail closed today without an orchestration runtime; see "Enforcement, honestly" above. |
+| `scripts/check-escape-hatch-usage.sh` | Scans a diff for Praxis's `praxis:allow-*` escape-hatch markers and reports each by file:line. Informational only — never fails the build; the point is that using an opt-out is never silent to a reviewer. |
+| `scripts/validate-plugin.sh`           | Plugin self-test: SKILL.md frontmatter validity (incl. single-line `tools:`), JSON/YAML parse, cross-reference integrity, manifest version parity, enforcement-script syntax, inventory parity, agent-frontmatter validity, and fenced-code balance. |
+| `scripts/test-probes.sh`               | Self-test for the guardrail probes' language coverage: runs `check-no-skipped-tests.sh` and `check-no-sleep-waits.sh` against multi-language fixtures and asserts the expected verdicts. |
+| `scripts/gen-coverage-matrix.sh`       | Generates / checks `docs/coverage-matrix.md` from each probe's `--include` list, so the language-coverage claim cannot drift from reality. |
+| `scripts/gen-tier-table.sh`            | Generates (or checks) the tier-classification table from `scripts/data/tier-classification.json` into three surfaces (`intake-code-contribution`, `start-thin-slice`, `principal-engineer.agent.md`) so they cannot silently drift apart. `--check` runs in CI. |
 
 ## How the two halves compose
 

@@ -3,6 +3,13 @@
 #
 # Reads skills/using-praxis/SKILL.md and emits it as session context in the
 # format expected by the host harness (Claude Code, Cursor, Copilot CLI).
+#
+# The matcher (hooks.json) fires on startup|clear|compact by design: on
+# harnesses without applyTo-scoped instructions (e.g. Claude Code), this dump is
+# the ONLY always-on surface for the guardrail summary, so it must be
+# re-asserted after a /clear or a context compaction or the guardrails silently
+# fall out of the model's context. The cost of re-injecting is the deliberate
+# price of keeping the guardrails always-on there.
 
 set -euo pipefail
 

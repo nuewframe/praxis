@@ -27,11 +27,13 @@ This skill is the front door for high-quality GenAI implementation. It prevents 
 
 Before any other intake work, classify the change into one of three tiers. The tier determines which subsequent steps run. Tier choice is **declared in the contribution envelope** (Step 6) and is auditable.
 
-| Tier         | Use when                                                                                                                                                        | Steps required                                                                        | Phased workflow path                                                      |
-| ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
-| **Trivial**  | ≤ ~20 LOC, single capability, no public contract change, no new dependency, no behavior change. Examples: typo, log-line fix, dependency bump, internal rename. | Step 4 (current code touchpoints) and Step 5 (test posture: green-baseline) only.     | Skip architect + full implementer rituals → run `verify-and-assemble-pr`. |
-| **Standard** | Within an existing capability and an active thin-slice; no new capability, no new ADR-level decision; existing wave specs cover the intent.                     | Steps 1-6. Skip Step 2 if wave specs are already current.                             | Skip architect mode. `implement-with-defensive-patterns` → reviewer mode. |
-| **Major**    | New capability; new external dependency; public contract change; cross-cutting trade-off; any change that should produce an ADR.                                | All steps 1-6, including a refreshed Ambiguity Log and architect mode design package. | Architect mode (Phases 1-4) → implementer mode → reviewer mode.           |
+<!-- BEGIN GENERATED: tier-table (source: scripts/data/tier-classification.json; regenerate with scripts/gen-tier-table.sh --write) -->
+| Tier         | Use when                                                                                                                                                        | Steps required                                                                        | Phased workflow path                                                                                                                                 |
+| ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Trivial**  | ≤ ~20 LOC, single capability, no public contract change, no new dependency, no behavior change. Examples: typo, log-line fix, dependency bump, internal rename. | Step 4 (current code touchpoints) and Step 5 (test posture: green-baseline) only.     | Implementer mode (minimal — skip design package + full TDD ritual; existing layout is the design) → reviewer mode. No sprint.                        |
+| **Standard** | Within an existing capability and an active thin-slice; no new capability, no new ADR-level decision; existing wave specs cover the intent.                     | Steps 1-6. Skip Step 2 if wave specs are already current.                             | Skip architect mode. `implement-with-defensive-patterns` → reviewer mode.                                                                            |
+| **Major**    | New capability; new external dependency; public contract change; cross-cutting trade-off; any change that should produce an ADR.                                | All steps 1-6, including a refreshed Ambiguity Log and architect mode design package. | Architect mode (Phases 1–4) → `create-sprint` (plan informed by the Design Package) → mechanical Design Approval → implementer mode → reviewer mode. |
+<!-- END GENERATED -->
 
 ### Tier Decision Rules
 
@@ -41,7 +43,7 @@ Before any other intake work, classify the change into one of three tiers. The t
 - **A correction or reopen of a thin-slice keeps the slice ID** and is at minimum Standard, regardless of LOC.
 - **Refusal:** if the human disputes a tier escalation, capture the disagreement in the envelope and escalate to a human decision before proceeding.
 
-If Trivial: produce the abbreviated envelope, run the project's `verify` entry point, capture output, and hand off. Do **not** invent waves or sprints to satisfy a higher tier when the change is genuinely trivial.
+If Trivial: produce the abbreviated envelope and hand off — implementer mode makes the change with minimal ceremony (no design package; existing layout is the design), then reviewer mode runs the project's `verify` entry point and captures the output. Do **not** invent waves or sprints to satisfy a higher tier when the change is genuinely trivial.
 
 If Standard or Major: continue to Step 1.
 
@@ -103,6 +105,8 @@ Confirm:
 
 If no sprint exists, use `create-sprint`. If the sprint exists but does not match the work, do not edit scope in place; close or descope it and create a new sprint.
 
+**Major-tier ordering.** A Major sprint's implementation plan must be informed by an Accepted ADR — the sprint is created *after* the architect phase (`create-sprint` runs after `create-adr`) so the plan reflects the Design Package, and the sprint is the home of the Design Approval line the architect-mode exit signal requires. If you reached this step on a Major change with **no** Design Package or Accepted ADR, **stop** and run the architect phase first (`discovery-and-ambiguity-log` → `design-system-architecture` → `design-capability-layout` → `create-adr` → `create-sprint`), then resume intake. Do not fabricate a sprint plan ahead of the design.
+
 ---
 
 ## Step 4 - Correlate Against Current Code
@@ -157,7 +161,11 @@ Before implementation, output this compact envelope. Trivial-tier changes use th
 ```markdown
 ## Code Contribution Intake (Trivial)
 
-Tier: Trivial Reason: [why this qualifies — LOC, single capability, no contract change, no behavior change] Files touched: [paths] Green-baseline: [verify command + expected green tests] Verification: [single `verify` entry point]
+Tier: Trivial
+Reason: [why this qualifies — LOC, single capability, no contract change, no behavior change]
+Files touched: [paths]
+Green-baseline: [verify command + expected green tests]
+Verification: [single `verify` entry point]
 ```
 
 ### Standard / Major envelope
@@ -165,7 +173,12 @@ Tier: Trivial Reason: [why this qualifies — LOC, single capability, no contrac
 ```markdown
 ## Code Contribution Intake
 
-Tier: Standard | Major Wave: [name + path] Thin-slice: [TS-NNN + title] Sprint: [sprint file] Wave specs: [README/product-design/product-architecture/qa status] Design approval (Major only): [ADR.<ID> status: Accepted | Pending | n/a] + [sprint Design Approval line ref]
+Tier: Standard | Major
+Wave: [name + path]
+Thin-slice: [TS-NNN + title]
+Sprint: [sprint file]
+Wave specs: [README/product-design/product-architecture/qa status]
+Design approval (Major only): [ADR.<ID> status: Accepted | Pending | n/a] + [sprint Design Approval line ref]
 
 Current code touchpoints:
 
@@ -199,9 +212,9 @@ After intake is complete, hand off according to the declared tier. The principal
 
 | Tier     | Hand-off path                                                                                                                                                                                                                                                                                                                                    |
 | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Trivial  | → `verify-and-assemble-pr` (reviewer mode). Skip architect and implementer ceremonies.                                                                                                                                                                                                                                                           |
+| Trivial  | → `implement-with-defensive-patterns` (implementer mode, minimal ceremony — no design package, the existing layout is the design, confirm green baseline) → `verify-and-assemble-pr` (reviewer mode). Skip architect ceremonies only; no sprint. The implementer applies the change; the reviewer verifies it — the edit is never made in reviewer mode.                                                                                                                                                                                                                                                          |
 | Standard | → `implement-with-defensive-patterns` (implementer mode) → `verify-and-assemble-pr` (reviewer mode). Existing wave specs are the design package.                                                                                                                                                                                                 |
-| Major    | → `discovery-and-ambiguity-log` → `design-system-architecture` → `design-capability-layout` → `create-adr` (architect mode) → wait for **mechanical Design Approval** (`status: Accepted` ADR + signed Design Approval line in sprint file) → `implement-with-defensive-patterns` (implementer mode) → `verify-and-assemble-pr` (reviewer mode). |
+| Major    | Intake is the **last gate before implementer mode**, not the trigger of architecture. By the time you reach here on a Major change, the architect phase, `create-sprint`, and the signed Design Approval must already be complete (Steps 2–3 verify this). Then → `implement-with-defensive-patterns` (implementer mode) → `verify-and-assemble-pr` (reviewer mode). **Cold-entry redirect:** if you were invoked directly on a Major change with no Design Package, **stop** and run the architect-first path — `discovery-and-ambiguity-log` → `design-system-architecture` → `design-capability-layout` → `create-adr` → `create-sprint` → sign Design Approval — then resume intake. The canonical ordered Major path is defined in `start-thin-slice` Step 5. |
 
 In every tier:
 
@@ -218,6 +231,7 @@ In every tier:
 - [ ] (Standard/Major) Thin-slice acceptance criteria are testable
 - [ ] (Standard/Major) All four wave specs exist and are specific enough
 - [ ] (Standard/Major) Sprint bridge exists and matches the requested work
+- [ ] (Major) Sprint created after the ADR and before the Design Approval gate, with its plan informed by the Design Package
 - [ ] (Standard/Major) Sprint Plan Approval line is signed (or `n/a (tier: Trivial)`)
 - [ ] (Standard/Major) Every acceptance criterion maps to ≥1 test in the traceability matrix
 - [ ] (Standard/Major) Production-Readiness conformance block present; seams named and each anchor conforming or a reviewed deviation recorded
@@ -240,6 +254,7 @@ In every tier:
 - Leaving an acceptance criterion with no mapped test and proceeding anyway
 - Letting missing `product-design.md`, `product-architecture.md`, or `qa.md` become implementation guesswork
 - Starting Major-tier implementation before mechanical Design Approval is recorded
+- Routing a Major change to the Design Approval gate before `create-sprint` has created the sprint that hosts the Design Approval line
 - Implementer silently editing an Accepted ADR mid-flight instead of bouncing back to architect mode
 - Writing production code before red-first tests for changed behavior
 - Refactoring without green-baseline evidence

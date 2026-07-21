@@ -1,14 +1,7 @@
 ---
 name: discovery-and-ambiguity-log
 mode: architect
-tools: [
-  read_file,
-  file_search,
-  grep_search,
-  semantic_search,
-  create_file,
-  replace_string_in_file,
-]
+tools: [read_file, file_search, grep_search, semantic_search, create_file, replace_string_in_file]
 description: Phase 1 of the principal-engineer workflow (architect mode). Use before any non-trivial change to map context, define SLOs/SLAs, and produce a structured Ambiguity Log. Stops the work and asks for clarification before proceeding to design. Architect mode forbids edits to source code; writes are limited to docs and ADR paths.
 ---
 
