@@ -21,7 +21,9 @@
 #  11. stateless request path (production-readiness: Horizontally-scalable anchor)
 #  12. resilient boundary (production-readiness: Resilient anchor)
 #  13. sprint-id collision (coordination artifact: parallel sprint-id safety)
-#  14. unit + integration tests
+#  14. design-approval gate (Major-tier sprints: ADR Accepted + genuinely
+#      signed Design Approval block — hard-fail, not warn-first)
+#  15. unit + integration tests
 #
 # Each step is a function. Override or skip by setting:
 #   VERIFY_SKIP="format,lint"   # comma-separated step names
@@ -74,6 +76,7 @@ step_observability() { bash scripts/check-observability-at-seams.sh .; }  # warn
 step_statelessness() { bash scripts/check-stateless-request-path.sh .; }  # warn by default; set mode=enforce in .statelessness.json once clean
 step_resilience()    { bash scripts/check-resilient-boundary.sh .; }  # warn by default; set mode=enforce in .resilience.json once clean
 step_sprint_ids()    { bash scripts/check-sprint-id-collision.sh .; }  # warn by default; set mode=enforce in .sprint-coordination.json once sprints are created in parallel
+step_design_approval() { bash scripts/check-design-approval-gate.sh .; }  # HARD-FAIL by design, no warn mode: Major-tier sprints must be genuinely signed against an Accepted ADR
 step_tests()        { :; }   # e.g.: npm test          |  pytest              |  ./gradlew test
 
 # --- Pipeline. ---
@@ -91,6 +94,7 @@ run_step observability step_observability
 run_step statelessness step_statelessness
 run_step resilience   step_resilience
 run_step sprint-ids   step_sprint_ids
+run_step design-approval step_design_approval
 run_step tests        step_tests
 
 echo "verify: all steps passed"

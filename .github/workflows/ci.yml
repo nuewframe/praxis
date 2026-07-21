@@ -45,6 +45,9 @@ jobs:
       - name: coverage matrix is current
         run: bash scripts/gen-coverage-matrix.sh --check
 
+      - name: tier table is current
+        run: bash scripts/gen-tier-table.sh --check
+
       - name: enforcement scripts parse under this bash
         run: |
           rc=0

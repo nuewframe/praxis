@@ -1,0 +1,29 @@
+{
+  "_comment": "Single source of truth for the Trivial/Standard/Major tier classification. Rendered by scripts/gen-tier-table.sh into three surfaces: skills/intake-code-contribution/SKILL.md Step 0 (full table), skills/start-thin-slice/SKILL.md Step 5 (routing table), agents/principal-engineer.agent.md (terse bullets). Edit THIS file, not the generated blocks — they are overwritten on the next --write and checked in CI via --check.",
+  "tiers": [
+    {
+      "name": "Trivial",
+      "criteria": "≤ ~20 LOC, single capability, no public contract change, no new dependency, no behavior change. Examples: typo, log-line fix, dependency bump, internal rename.",
+      "steps_required": "Step 4 (current code touchpoints) and Step 5 (test posture: green-baseline) only.",
+      "phased_workflow_path": "Implementer mode (minimal — skip design package + full TDD ritual; existing layout is the design) → reviewer mode. No sprint.",
+      "routing_detailed": "→ `intake-code-contribution` (abbreviated envelope) → `implement-with-defensive-patterns` (implementer mode, minimal ceremony) → `verify-and-assemble-pr` (reviewer mode). No sprint.",
+      "agent_bullet": "implementer mode (minimal ceremony — no design package; the existing capability layout is the design; confirm green baseline) → reviewer mode. No sprint."
+    },
+    {
+      "name": "Standard",
+      "criteria": "Within an existing capability and an active thin-slice; no new capability, no new ADR-level decision; existing wave specs cover the intent.",
+      "steps_required": "Steps 1-6. Skip Step 2 if wave specs are already current.",
+      "phased_workflow_path": "Skip architect mode. `implement-with-defensive-patterns` → reviewer mode.",
+      "routing_detailed": "→ `create-sprint` (seed the Risk register from Step 4) → **wait for the Sprint Plan Approval line to be signed** → `intake-code-contribution` → `implement-with-defensive-patterns` → `verify-and-assemble-pr`.",
+      "agent_bullet": "implementer mode → reviewer mode. Existing wave specs are the design package."
+    },
+    {
+      "name": "Major",
+      "criteria": "New capability; new external dependency; public contract change; cross-cutting trade-off; any change that should produce an ADR.",
+      "steps_required": "All steps 1-6, including a refreshed Ambiguity Log and architect mode design package.",
+      "phased_workflow_path": "Architect mode (Phases 1–4) → `create-sprint` (plan informed by the Design Package) → mechanical Design Approval → implementer mode → reviewer mode.",
+      "routing_detailed": "→ `discovery-and-ambiguity-log` → `design-system-architecture` → `design-capability-layout` → `create-adr` (ADR → `status: Accepted`) → `create-sprint` (implementation plan informed by the Design Package; the sprint carries both the Sprint Plan Approval and Design Approval lines) → wait for **mechanical Design Approval** (ADR `status: Accepted` + signed Design Approval line) **and Sprint Plan Approval** → `intake-code-contribution` → `implement-with-defensive-patterns` → `verify-and-assemble-pr`.",
+      "agent_bullet": "architect mode (Phases 1–4) → mechanical Design Approval → implementer mode → reviewer mode."
+    }
+  ]
+}

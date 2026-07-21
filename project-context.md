@@ -152,10 +152,12 @@ plugin/
 │   ├── check-resilient-boundary.sh             # production-readiness probe (Resilient anchor)
 │   ├── check-seam-contract-parity.sh           # seam-contract parity gate (Shape + Behavior suite)
 │   ├── check-sprint-id-collision.sh            # coordination-artifact gate (parallel sprint-id collision)
+│   ├── check-design-approval-gate.sh        # Major-tier Design Approval fail-closed gate (hard-fail, not warn-first)
 │   ├── check-escape-hatch-usage.sh          # diff-scoped escape-hatch marker report (informational, never fails)
 │   ├── bump-version.sh                          # version-parity tool across manifests
 │   ├── test-probes.sh                           # self-test: probe language coverage (fixtures)
 │   ├── gen-coverage-matrix.sh                   # generate/check docs/coverage-matrix.md from probe includes
+│   ├── gen-tier-table.sh                        # generate/check the tier table across 3 surfaces from scripts/data/tier-classification.json
 │   └── validate-plugin.sh                       # plugin self-test
 ├── AGENTS.md                                    # bootstrap pointer for AGENTS.md-aware harnesses
 ├── CLAUDE.md                                    # bootstrap pointer for Claude Code
@@ -197,6 +199,8 @@ Those concerns belong in an orchestration runtime such as [Claude MPM](https://g
 - MPM's PM agent uses those artifacts as the source of truth for delegation, and its specialists (`typescript`, `qa`, `design`, `product`) align to the personas defined here (`principal-engineer`, `product-designer`, `product-manager`). Host repos may overlay project-specific persona names (e.g. `manny`, `shelby`, `rusty`) that extend these role-based agents.
 
 The two are orthogonal. Either can be used without the other; together they cover both "what to build" and "how the agents collaborate to build it".
+
+The Major-tier Design Approval gate illustrates how the composition would extend beyond a bare harness. `scripts/check-design-approval-gate.sh` is a plain script with no runtime dependency — on a bare harness it runs as a pre-push git hook and fails the push. The same mechanism generalizes: an orchestration runtime such as MPM could invoke this script as a pre-delegation gate, run before the PM agent dispatches implementer-mode work on a Major-tier slice, refusing to hand off the task at all if the check fails — a stronger enforcement point than blocking only at push time, since it stops the agent from ever starting the work. This is a documented composition pattern, not a built or tested MPM integration; Praxis ships the mechanism (the script), not the runtime wiring, consistent with this plugin's stated non-goal of not shipping executable agents or MCP servers.
 
 ### Script-checkable vs. runtime-enforced
 

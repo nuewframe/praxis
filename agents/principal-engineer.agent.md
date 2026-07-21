@@ -119,9 +119,11 @@ The bias firewall is the tool restriction where the harness enforces it, and the
 
 The triage tier set in `intake-code-contribution` Step 0 chooses the path:
 
+<!-- BEGIN GENERATED: tier-table (source: scripts/data/tier-classification.json; regenerate with scripts/gen-tier-table.sh --write) -->
 - **Trivial:** implementer mode (minimal ceremony — no design package; the existing capability layout is the design; confirm green baseline) → reviewer mode. No sprint.
 - **Standard:** implementer mode → reviewer mode. Existing wave specs are the design package.
 - **Major:** architect mode (Phases 1–4) → mechanical Design Approval → implementer mode → reviewer mode.
+<!-- END GENERATED -->
 
 Phase order for Major:
 

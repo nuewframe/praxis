@@ -83,12 +83,13 @@ The entry point must run, in order, and abort on first failure:
 10. **Observability-at-seams probe** — `scripts/check-observability-at-seams.sh` (this plugin). Production-readiness: Observable anchor — a boundary call with no log/metric/trace/correlation-id.
 11. **Stateless-request-path probe** — `scripts/check-stateless-request-path.sh` (this plugin). Production-readiness: Horizontally-scalable anchor — node-local mutable state on the request path.
 12. **Resilient-boundary probe** — `scripts/check-resilient-boundary.sh` (this plugin). Production-readiness: Resilient anchor — a boundary call with no timeout/retry/circuit-breaker/fallback.
-13. **Logic tests** — fast, pure-function unit tests.
-14. **Composition tests** — service + API + in-memory Port adapters wired together.
-15. **Adapter Contract tests** — shared suite run against both the in-memory and real-backend adapters of each touched Port.
-16. **Seam Behavior tests** — each touched seam's shared contract suite (`*.contract.test.*`) run against **both** sides (consumer-driven). Parity (Shape + suite exist) is checked structurally by step 8; this step proves the suite actually **ran and passed**.
-17. **Integration boundary tests** — wrapper code (timeout/retry/circuit breaker) against contract-tested fakes or sandboxes.
-18. **Journey tests** — for changes that affect a user-facing flow.
+13. **Design Approval gate** — `scripts/check-design-approval-gate.sh` (this plugin). For every Major-tier sprint, verifies the referenced ADR's status is `Accepted` and the sprint's Design Approval block is genuinely signed (not template placeholders). **Hard-fail**, not warn-first — unlike the coordination/production-readiness probes above it, there is no mode config and no opt-out; this is the one gate Praxis makes fail closed today without an orchestration runtime.
+14. **Logic tests** — fast, pure-function unit tests.
+15. **Composition tests** — service + API + in-memory Port adapters wired together.
+16. **Adapter Contract tests** — shared suite run against both the in-memory and real-backend adapters of each touched Port.
+17. **Seam Behavior tests** — each touched seam's shared contract suite (`*.contract.test.*`) run against **both** sides (consumer-driven). Parity (Shape + suite exist) is checked structurally by step 8; this step proves the suite actually **ran and passed**.
+18. **Integration boundary tests** — wrapper code (timeout/retry/circuit breaker) against contract-tested fakes or sandboxes.
+19. **Journey tests** — for changes that affect a user-facing flow.
 
 Capture exit code and the last lines of output. If anything fails, **bounce back** — implementer mode fixes; reviewer mode does not edit code. Re-run the entire `verify` entry point after the fix. Partial reruns are not evidence.
 
