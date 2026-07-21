@@ -4,6 +4,34 @@ All notable changes to the Praxis plugin are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.4.0] — 2026-07-20
+
+### Note on evidence
+
+This release ships the course-correction toward the plugin's own sharpened Problem statement (trust transfer / execution fidelity). The plugin's own evolution policy (see `project-context.md` § Evolution policy) says a minor bump's CHANGELOG entry "must cite the real-repo evidence... a bump that can only cite dogfooding does not qualify." That evidence does not yet exist — real-repo validation (running a full wave → sprint → close-sprint cycle at `profile: full` against an actual project) is the immediate next step after this release, not a precondition already met. Stated here plainly rather than silently omitted: everything below is verified by self-test and independent reconciliation against each item's stated Done criterion, not by real-world use yet.
+
+### Added
+
+- **`## Problem` section in `project-context.md`** — states the plugin's actual problem plainly: trust transfer. An agent-generated delivery artifact looks the same whether the agent reasoned hard or pattern-matched a template; Praxis's job is closing that gap, and its primary output is **execution fidelity** — the agent demonstrably did the disciplined work, and where it didn't is visible.
+- **`## The method at a glance` section in `project-context.md`** — the ordered PLAN → TRIAGE → BUILD → LEARN → TEACH spine, Trivial/Standard/Major tier branching, and a stage-by-stage "where fidelity is made" table, so the high-level flow is legible from the constitution alone instead of only from the file tree.
+- **4th scope-litmus question** — "Does it measurably improve the agent's execution fidelity, or close a known agent failure mode?" A rule can be universal, disciplined, and defensible and still not belong in the plugin if it fails this question; universality is necessary but not sufficient.
+- **Strengthened evolution policy** — real-repo validation is now the non-negotiable step before a minor bump; dogfooding the plugin on itself no longer substitutes, and a bump's CHANGELOG entry must cite real-repo evidence (see the Note above — this release itself does not yet meet that bar, by design, and says so).
+- **`README.md` § "Enforcement, honestly"** — discloses the script-enforced / human-signed / agent-attested gate split in the opening pitch, guarded by a new `.praxis-canon.json` `requiredPhrases` lint (the inverse of `forbiddenTerms`) so the disclosure can't silently regress. `scripts/validate-plugin.sh` gained a 12th check enforcing it.
+- **`scripts/check-design-approval-gate.sh`** — the plugin's first gate that is genuinely hard-fail with no warn mode and no opt-out. For every Major-tier sprint, verifies the referenced ADR's status is `Accepted` and the sprint's Design Approval block is genuinely signed, not template placeholders. Wired into the host-repo `verify.sh` template and therefore the optional pre-push git hook — the first Praxis gate demonstrably failing closed without an orchestration runtime. Self-tested against 5 scenarios.
+- **`scripts/data/tier-classification.json` + `scripts/gen-tier-table.sh`** — single source of truth for the Trivial/Standard/Major tier facts, rendered into marker-wrapped generated blocks across `intake-code-contribution`, `start-thin-slice`, and `principal-engineer.agent.md`, so the same fact restated three ways cannot silently diverge. `--check` runs in CI. Drift detection was independently proven twice before this release.
+- **`verify-and-assemble-pr` Step 6 "Artifact-fidelity review"** — a separate-head rubric grading whether an ADR's alternatives, a Design Approval signature, an ambiguity log, a hypothesis card, or a risk-register entry carries real substance or is boilerplate. A warn-signal for human judgment, not a hard gate — it does not certify decision correctness, only reasoning substance.
+- **`verify-and-assemble-pr` Step 7 "Trust Receipt"** (renumbered from Step 6) — aggregates gate-kind status (script-enforced / human-signed / agent-attested), escape-hatch usage, and Step 6's verdicts into one human-readable block per PR — the first concrete artifact answering the plugin's own trust-transfer problem statement directly.
+- **`scripts/check-escape-hatch-usage.sh`** — diff-scoped scanner for the four `praxis:allow-*` escape-hatch markers, reporting exact file:line. Informational only, always exits 0 — the point is that using an opt-out is never silent to a reviewer, not blocking it.
+- **`docs/architecture/`** — the plugin's own capability record, created for the first time, per its own `close-sprint` doctrine that "the capability record is the truth." A system overview, three capability records (`skills/`, `enforcement/`, `distribution/` — `agents/` and `instructions/` folded into the overview as too small/stable to warrant their own record), and three ADRs for the durable decisions in this release: the Design Approval gate, the generated tier table, and the fidelity-review/trust-receipt mechanism.
+
+### Removed
+
+- **The `lite`/`standard` adoption-profile dial** — deleted, not deprecated. It never shipped in a tagged release (confirmed via `git merge-base` against `v0.3.0`) and was never wired into `provision-project-overlay/manifest.yaml`'s conditional logic, so no adopter depends on it and the standard one-minor-version deprecation notice does not apply. `full` is the only supported profile. Two `.praxis-canon.json` `forbiddenTerms` entries guard against silent reintroduction. Multi-harness distribution and persona-alias support are unaffected — both remain deliberate, undiminished goals, not weight that was cut alongside the profile dial.
+
+### Changed
+
+- **`docs/plans/` pruned** — four fully-implemented plans removed after verifying no still-open commitment remained in any of them (`major-path-ordering-and-deadlock.md`, `praxis-maturity-roadmap.md`, `teach-phase-user-docs.md`, `thin-slice-loop-hardening.md`); their content is now either shipped code, `docs/architecture/`, or superseded by `executable-seams-first.md`, which is kept because its D1/D3 primitives remain deliberately deferred to a specific, not-yet-reached trigger (first real concurrent slice dispatch).
+
 ## [0.3.0] — 2026-07-18
 
 ### Added
