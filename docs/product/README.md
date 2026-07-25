@@ -26,7 +26,7 @@ Product overview and dashboard for Praxis itself. This is the `docs/product/READ
 | [wave-production-readiness](waves/wave-production-readiness/README.md) | Runtime posture decided once at the wave, conformed mechanically per slice. | ✅ Delivered† | 4 — 4 ✅ |
 | [wave-trust-transfer](waves/wave-trust-transfer/README.md) | A human can tell whether the agent reasoned or pattern-matched. | ✅ Delivered† | 5 — 5 ✅ |
 | [wave-self-conformance](waves/wave-self-conformance/README.md) | Every convention and gate Praxis prescribes is one it demonstrably follows and runs against itself. | ✅ Delivered | 11 — 11 ✅ |
-| [wave-brownfield-adoption](waves/wave-brownfield-adoption/README.md) | A product that already ships can adopt the method against what it has. | ⚪ Not Started | 2 — 2 ⚪ |
+| [wave-brownfield-adoption](waves/wave-brownfield-adoption/README.md) | A product that already ships can adopt the method against what it has. | 🔄 In Progress | 2 — 1 ✅, 1 ⚪ |
 
 **† Delivered before wave adoption.** These waves are *derived records*, reconstructed from release history, ADRs, and the capability records after the work shipped. They carry a README only — no hypothesis card, no acceptance criteria, no educated-theory documents — because none were written at the time, and inventing them retroactively would assert validated learning that never happened. Each slice cites its evidence instead. The derivation rules, and the distinction between deriving from truth and fabricating history, are recorded in [ADR.260725.10](../architecture/adr/ADR.260725.10-brownfield-wave-retrofit.md).
 

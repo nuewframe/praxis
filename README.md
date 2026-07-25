@@ -126,7 +126,8 @@ If [Claude MPM](https://github.com/anthropics/claude-mpm) is installed in the sa
 ## Precedence
 
 ```
-repo .github/copilot-instructions.md, .claude/CLAUDE.md   (highest — project owns final word)
+package <pkg>/.praxis/context.md, <pkg>/.github/          (highest — monorepo only)
+repo .github/copilot-instructions.md, .claude/CLAUDE.md   (project owns final word)
 repo .github/instructions/*.instructions.md (scoped)
 repo .github/agents/, .github/skills/
 ─────────────────────────────────────────────────────────

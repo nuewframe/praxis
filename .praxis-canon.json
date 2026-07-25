@@ -60,6 +60,11 @@
       "file": "skills/bootstrap-project/SKILL.md",
       "pattern": "the architecture tree is validated truth, promoted there by",
       "reason": "Binds the product dashboard's authority statement to the template bootstrap-project scaffolds. TS-010's acceptance criterion spans two footprints \u2014 the scaffold can be written by one slice but only verified against a file that slice may not touch \u2014 so the two matched by construction and nothing enforced it. Requiring the phrase in both files makes the match mechanical."
+    },
+    {
+      "file": "skills/provision-project-overlay/SKILL.md",
+      "pattern": "this repository is one \\*\\*part\\*\\*",
+      "reason": "ADR.260725.17: when paths.product_root is set the repository is a PART of a larger product, and its dashboard must declare that scope rather than presenting a fragment as the whole. This binds the overlay skill to state the rule it must apply. The failure mode is not a missing dashboard but a confident one, so the phrase is what the check can hold."
     }
   ]
 }

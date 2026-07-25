@@ -11,6 +11,8 @@ You are operating with **Praxis** loaded: an opinionated method that fuses **lea
 
 The host repository's own `.github/`, `.claude/`, or workspace instructions **always override** anything here. When in doubt, the repo wins.
 
+In a **monorepo**, a package tier sits above the repository: `<pkg>/.praxis/context.md` and `<pkg>/.github/`. Walk from the file you are working on toward the repository root and take the nearest declaration of each fact — a package states only what differs and inherits the rest. When a product spans **several repositories**, `praxis.config.yaml`'s optional `paths.product_root` names where the whole product's intent lives; if it is set, this repository is a part and its dashboard says so.
+
 This file is your **router** — what to do right now. It is re-injected at session start and after `/clear` or compaction so the guardrails below stay in force. Skim it; load specific skills on demand.
 
 For the *why* — the trust-transfer problem, the ten opinions, the full enforcement rationale, and plugin governance — read [`docs/project-context.md`](../../docs/project-context.md). Don't load it mid-task unless the question is about the method itself.

@@ -2,7 +2,7 @@
 
 > **Planning-stage document — an educated theory, not yet the truth.** The best approach given what we know today; current-state architecture lives in [docs/architecture/](../../../architecture/), promoted there by `close-sprint`.
 
-**Status:** ⚪ Not Started\
+**Status:** 🔄 In Progress\
 **Goal:** A team whose product already exists — possibly across many packages or many repositories — can adopt the method against what they have, instead of being offered only a greenfield entry point.
 
 ---
@@ -57,19 +57,23 @@ Almost nobody adopts a delivery method on an empty repository. They adopt it on 
 
 ### TS-002: Context placement when one repository is not the product
 
-> **Status:** ⚪ Not Started
+> **Status:** ✅ Complete
 
 **User Value:** As a team whose product spans many packages or many repositories, I need to know where project context, waves, and architecture records live so that no single location is a partial truth presented as the whole.
 
 **Acceptance Criteria:**
 
-- [ ] Given a monorepo of many packages, when the guidance is followed, then it is clear which context is repository-wide and which is per-package, and how an agent resolves precedence between them
-- [ ] Given a product spanning several repositories, when the guidance is followed, then wave and dashboard placement is defined without any one repository claiming to hold the whole product's intent
-- [ ] Given content that legitimately belongs in two places, when the guidance is followed, then it is generated from one source rather than hand-synced
+- [x] Given a monorepo of many packages, when the guidance is followed, then it is clear which context is repository-wide and which is per-package, and how an agent resolves precedence between them
+- [x] Given a product spanning several repositories, when the guidance is followed, then wave and dashboard placement is defined without any one repository claiming to hold the whole product's intent
+- [x] Given content that legitimately belongs in two places, when the guidance is followed, then it is generated from one source rather than hand-synced
 
 **Dependencies:** None.
 
-**Tracking note:** Genuinely unsolved rather than merely unscheduled. One `project-context.md` cannot describe twelve packages, and a product spanning repositories makes `docs/product/waves/` in any single repository a partial view. The dual-home content problem overlaps `TS-007` of [wave-self-conformance](../wave-self-conformance/README.md) — if that slice builds a generator for content living in two places, this slice consumes it rather than duplicating the mechanism.
+**Tracking note:** Resolved as **precedence, not generation** ([ADR.260725.17](../../../architecture/adr/ADR.260725.17-context-placement-beyond-one-repo.md)). A package tier joins the precedence stack; a package declares only what differs and inherits the rest. A product spanning repositories names where the whole lives via the optional `paths.product_root`, and a repository that is a part must declare that scope rather than presenting a fragment as the entire picture.
+
+The third criterion is satisfied by **dissolution rather than construction**, which is worth stating plainly instead of quietly ticking: under precedence a fact lives at the level where it is true, so it never lives in two places and there is nothing to generate. The dual-home generator this slice expected to consume is therefore retired as a concept rather than deferred again — `TS-007` of [wave-self-conformance](../wave-self-conformance/README.md) had already narrowed away from it for the same reason.
+
+**Honest limit:** read-time resolution is a *behavior*, not an artifact. Praxis can check that a package context file parses; it cannot prove an agent walked the tree. That sits in the agent-attested tier — the weakest of the three — and the mitigation is placement in the always-on summary, not a gate. The one mechanically enforced part is that a part-repository must declare its scope.
 
 ---
 

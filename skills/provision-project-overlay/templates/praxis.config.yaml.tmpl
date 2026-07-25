@@ -28,6 +28,10 @@ paths:
   engineering: {{paths.engineering}}
   project_context: {{paths.project_context}}
   product_dashboard: {{paths.product_dashboard}}
+  # Optional. Omit when this repository IS the product (the default).
+  # Set when it is one PART of a product spanning several repositories:
+  # names where the whole product's intent lives. See ADR.260725.17.
+  product_root: {{paths.product_root}}
 
 quality_gates:
   lint: {{quality_gates.lint}}

@@ -323,7 +323,8 @@ They interlock: `create-product-architecture-spec` (wave-scoped) feeds `design-s
 Praxis is one tier in a four-tier system:
 
 ```
-repo .github/copilot-instructions.md, .claude/CLAUDE.md      (highest)
+package <pkg>/.praxis/context.md, <pkg>/.github/             (highest — monorepo only)
+repo .github/copilot-instructions.md, .claude/CLAUDE.md
 repo .github/instructions/, .github/agents/, .github/skills/
 ─────────────────────────────────────────────────────────────
 plugin instructions/, agents/, skills/                       (defaults — Praxis)
@@ -332,6 +333,11 @@ user ~/.claude/CLAUDE.md, VS Code user prompts               (personal)
 ```
 
 Repo guidance always overrides plugin guidance. Praxis should never assume its rules are the final word.
+
+A **package tier** sits above the repository for a monorepo: `<pkg>/.praxis/context.md` and `<pkg>/.github/`. The agent resolves by walking from the file it is working on toward the repository root and taking the nearest declaration of each fact, so a package declares **only what differs** and inherits everything else. This is read-time precedence, not generated per-package copies — a fact lives at the level where it is true, so there is never a second copy to keep in sync (see [ADR.260725.17](architecture/adr/ADR.260725.17-context-placement-beyond-one-repo.md)).
+
+When a product spans several repositories, `praxis.config.yaml`'s optional `paths.product_root` names where the whole product's intent lives. Omitted — the default — means this repository *is* the product. Set means this repository is a **part**, and its dashboard must say so and point at the whole rather than presenting a fragment as the entire picture.
+
 
 ### Composes with orchestration runtimes (Claude MPM, others)
 

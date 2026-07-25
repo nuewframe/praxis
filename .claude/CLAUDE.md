@@ -13,3 +13,5 @@ For the method, its doctrine, and governance: [`docs/project-context.md`](../doc
 ## Precedence
 
 The host repository's own `.github/`, `.claude/`, or workspace instructions always override anything in this plugin. Praxis sets defaults; the host repo wins.
+
+In a monorepo, a package tier (`<pkg>/.praxis/context.md`, `<pkg>/.github/`) sits above the repository — nearest declaration wins, and a package states only what differs.
