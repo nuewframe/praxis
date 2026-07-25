@@ -1,6 +1,6 @@
 # Enforcement — Capability Record
 
-The `scripts/` tree (17 `.sh` files, plus `data/` and `__fixtures__/`) is the generic, project-agnostic enforcement tooling this plugin ships. It is the mechanism half of the plugin's trust-transfer problem: the doctrine in `skills/` says what disciplined work looks like; the scripts here are what can actually check it without relying on an agent's self-report.
+The `scripts/` tree (18 `.sh` files, one `.py` module, plus `data/` and `__fixtures__/`) is the generic, project-agnostic enforcement tooling this plugin ships. It is the mechanism half of the plugin's trust-transfer problem: the doctrine in `skills/` says what disciplined work looks like; the scripts here are what can actually check it without relying on an agent's self-report.
 
 ## `validate-plugin.sh` — the plugin's own self-test
 
@@ -35,11 +35,27 @@ These probes have no `mode: enforce` config to flip because they never shipped a
 - `check-no-skipped-tests.sh`
 - `check-no-sleep-waits.sh`
 - `check-port-adapter-parity.sh`
-- `check-design-approval-gate.sh` — the newest of the eleven, and deliberately hard-fail with no opt-out by design (see ADR.260720.01, below): unlike every other probe in this repo it ships with no `.{name}.json` config at all, because there is nothing to configure.
+- `check-design-approval-gate.sh` — the newest of the twelve, and deliberately hard-fail with no opt-out by design (see ADR.260720.01, below): unlike every other probe in this repo it ships with no `.{name}.json` config at all, because there is nothing to configure.
 
 ### Informational, never fails
 
-- `check-escape-hatch-usage.sh` — reports every `praxis:allow-*` marker it finds by file:line, but always exits 0. Its job is visibility for a human reviewer, not gatekeeping.
+- `check-escape-hatch-usage.sh` — reports every `praxis:allow-*` marker it finds by file:line, but always exits 0. Its job is visibility for a human reviewer, not gatekeeping. Its vocabulary is **six** markers, defined once in the script's `MARKERS` array; the header comment used to restate the list with nothing keeping the two in agreement, and no longer does.
+
+## Declared exceptions — citation is not assertion
+
+Two of the checks are literal scanners: version single-source (#13, delegating to `bump-version.sh --audit`) and terminology drift (#10). Neither could tell a document that **asserts** a literal from one that **cites** it, and the answer used to be path allowlists — 8 entries in `.version-bump.json` and 3 in `.praxis-canon.json`, most of them directory-wide. That inverted default-deny: exempting `docs/architecture/adr/` meant a future ADR making a genuinely stale claim about the *current* plugin version passed silently, which is the precise defect check #13 exists to catch, disabled across the tree holding the most durable decisions.
+
+Both lists are gone. [ADR.260725](../adr/ADR.260725-inline-declared-exceptions.md) replaced them with three layers, and `scripts/citation_scan.py` is the single implementation both scanners consume — one home, so Layer 1 cannot drift between them:
+
+- **Layer 1 — structural, no configuration.** A literal inside a fenced block, a blockquote, or an inline code span is a citation by position and is not reported. The fence rule is check #14's, moved into the shared module rather than copied; it honours the opening marker's length, because a naive three-backtick toggle produced a real false negative. Code-span detection is column-precise: a line carrying a cited literal in backticks *and* a bare assertion is still reported.
+- **Layer 2 — declared, for the prose residue.** A citation in running prose carries `<!-- praxis:allow-version-literal reason="…" -->` or `<!-- praxis:allow-term reason="…" -->` on the preceding line. **The reason is mandatory and its absence is itself a failure** — an unexplained exemption is the defect being removed, not a smaller version of it.
+- **Layer 3 — accumulation is visible.** Both markers are registered in `check-escape-hatch-usage.sh`, so each use appears in the PR diff report, and the marker count joins the Trust Receipt. An exemption set that grows in silence is debt; one that reports its size every PR is a decision the reviewer keeps making.
+
+Migrating this way changed what the checks can see. Under the old rules a planted stale current-version claim in an ADR passed; under the new rules it fails. In practice **Layer 1 absorbed almost the whole migration** — the citations that surfaced were version tokens that read better as code literals anyway, and backticking them is what a careful author would have done regardless. That matters for the open question ADR.260725 deliberately left undecided: a marker *range* form for a paragraph of several citations was never needed, because the one shape that would have required it — a literal inside a markdown table row, where a comment line would break the table — is solved by Layer 1 instead. The range form stays uninvented.
+
+Two of the three retired terminology entries turned out to be dead weight: `CHANGELOG.md` and `.praxis-canon.json` sit outside the scanned directories, so they were exempting files the check never read.
+
+Check #10 also had to change shape before Layer 2 was possible at all. It scanned whole files and reported the file, so there was no line for a marker to attach to; it is now line-scoped and reports `file:line`.
 
 ## The two generators
 

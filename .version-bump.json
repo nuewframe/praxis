@@ -42,43 +42,7 @@
       "skills",
       "agents",
       "instructions"
-    ],
-    "allow": [
-      {
-        "path": "docs/project-context.md",
-        "lines": "Pre-1\\.0|Reserve `1\\.0\\.0`",
-        "reason": "§ Versioning states the 0.y.z rule and needs semver examples to do it. Scoped to those lines ONLY — any other version literal in this file still fails, which is the point: this file previously carried a stale v0.4.0 claim."
-      },
-      {
-        "path": "docs/DEPLOY.md",
-        "reason": "Release runbook — semver appears in the release-type table, the pre-1.0 note, and command examples. Scoped to those line shapes so a stray version claim elsewhere in the runbook still fails.",
-        "lines": "^\\| \\*\\*(patch|minor|major)|^> \\*\\*While Praxis is pre-1\\.0|bump-version\\.sh 0\\.|^NEW=0\\.|^## \\[0\\."
-      },
-      {
-        "path": "docs/architecture/adr",
-        "reason": "ADRs are immutable decision records. Their version references are dated statements about the release context a decision was made in ('0.4.0 added the fourth litmus question'), never claims about the current plugin version. Syncing them mechanically would falsify the historical record, and 'stale' is a category error for a document that is superseded rather than edited. Scoped to the adr/ directory ONLY — the surrounding capability records (docs/architecture/README.md, docs/architecture/*/README.md) are living documents and stay guarded, which is what caught docs/architecture/README.md claiming 0.3.0 two releases behind."
-      },
-      {
-        "path": "skills/create-product-architecture-spec/SKILL.md",
-        "reason": "template content — the HOST repo's document version, not Praxis's"
-      },
-      {
-        "path": "skills/create-product-design-spec/templates",
-        "reason": "template content — host repo thin-slice document version"
-      },
-      {
-        "path": "skills/create-adr/SKILL.md",
-        "reason": "collision-safe ADR ID examples are shaped like semver"
-      },
-      {
-        "path": "skills/define-seam-contract/SKILL.md",
-        "reason": "seam contract <name>@vN version examples"
-      },
-      {
-        "path": "docs/product/sprints",
-        "reason": "Sprint files are ephemeral planning artifacts (deleted at close) that legitimately name target releases and cite historical CHANGELOG headings. Scoped to the sprints directory ONLY — docs/product/README.md is durable and stays guarded, since a stale version claim on the dashboard is exactly what this check exists to catch."
-      }
     ]
   },
-  "_comment": "Version single-source registry. package.json is the source of truth; every file in 'files' is synced mechanically by scripts/bump-version.sh. No other file may state the plugin's version — audit.scan paths are checked for semver literals and every legitimate occurrence must be declared in audit.allow with a reason."
+  "_comment": "Version single-source registry. package.json is the source of truth; every file in 'files' is synced mechanically by scripts/bump-version.sh. No other file may state the plugin's version. audit.scan paths are scanned for semver literals; a literal inside a fenced block, blockquote, or inline code span is a citation and is not reported, and one in running prose must carry an inline <!-- praxis:allow-version-literal reason=\"...\" --> marker on the preceding line. Path allowlists were retired by ADR.260725 \u2014 they exempted whole directories and so inverted default-deny."
 }

@@ -58,14 +58,6 @@ audit_scan_paths() {
   jq -r '.audit.scan[]' "$CONFIG" 2>/dev/null
 }
 
-# Declared-legitimate semver locations, as "path<TAB>lineRegex".
-# An empty lineRegex allows the whole path; a non-empty one allows ONLY lines
-# matching it, so a file may host policy examples and still be guarded against
-# stale version claims.
-audit_allow_entries() {
-  jq -r '.audit.allow[] | "\(.path)\t\(.lines // "")"' "$CONFIG" 2>/dev/null
-}
-
 # --- commands ---
 
 cmd_check() {
@@ -106,6 +98,30 @@ cmd_check() {
   return $has_drift
 }
 
+# Cache of exempt line numbers for the file most recently asked about, so a file
+# with many matches costs one python invocation rather than one per match.
+EXEMPT_CACHE=""
+EXEMPT_CACHE_PATH=""
+BAD_MARKERS=""
+
+exempt_lines_for() {
+  local path="$1"
+  [[ "$path" == "$EXEMPT_CACHE_PATH" ]] && return 0
+  EXEMPT_CACHE_PATH="$path"
+  EXEMPT_CACHE=""
+  local out
+  out=$(cd "$REPO_ROOT" && python3 scripts/citation_scan.py "$path" \
+          --marker praxis:allow-version-literal \
+          --pattern '[0-9]+\.[0-9]+\.[0-9]+' 2>/dev/null || true)
+  local kind n rest
+  while read -r kind n rest; do
+    case "$kind" in
+      EXEMPT) EXEMPT_CACHE="$EXEMPT_CACHE $n" ;;
+      BADMARKER) BAD_MARKERS="${BAD_MARKERS}  $path:$n: $rest"$'\n' ;;
+    esac
+  done <<< "$out"
+}
+
 cmd_audit() {
   # First run check (declared manifests in sync?)
   cmd_check || true
@@ -121,9 +137,8 @@ cmd_audit() {
   # (instructional examples, host-repo template content) must be declared in
   # audit.allow with a reason — a reviewed exception, never silence.
 
-  local -a scan_paths=() allow_entries=() declared_paths=()
+  local -a scan_paths=() declared_paths=()
   while IFS= read -r p; do [[ -n "$p" ]] && scan_paths+=("$p"); done < <(audit_scan_paths)
-  while IFS= read -r e; do [[ -n "$e" ]] && allow_entries+=("$e"); done < <(audit_allow_entries)
   while IFS=$'\t' read -r path _field; do declared_paths+=("$path"); done < <(declared_files)
 
   if [[ ${#scan_paths[@]} -eq 0 ]]; then
@@ -149,17 +164,16 @@ cmd_audit() {
     for dp in "${declared_paths[@]}"; do
       [[ "$rel_path" == "$dp" ]] && skip=1 && break
     done
-    # Skip declared-legitimate locations. A path with no lineRegex is allowed
-    # wholesale; a path WITH one allows only matching lines, so any other semver
-    # literal in that same file is still reported.
-    local ap alines
-    for entry in "${allow_entries[@]}"; do
-      IFS=$'\t' read -r ap alines <<< "$entry"
-      if [[ "$rel_path" == "$ap" || "$rel_path" == "$ap"/* ]]; then
-        if [[ -z "$alines" ]]; then skip=1; break; fi
-        if [[ "$content" =~ $alines ]]; then skip=1; break; fi
-      fi
-    done
+    local lineno="${rest%%:*}"
+    if [[ "$skip" -eq 0 ]]; then
+      # Declared exceptions (ADR.260725): a literal inside a fence, blockquote,
+      # or inline code span is a citation by position; a citation in running
+      # prose carries an inline marker with a mandatory reason. Both layers come
+      # from scripts/citation_scan.py — one implementation, so Layer 1 cannot
+      # diverge from check #14's fence rule.
+      exempt_lines_for "$rel_path"
+      case " $EXEMPT_CACHE " in *" $lineno "*) skip=1 ;; esac
+    fi
     [[ "$skip" -eq 1 ]] && continue
 
     if [[ "$found" -eq 0 ]]; then
@@ -171,19 +185,36 @@ cmd_audit() {
              --exclude-dir=node_modules --exclude-dir=.git \
              "$semver" "${scan_paths[@]}" 2>/dev/null || true)
 
+  # An exemption that explains nothing is itself the defect (ADR.260725).
+  if [[ -n "$BAD_MARKERS" ]]; then
+    echo ""
+    echo "UNEXPLAINED exemption markers found:"
+    printf '%s' "$BAD_MARKERS"
+    found=1
+  fi
+
   if [[ "$found" -eq 1 ]]; then
     echo ""
+    if [[ "$AUDIT_REPORT_ONLY" -eq 1 ]]; then
+      echo "(--report-only: the rules above are NOT authoritative; exit code forced to 0)"
+      return 0
+    fi
     echo "package.json is the single source of truth for the plugin version."
     echo "Fix by one of:"
     echo "  1. Remove the literal — prose rarely needs to state a version at all."
     echo "  2. Add the file to .version-bump.json \"files\" so it is synced mechanically."
-    echo "  3. Add it to .version-bump.json \"audit.allow\" WITH a reason, if the literal"
-    echo "     is an instructional example or host-repo template content. Prefer a narrow"
-    echo "     \"lines\" regex over allowing a whole file — a file that legitimately hosts"
-    echo "     examples can still develop a stale version claim."
+    echo "  3. Put the literal inside a fenced block, blockquote, or inline code span"
+    echo "     if it is a citation — those are recognised structurally, no config needed."
+    echo "  4. If it must sit in running prose, declare it on the line above:"
+    echo "     <!-- praxis:allow-version-literal reason=\"why this cites rather than claims\" -->"
+    echo "     The reason is mandatory; an empty one fails."
     return 1
   fi
 
+  if [[ "$AUDIT_REPORT_ONLY" -eq 1 ]]; then
+    echo "(--report-only) No undeclared version literals."
+    return 0
+  fi
   echo "No undeclared version literals. package.json remains the single source."
   return 0
 }
@@ -220,19 +251,31 @@ cmd_bump() {
 
 # --- main ---
 
+AUDIT_REPORT_ONLY=0
+
 case "${1:-}" in
   --check)
     cmd_check
     ;;
   --audit)
+    # --audit [--report-only] [--rules old|new]
+    shift || true
+    while [[ $# -gt 0 ]]; do
+      case "$1" in
+        --report-only) AUDIT_REPORT_ONLY=1 ;;
+        *) echo "error: unknown --audit option '$1'" >&2; exit 1 ;;
+      esac
+      shift
+    done
     cmd_audit
     ;;
   --help|-h|"")
-    echo "Usage: bump-version.sh <new-version> | --check | --audit"
+    echo "Usage: bump-version.sh <new-version> | --check | --audit [--report-only]"
     echo ""
     echo "  <new-version>  Bump all declared files to the given version"
     echo "  --check        Show current versions, detect drift"
     echo "  --audit        Check + scan repo for undeclared version references"
+    echo "  --report-only  Report what would fail, always exit 0"
     exit 0
     ;;
   --*)

@@ -13,7 +13,7 @@
 
 Two of the plugin's self-checks are literal scanners. Check #13 (version single-source, delegating to `bump-version.sh --audit`) fails on any semver literal outside the mechanically-synced manifests. Check #10 (terminology) fails on any `.praxis-canon.json` `forbiddenTerms` match. Both encode a real defect: a document that *asserts* a stale plugin version, or *uses* retired doctrine vocabulary, misleads a reader.
 
-Neither can distinguish a document that **asserts** a literal from one that **cites** it. An ADR writing "0.4.0 added the fourth litmus question" is recording history. A sprint ledger recording that it injected a retired doctrine term and confirmed the check fired is recording a test. Both are correct prose that the scanners read as defects.
+Neither can distinguish a document that **asserts** a literal from one that **cites** it. An ADR writing "`0.4.0` added the fourth litmus question" is recording history. A sprint ledger recording that it injected a retired doctrine term and confirmed the check fired is recording a test. Both are correct prose that the scanners read as defects.
 
 **This ADR is its own evidence.** The sentence above originally quoted the retired term verbatim, and check #10 failed the build on it — the document proposing the fix could not state its own motivating example. The options available today were to reword (chosen, at a cost in precision) or to exempt the entire `docs/architecture/adr/` tree a second time. Layer 1 below would permit the quotation inside a code span with no configuration at all.
 

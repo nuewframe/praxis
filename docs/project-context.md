@@ -420,6 +420,8 @@ plugin/
 │   ├── check-escape-hatch-usage.sh              # diff-scoped escape-hatch marker report (informational, never fails)
 │   ├── bump-version.sh                          # version-parity tool across manifests
 │   ├── test-probes.sh                           # self-test: probe language coverage (fixtures)
+│   ├── test-citation-scan.sh                    # self-test: citation_scan.py (fence/quote/span + markers)
+│   ├── citation_scan.py                         # shared citation-vs-assertion rules (ADR.260725)
 │   ├── gen-coverage-matrix.sh                   # generate/check docs/coverage-matrix.md from probe includes
 │   ├── gen-tier-table.sh                        # generate/check the tier table across 3 surfaces from scripts/data/tier-classification.json
 │   └── validate-plugin.sh                       # plugin self-test

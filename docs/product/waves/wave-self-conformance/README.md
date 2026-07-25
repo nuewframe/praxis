@@ -160,22 +160,24 @@ Praxis's product is **trust transfer** — an adopter believes a green check bec
 
 ### TS-008: A sanctioned literal explains itself where it appears
 
-> **Status:** ⚪ Not Started
+> **Status:** ✅ Complete
 
 **User Value:** As a maintainer whose document legitimately cites a version or a retired term, I need to declare that one occurrence at the line where it appears so that excusing it does not disable the check for every document in the directory.
 
 **Acceptance Criteria:**
 
-- [ ] Given a literal inside a fenced block, blockquote, or inline code span, when the version or terminology check runs, then it is treated as a citation and not reported — using the same fence-tracking implementation as check #14, not a second copy
-- [ ] Given a literal in running prose with an inline `praxis:allow-*` marker carrying a non-empty `reason=`, when the check runs, then it is allowed
-- [ ] Given such a marker with a missing or empty `reason=`, when the check runs, then it fails — an unexplained exemption is the defect being removed
-- [ ] Given a stale claim about the *current* plugin version anywhere in `docs/architecture/adr/`, when the check runs, then it fails (it does not today, because the whole directory is exempt)
-- [ ] Given the new markers, when a PR touches one, then `check-escape-hatch-usage.sh` reports it and the Trust Receipt carries the count
-- [ ] Given the migration, when the path allowlists are deleted, then a `--report-only` parity pass has already shown the new rules match the old ones on the clean tree
+- [x] Given a literal inside a fenced block, blockquote, or inline code span, when the version or terminology check runs, then it is treated as a citation and not reported — using the same fence-tracking implementation as check #14, not a second copy
+- [x] Given a literal in running prose with an inline `praxis:allow-*` marker carrying a non-empty `reason=`, when the check runs, then it is allowed
+- [x] Given such a marker with a missing or empty `reason=`, when the check runs, then it fails — an unexplained exemption is the defect being removed
+- [x] Given a stale claim about the *current* plugin version anywhere in `docs/architecture/adr/`, when the check runs, then it fails (it does not today, because the whole directory is exempt)
+- [x] Given the new markers, when a PR touches one, then `check-escape-hatch-usage.sh` reports it and the Trust Receipt carries the count
+- [x] Given the migration, when the path allowlists are deleted, then a `--report-only` parity pass has already shown the new rules match the old ones on the clean tree
 
 **Dependencies:** None. Decided in [ADR.260725](../../../architecture/adr/ADR.260725-inline-declared-exceptions.md) (status: Accepted). Major-tier, so implementation additionally requires a signed Design Approval block in the sprint that carries it.
 
 **Named risk:** `bump-version.sh --audit` is load-bearing for releases, so its blast radius exceeds the defect. Change `--audit` matching only; leave `--check` and `--write` untouched.
+
+**Tracking note:** Layer 1 absorbed nearly the whole migration — the citations that surfaced were version tokens that read better as code literals anyway. The marker *range* form the ADR left open was never needed: the one shape that would have forced it, a literal inside a markdown table row where a comment line breaks the table, is answered by Layer 1 instead. Two of the three retired terminology entries were exempting files the check never read. The named risk held: `--check` output was verified byte-identical before and after.
 
 ---
 

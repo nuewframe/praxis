@@ -433,27 +433,44 @@ fi
 
 # 10. Terminology drift — forbidden legacy terms (from .praxis-canon.json) must
 #     not reappear in the doctrine surfaces. Single source of truth for terms.
+#     Line-scoped and citation-aware per ADR.260725: a term inside a fence,
+#     blockquote, or inline code span is a citation, and one in running prose may
+#     be declared with `praxis:allow-term` carrying a mandatory reason. Reporting
+#     file:line is what makes a line-scoped marker possible at all — the previous
+#     whole-file scan had no line to attach one to.
 echo "validate-plugin: checking terminology..."
 TERM_REPORT=$(python3 <<'PY'
 import json, os, re, sys
+sys.path.insert(0, 'scripts')
+import citation_scan
+
 if not os.path.isfile('.praxis-canon.json'):
     print('skipped (no .praxis-canon.json)'); sys.exit(0)
 canon = json.load(open('.praxis-canon.json'))
 terms = canon.get('forbiddenTerms', [])
 scan_dirs = canon.get('terminologyScanDirs', [])
-allow = tuple(canon.get('terminologyAllowPaths', []))
 files = []
 for d in scan_dirs:
     files += os.popen("find %s -type f \\( -name '*.md' -o -name '*.md.tmpl' \\)" % d).read().splitlines()
+
 problems = []
 for path in sorted(f for f in files if f):
-    if any(a in path for a in allow):
+    result = citation_scan.analyze(path, marker='praxis:allow-term')
+    for lineno, msg in result.bad_markers:
+        problems.append('%s:%d: %s' % (path, lineno, msg))
+    try:
+        lines = open(path, errors='replace').read().split('\n')
+    except Exception:
         continue
-    text = open(path, errors='replace').read()
-    for t in terms:
-        m = re.search(t['pattern'], text)
-        if m:
-            problems.append("%s: forbidden term '%s' -- %s" % (path, m.group(0), t['reason']))
+    for lineno, line in enumerate(lines, 1):
+        if lineno in result.exempt:
+            continue
+        scrubbed = citation_scan.strip_code_spans(line)
+        for t in terms:
+            m = re.search(t['pattern'], scrubbed)
+            if m:
+                problems.append("%s:%d: forbidden term '%s' -- %s"
+                                % (path, lineno, m.group(0), t['reason']))
 for p in problems:
     print(p)
 sys.exit(1 if problems else 0)
