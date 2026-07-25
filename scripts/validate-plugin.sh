@@ -30,6 +30,8 @@
 #  13. Version single-source: package.json is the only home of the version
 #      (delegates to bump-version.sh --audit).
 #  14. Link resolution: every relative markdown link points at a real file.
+#      Fence/code-span/praxis:allow-path aware via citation_scan (blockquote
+#      excepted — a link in a blockquote renders live and must still resolve).
 #  15. CHANGELOG structure: version headings parse, are unique, and descend.
 #  16. Self-conformance declaration parity: every shipped check-*.sh is declared
 #      in .self-conformance.json as run-against-Praxis or a reasoned n/a.
@@ -637,21 +639,45 @@ fi
 # 14. Link resolution — every relative markdown link must point at a file or
 #     directory that exists. The inventory-parity check (#7) only proves a name is
 #     *mentioned*; it cannot prove a link *resolves*, which is how a docs
-#     reorganization can silently strand references. Three exclusions, each
+#     reorganization can silently strand references.
+#
+#     Citation positions come from citation_scan — the SAME module checks #4 and
+#     #10 use. The fence rule was BORN here as a hand-rolled loop and was the last
+#     copy of it; ADR.260725 mandates one implementation, so this check now
+#     consumes the module rather than duplicating it. Exclusions, each
 #     load-bearing:
 #       - fenced code blocks: template content whose paths resolve from the
-#         destination document, not from the file quoting it;
+#         destination document, not from the file quoting it (fence tracking is
+#         marker-length aware in the module, so a nested fence cannot mis-toggle);
+#       - inline code spans: a link construct in backticks is prose ABOUT markdown,
+#         not a link. Passing the link regex as citation_scan's `pattern` makes
+#         this column-precise: a line is exempt only when EVERY link on it sits
+#         inside a span, and the scrub below re-checks the live links on a mixed
+#         line. Documenting the link checker no longer breaks the link checker;
+#       - `praxis:allow-path` declared exemption, with its mandatory reason;
 #       - paths containing < or >: `<placeholder>` template segments;
 #       - external schemes: http(s) and mailto are not this check's business.
-#     Fence tracking honours the opening marker's length, because a naive
-#     three-backtick toggle mis-tracks nested fences and produces false negatives.
+#
+#     Blockquote is deliberately NOT taken from the module. For a *literal* a
+#     blockquote is a citation, which is why #4 and #10 honour it — but a link
+#     inside a blockquote renders live and breaks like any other, and 18 real
+#     links in this repo live on blockquote lines. Honouring it here would have
+#     dropped them from coverage silently. Same module, different citation
+#     positions per literal kind — the asymmetry is the point.
+#
+#     Bad `praxis:allow-path` markers are reported by #4, which walks the same
+#     file set; re-reporting them here would only duplicate the diagnostic.
 echo "validate-plugin: checking link resolution..."
 LINK_REPORT=$(python3 <<'PY'
 import os, re, sys
+sys.path.insert(0, 'scripts')
+import citation_scan
 
 SKIP_DIRS = {'.git', 'node_modules'}
-fence_re = re.compile(r'^\s*(`{3,}|~{3,})')
-link_re = re.compile(r'\[[^\]]*\]\(([^)\s]+)')
+# One regex, used both as the citation_scan `pattern` (for code-span precision)
+# and as the matcher below, so the two can never disagree about what a link is.
+LINK_PATTERN = r'\[[^\]]*\]\(([^)\s]+)'
+link_re = re.compile(LINK_PATTERN)
 
 problems = []
 for dirpath, dirnames, filenames in os.walk('.'):
@@ -665,20 +691,26 @@ for dirpath, dirnames, filenames in os.walk('.'):
         except Exception as e:
             problems.append('%s: cannot read (%s)' % (path, e))
             continue
-        in_fence = False
-        marker = None
+        result = citation_scan.analyze(path, marker='praxis:allow-path',
+                                       pattern=LINK_PATTERN)
+        fenced = citation_scan.fenced_lines(lines)
+        declared, _bad = citation_scan.marker_lines(lines, 'praxis:allow-path')
+        exempt = set()
+        for lineno in result.exempt:
+            line = lines[lineno - 1] if 0 < lineno <= len(lines) else ''
+            # Drop a line exempted *only* because it is a blockquote; a fence,
+            # marker, or all-links-in-code-spans exemption still stands.
+            if (citation_scan.BLOCKQUOTE_RE.match(line)
+                    and lineno not in fenced and lineno not in declared):
+                continue
+            exempt.add(lineno)
         for lineno, line in enumerate(lines, 1):
-            m = fence_re.match(line)
-            if m:
-                tok = m.group(1)
-                if not in_fence:
-                    in_fence, marker = True, tok[0] * 3
-                elif line.strip().startswith(marker):
-                    in_fence, marker = False, None
+            if lineno in exempt:
                 continue
-            if in_fence:
-                continue
-            for lm in link_re.finditer(line):
+            # Blank inline code spans so a quoted link construct on a line that
+            # also carries a live link is not matched, while the live one is.
+            scrubbed = citation_scan.strip_code_spans(line)
+            for lm in link_re.finditer(scrubbed):
                 target = lm.group(1).split('#')[0]
                 if not target:
                     continue
