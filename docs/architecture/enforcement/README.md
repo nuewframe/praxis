@@ -4,15 +4,17 @@ The `scripts/` tree (17 `.sh` files, plus `data/` and `__fixtures__/`) is the ge
 
 ## `validate-plugin.sh` — the plugin's own self-test
 
-`scripts/validate-plugin.sh` runs 15 checks: SKILL.md frontmatter (including the guard that a `tools:` value must be a single-line flow sequence, since a multi-line one is valid YAML that silently prevents the skill registering in Claude Code), every JSON file parses, every YAML file parses, cross-references resolve, manifest versions are in parity, every enforcement script parses and is executable, inventory parity (every skill/script/instruction on disk is referenced in the canonical docs), agent frontmatter, fenced-code balance, terminology drift (`.praxis-canon.json` forbidden legacy terms, scanned across `skills`, `instructions`, `agents`, and `docs`), template placeholder parity, required-phrase presence (enforcing `.praxis-canon.json`'s `requiredPhrases` — e.g. that README.md discloses the enforcement split), version single-source (delegating to `bump-version.sh --audit`), link resolution, and CHANGELOG structure.
+`scripts/validate-plugin.sh` runs 16 checks: SKILL.md frontmatter (including the guard that a `tools:` value must be a single-line flow sequence, since a multi-line one is valid YAML that silently prevents the skill registering in Claude Code), every JSON file parses, every YAML file parses, cross-references resolve, manifest versions are in parity, every enforcement script parses and is executable, inventory parity (every skill/script/instruction on disk is referenced in the canonical docs), agent frontmatter, fenced-code balance, terminology drift (`.praxis-canon.json` forbidden legacy terms, scanned across `skills`, `instructions`, `agents`, and `docs`), template placeholder parity, required-phrase presence (enforcing `.praxis-canon.json`'s `requiredPhrases` — e.g. that README.md discloses the enforcement split), version single-source (delegating to `bump-version.sh --audit`), link resolution, CHANGELOG structure, and self-conformance declaration parity.
 
 The last three are the drift classes that were previously caught only by hand. **Link resolution matters because inventory parity proves a name is *mentioned*, never that a link *resolves*** — a reorganization can satisfy the first while stranding every reference. Its three exclusions are load-bearing: fenced blocks (template content whose relative paths resolve from the destination document), `<placeholder>` path segments, and external schemes. Its fence tracking honours the opening marker's length; a naive three-backtick toggle produces false negatives.
 
 The count is code-sourced, not header-sourced. The script's header comment has undercounted before, which is why the number here is stated against the executing checks.
 
+Check #16 — **self-conformance declaration parity** — is the one that closes the loop this capability record describes. It reads `.self-conformance.json` and fails when a shipped `check-*.sh` is undeclared, declared twice, names a script that does not exist, or is exempted with `runs: false` and no reason. An unexplained exemption is the defect it removes; without it, a probe could ship and simply never run against this repo, with nothing recording whether that was a decision or an oversight.
+
 ## The three enforcement postures
 
-Eleven `check-*.sh` probes ship for host projects. Each falls into exactly one of three postures:
+Twelve `check-*.sh` probes ship for host projects. Each falls into exactly one of three postures:
 
 ### Warn-first, mode-promotable
 
@@ -50,7 +52,20 @@ Both run in `--check` mode in `.github/workflows/ci.yml`.
 
 ## CI wiring
 
-`.github/workflows/ci.yml` runs, on every push and pull request, across both an Ubuntu (bash 5) and a macOS (bash 3.2, the declared floor) runner: `validate-plugin.sh`, `check-anti-dumping.sh` (the plugin scanning itself), `test-probes.sh` (the probe language-coverage self-test against `__fixtures__/`), `gen-coverage-matrix.sh --check`, `gen-tier-table.sh --check`, and a `bash -n` syntax sweep over every script in `scripts/`.
+`.github/workflows/ci.yml` runs, on every push and pull request, across both an Ubuntu (bash 5) and a macOS (bash 3.2, the declared floor) runner: `validate-plugin.sh`, `.github/run-self-conformance.sh` (every shipped gate, below), `test-probes.sh` (the probe language-coverage self-test against `__fixtures__/`), `gen-coverage-matrix.sh --check`, `gen-tier-table.sh --check`, and a `bash -n` syntax sweep over `scripts/*.sh` and `.github/*.sh`.
+
+## Running the gates it ships
+
+A plugin that ships a gate it never runs against itself is making two different claims with one script. `.self-conformance.json` closes that gap: it declares, for each of the twelve probes, whether Praxis executes it in its own CI — and when it does not, a **mandatory** `reason`. `.github/run-self-conformance.sh` reads that manifest, executes every `runs: true` gate, and prints an explicit `n/a — <reason>` line for the rest, so the full twelve-gate verdict is visible in the build rather than ten of them being silently absent.
+
+The runner accumulates rather than short-circuits: a gate failure is recorded and reporting continues, so one red gate never hides the eleven behind it. It lives under `.github/` rather than `scripts/` because it is Praxis's own CI tooling, not generic host-facing enforcement that ships to adopters.
+
+The split today is **10 run, 2 reasoned `n/a`**:
+
+- **`check-no-skipped-tests.sh` and `check-no-sleep-waits.sh` are `n/a`.** Both target a product test suite Praxis does not ship. Their only in-tree matches are the deliberate dirty fixtures under `scripts/__fixtures__/`, which `test-probes.sh` already asserts must exit 1 — a stronger proof of those probes than a scoped vacuous pass. Giving them an exclusion flag was rejected: changing a host-facing probe's scan semantics to accommodate this repo's fixture layout would export Praxis's problem into every adopter's build.
+- **Five of the ten that run pass vacuously**, and say so in a `note` field: the four production-readiness anchors and `check-port-adapter-parity.sh` scan globs Praxis has no files under. They are still executed, because that proves the scripts *run* on both the bash 3.2 floor and bash 5 — which `bash -n` does not — but the manifest records that the pass proves execution, not that the anchor holds on real runtime code. The gate is not permitted to read as a stronger claim than it is.
+- **`check-seam-contract-parity.sh` is declared `runs: true` even though it self-skips today** (Praxis declares no `.seam-contracts.json`), so the gate activates automatically the moment Praxis declares its first seam rather than the exemption going stale.
+- **`check-design-approval-gate.sh` runs unconditionally**, so its verdict appears on every build. With no Major-tier sprint on the branch it reports the empty-input verdict; the populated path is exercised whenever a Major sprint is present.
 
 ## ADR index
 

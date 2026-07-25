@@ -4,6 +4,16 @@ All notable changes to the Praxis plugin are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- **Praxis now runs the gates it ships, and declares the ones it does not.** CI executed exactly one of the twelve `check-*.sh` probes; the other eleven were only `bash -n`-parsed, so "we ship this check" and "this check passes" were two different claims about the same script. A new `.self-conformance.json` declares, per probe, whether Praxis runs it against itself — and when it does not, a mandatory `reason`. `.github/run-self-conformance.sh` executes every `runs: true` gate and prints an explicit `n/a — <reason>` line for the rest, so the full twelve-gate verdict is visible in the build. The loop deliberately does not short-circuit on first failure: it reports every gate, then exits non-zero, because a half-reported build hides gates behind the first red one. Current split: **10 run, 2 reasoned `n/a`**.
+- **Self-conformance declaration parity in `validate-plugin.sh`** (check #16) — every shipped `check-*.sh` must be declared exactly once, entries must name a script that exists, and a `runs: false` entry must carry a non-empty reason. A new probe can no longer ship and simply never run against this repo with nothing recording whether that was a decision or an oversight. Negative-tested five ways: undeclared probe, stale entry, empty reason, duplicate entry, and a missing manifest.
+
+### Changed
+
+- **`check-no-skipped-tests.sh` and `check-no-sleep-waits.sh` are declared `n/a` against Praxis, with the reason recorded inline.** Both target a product test suite Praxis does not ship, and their only in-tree matches are the deliberate dirty fixtures under `scripts/__fixtures__/` that `test-probes.sh` already asserts must exit 1 — a stronger proof of those probes than a scoped vacuous pass would be. Adding an exclusion flag was considered and rejected: changing a host-facing probe's scan semantics to accommodate Praxis's own fixture layout would export this repo's problem into every adopter's build.
+- **Five probes whose clean verdict is vacuous now say so.** The four production-readiness anchors and `check-port-adapter-parity.sh` scan globs Praxis has no files under. They are still executed — that proves the scripts *run*, on both the bash 3.2 floor and bash 5, which `bash -n` does not — but each carries a `note` recording that the pass proves execution and not that the anchor holds on real runtime code. The gate is not permitted to read as a stronger claim than it is.
+
 ## [0.5.0] — 2026-07-24
 
 ### Note on the version number

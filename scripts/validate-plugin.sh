@@ -23,6 +23,14 @@
 #      reappear in the doctrine surfaces.
 #  11. Template placeholder parity: every {{key}} in an overlay template resolves
 #      against a key in praxis.config.yaml.tmpl.
+#  12. Required-phrase presence: .praxis-canon.json's requiredPhrases appear in
+#      the files that must carry them.
+#  13. Version single-source: package.json is the only home of the version
+#      (delegates to bump-version.sh --audit).
+#  14. Link resolution: every relative markdown link points at a real file.
+#  15. CHANGELOG structure: version headings parse, are unique, and descend.
+#  16. Self-conformance declaration parity: every shipped check-*.sh is declared
+#      in .self-conformance.json as run-against-Praxis or a reasoned n/a.
 #
 # Compatible with bash 3.2+ (macOS default). Requires python3.
 #
@@ -689,6 +697,72 @@ PY
 CHANGELOG_RC=$?
 if [[ $CHANGELOG_RC -ne 0 ]]; then
   echo "$CHANGELOG_REPORT" >&2
+  FAILED=$((FAILED + 1))
+else
+  echo "  ok"
+fi
+
+# 16. Self-conformance declaration parity — every shipped `check-*.sh` must be
+#     declared in .self-conformance.json as either run-against-Praxis or an
+#     explicitly reasoned n/a. Before this check, a probe could ship and simply
+#     never run against this repo, with nothing recording whether that was a
+#     decision or an oversight. An exemption without a reason is the defect.
+echo "validate-plugin: checking self-conformance declaration parity..."
+SELFCONF_REPORT=$(python3 <<'PY'
+import json, os, sys
+
+MANIFEST = '.self-conformance.json'
+problems = []
+
+if not os.path.isfile(MANIFEST):
+    print('%s: missing -- every shipped check-*.sh must declare whether Praxis '
+          'runs it against itself' % MANIFEST)
+    sys.exit(1)
+
+try:
+    gates = json.load(open(MANIFEST))['gates']
+except Exception as e:
+    print('%s: cannot read `gates` (%s)' % (MANIFEST, e))
+    sys.exit(1)
+
+on_disk = sorted(f for f in os.listdir('scripts')
+                 if f.startswith('check-') and f.endswith('.sh'))
+
+seen = {}
+for i, gate in enumerate(gates):
+    name = gate.get('script')
+    if not name:
+        problems.append('%s: gates[%d] has no `script` key' % (MANIFEST, i))
+        continue
+    if name in seen:
+        problems.append('%s: duplicate entry for %s (first at gates[%d]) -- one '
+                        'declaration per script, or the split is ambiguous'
+                        % (MANIFEST, name, seen[name]))
+    else:
+        seen[name] = i
+    if not os.path.isfile(os.path.join('scripts', name)):
+        problems.append('%s: stale entry -- scripts/%s does not exist' % (MANIFEST, name))
+    runs = gate.get('runs')
+    if not isinstance(runs, bool):
+        problems.append('%s: %s has no boolean `runs` key' % (MANIFEST, name))
+    elif runs is False and not str(gate.get('reason', '')).strip():
+        problems.append('%s: %s is declared `runs: false` with no reason -- an '
+                        'unexplained exemption is the defect this check removes'
+                        % (MANIFEST, name))
+
+for name in on_disk:
+    if name not in seen:
+        problems.append('%s: undeclared -- scripts/%s ships but is not declared '
+                        'run-against-Praxis or a reasoned n/a' % (MANIFEST, name))
+
+for p in problems:
+    print(p)
+sys.exit(1 if problems else 0)
+PY
+)
+SELFCONF_RC=$?
+if [[ $SELFCONF_RC -ne 0 ]]; then
+  echo "$SELFCONF_REPORT" >&2
   FAILED=$((FAILED + 1))
 else
   echo "  ok"

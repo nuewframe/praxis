@@ -108,17 +108,19 @@ Praxis's product is **trust transfer** — an adopter believes a green check bec
 
 ### TS-005: Praxis runs the gates it ships
 
-> **Status:** ⚪ Not Started
+> **Status:** ✅ Complete
 
 **User Value:** As an adopter deciding whether to trust a Praxis gate, I need evidence that the gate runs green against Praxis itself so that "we ship this check" and "this check passes" are not two different claims.
 
 **Acceptance Criteria:**
 
-- [ ] Given the enforcement scripts applicable to a repo with no runtime code, when CI runs, then each executes against Praxis rather than only being syntax-checked by `bash -n`
-- [ ] Given a gate that targets host-repo runtime code Praxis does not have, when CI runs, then it reports an explicit reasoned `n/a` rather than being silently absent
-- [ ] Given `check-design-approval-gate.sh`, when CI runs on a branch carrying a Major-tier sprint, then the gate's verdict is visible in the build
+- [x] Given the enforcement scripts applicable to a repo with no runtime code, when CI runs, then each executes against Praxis rather than only being syntax-checked by `bash -n`
+- [x] Given a gate that targets host-repo runtime code Praxis does not have, when CI runs, then it reports an explicit reasoned `n/a` rather than being silently absent
+- [x] Given `check-design-approval-gate.sh`, when CI runs on a branch carrying a Major-tier sprint, then the gate's verdict is visible in the build
 
 **Dependencies:** None. Gate findings may block other slices from reporting green.
+
+**Tracking note:** A declared `n/a` carries a mandatory reason, and an exemption without one fails the build — the split is a decision on the record, not an absence. Two probes are `n/a` because they target a product test suite Praxis does not ship; five of the ten that run pass vacuously and declare that in the manifest, so the build cannot be read as proving an anchor holds on runtime code Praxis has none of.
 
 ---
 
