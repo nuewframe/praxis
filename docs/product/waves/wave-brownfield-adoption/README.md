@@ -49,7 +49,7 @@ Almost nobody adopts a delivery method on an empty repository. They adopt it on 
 - [ ] Given a candidate delivered slice with no citable release entry, ADR, or capability-record passage, when the path is followed, then the slice is dropped or recorded as undocumented prior work — never given invented evidence
 - [ ] Given a reader encountering a derived wave, when they open it, then they can tell it was reconstructed after delivery without being told separately
 
-**Dependencies:** None. Decided in [ADR.260725.10](../../../architecture/adr/ADR.260725.10-brownfield-wave-retrofit.md) (status: Proposed — must reach `Accepted` before implementation).
+**Dependencies:** None. Decided in [ADR.260725.10](../../../architecture/adr/ADR.260725.10-brownfield-wave-retrofit.md) (status: Accepted). The decision is already applied to Praxis's own tree; this slice generalizes it into a path others can follow.
 
 **Tracking note:** The pattern has exactly one instance — Praxis's own retrofit. The evolution policy requires real-repo validation before a rule ships, and dogfooding does not substitute. This slice generalizes the pattern only after it has been applied to a project that is not Praxis.
 

@@ -1,7 +1,8 @@
 # ADR.260725: Declared exceptions move inline — citation is not assertion
 
-**Status:** Proposed
+**Status:** Accepted
 **Date:** 2026-07-25
+**Accepted:** 2026-07-25 by Wael Rabadi (maintainer)
 **Deciders:** Wael Rabadi (maintainer) + Principal Engineer persona
 
 > **Approval mechanics:** `status` is the mechanical gate between architect mode and implementer mode for Major-tier changes. Implementer mode REJECTS the work if `status` is not `Accepted`. Pair this status with a signed Design Approval line in the active sprint file (see `create-sprint`). Both signals are required.

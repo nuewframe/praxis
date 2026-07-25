@@ -167,7 +167,7 @@ Praxis's product is **trust transfer** — an adopter believes a green check bec
 - [ ] Given the new markers, when a PR touches one, then `check-escape-hatch-usage.sh` reports it and the Trust Receipt carries the count
 - [ ] Given the migration, when the path allowlists are deleted, then a `--report-only` parity pass has already shown the new rules match the old ones on the clean tree
 
-**Dependencies:** None. Decided in [ADR.260725](../../../architecture/adr/ADR.260725-inline-declared-exceptions.md) (status: Proposed — must reach `Accepted` before implementation, this is Major-tier).
+**Dependencies:** None. Decided in [ADR.260725](../../../architecture/adr/ADR.260725-inline-declared-exceptions.md) (status: Accepted). Major-tier, so implementation additionally requires a signed Design Approval block in the sprint that carries it.
 
 **Named risk:** `bump-version.sh --audit` is load-bearing for releases, so its blast radius exceeds the defect. Change `--audit` matching only; leave `--check` and `--write` untouched.
 
