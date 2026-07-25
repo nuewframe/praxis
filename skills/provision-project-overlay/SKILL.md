@@ -1,6 +1,8 @@
 ---
 name: provision-project-overlay
 description: Generate a project-specific `.github/` overlay (skills, agents, prompts, persona instructions) on top of an existing repo that has just installed the praxis plugin. Interview the human for stack, paths, persona aliases, and quality gates; write `praxis.config.yaml`; emit a managed set of overlay files from the plugin templates with placeholders substituted; optionally bootstrap `docs/project-context.md`, `docs/product/PRODUCT.md`, and a first ADR file that follows `create-adr` ID rules. Idempotent — re-running with `--reconfigure` re-runs the interview; re-running without it regenerates managed files from the current config and shows diffs for human-edited files before overwriting.
+user-invocable: true
+disable-model-invocation: false
 ---
 
 # Provision Project Overlay

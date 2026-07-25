@@ -3,6 +3,8 @@ name: verify-and-assemble-pr
 mode: reviewer
 tools: [read_file, file_search, grep_search, semantic_search, run_in_terminal]
 description: Phase 6 of the principal-engineer workflow (reviewer mode). Use after implementation to verify behavior with the project's `verify` entry point, evaluate the refactor decision matrix, and assemble a structured PR narrative including rollback plan. Reviewer mode is read-only on source code — it files structured change requests; the implementer applies them. Approval requires the captured `verify` output, never a bare checkbox.
+user-invocable: true
+disable-model-invocation: false
 ---
 
 # Verify and Assemble PR

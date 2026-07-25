@@ -10,6 +10,8 @@ description: >
 
 Always-on rules for any product-planning artifact. The host project owns the final word — its own instructions override these.
 
+**Path coverage.** The `applyTo` glob names five roots. Three are where Praxis skills actually write: `docs/product/**` (waves and sprints at their default homes), `docs/architecture/**` (capability records and ADRs), and `docs/guides/**` (TEACH-phase user docs). The remaining two — `docs/waves/**` and `docs/sprints/**` — are **override-only**. No Praxis skill creates them; `provision-project-overlay` defaults `paths.waves` to `docs/product/waves` and `paths.sprints` to `docs/product/sprints`. They are listed so that a host project which remaps those keys to top-level directories still receives these guardrails, not because anything in Praxis puts files there. If you are looking for wave documents in a default install, they are under `docs/product/`.
+
 ---
 
 ## 1. Waves Are Intent, Not Sprints With Bigger Scope

@@ -1,6 +1,8 @@
 ---
 name: bootstrap-project
 description: Scaffold a new project from empty (greenfield) with capability-driven architecture, anti-dumping enforcement, ADR discipline, and the principal-engineer phased workflow wired in. Generates .github/, .claude/, docs/, and a capability-driven src/ skeleton.
+user-invocable: true
+disable-model-invocation: false
 ---
 
 # Bootstrap Project

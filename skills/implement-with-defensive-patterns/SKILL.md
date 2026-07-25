@@ -3,6 +3,8 @@ name: implement-with-defensive-patterns
 mode: implementer
 tools: [read_file, file_search, grep_search, semantic_search, create_file, replace_string_in_file, run_in_terminal]
 description: "Phase 5 of the principal-engineer workflow (implementer mode). Use after the capability layout and ADR are approved (mechanical Design Approval = ADR status Accepted + signed Design Approval line in active sprint file) to write production-ready code with composition over inheritance, shift-left security, and structured telemetry. Implementer mode cannot modify approved ADRs, design specs, or wave docs — if a design flaw is discovered, bounce back to architect mode."
+user-invocable: true
+disable-model-invocation: false
 ---
 
 # Implement with Defensive Patterns
