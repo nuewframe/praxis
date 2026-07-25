@@ -35,31 +35,40 @@ commonly observed in software development:
        software, including considerations for maintenance, updates, and support.
      - **Performance Optimization**: Ensuring that the software performs
        efficiently under various conditions and meets user expectations.
-2. **System Development**: This workflow focuses on the technical aspects of
-   software development, including architecture, design, and implementation. It
-   involves translating business requirements into technical specifications and
-   ensuring that the software is built to meet those requirements. Key
+2. **Agile Blueprint**: An agile blueprint is the result of incremental maturity
+   applied to an artifact over many iterations. That means the make up of the
+   blueprint are many micro-artifacts that are created and refined over time.
+   The blueprint is a living document that evolves as the software development
+   progresses, incorporating feedback from stakeholders and adapting to changing
+   requirements. It serves as a guide for the development team, providing a
+   clear understanding of the software's structure, functionality, and design
+   principles. These micro-artifacts focus is a micro-spec that is an atomic
+   unit of user value, aka a **thin slice**. The micro-artifacts can include
+   user stories, wireframes, prototypes, and other design elements that
+   contribute to the overall blueprint. These micro-artifacts mature a systems'
+   User Experience Documents, System Design and Architecture, ADR, and code. In
+   turn the code matures the logic and the actual living architecture documents
+   and user guides. We call this the plan->triage->build->learn->teach cycle in
+   the praxis system.
+
+3. **System Development**: ...
+
+4. **Software Runtime**: This exercise focuses on the runtime platform and the
+   operational aspects of the software, including deployment, monitoring, and
+   maintenance. It involves ensuring that the software runs smoothly in
+   production environments and meets performance and reliability standards. Key
    activities include:
-   - **Architecture Design**: Creating a blueprint for the software's structure
-     and components, ensuring that it aligns with business requirements and
-     technical standards.
-   - **Code Implementation**: Writing the actual code that implements the
-     software's functionality, following best practices and coding standards.
-   - **Integration & Testing**: Ensuring that the different components of the
-     software work together seamlessly and meet quality standards through
-     rigorous testing and validation processes.
-3. **Software Runtime & Delivery**: This workflow focuses on the deployment,
-   operation, and maintenance of the software in a production environment. It
-   involves ensuring that the software is delivered to users effectively and
-   operates reliably. Key activities include:
-   - **Deployment**: The process of releasing the software to a production
-     environment, ensuring that it is accessible to users and functions as
-     intended.
-   - **Monitoring & Maintenance**: Continuously monitoring the software's
-     performance and addressing any issues that arise, including bug fixes,
-     updates, and enhancements.
-   - **User Support**: Providing assistance to users, addressing their concerns,
-     and gathering feedback to inform future development efforts.
+   - **Platform Development**: Building and maintaining the underlying
+     infrastructure and services that support the software's operation, ensuring
+     that it is scalable, secure, and reliable.
+   - **Deployment**: The process of releasing the software to production
+     environments, ensuring that it is properly configured and ready for use.
+   - **Monitoring**: Continuously tracking the software's performance,
+     availability, and usage to identify potential issues and areas for
+     improvement.
+   - **Maintenance**: Ongoing support and updates to the software, addressing
+     bugs, security vulnerabilities, and user feedback to ensure that it remains
+     functional and relevant over time.
 
 ## References
 
