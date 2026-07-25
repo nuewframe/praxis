@@ -1,12 +1,14 @@
 #!/usr/bin/env bash
 #
-# bump-version.sh — bump version numbers across all declared files,
-# with drift detection and repo-wide audit for missed files.
+# bump-version.sh — single-source the plugin version.
+#
+# package.json is the source of truth. Every file listed in .version-bump.json
+# "files" is synced from it mechanically; no other file may state the version.
 #
 # Usage:
-#   bump-version.sh <new-version>   Bump all declared files to new version
-#   bump-version.sh --check         Report current versions (detect drift)
-#   bump-version.sh --audit         Check + grep repo for old version strings
+#   bump-version.sh <new-version>   Sync all declared files to new version
+#   bump-version.sh --check         Report declared versions (detect drift)
+#   bump-version.sh --audit         Fail on any undeclared version literal
 #
 set -euo pipefail
 
@@ -51,6 +53,19 @@ audit_excludes() {
   jq -r '.audit.exclude[]' "$CONFIG" 2>/dev/null
 }
 
+# Paths scanned for stray version literals.
+audit_scan_paths() {
+  jq -r '.audit.scan[]' "$CONFIG" 2>/dev/null
+}
+
+# Declared-legitimate semver locations, as "path<TAB>lineRegex".
+# An empty lineRegex allows the whole path; a non-empty one allows ONLY lines
+# matching it, so a file may host policy examples and still be guarded against
+# stale version claims.
+audit_allow_entries() {
+  jq -r '.audit.allow[] | "\(.path)\t\(.lines // "")"' "$CONFIG" 2>/dev/null
+}
+
 # --- commands ---
 
 cmd_check() {
@@ -92,75 +107,85 @@ cmd_check() {
 }
 
 cmd_audit() {
-  # First run check
+  # First run check (declared manifests in sync?)
   cmd_check || true
   echo ""
 
-  # Determine the current version (most common across declared files)
-  local current_version
-  current_version=$(
-    while IFS=$'\t' read -r path field; do
-      local fullpath="$REPO_ROOT/$path"
-      [[ -f "$fullpath" ]] && read_json_field "$fullpath" "$field"
-    done < <(declared_files) | sort | uniq -c | sort -rn | head -1 | awk '{print $2}'
-  )
+  # Scan for ANY semver literal in the declared scan paths. This deliberately
+  # does NOT search for the *current* version: a stale claim (e.g. a doc still
+  # saying 0.3.0 after the repo moved to 0.4.0) is exactly the drift that
+  # searching for the current string can never find.
+  #
+  # package.json is the single source of truth. No file outside .version-bump.json's
+  # "files" list may state the plugin's version. Legitimate semver literals
+  # (instructional examples, host-repo template content) must be declared in
+  # audit.allow with a reason — a reviewed exception, never silence.
 
-  if [[ -z "$current_version" ]]; then
-    echo "error: could not determine current version" >&2
+  local -a scan_paths=() allow_entries=() declared_paths=()
+  while IFS= read -r p; do [[ -n "$p" ]] && scan_paths+=("$p"); done < <(audit_scan_paths)
+  while IFS= read -r e; do [[ -n "$e" ]] && allow_entries+=("$e"); done < <(audit_allow_entries)
+  while IFS=$'\t' read -r path _field; do declared_paths+=("$path"); done < <(declared_files)
+
+  if [[ ${#scan_paths[@]} -eq 0 ]]; then
+    echo "audit: no scan paths configured in .version-bump.json (audit.scan)" >&2
     return 1
   fi
 
-  echo "Audit: scanning repo for version string '$current_version'..."
+  echo "Audit: scanning for undeclared version literals in: ${scan_paths[*]}"
   echo ""
 
-  # Build grep exclude args
-  local -a exclude_args=()
-  while IFS= read -r pattern; do
-    exclude_args+=("--exclude=$pattern" "--exclude-dir=$pattern")
-  done < <(audit_excludes)
+  local found=0
+  local semver='[0-9]+\.[0-9]+\.[0-9]+'
 
-  # Also always exclude binary files and .git
-  exclude_args+=("--exclude-dir=.git" "--exclude-dir=node_modules" "--binary-files=without-match")
-
-  # Get list of declared paths for comparison
-  local -a declared_paths=()
-  while IFS=$'\t' read -r path _field; do
-    declared_paths+=("$path")
-  done < <(declared_files)
-
-  # Grep for the version string
-  local found_undeclared=0
   while IFS= read -r match; do
-    local match_file
-    match_file=$(echo "$match" | cut -d: -f1)
-    # Make path relative to repo root
-    local rel_path="${match_file#$REPO_ROOT/}"
+    [[ -z "$match" ]] && continue
+    local rel_path="${match%%:*}"
+    rel_path="${rel_path#./}"
+    local rest="${match#*:}"          # "<lineno>:<content>"
+    local content="${rest#*:}"
 
-    # Check if this file is in the declared list
-    local is_declared=0
+    # Skip files whose version IS mechanically managed.
+    local skip=0
     for dp in "${declared_paths[@]}"; do
-      if [[ "$rel_path" == "$dp" ]]; then
-        is_declared=1
-        break
+      [[ "$rel_path" == "$dp" ]] && skip=1 && break
+    done
+    # Skip declared-legitimate locations. A path with no lineRegex is allowed
+    # wholesale; a path WITH one allows only matching lines, so any other semver
+    # literal in that same file is still reported.
+    local ap alines
+    for entry in "${allow_entries[@]}"; do
+      IFS=$'\t' read -r ap alines <<< "$entry"
+      if [[ "$rel_path" == "$ap" || "$rel_path" == "$ap"/* ]]; then
+        if [[ -z "$alines" ]]; then skip=1; break; fi
+        if [[ "$content" =~ $alines ]]; then skip=1; break; fi
       fi
     done
+    [[ "$skip" -eq 1 ]] && continue
 
-    if [[ "$is_declared" -eq 0 ]]; then
-      if [[ "$found_undeclared" -eq 0 ]]; then
-        echo "UNDECLARED files containing '$current_version':"
-        found_undeclared=1
-      fi
-      echo "  $match"
+    if [[ "$found" -eq 0 ]]; then
+      echo "UNDECLARED version literals found:"
+      found=1
     fi
-  done < <(grep -rn "${exclude_args[@]}" -F "$current_version" "$REPO_ROOT" 2>/dev/null || true)
+    echo "  $match"
+  done < <(cd "$REPO_ROOT" && grep -rnE --include='*.md' --include='*.json' --include='*.yaml' \
+             --exclude-dir=node_modules --exclude-dir=.git \
+             "$semver" "${scan_paths[@]}" 2>/dev/null || true)
 
-  if [[ "$found_undeclared" -eq 0 ]]; then
-    echo "No undeclared files contain the version string. All clear."
-  else
+  if [[ "$found" -eq 1 ]]; then
     echo ""
-    echo "Review the above files — if they should be bumped, add them to .version-bump.json"
-    echo "If they should be skipped, add them to the audit.exclude list."
+    echo "package.json is the single source of truth for the plugin version."
+    echo "Fix by one of:"
+    echo "  1. Remove the literal — prose rarely needs to state a version at all."
+    echo "  2. Add the file to .version-bump.json \"files\" so it is synced mechanically."
+    echo "  3. Add it to .version-bump.json \"audit.allow\" WITH a reason, if the literal"
+    echo "     is an instructional example or host-repo template content. Prefer a narrow"
+    echo "     \"lines\" regex over allowing a whole file — a file that legitimately hosts"
+    echo "     examples can still develop a stale version claim."
+    return 1
   fi
+
+  echo "No undeclared version literals. package.json remains the single source."
+  return 0
 }
 
 cmd_bump() {

@@ -2,11 +2,13 @@
 
 `hooks/`, the per-harness manifests (`.claude-plugin/`, `.codex-plugin/`, `.cursor-plugin/`, `.opencode/`, `gemini-extension.json`), and `skills/provision-project-overlay/` together are how Praxis reaches a host project across six harnesses — Claude Code, Codex CLI/App, Cursor, Gemini CLI, OpenCode, and GitHub Copilot CLI/VS Code — from one single-source `skills/` / `agents/` / `instructions/` tree. There are no per-harness content forks, only per-harness manifest and hook adapters pointing at the same substantive files.
 
-Multi-harness reach is a deliberate distribution goal stated in `project-context.md`'s Identity section, not a hedge requiring adoption evidence — that evidentiary bar applies to methodology-fidelity claims, not to how many harnesses can install the same doctrine. Reach is proven on Claude Code, the harness this repo is built and tested against, and remains aspirational on the others until validated.
+Multi-harness reach is a deliberate distribution goal stated in `docs/project-context.md`'s Identity section, not a hedge requiring adoption evidence — that evidentiary bar applies to methodology-fidelity claims, not to how many harnesses can install the same doctrine. Reach is proven on Claude Code, the harness this repo is built and tested against, and remains aspirational on the others until validated.
 
 ## Session-start injection
 
 `hooks/session-start` reads `skills/using-praxis/SKILL.md` in full and injects it as session context on every harness that lacks a native `applyTo` mechanism. On a harness like Claude Code, this injection is the *only* always-on guardrail surface: the matcher fires on startup, `/clear`, and context compaction by design, because those are exactly the moments the always-on guardrail summary would otherwise silently fall out of the model's context.
+
+The hook emits JSON with the skill body escaped into a single string value (`escape_for_json` converts newlines to `\n`). **Verify its output by redirecting to a file and parsing that** — `python3 -c 'json.loads(...)'` or `jq -e .`. Do not pipe it through `echo`: zsh's builtin `echo` expands `\n` back into literal newlines, corrupting the payload before the parser sees it and producing a false "invalid JSON" conclusion about a hook that is in fact correct.
 
 ## The overlay path: `provision-project-overlay`
 

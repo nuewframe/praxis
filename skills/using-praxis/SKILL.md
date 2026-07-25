@@ -1,25 +1,25 @@
 ---
 name: using-praxis
 description: Bootstrap entry point for the Praxis plugin. Loaded at session start by every harness (Claude Code, Codex, Cursor, Gemini, OpenCode, Copilot). Teaches the agent which personas exist, which guardrails are always-on, and which skill to invoke for each product or engineering moment.
+user-invocable: true
+disable-model-invocation: false
 ---
 
-# Praxis — Skill Index and Bootstrap
+# Praxis — Operational Index
 
-You are operating with the **Praxis** plugin loaded. Praxis is an opinionated plugin that fuses **lean wave-based product delivery** with **Principal Engineer discipline** into a single composable method. Its doctrine is universal — language-, framework-, and runtime-agnostic; its **static enforcement is best-effort per language** (see [`docs/coverage-matrix.md`](../../docs/coverage-matrix.md)).
+You are operating with **Praxis** loaded: an opinionated method that fuses **lean wave-based product delivery** with **Principal Engineer discipline**. Doctrine is universal — language-, framework-, and runtime-agnostic; **static enforcement is best-effort per language** ([`docs/coverage-matrix.md`](../../docs/coverage-matrix.md)).
 
-The host repository's own `.github/`, `.claude/`, or workspace instructions **always override** anything in this plugin. When in doubt, the repo wins.
+The host repository's own `.github/`, `.claude/`, or workspace instructions **always override** anything here. When in doubt, the repo wins.
 
-This file is your map. It is re-surfaced at session start and after `/clear` or a context compaction so the always-on guardrails below stay in force across the session — skim it, then load specific skills on demand rather than re-reading it in full.
+This file is your **router** — what to do right now. It is re-injected at session start and after `/clear` or compaction so the guardrails below stay in force. Skim it; load specific skills on demand.
+
+For the *why* — the trust-transfer problem, the ten opinions, the full enforcement rationale, and plugin governance — read [`docs/project-context.md`](../../docs/project-context.md). Don't load it mid-task unless the question is about the method itself.
 
 ---
 
 ## How to use this plugin
 
-1. **Identify the moment.** Is the human asking you to plan, design, implement, review, refactor, or ship?
-2. **Pick the persona.** Three roles, each with a single responsibility (`agents/*.agent.md`).
-3. **Pick the skill.** Each skill is a focused, repeatable workflow (`skills/<name>/SKILL.md`).
-4. **Honor the guardrails.** Three always-on rule sets shape every decision (`instructions/*.instructions.md`).
-5. **When the host repo is silent, follow the plugin defaults. When it speaks, the host repo wins.**
+Identify the moment (plan, triage, design, implement, review, ship) → pick the persona → load that skill's `SKILL.md` → honor the always-on guardrails. When the host repo is silent, follow these defaults; when it speaks, it wins.
 
 ---
 
@@ -33,15 +33,15 @@ Load the persona's full file before acting in that role.
 | **Product Designer** | User value, thin-slice acceptance criteria, authoring `product-design.md`; leads `qa.md` (paired with the engineer, designer-owned when user-facing risk dominates) | `agents/product-designer.agent.md` |
 | **Principal Engineer** | Capability-driven architecture, refactoring, cross-cutting decisions; operates in three modes — architect, implementer, reviewer — never two at once | `agents/principal-engineer.agent.md` |
 
-The same engineer cannot self-approve. If you are the implementer, you cannot also be the reviewer in the same session — switch personas explicitly or hand off.
+**The same engineer cannot self-approve.** If you are the implementer, you cannot also be the reviewer in the same session — switch personas explicitly or hand off.
 
 ---
 
 ## Always-on guardrails
 
-These guardrails ship as `applyTo`-scoped `.instructions.md` files. **Copilot** auto-applies each one whenever you edit a file matching its `applyTo` glob. **Claude Code and other harnesses have no `applyTo` mechanism** and do not auto-load the plugin's `instructions/` directory — for those, the compressed summary below is the always-on surface (this file is loaded at session start), and you must treat each rule set as in force whenever you touch the matching paths. In a provisioned repo, `provision-project-overlay` copies these files into `.github/instructions/` so Copilot picks them up natively.
+These ship as `applyTo`-scoped `.instructions.md` files. **Copilot** auto-applies each one whenever you edit a file matching its glob. **Claude Code and other harnesses have no `applyTo` mechanism** and do not auto-load `instructions/` — for those, the summary below is the always-on surface, and you must treat each rule set as in force whenever you touch the matching paths. In a provisioned repo, `provision-project-overlay` copies these into `.github/instructions/` so Copilot picks them up natively.
 
-### Lean Delivery Guardrails — `instructions/lean-delivery-guardrails.instructions.md`
+### Lean Delivery — `instructions/lean-delivery-guardrails.instructions.md`
 
 Applies to `docs/product/**`, `docs/architecture/**`, `docs/guides/**`, `docs/waves/**`, `docs/sprints/**`.
 
@@ -49,121 +49,104 @@ Applies to `docs/product/**`, `docs/architecture/**`, `docs/guides/**`, `docs/wa
 - Thin-slices are atomic user outcomes with stable IDs (`TS-NNN`). Corrections keep the same ID.
 - Sprint is an immutable bridge — scope is locked once it starts. To change scope, close it and create a new one.
 - Sprint close is bidirectional: learnings flow into product artifacts AND engineering artifacts; sprint files are then deleted.
+- **Wave = educated theory; capability record = truth.** Wave docs point into `docs/architecture/`; they never duplicate current-state topology.
 - Quality is specified in `qa.md` before it is tested. No code in `qa.md`.
 - Code contribution intake (wave, slice, specs, sprint, code state, test posture) comes before any implementation.
-- ADRs capture durable decisions with mandatory alternatives table.
+- ADRs capture durable decisions with a mandatory alternatives table.
 
-### Capability-Driven Engineering Guardrails — `instructions/capability-driven-guardrails.instructions.md`
+### Capability-Driven Engineering — `instructions/capability-driven-guardrails.instructions.md`
 
 Applies to `src/**`, `packages/**`, `services/**`, `apps/**`, `libs/**`, `modules/**`.
 
 - Organize by **business capability**, not technical layer. No `controllers/`, `models/`, `services/`, `views/`, `handlers/` silos.
-- **Anti-dumping policy:** `utils/`, `helpers/`, `common/`, `shared/`, `misc.*`, `lib.*` are forbidden. Name the actual capability or duplicate.
+- **Anti-dumping:** `utils/`, `helpers/`, `common/`, `shared/`, `misc.*`, `lib.*` are forbidden. Name the actual capability or duplicate.
 - Functional core, imperative shell — pure logic in one file, I/O wrapper in another.
-- Cross-capability calls go through an explicit public surface. No deep imports across capabilities.
+- Cross-capability calls go through an explicit public surface. No deep imports.
 - Every external call declares timeout, retry policy, fallback, and (for hot paths) circuit breaker.
 - Every cross-process path produces structured logs with correlation ID, plus latency / throughput / error metrics.
-- Two units may be built concurrently only if disjoint across capability/files, persistent resources, and config keys, and each depends only on a frozen `<name>@vN` contract.
+- Two units may be built concurrently only under the four-condition rule below.
 
 ### Code Contribution Intake — `instructions/code-contribution-intake.instructions.md`
 
-Applies before any user-story, feature, thin-slice, or behavior-changing contribution. Run the intake skill first.
+Applies before any user-story, feature, thin-slice, or behavior-changing contribution. Run `intake-code-contribution` first.
+
+---
+
+## The spine
+
+```
+PLAN ──────────► TRIAGE ────────► BUILD ─────────────────────► LEARN ─────────► TEACH
+create-wave →    start-thin-      create-sprint → intake →      close-sprint     author-
+product docs     slice            implement → verify                             user-docs
+```
+
+**Tier branching** — provisional at `start-thin-slice`, authoritative at `intake` Step 0:
+
+- **Trivial** — `intake` (abbreviated) → `implement-with-defensive-patterns` → `verify-and-assemble-pr`. No sprint, no close.
+- **Standard** — the full spine above.
+- **Major** — architect pipeline *first*: `discovery-and-ambiguity-log` → `design-system-architecture` → `design-capability-layout` → `create-adr` (**`status: Accepted`**) → then `create-sprint` onward.
+
+The **canonical ordered path**, including where each approval line is waited on, is `start-thin-slice` Step 5. Do not paraphrase it.
 
 ---
 
 ## Skill index
 
-Skills are grouped by phase. Load the SKILL.md file of any skill you intend to follow.
+Load the `SKILL.md` of any skill you intend to follow.
 
-### Lean delivery — planning artifacts
-
-| Skill | Use when |
-|---|---|
-| `bootstrap-project` | A greenfield repo needs `.github/` + `.claude/` + capability-driven `src/` skeleton |
-| `provision-project-overlay` | An existing repo has just installed Praxis and needs a project-specific overlay (interview-driven, idempotent) |
-| `create-wave` | Starting a new wave; scaffolds the four-document pattern |
-| `create-product-design-spec` | Authoring `product-design.md` — user journeys, ambiguity handling, recovery paths |
-| `create-product-architecture-spec` | Authoring wave-scoped `product-architecture.md` — domain ownership, contracts, integrations |
-| `create-quality-spec` | Authoring `qa.md` — risk tiers, test layer mapping, coverage matrix, observable DoD |
-| `start-thin-slice` | Front door for slice work ("Work on TS-NNN"); checks dependency/status preconditions, provisional tier, then routes to create-sprint vs. the architect path |
-| `create-sprint` | Locking the immutable bridge: thin-slice intent + engineering current-state snapshot + hypothesis card + test plan |
-| `intake-code-contribution` | Pre-implementation gate; mandatory before any code change |
-| `close-sprint` | Distilling learnings bidirectionally into product AND engineering artifacts; deletes the sprint file |
-| `author-user-docs` | TEACH phase — rendering a validated capability record into Diátaxis user guides in `docs/guides/` (product-designer-owned) |
-| `create-adr` | A decision binds future work; ADR with alternatives table required |
-| `define-seam-contract` | A wave/slice crosses a boundary that must be honored executably; produces Shape + Behavior suite + frozen `<name>@vN` id |
-
-### Engineering discipline — phased delivery
-
-| Skill | Phase | Use when |
+| Stage | Skill | Use when |
 |---|---|---|
-| `discovery-and-ambiguity-log` | 1 | Surfacing assumptions, defining SLO/SLA, producing an Ambiguity Log |
-| `design-system-architecture` | 2–3 | Topology, resilience patterns, contract-first APIs, polyglot persistence, expand/contract migrations |
-| `design-capability-layout` | 4 | Mapping the capability into a vertical-slice folder layout with functional core / imperative shell |
-| `implement-with-defensive-patterns` | 5 | Writing the implementation; composition over inheritance, shift-left security, structured telemetry |
-| `verify-and-assemble-pr` | 6 | TDD verification, integration boundary tests, PR narrative |
-| `refactor-layered-to-capability` | — | Migrating a legacy `controllers/` + `services/` codebase into vertical slices |
-| `test-by-ownership` | — | Picking the right test layer (Logic → Composition → Adapter Contract → Integration → Journey) for each behavior |
-
----
-
-## Tooling
-
-Praxis ships generic, configurable enforcement scripts. Wire them into the project task runner and CI:
-
-| Script | Fails on |
-|---|---|
-| `scripts/check-anti-dumping.sh` | `utils/`, `helpers/`, `common/`, `shared/`, `misc.*` inside capability roots |
-| `scripts/check-no-skipped-tests.sh` | Committed `.skip(`, `xit(`, `@Disabled`, `@pytest.mark.skip` markers |
-| `scripts/check-no-sleep-waits.sh` | `Thread.sleep`, `time.sleep`, `waitForTimeout` |
-| `scripts/check-port-adapter-parity.sh` | `*.ports.*` with no adapter; warns if no in-memory test double |
-| `scripts/check-seam-contract-parity.sh` | A seam in `.seam-contracts.json` missing its Shape or Behavior suite; warn-first, mode-promoted |
-| `scripts/check-config-externalized.sh` | Hardcoded remote URLs, endpoints, or secret literals (Configurable anchor); warn-first, reviewed per-line opt-out |
-| `scripts/check-observability-at-seams.sh` | A boundary call with no log/metric/trace/correlation-id (Observable anchor); warn-first, reviewed per-file opt-out |
-| `scripts/check-stateless-request-path.sh` | Node-local mutable state on the request path (Horizontally-scalable anchor); warn-first, reviewed per-line opt-out |
-| `scripts/check-resilient-boundary.sh` | A boundary call with no timeout/retry/circuit-breaker/fallback (Resilient anchor); warn-first, reviewed per-file opt-out |
-| `scripts/check-sprint-id-collision.sh` | Two active sprint files sharing an id token (parallel-creation collision); exact, warn-first via `.sprint-coordination.json` |
-| `scripts/validate-plugin.sh` | Plugin self-test (run from this repo) |
+| **Enter** | `bootstrap-project` | Greenfield repo needs `.github/` + `.claude/` + capability-driven `src/` |
+| | `provision-project-overlay` | Existing repo just installed Praxis; needs a project overlay (interview-driven, idempotent) |
+| | `refactor-layered-to-capability` | Legacy `controllers/` + `services/` → vertical slices, one shippable slice at a time |
+| **PLAN** | `create-wave` | Starting a wave; scaffolds the four-document pattern |
+| | `create-product-design-spec` | `product-design.md` — journeys, UX states, ambiguity handling, recovery paths |
+| | `create-product-architecture-spec` | wave `product-architecture.md` — domain ownership, contracts, seams, integrations |
+| | `create-quality-spec` | `qa.md` — risk tiers, test layer mapping, security coverage, observable DoD |
+| **TRIAGE** | `start-thin-slice` | Front door ("Work on TS-NNN"); precondition hard-gate, provisional tier, route |
+| **ARCHITECT**<br>*(Major only)* | `discovery-and-ambiguity-log` | Phase 1 — assumptions, SLO/SLA, Ambiguity Log |
+| | `design-system-architecture` | Phases 2–3 — topology, resilience, contract-first APIs, persistence, migrations |
+| | `design-capability-layout` | Phase 4 — slice layout, functional core / imperative shell, declared Ports |
+| | `create-adr` | A decision binds future work; alternatives table required; must reach `status: Accepted` |
+| | `define-seam-contract` | A boundary another slice builds against; Shape + Behavior suite + frozen `<name>@vN` |
+| **BUILD** | `create-sprint` | Lock the bridge: slice intent + current-state snapshot + hypothesis card + test plan |
+| | `intake-code-contribution` | Phase 0 gate — **mandatory before any code change** |
+| | `test-by-ownership` | Right layer per behavior: Logic → Composition → Adapter Contract → Integration → Journey |
+| | `implement-with-defensive-patterns` | Phase 5 — composition over inheritance, shift-left security, structured telemetry |
+| | `verify-and-assemble-pr` | Phase 6 — captured `verify` output, refactor matrix, PR narrative + rollback |
+| **LEARN** | `close-sprint` | Outcome evidence + continue/pivot/stop into product AND engineering artifacts; deletes the sprint |
+| **TEACH** | `author-user-docs` | Validated capability record → Diátaxis guides in `docs/guides/` (product-designer-owned) |
 
 ---
 
 ## Enforcement model — what is mechanical vs. trusted
 
-Praxis has three kinds of gate. Knowing which is which is the difference between a guarantee and a good intention:
+Three kinds of gate. Knowing which is which is the difference between a guarantee and a good intention:
 
-| Gate kind | Enforced by | Examples | Fails closed? |
-|---|---|---|---|
-| **Script-enforced** | `verify.sh` / CI running the `check-*.sh` probes | anti-dumping, no-skipped-tests, no-sleep-waits, Port/Adapter parity, seam-contract parity, the four readiness anchors, sprint-id collision | Yes — once wired into CI or a git hook (several probes are warn-first until you set `mode: enforce`) |
-| **Human-signed** | a person filling an approval line | Sprint Plan Approval, Design Approval | The next skill refuses to proceed without the signature — but only a compliant agent checks |
-| **Agent-attested** | the agent following the skill | tier classification, the intake envelope, the four-anchor conformance *declaration*, red-first test posture, the adversarial seam review | **No** on a bare harness — trusted, not mechanically compelled |
+| Gate kind | Examples | Fails closed? |
+|---|---|---|
+| **Script-enforced** — the `check-*.sh` probes | anti-dumping, test hygiene, Port/Adapter + seam parity, the four readiness anchors | Yes, once wired into CI or a git hook. Several are warn-first until you set `mode: enforce` |
+| **Human-signed** — a person fills an approval line | Sprint Plan Approval, Design Approval | Blocks the next skill — but only a compliant agent checks |
+| **Agent-attested** — you, following the skill | tier classification, intake envelope, four-anchor conformance, red-first posture, adversarial seam review | **No.** Trusted, not compelled |
 
-The honest consequence: on a bare harness (Claude Code, Copilot) the **script-enforced** gates are real only when the project runs `verify.sh` in CI or a git hook; the **human-signed** and **agent-attested** gates rest on compliance. Compelling the attested gates at runtime — forcing intake before code, dispatching a genuinely separate reviewer head — is the job of an orchestration runtime (see MPM composition below). Praxis ships the artifacts and the checks; it does not, by itself, force the agent to run them. Wire `verify.sh` into CI and a pre-push hook to make the script-enforced tier actually fail closed.
+**"Mechanical" means script-checkable, not runtime-enforced.** A probe verifies an artifact exists and carries substance; it cannot stop you proceeding. The lower two tiers rest on your compliance — honor them anyway, and never describe a gate as stronger than it is.
+
+Exception: `check-design-approval-gate.sh` **hard-fails** a Major-tier sprint whose ADR is not `Accepted` or whose Design Approval is unsigned.
+
+Probes live in `scripts/` — wire them into the project's `verify` entry point. Full table in `README.md`; rationale in `docs/project-context.md`.
 
 ---
 
 ## Emergent parallelism — the four-condition disjointness rule
 
-Praxis never schedules parallel work. Parallelism is an **emergent permission**, exercised by the human or an orchestration runtime — never forced by the method, never an artifact Praxis produces. A unit of work (a slice/sprint) may run concurrently with another **only if all four conditions hold**:
+Praxis never schedules parallel work. Parallelism is an **emergent permission**, exercised by the human or an orchestration runtime. Two units may run concurrently **only if all four hold**:
 
-1. **Capability/file disjoint** — they touch no source file or capability in common.
-2. **Persistent-resource disjoint** — they write no shared table, topic, queue, cache, or migration in common.
-3. **Config-key disjoint** — they mutate no shared configuration key in common.
-4. **Frozen-contract dependent** — each depends only on a frozen `<name>@vN` seam contract (`define-seam-contract`), never on the other's in-flight internals.
+1. **Capability/file disjoint** — no source file or capability in common.
+2. **Persistent-resource disjoint** — no shared table, topic, queue, cache, or migration.
+3. **Config-key disjoint** — no shared configuration key.
+4. **Frozen-contract dependent** — each depends only on a frozen `<name>@vN` seam contract, never on the other's in-flight internals.
 
-Capability-disjointness **alone is not sufficient**: two slices in different capabilities still collide if they share a table, a config key, or one consumes the other's unfrozen surface. The three disjointness axes (conditions 1–3) *plus* the frozen-contract rule (condition 4) must all hold. If any condition fails, the units are sequential, not parallel. The collision-safe coordination artifacts (`create-sprint`) and the staleness re-anchor at intake (`intake-code-contribution`) are what make a permitted parallel run *safe*.
-
----
-
-## Composition with orchestration runtimes (MPM and others)
-
-Praxis owns **artifact discipline**. It does not implement runtime mechanics — delegation, verification gates, ticketing, branch protection, circuit breakers as runtime checks. Those belong in an orchestration runtime such as [Claude MPM](https://github.com/bobmatnyc/claude-mpm).
-
-When MPM is installed:
-
-- Praxis produces the artifacts (`product-design.md`, `product-architecture.md`, `qa.md`, sprint files, ADRs, wave READMEs, handbook updates).
-- MPM's PM agent uses those artifacts as the source of truth for delegation; specialists align to the personas defined here (`principal-engineer`, `product-designer`, `product-manager`).
-
-The two are orthogonal. Either can be used without the other.
+Capability-disjointness **alone is not sufficient**. If any condition fails, the units are sequential.
 
 ---
 
@@ -179,7 +162,7 @@ plugin instructions, agents, skills                       (defaults — Praxis)
 user ~/.claude/CLAUDE.md, VS Code user prompts            (personal preferences only)
 ```
 
-If a host repo's instruction conflicts with this plugin, follow the host. Praxis sets defaults; it never claims the final word.
+Praxis sets defaults; it never claims the final word. Praxis is artifact discipline, not runtime orchestration — delegation, ticketing, and branch protection belong to a runtime such as Claude MPM (see `docs/project-context.md`).
 
 ---
 

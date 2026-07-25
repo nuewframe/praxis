@@ -251,7 +251,7 @@ The agent should name the three personas, the always-on guardrails, and at least
 
 ## Documentation
 
-- [project-context.md](project-context.md) — plugin governance, scope rules, evolution policy.
+- [docs/project-context.md](docs/project-context.md) — the method, its doctrine, scope rules, and evolution policy.
 - [CHANGELOG.md](CHANGELOG.md) — version history.
 
 ## License
