@@ -10,8 +10,8 @@
     { "pattern": "profile:\\s*lite", "reason": "the lite/standard adoption profile dial was cut pre-release (never shipped in a tagged version, confirmed via git merge-base against v0.3.0) -- full is the only supported profile; do not reintroduce without real-repo evidence per the evolution policy" },
     { "pattern": "lite \\| standard \\| full", "reason": "the three-way adoption-profile enum was cut pre-release; full is the only supported profile" }
   ],
-  "terminologyScanDirs": ["skills", "instructions", "agents"],
-  "terminologyAllowPaths": ["docs/plans", "CHANGELOG.md", ".praxis-canon.json"],
+  "terminologyScanDirs": ["skills", "instructions", "agents", "docs"],
+  "terminologyAllowPaths": ["CHANGELOG.md", ".praxis-canon.json", "docs/product/sprints"],
   "placeholderConfigTemplate": "skills/provision-project-overlay/templates/praxis.config.yaml.tmpl",
   "placeholderScanGlob": "skills/provision-project-overlay/templates",
   "specialPlaceholders": ["TODAY"],

@@ -13,7 +13,7 @@
 #   6. Every enforcement script parses and is executable.
 #   7. Inventory parity: every skill, script, and instruction on disk is
 #      referenced in the canonical self-describing docs (README.md,
-#      project-context.md, and — for instructions — using-praxis), so the
+#      docs/project-context.md, and — for instructions — using-praxis), so the
 #      docs cannot silently drift behind the file tree.
 #   8. Every agent (`agents/*.agent.md`) has parseable frontmatter with the
 #      required keys.
@@ -192,8 +192,6 @@ import os, re, sys
 # Match relative refs to skills/<name>, agents/<name>, instructions/<name>,
 # scripts/<name>. Only check existence of the directory or file root, not deep
 # anchors. Backtick-wrapped paths are fine; angle-bracket links too.
-# docs/plans/* is excluded: planning docs are forward-looking and legitimately
-# reference not-yet-built artifacts.
 patterns = [
     re.compile(r'`(skills/[A-Za-z0-9_./-]+)`'),
     re.compile(r'`(agents/[A-Za-z0-9_./-]+)`'),
@@ -208,7 +206,7 @@ allowed_missing = {
 }
 
 problems = []
-md_files = [p for p in os.popen("find . -type f -name '*.md' -not -path './node_modules/*' -not -path './.git/*' -not -path './docs/plans/*'").read().splitlines() if p]
+md_files = [p for p in os.popen("find . -type f -name '*.md' -not -path './node_modules/*' -not -path './.git/*'").read().splitlines() if p]
 
 for path in sorted(md_files):
     try:
@@ -284,10 +282,10 @@ fi
 # 7. Inventory parity: every skill, script, and instruction on disk must be
 #    referenced in the canonical self-describing docs, so the docs cannot
 #    silently drift behind the file tree.
-#      - skills/<name>/        → README.md AND project-context.md
-#      - scripts/check-*.sh    → README.md AND project-context.md
-#      - scripts/*.sh (others) → project-context.md (README allowlist below)
-#      - instructions/*.md     → README.md, project-context.md, using-praxis
+#      - skills/<name>/        → README.md AND docs/project-context.md
+#      - scripts/check-*.sh    → README.md AND docs/project-context.md
+#      - scripts/*.sh (others) → docs/project-context.md (README allowlist below)
+#      - instructions/*.md     → README.md, docs/project-context.md, using-praxis
 echo "validate-plugin: checking inventory parity..."
 INV_REPORT=$(python3 <<'PY'
 import os, sys
@@ -299,7 +297,7 @@ def read(path):
         return ''
 
 readme = read('README.md')
-context = read('project-context.md')
+context = read('docs/project-context.md')
 bootstrap = read('skills/using-praxis/SKILL.md')
 
 problems = []
@@ -314,13 +312,13 @@ for skill in sorted(d for d in os.listdir('skills') if os.path.isdir(os.path.joi
     if skill not in readme:
         problems.append(f'skills/{skill}: not referenced in README.md')
     if skill not in context:
-        problems.append(f'skills/{skill}: not referenced in project-context.md')
+        problems.append(f'skills/{skill}: not referenced in docs/project-context.md')
 
 # Scripts — every script must appear in project-context; check-*.sh + others
 # (minus the release allowlist) must also appear in README.
 for script in sorted(f for f in os.listdir('scripts') if f.endswith('.sh')):
     if script not in context:
-        problems.append(f'scripts/{script}: not referenced in project-context.md')
+        problems.append(f'scripts/{script}: not referenced in docs/project-context.md')
     if script not in readme_optional_scripts and script not in readme:
         problems.append(f'scripts/{script}: not referenced in README.md')
 
@@ -330,7 +328,7 @@ for instr in sorted(f for f in os.listdir('instructions') if f.endswith('.instru
     if instr not in readme:
         problems.append(f'instructions/{instr}: not referenced in README.md')
     if instr not in context:
-        problems.append(f'instructions/{instr}: not referenced in project-context.md')
+        problems.append(f'instructions/{instr}: not referenced in docs/project-context.md')
     if instr not in bootstrap:
         problems.append(f'instructions/{instr}: not referenced in skills/using-praxis/SKILL.md')
 
@@ -526,6 +524,171 @@ PY
 PHRASE_RC=$?
 if [[ $PHRASE_RC -ne 0 ]]; then
   echo "$PHRASE_REPORT" >&2
+  FAILED=$((FAILED + 1))
+else
+  echo "  ok"
+fi
+
+# 13. Version single-source — package.json is the only place the plugin version
+#     is authored. Every harness manifest is synced from it; no document may
+#     restate it in prose. Delegates to bump-version.sh --audit, which scans for
+#     ANY semver literal (not just the current one, so a *stale* claim is caught)
+#     outside the declared manifests and the reasoned audit.allow list.
+echo "validate-plugin: checking version single-source..."
+if VERSION_REPORT=$(bash "$(dirname "$0")/bump-version.sh" --audit 2>&1); then
+  echo "  ok"
+else
+  echo "$VERSION_REPORT" | sed -n '/UNDECLARED/,$p' >&2
+  FAILED=$((FAILED + 1))
+fi
+
+# 14. Link resolution — every relative markdown link must point at a file or
+#     directory that exists. The inventory-parity check (#7) only proves a name is
+#     *mentioned*; it cannot prove a link *resolves*, which is how a docs
+#     reorganization can silently strand references. Three exclusions, each
+#     load-bearing:
+#       - fenced code blocks: template content whose paths resolve from the
+#         destination document, not from the file quoting it;
+#       - paths containing < or >: `<placeholder>` template segments;
+#       - external schemes: http(s) and mailto are not this check's business.
+#     Fence tracking honours the opening marker's length, because a naive
+#     three-backtick toggle mis-tracks nested fences and produces false negatives.
+echo "validate-plugin: checking link resolution..."
+LINK_REPORT=$(python3 <<'PY'
+import os, re, sys
+
+SKIP_DIRS = {'.git', 'node_modules'}
+fence_re = re.compile(r'^\s*(`{3,}|~{3,})')
+link_re = re.compile(r'\[[^\]]*\]\(([^)\s]+)')
+
+problems = []
+for dirpath, dirnames, filenames in os.walk('.'):
+    dirnames[:] = [d for d in dirnames if d not in SKIP_DIRS]
+    for fn in filenames:
+        if not fn.endswith('.md'):
+            continue
+        path = os.path.join(dirpath, fn)
+        try:
+            lines = open(path, errors='replace').read().split('\n')
+        except Exception as e:
+            problems.append('%s: cannot read (%s)' % (path, e))
+            continue
+        in_fence = False
+        marker = None
+        for lineno, line in enumerate(lines, 1):
+            m = fence_re.match(line)
+            if m:
+                tok = m.group(1)
+                if not in_fence:
+                    in_fence, marker = True, tok[0] * 3
+                elif line.strip().startswith(marker):
+                    in_fence, marker = False, None
+                continue
+            if in_fence:
+                continue
+            for lm in link_re.finditer(line):
+                target = lm.group(1).split('#')[0]
+                if not target:
+                    continue
+                if target.startswith(('http://', 'https://', 'mailto:')):
+                    continue
+                if '<' in target or '>' in target:
+                    continue
+                resolved = os.path.normpath(os.path.join(os.path.dirname(path), target))
+                if not os.path.exists(resolved):
+                    problems.append('%s:%d: unresolved link -> %s' % (path, lineno, target))
+
+for p in problems:
+    print(p)
+sys.exit(1 if problems else 0)
+PY
+)
+LINK_RC=$?
+if [[ $LINK_RC -ne 0 ]]; then
+  echo "$LINK_REPORT" >&2
+  FAILED=$((FAILED + 1))
+else
+  echo "  ok"
+fi
+
+# 15. CHANGELOG structure — a lost `## [0.4.0]` heading once went undetected,
+#     silently re-parenting a whole release's entries under the heading above it.
+#     Verifies the headings parse, are unique, descend strictly by version, that
+#     [Unreleased] (if present) leads, and that the version package.json declares
+#     actually has an entry.
+echo "validate-plugin: checking CHANGELOG structure..."
+CHANGELOG_REPORT=$(python3 <<'PY'
+import json, os, re, sys
+
+if not os.path.isfile('CHANGELOG.md'):
+    print('skipped (no CHANGELOG.md)'); sys.exit(0)
+
+heading_re = re.compile(r'^##\s+(.*)$')
+released_re = re.compile(r'^\[(\d+)\.(\d+)\.(\d+)\]\s+—\s+\d{4}-\d{2}-\d{2}$')
+
+problems = []
+order = []          # (lineno, (major, minor, patch), raw)
+unreleased_at = None
+seen = {}
+
+for lineno, line in enumerate(open('CHANGELOG.md', errors='replace').read().split('\n'), 1):
+    m = heading_re.match(line)
+    if not m:
+        continue
+    body = m.group(1).strip()
+    if body == '[Unreleased]':
+        if unreleased_at is not None:
+            problems.append('CHANGELOG.md:%d: duplicate [Unreleased] heading' % lineno)
+        unreleased_at = lineno
+        order.append((lineno, None, body))
+        continue
+    rm = released_re.match(body)
+    if not rm:
+        problems.append(
+            'CHANGELOG.md:%d: malformed version heading %r -- expected '
+            '"## [X.Y.Z] — YYYY-MM-DD" (em dash) or "## [Unreleased]"' % (lineno, body))
+        continue
+    ver = tuple(int(g) for g in rm.groups())
+    if ver in seen:
+        problems.append('CHANGELOG.md:%d: duplicate version heading for %d.%d.%d '
+                        '(first seen at line %d)' % ((lineno,) + ver + (seen[ver],)))
+    else:
+        seen[ver] = lineno
+    order.append((lineno, ver, body))
+
+versioned = [(ln, v) for ln, v, _ in order if v is not None]
+for (ln_a, v_a), (ln_b, v_b) in zip(versioned, versioned[1:]):
+    if v_b >= v_a:
+        problems.append(
+            'CHANGELOG.md:%d: version %s does not descend from %s at line %d -- '
+            'entries must be newest-first' % (ln_b, '.'.join(map(str, v_b)),
+                                              '.'.join(map(str, v_a)), ln_a))
+
+if unreleased_at is not None and order and order[0][2] != '[Unreleased]':
+    problems.append('CHANGELOG.md:%d: [Unreleased] must be the first "##" heading' % unreleased_at)
+
+try:
+    declared = json.load(open('package.json'))['version']
+except Exception as e:
+    problems.append('package.json: cannot read version (%s)' % e)
+    declared = None
+
+if declared:
+    want = tuple(int(x) for x in declared.split('.')[:3])
+    if want not in seen:
+        problems.append(
+            'CHANGELOG.md: package.json declares version %s but no "## [%s] — <date>" '
+            'entry exists -- a released version with no CHANGELOG section is the '
+            'orphaned-heading defect this check exists to catch' % (declared, declared))
+
+for p in problems:
+    print(p)
+sys.exit(1 if problems else 0)
+PY
+)
+CHANGELOG_RC=$?
+if [[ $CHANGELOG_RC -ne 0 ]]; then
+  echo "$CHANGELOG_REPORT" >&2
   FAILED=$((FAILED + 1))
 else
   echo "  ok"

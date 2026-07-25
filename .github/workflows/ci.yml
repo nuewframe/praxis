@@ -33,7 +33,7 @@ jobs:
           fi
           jq --version
 
-      - name: validate-plugin (frontmatter, refs, fences, agents, inventory)
+      - name: validate-plugin (15 structural checks)
         run: bash scripts/validate-plugin.sh
 
       - name: anti-dumping (plugin scans itself)

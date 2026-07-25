@@ -4,9 +4,11 @@ The `scripts/` tree (17 `.sh` files, plus `data/` and `__fixtures__/`) is the ge
 
 ## `validate-plugin.sh` — the plugin's own self-test
 
-`scripts/validate-plugin.sh` runs 12 checks: SKILL.md frontmatter, every JSON file parses, every YAML file parses, cross-references resolve, manifest versions are in parity, every enforcement script parses and is executable, inventory parity (every skill/script/instruction on disk is referenced in the canonical docs), agent frontmatter, fenced-code balance, terminology drift (`.praxis-canon.json` forbidden legacy terms), template placeholder parity, and required-phrase presence (the last one enforces `.praxis-canon.json`'s `requiredPhrases` — e.g. that README.md discloses the enforcement split).
+`scripts/validate-plugin.sh` runs 15 checks: SKILL.md frontmatter (including the guard that a `tools:` value must be a single-line flow sequence, since a multi-line one is valid YAML that silently prevents the skill registering in Claude Code), every JSON file parses, every YAML file parses, cross-references resolve, manifest versions are in parity, every enforcement script parses and is executable, inventory parity (every skill/script/instruction on disk is referenced in the canonical docs), agent frontmatter, fenced-code balance, terminology drift (`.praxis-canon.json` forbidden legacy terms, scanned across `skills`, `instructions`, `agents`, and `docs`), template placeholder parity, required-phrase presence (enforcing `.praxis-canon.json`'s `requiredPhrases` — e.g. that README.md discloses the enforcement split), version single-source (delegating to `bump-version.sh --audit`), link resolution, and CHANGELOG structure.
 
-The script's own header comment currently lists only 11 numbered checks. The 12th — required-phrase presence — exists in the code (the `requiredPhrases` check against `.praxis-canon.json`) but was never added to the header list. The header undercounts by one; the actual, code-sourced count is 12.
+The last three are the drift classes that were previously caught only by hand. **Link resolution matters because inventory parity proves a name is *mentioned*, never that a link *resolves*** — a reorganization can satisfy the first while stranding every reference. Its three exclusions are load-bearing: fenced blocks (template content whose relative paths resolve from the destination document), `<placeholder>` path segments, and external schemes. Its fence tracking honours the opening marker's length; a naive three-backtick toggle produces false negatives.
+
+The count is code-sourced, not header-sourced. The script's header comment has undercounted before, which is why the number here is stated against the executing checks.
 
 ## The three enforcement postures
 
@@ -55,5 +57,6 @@ Both run in `--check` mode in `.github/workflows/ci.yml`.
 | ADR | Purpose |
 | --- | --- |
 | [ADR.260720.01: Design Approval git pre-push hook gate](../adr/ADR.260720.01-design-approval-git-hook-gate.md) | Builds `check-design-approval-gate.sh`, the one probe in this repo that is hard-fail with no opt-out by design — the first gate Praxis demonstrably fails closed without an orchestration runtime. |
+| [ADR.260725: Declared exceptions move inline](../adr/ADR.260725-inline-declared-exceptions.md) | Replaces the path-based allowlists in `.version-bump.json` and `.praxis-canon.json` with structural citation detection plus inline reasoned `praxis:allow-*` markers, restoring default-deny at line granularity and making exemption growth visible in the Trust Receipt. **Status: Proposed.** |
 
 **Cross-capability note.** [ADR.260720.02](../adr/ADR.260720.02-generated-tier-table.md) (generated tier table) is homed in the `skills` capability record, but the generator pattern it establishes was proven using this capability's own `gen-coverage-matrix.sh` as precedent — the same generate / `--write` / `--check` shape, applied to a second fact.
