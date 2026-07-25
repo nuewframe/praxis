@@ -2,7 +2,7 @@
 
 > **Planning-stage document — an educated theory, not yet the truth.** The best approach given what we know today; current-state architecture lives in [docs/architecture/](../../../architecture/), promoted there by `close-sprint`.
 
-**Status:** 🔄 In Progress\
+**Status:** ✅ Delivered\
 **Goal:** A team whose product already exists — possibly across many packages or many repositories — can adopt the method against what they have, instead of being offered only a greenfield entry point.
 
 ---
@@ -37,21 +37,30 @@ Almost nobody adopts a delivery method on an empty repository. They adopt it on 
 
 ### TS-001: Adopting waves on a product that already shipped
 
-> **Status:** ⚪ Not Started
+> **Status:** ✅ Complete
 
 **User Value:** As a team adopting Praxis on an existing product, I need a documented path for deriving my wave structure from what I have already built, so that I get an intent map without inventing acceptance criteria for work that shipped years ago.
 
 **Acceptance Criteria:**
 
-- [ ] Given an existing product with release history and architecture documentation, when the path is followed, then it produces a wave set derived from coherent value themes rather than one wave per code module
-- [ ] Given a wave whose work is finished, when it is authored, then it carries a README with evidence-cited slices and no hypothesis card, acceptance criteria, or educated-theory documents
-- [ ] Given a wave whose work is open, when it is authored, then it carries the full four-document set
-- [ ] Given a candidate delivered slice with no citable release entry, ADR, or capability-record passage, when the path is followed, then the slice is dropped or recorded as undocumented prior work — never given invented evidence
-- [ ] Given a reader encountering a derived wave, when they open it, then they can tell it was reconstructed after delivery without being told separately
+- [x] Given an existing product with release history and architecture documentation, when the path is followed, then it produces a wave set derived from coherent value themes rather than one wave per code module
+- [x] Given a wave whose work is finished, when it is authored, then it carries a README with evidence-cited slices and no hypothesis card, acceptance criteria, or educated-theory documents
+- [x] Given a wave whose work is open, when it is authored, then it carries the full four-document set
+- [x] Given a candidate delivered slice with no citable release entry, ADR, or capability-record passage, when the path is followed, then the slice is dropped or recorded as undocumented prior work — never given invented evidence
+- [x] Given a reader encountering a derived wave, when they open it, then they can tell it was reconstructed after delivery without being told separately
 
 **Dependencies:** None. Decided in [ADR.260725.10](../../../architecture/adr/ADR.260725.10-brownfield-wave-retrofit.md) (status: Accepted). The decision is already applied to Praxis's own tree; this slice generalizes it into a path others can follow.
 
-**Tracking note:** The pattern has exactly one instance — Praxis's own retrofit. The evolution policy requires real-repo validation before a rule ships, and dogfooding does not substitute. This slice generalizes the pattern only after it has been applied to a project that is not Praxis.
+**Tracking note:** The bar this slice set for itself was met before a line of the path was written: the pattern was applied end-to-end to `nuewframe/logickit` — a product that is not Praxis, with five successive generations, partial prior adoption, and no product dashboard. The path is [`derive-waves-from-history`](../../../../skills/derive-waves-from-history/SKILL.md).
+
+That second application changed the content rather than confirming it. Four of the path's rules exist because LogicKit hit cases Praxis's own single-tree retrofit could not:
+
+- **A product can have several roots.** Five generations, two carrying their own waves, none holding the product's intent — so the dashboard sits above them all.
+- **An existing wave document can declare a status its own repository contradicts.** All three `alpha.5` waves say every slice is Not Started while the commit log ends at *"epic complete"*. The path shows such a contradiction rather than resolving it by inference.
+- **Slice identifier schemes drift.** Waves numbered `TS-NNN`, commits numbered `ST-NNN`, correspondence obvious from titles and declared nowhere. It was deliberately **not** applied — inference that feels obvious is the exact shape fabrication takes.
+- **Partial prior adoption is the normal case.** Late adoption rarely means no Praxis; it usually means some Praxis, unmaintained.
+
+The derived dashboard was left uncommitted in LogicKit for its owner to review.
 
 ---
 
@@ -81,10 +90,10 @@ The third criterion is satisfied by **dissolution rather than construction**, wh
 
 Wave is complete when:
 
-- [ ] All thin-slices are ✅ Complete
-- [ ] Journey tests pass for all primary scenarios — for this wave, the path has been applied end-to-end to at least one project that is not Praxis
-- [ ] User guides updated (TEACH) for capabilities whose user-observable behavior changed — via `author-user-docs`
-- [ ] Product dashboard updated to reflect completion
+- [x] All thin-slices are ✅ Complete
+- [x] Journey tests pass for all primary scenarios — for this wave, the path has been applied end-to-end to at least one project that is not Praxis (`nuewframe/logickit`)
+- [~] User guides updated (TEACH) for capabilities whose user-observable behavior changed — via `author-user-docs`. **Not met, and not waived.** Praxis ships no `docs/guides/` tree, so `author-user-docs` has no target in this repo; the skill and the CHANGELOG carry the change. Same limitation recorded by wave-self-conformance.
+- [x] Product dashboard updated to reflect completion
 
 ---
 

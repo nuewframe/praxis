@@ -110,6 +110,7 @@ Load the `SKILL.md` of any skill you intend to follow.
 | | `provision-project-overlay` | Existing repo just installed Praxis; needs a project overlay (interview-driven, idempotent) |
 | | `refactor-layered-to-capability` | Legacy `controllers/` + `services/` → vertical slices, one shippable slice at a time |
 | **PLAN** | `create-wave` | Starting a wave; scaffolds the four-document pattern |
+| **PLAN** | `derive-waves-from-history` | Adopting on a product that already shipped; derives waves from its own record instead of inventing criteria |
 | | `create-product-design-spec` | `product-design.md` — journeys, UX states, ambiguity handling, recovery paths |
 | | `create-product-architecture-spec` | wave `product-architecture.md` — domain ownership, contracts, seams, integrations |
 | | `create-quality-spec` | `qa.md` — risk tiers, test layer mapping, security coverage, observable DoD |

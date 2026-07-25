@@ -35,6 +35,7 @@ Give your agent Praxis: [Claude Code](#claude-code) · [Codex CLI](#codex-cli) �
 | Skill                                      | Purpose                                                                                                                      |
 | ------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------- |
 | `skills/create-wave/`                      | Scaffold a new wave with the four-document pattern (README, design, architecture, qa).                                       |
+| `skills/derive-waves-from-history/`        | Derive a wave structure for a product that already shipped, from the record it already has — without inventing the acceptance criteria that were never written. The late-adoption entry point, between greenfield `bootstrap-project` and code-level `refactor-layered-to-capability`. |
 | `skills/create-product-design-spec/`       | Author `product-design.md` — user journeys, ambiguity handling, recovery paths.                                              |
 | `skills/create-product-architecture-spec/` | Author wave-scoped `product-architecture.md` — the wave's **educated theory**: domain ownership, contracts, seams, integrations, pointing into the durable capability records.         |
 | `skills/create-quality-spec/`              | Author `qa.md` — risk tiers, test layer mapping, security coverage matrix, observable definition-of-done.                    |

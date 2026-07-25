@@ -65,6 +65,7 @@ A wave is a coherent slice of product value tracked through thin-slices. Waves o
 Thin-slices are atomic user outcomes with **stable IDs** (`TS-NNN`). A correction to a completed slice keeps its original ID — it never gets a fresh one.
 
 → [`create-wave`](../skills/create-wave/SKILL.md), [`lean-delivery-guardrails`](../instructions/lean-delivery-guardrails.instructions.md)
+→ [`derive-waves-from-history`](../skills/derive-waves-from-history/SKILL.md), [`lean-delivery-guardrails`](../instructions/lean-delivery-guardrails.instructions.md)  # derive waves from delivered history (late adoption)
 
 ### 3.4 Wave = educated theory; capability record = truth
 
@@ -255,6 +256,7 @@ Each sub-skill is a focused, repeatable workflow. Load its `SKILL.md` before fol
 | [`bootstrap-project`](../skills/bootstrap-project/SKILL.md) | A greenfield repo needs `.github/` + `.claude/` + a capability-driven `src/` skeleton |
 | [`provision-project-overlay`](../skills/provision-project-overlay/SKILL.md) | An existing repo just installed Praxis and needs a project-specific overlay (interview-driven, idempotent) |
 | [`create-wave`](../skills/create-wave/SKILL.md) | Starting a wave; scaffolds the four-document pattern and registers it on the dashboard |
+| [`derive-waves-from-history`](../skills/derive-waves-from-history/SKILL.md) | Adopting Praxis on a product that already shipped; derives a wave structure from release history, ADRs, capability records and the commit log, without inventing the acceptance criteria that were never written |
 | [`create-product-design-spec`](../skills/create-product-design-spec/SKILL.md) | Authoring `product-design.md` — journeys, UX states, ambiguity handling, recovery paths |
 | [`create-product-architecture-spec`](../skills/create-product-architecture-spec/SKILL.md) | Authoring wave-scoped `product-architecture.md` — domain ownership, contracts, seams, integrations, failure behavior |
 | [`create-quality-spec`](../skills/create-quality-spec/SKILL.md) | Authoring `qa.md` — risk tiers, test-layer mapping, security coverage, observable DoD |
