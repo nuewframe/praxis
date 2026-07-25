@@ -1,12 +1,14 @@
 #!/usr/bin/env bash
 #
-# bump-version.sh — bump version numbers across all declared files,
-# with drift detection and repo-wide audit for missed files.
+# bump-version.sh — single-source the plugin version.
+#
+# package.json is the source of truth. Every file listed in .version-bump.json
+# "files" is synced from it mechanically; no other file may state the version.
 #
 # Usage:
-#   bump-version.sh <new-version>   Bump all declared files to new version
-#   bump-version.sh --check         Report current versions (detect drift)
-#   bump-version.sh --audit         Check + grep repo for old version strings
+#   bump-version.sh <new-version>   Sync all declared files to new version
+#   bump-version.sh --check         Report declared versions (detect drift)
+#   bump-version.sh --audit         Fail on any undeclared version literal
 #
 set -euo pipefail
 
@@ -51,6 +53,11 @@ audit_excludes() {
   jq -r '.audit.exclude[]' "$CONFIG" 2>/dev/null
 }
 
+# Paths scanned for stray version literals.
+audit_scan_paths() {
+  jq -r '.audit.scan[]' "$CONFIG" 2>/dev/null
+}
+
 # --- commands ---
 
 cmd_check() {
@@ -91,76 +98,125 @@ cmd_check() {
   return $has_drift
 }
 
+# Cache of exempt line numbers for the file most recently asked about, so a file
+# with many matches costs one python invocation rather than one per match.
+EXEMPT_CACHE=""
+EXEMPT_CACHE_PATH=""
+BAD_MARKERS=""
+
+exempt_lines_for() {
+  local path="$1"
+  [[ "$path" == "$EXEMPT_CACHE_PATH" ]] && return 0
+  EXEMPT_CACHE_PATH="$path"
+  EXEMPT_CACHE=""
+  local out
+  out=$(cd "$REPO_ROOT" && python3 scripts/citation_scan.py "$path" \
+          --marker praxis:allow-version-literal \
+          --pattern '[0-9]+\.[0-9]+\.[0-9]+' 2>/dev/null || true)
+  local kind n rest
+  while read -r kind n rest; do
+    case "$kind" in
+      EXEMPT) EXEMPT_CACHE="$EXEMPT_CACHE $n" ;;
+      BADMARKER) BAD_MARKERS="${BAD_MARKERS}  $path:$n: $rest"$'\n' ;;
+    esac
+  done <<< "$out"
+}
+
 cmd_audit() {
-  # First run check
+  # First run check (declared manifests in sync?)
   cmd_check || true
   echo ""
 
-  # Determine the current version (most common across declared files)
-  local current_version
-  current_version=$(
-    while IFS=$'\t' read -r path field; do
-      local fullpath="$REPO_ROOT/$path"
-      [[ -f "$fullpath" ]] && read_json_field "$fullpath" "$field"
-    done < <(declared_files) | sort | uniq -c | sort -rn | head -1 | awk '{print $2}'
-  )
+  # Scan for ANY semver literal in the declared scan paths. This deliberately
+  # does NOT search for the *current* version: a stale claim (e.g. a doc still
+  # saying 0.3.0 after the repo moved to 0.4.0) is exactly the drift that
+  # searching for the current string can never find.
+  #
+  # package.json is the single source of truth. No file outside .version-bump.json's
+  # "files" list may state the plugin's version. Legitimate semver literals
+  # (instructional examples, host-repo template content) must be declared in
+  # audit.allow with a reason — a reviewed exception, never silence.
 
-  if [[ -z "$current_version" ]]; then
-    echo "error: could not determine current version" >&2
+  local -a scan_paths=() declared_paths=()
+  while IFS= read -r p; do [[ -n "$p" ]] && scan_paths+=("$p"); done < <(audit_scan_paths)
+  while IFS=$'\t' read -r path _field; do declared_paths+=("$path"); done < <(declared_files)
+
+  if [[ ${#scan_paths[@]} -eq 0 ]]; then
+    echo "audit: no scan paths configured in .version-bump.json (audit.scan)" >&2
     return 1
   fi
 
-  echo "Audit: scanning repo for version string '$current_version'..."
+  echo "Audit: scanning for undeclared version literals in: ${scan_paths[*]}"
   echo ""
 
-  # Build grep exclude args
-  local -a exclude_args=()
-  while IFS= read -r pattern; do
-    exclude_args+=("--exclude=$pattern" "--exclude-dir=$pattern")
-  done < <(audit_excludes)
+  local found=0
+  local semver='[0-9]+\.[0-9]+\.[0-9]+'
 
-  # Also always exclude binary files and .git
-  exclude_args+=("--exclude-dir=.git" "--exclude-dir=node_modules" "--binary-files=without-match")
-
-  # Get list of declared paths for comparison
-  local -a declared_paths=()
-  while IFS=$'\t' read -r path _field; do
-    declared_paths+=("$path")
-  done < <(declared_files)
-
-  # Grep for the version string
-  local found_undeclared=0
   while IFS= read -r match; do
-    local match_file
-    match_file=$(echo "$match" | cut -d: -f1)
-    # Make path relative to repo root
-    local rel_path="${match_file#$REPO_ROOT/}"
+    [[ -z "$match" ]] && continue
+    local rel_path="${match%%:*}"
+    rel_path="${rel_path#./}"
+    local rest="${match#*:}"          # "<lineno>:<content>"
+    local content="${rest#*:}"
 
-    # Check if this file is in the declared list
-    local is_declared=0
+    # Skip files whose version IS mechanically managed.
+    local skip=0
     for dp in "${declared_paths[@]}"; do
-      if [[ "$rel_path" == "$dp" ]]; then
-        is_declared=1
-        break
-      fi
+      [[ "$rel_path" == "$dp" ]] && skip=1 && break
     done
-
-    if [[ "$is_declared" -eq 0 ]]; then
-      if [[ "$found_undeclared" -eq 0 ]]; then
-        echo "UNDECLARED files containing '$current_version':"
-        found_undeclared=1
-      fi
-      echo "  $match"
+    local lineno="${rest%%:*}"
+    if [[ "$skip" -eq 0 ]]; then
+      # Declared exceptions (ADR.260725): a literal inside a fence, blockquote,
+      # or inline code span is a citation by position; a citation in running
+      # prose carries an inline marker with a mandatory reason. Both layers come
+      # from scripts/citation_scan.py — one implementation, so Layer 1 cannot
+      # diverge from check #14's fence rule.
+      exempt_lines_for "$rel_path"
+      case " $EXEMPT_CACHE " in *" $lineno "*) skip=1 ;; esac
     fi
-  done < <(grep -rn "${exclude_args[@]}" -F "$current_version" "$REPO_ROOT" 2>/dev/null || true)
+    [[ "$skip" -eq 1 ]] && continue
 
-  if [[ "$found_undeclared" -eq 0 ]]; then
-    echo "No undeclared files contain the version string. All clear."
-  else
+    if [[ "$found" -eq 0 ]]; then
+      echo "UNDECLARED version literals found:"
+      found=1
+    fi
+    echo "  $match"
+  done < <(cd "$REPO_ROOT" && grep -rnE --include='*.md' --include='*.json' --include='*.yaml' \
+             --exclude-dir=node_modules --exclude-dir=.git \
+             "$semver" "${scan_paths[@]}" 2>/dev/null || true)
+
+  # An exemption that explains nothing is itself the defect (ADR.260725).
+  if [[ -n "$BAD_MARKERS" ]]; then
     echo ""
-    echo "Review the above files — if they should be bumped, add them to .version-bump.json"
-    echo "If they should be skipped, add them to the audit.exclude list."
+    echo "UNEXPLAINED exemption markers found:"
+    printf '%s' "$BAD_MARKERS"
+    found=1
   fi
+
+  if [[ "$found" -eq 1 ]]; then
+    echo ""
+    if [[ "$AUDIT_REPORT_ONLY" -eq 1 ]]; then
+      echo "(--report-only: the rules above are NOT authoritative; exit code forced to 0)"
+      return 0
+    fi
+    echo "package.json is the single source of truth for the plugin version."
+    echo "Fix by one of:"
+    echo "  1. Remove the literal — prose rarely needs to state a version at all."
+    echo "  2. Add the file to .version-bump.json \"files\" so it is synced mechanically."
+    echo "  3. Put the literal inside a fenced block, blockquote, or inline code span"
+    echo "     if it is a citation — those are recognised structurally, no config needed."
+    echo "  4. If it must sit in running prose, declare it on the line above:"
+    echo "     <!-- praxis:allow-version-literal reason=\"why this cites rather than claims\" -->"
+    echo "     The reason is mandatory; an empty one fails."
+    return 1
+  fi
+
+  if [[ "$AUDIT_REPORT_ONLY" -eq 1 ]]; then
+    echo "(--report-only) No undeclared version literals."
+    return 0
+  fi
+  echo "No undeclared version literals. package.json remains the single source."
+  return 0
 }
 
 cmd_bump() {
@@ -195,19 +251,31 @@ cmd_bump() {
 
 # --- main ---
 
+AUDIT_REPORT_ONLY=0
+
 case "${1:-}" in
   --check)
     cmd_check
     ;;
   --audit)
+    # --audit [--report-only] [--rules old|new]
+    shift || true
+    while [[ $# -gt 0 ]]; do
+      case "$1" in
+        --report-only) AUDIT_REPORT_ONLY=1 ;;
+        *) echo "error: unknown --audit option '$1'" >&2; exit 1 ;;
+      esac
+      shift
+    done
     cmd_audit
     ;;
   --help|-h|"")
-    echo "Usage: bump-version.sh <new-version> | --check | --audit"
+    echo "Usage: bump-version.sh <new-version> | --check | --audit [--report-only]"
     echo ""
     echo "  <new-version>  Bump all declared files to the given version"
     echo "  --check        Show current versions, detect drift"
     echo "  --audit        Check + scan repo for undeclared version references"
+    echo "  --report-only  Report what would fail, always exit 0"
     exit 0
     ;;
   --*)

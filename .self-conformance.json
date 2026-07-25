@@ -1,0 +1,83 @@
+{
+  "$comment": [
+    "Praxis's own declaration of which shipped enforcement gates it runs against itself.",
+    "This is NOT host-facing tooling and NOT a path allowlist \u2014 it declares, per script,",
+    "whether Praxis executes that gate in its own CI, and why not when it does not.",
+    "Every scripts/check-*.sh on disk must appear here exactly once; a `runs: false` entry",
+    "must carry a non-empty `reason`. Both invariants are enforced by validate-plugin.sh",
+    "check #16, so a newly added probe cannot be silently omitted from the split.",
+    "`note` is optional and records that a gate's clean verdict is vacuous \u2014 it executes,",
+    "but scans no matching files \u2014 so the build is never read as a stronger claim than it is."
+  ],
+  "gates": [
+    {
+      "script": "check-anti-dumping.sh",
+      "runs": true
+    },
+    {
+      "script": "check-config-externalized.sh",
+      "runs": true,
+      "note": "Vacuous pass: Praxis ships no runtime source under the probe's scan paths, so a clean verdict proves the script executes, not that the Configurable anchor holds on real code."
+    },
+    {
+      "script": "check-contract-freshness.sh",
+      "runs": true,
+      "note": "Activates whenever an active sprint's footprint declares a dependsOnContracts entry. Praxis declares no seams today, so it reports zero dependencies rather than being absent."
+    },
+    {
+      "script": "check-design-approval-gate.sh",
+      "runs": true,
+      "note": "Runs unconditionally so its verdict is visible on every build. With no Major-tier sprint on the branch it reports the empty-input verdict; the populated path is exercised when a Major sprint is present."
+    },
+    {
+      "script": "check-escape-hatch-usage.sh",
+      "runs": true,
+      "note": "Informational by design \u2014 always exits 0 (ADR.260720.03). Runs so the escape-hatch count is visible in the build, never to gate it."
+    },
+    {
+      "script": "check-no-skipped-tests.sh",
+      "runs": false,
+      "reason": "Targets a product test suite in the 11 scanned languages; Praxis ships none. The only in-tree matches are the deliberate dirty fixtures under scripts/__fixtures__/, which test-probes.sh already asserts must exit 1 \u2014 a stronger proof of this probe than a scoped vacuous pass. Adding an exclusion flag was rejected: it would change a host-facing probe's scan semantics to solve Praxis's own fixture layout."
+    },
+    {
+      "script": "check-no-sleep-waits.sh",
+      "runs": false,
+      "reason": "Same as check-no-skipped-tests.sh: targets a product test suite Praxis does not ship, and its only in-tree matches are the deliberate dirty fixtures that test-probes.sh asserts must exit 1."
+    },
+    {
+      "script": "check-observability-at-seams.sh",
+      "runs": true,
+      "note": "Vacuous pass: no runtime source under the scan paths, and this wave declares no seams. Proves the script executes, not that the Observable anchor holds on real code."
+    },
+    {
+      "script": "check-port-adapter-parity.sh",
+      "runs": true,
+      "note": "Vacuous pass: Praxis declares no *.ports.* files, so the probe finds 0 port files. Proves execution, not parity on real code."
+    },
+    {
+      "script": "check-resilient-boundary.sh",
+      "runs": true,
+      "note": "Vacuous pass: no runtime source under the scan paths and no boundary calls. Proves the script executes, not that the Resilient anchor holds on real code."
+    },
+    {
+      "script": "check-seam-contract-parity.sh",
+      "runs": true,
+      "note": "Self-skips today because Praxis declares no .seam-contracts.json. Declared `runs: true` rather than n/a so the gate activates automatically the moment Praxis declares its first seam, instead of the exemption going stale."
+    },
+    {
+      "script": "check-sprint-disjointness.sh",
+      "runs": true,
+      "note": "Activates whenever two or more active sprints declare a Sprint Footprint. Reports a skip verdict when fewer than two do \u2014 the footprint artifact is deliberately not mandatory before concurrent dispatch happens."
+    },
+    {
+      "script": "check-sprint-id-collision.sh",
+      "runs": true,
+      "note": "Activates whenever conforming sprint files exist under docs/product/sprints/. Reports a skip verdict when none are active."
+    },
+    {
+      "script": "check-stateless-request-path.sh",
+      "runs": true,
+      "note": "Vacuous pass: no request path and no runtime source under the scan paths. Proves the script executes, not that the Horizontally-scalable anchor holds on real code."
+    }
+  ]
+}

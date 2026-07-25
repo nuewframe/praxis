@@ -2,7 +2,7 @@
 # check-stateless-request-path.sh
 #
 # Executable probe for the "Horizontally scalable" production-readiness anchor
-# (plan: executable-seams-first.md, Bundle B3). Converts the anchor from an
+# (ADR.260725 lineage; Bundle B3). Converts the anchor from an
 # asserted checklist line into a build-time gate: it fails (or warns) when the
 # request path introduces node-local mutable state — a module-level mutable
 # singleton used as a cache/session/registry, or a static mutable collection.

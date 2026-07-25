@@ -1,6 +1,6 @@
 {
   "name": "praxis",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "Lean wave-based product delivery unified with Principal Engineer discipline. Bootstraps coding agents with personas, always-on guardrails, and a skill index across Claude Code, Codex, Cursor, Gemini CLI, OpenCode, and GitHub Copilot.",
   "type": "module",
   "main": ".opencode/plugins/praxis.js",
@@ -36,11 +36,10 @@
     ".cursor-plugin",
     ".opencode",
     "gemini-extension.json",
+    "docs",
     "AGENTS.md",
-    "CLAUDE.md",
     "GEMINI.md",
     "README.md",
-    "project-context.md",
     "CHANGELOG.md",
     "LICENSE"
   ]

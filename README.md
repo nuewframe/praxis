@@ -35,6 +35,7 @@ Give your agent Praxis: [Claude Code](#claude-code) · [Codex CLI](#codex-cli) �
 | Skill                                      | Purpose                                                                                                                      |
 | ------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------- |
 | `skills/create-wave/`                      | Scaffold a new wave with the four-document pattern (README, design, architecture, qa).                                       |
+| `skills/derive-waves-from-history/`        | Derive a wave structure for a product that already shipped, from the record it already has — without inventing the acceptance criteria that were never written. The late-adoption entry point, between greenfield `bootstrap-project` and code-level `refactor-layered-to-capability`. |
 | `skills/create-product-design-spec/`       | Author `product-design.md` — user journeys, ambiguity handling, recovery paths.                                              |
 | `skills/create-product-architecture-spec/` | Author wave-scoped `product-architecture.md` — the wave's **educated theory**: domain ownership, contracts, seams, integrations, pointing into the durable capability records.         |
 | `skills/create-quality-spec/`              | Author `qa.md` — risk tiers, test layer mapping, security coverage matrix, observable definition-of-done.                    |
@@ -82,6 +83,11 @@ These scripts check **shape and presence** — a file exists, a pattern matches,
 | `scripts/check-escape-hatch-usage.sh` | Scans a diff for Praxis's `praxis:allow-*` escape-hatch markers and reports each by file:line. Informational only — never fails the build; the point is that using an opt-out is never silent to a reviewer. |
 | `scripts/validate-plugin.sh`           | Plugin self-test: SKILL.md frontmatter validity (incl. single-line `tools:`), JSON/YAML parse, cross-reference integrity, manifest version parity, enforcement-script syntax, inventory parity, agent-frontmatter validity, and fenced-code balance. |
 | `scripts/test-probes.sh`               | Self-test for the guardrail probes' language coverage: runs `check-no-skipped-tests.sh` and `check-no-sleep-waits.sh` against multi-language fixtures and asserts the expected verdicts. |
+| `scripts/test-citation-scan.sh`        | Self-test for `scripts/citation_scan.py`, the shared citation-vs-assertion implementation both literal scanners consume: asserts that a literal inside a fence, blockquote, or code span is a citation, that a long fence is not closed early by a shorter inner one, and that an inline marker without a reason fails. |
+| `scripts/check-sprint-disjointness.sh` | Compares the `Sprint Footprint` block of every active sprint pairwise. Blocking axes: capabilities/file globs, persistent resources, config keys, and depending on a sibling's in-flight capability instead of a frozen `<name>@vN`. Advisory axes: shared close artifacts and divergent base revisions. Warn-first via `.sprint-coordination.json`. |
+| `scripts/check-contract-freshness.sh`  | Fails when a sprint depends on a seam contract that moved or vanished since its bridge froze, and flags a `baseRevision` that is not an ancestor of HEAD. Warn-first via `.sprint-coordination.json`. |
+| `scripts/test-sprint-coordination.sh`  | Self-test for both concurrency probes, using fixtures taken from the first real concurrent dispatch rather than invented ones. |
+| `scripts/gen-doctrine-index.sh`        | Generates each guardrail's `applyTo` scope table in `using-praxis` from the instruction files' own frontmatter. `--check` in CI fails on a hand-edit, so the one verbatim-duplicated doctrine fact cannot drift. |
 | `scripts/gen-coverage-matrix.sh`       | Generates / checks `docs/coverage-matrix.md` from each probe's `--include` list, so the language-coverage claim cannot drift from reality. |
 | `scripts/gen-tier-table.sh`            | Generates (or checks) the tier-classification table from `scripts/data/tier-classification.json` into three surfaces (`intake-code-contribution`, `start-thin-slice`, `principal-engineer.agent.md`) so they cannot silently drift apart. `--check` runs in CI. |
 
@@ -121,7 +127,8 @@ If [Claude MPM](https://github.com/anthropics/claude-mpm) is installed in the sa
 ## Precedence
 
 ```
-repo .github/copilot-instructions.md, .claude/CLAUDE.md   (highest — project owns final word)
+package <pkg>/.praxis/context.md, <pkg>/.github/          (highest — monorepo only)
+repo .github/copilot-instructions.md, .claude/CLAUDE.md   (project owns final word)
 repo .github/instructions/*.instructions.md (scoped)
 repo .github/agents/, .github/skills/
 ─────────────────────────────────────────────────────────
@@ -251,7 +258,7 @@ The agent should name the three personas, the always-on guardrails, and at least
 
 ## Documentation
 
-- [project-context.md](project-context.md) — plugin governance, scope rules, evolution policy.
+- [docs/project-context.md](docs/project-context.md) — the method, its doctrine, scope rules, and evolution policy.
 - [CHANGELOG.md](CHANGELOG.md) — version history.
 
 ## License

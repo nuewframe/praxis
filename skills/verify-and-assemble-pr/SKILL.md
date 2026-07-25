@@ -3,6 +3,8 @@ name: verify-and-assemble-pr
 mode: reviewer
 tools: [read_file, file_search, grep_search, semantic_search, run_in_terminal]
 description: Phase 6 of the principal-engineer workflow (reviewer mode). Use after implementation to verify behavior with the project's `verify` entry point, evaluate the refactor decision matrix, and assemble a structured PR narrative including rollback plan. Reviewer mode is read-only on source code — it files structured change requests; the implementer applies them. Approval requires the captured `verify` output, never a bare checkbox.
+user-invocable: true
+disable-model-invocation: false
 ---
 
 # Verify and Assemble PR
@@ -207,7 +209,7 @@ Steps 4–5 check structure and seam behavior. This step attacks a different fai
 
 Produce a Pull Request description with these sections:
 
-**Trust receipt — assemble from script output, not memory.** Before writing the narrative, run `scripts/check-escape-hatch-usage.sh` and paste its output directly; do not recall escape-hatch usage from memory. The Trust Receipt section below combines three sourced facts into one block a human can read in a single pass without re-deriving them: (1) which gates this slice engaged, named by kind — script-enforced / human-signed / agent-attested — per `using-praxis`'s Enforcement model; (2) every escape-hatch marker (`praxis:allow-*`) this diff introduces, with file:line, from the script's output, or "none"; (3) Step 6's Fidelity Review verdicts. This block is the deliverable of Praxis's stated problem — trust transfer — letting a human trust the slice's work without re-deriving it. It does not make a gate harder to bypass; it makes bypassing it impossible to miss.
+**Trust receipt — assemble from script output, not memory.** Before writing the narrative, run `scripts/check-escape-hatch-usage.sh` and paste its output directly; do not recall escape-hatch usage from memory. The marker count in that block is the accumulation signal Layer 3 of ADR.260725 depends on; report it even when the answer is zero, because "none this PR" against a known repo-wide total is information and a blank line is not. The Trust Receipt section below combines three sourced facts into one block a human can read in a single pass without re-deriving them: (1) which gates this slice engaged, named by kind — script-enforced / human-signed / agent-attested — per `using-praxis`'s Enforcement model; (2) every escape-hatch marker (`praxis:allow-*`) this diff introduces, with file:line, from the script's output, or "none"; (3) Step 6's Fidelity Review verdicts. This block is the deliverable of Praxis's stated problem — trust transfer — letting a human trust the slice's work without re-deriving it. It does not make a gate harder to bypass; it makes bypassing it impossible to miss.
 
 ````markdown
 ## Summary
@@ -280,6 +282,7 @@ One paragraph. What changed and why.
 
 - Gates engaged this slice (kind — script-enforced / human-signed / agent-attested): [list, sourced from `using-praxis`'s Enforcement model]
 - Escape hatches used (`praxis:allow-*`): [file:line list from `scripts/check-escape-hatch-usage.sh`'s output, or "none"]
+- Declared-exception marker count: [total `praxis:allow-*` markers this diff introduces, and the running repo-wide total]. A count that only ever rises is the signal ADR.260725 exists to surface — an exemption set that grows in silence is debt, one that reports its size every PR is a decision the reviewer keeps making. For `praxis:allow-version-literal` and `praxis:allow-term`, quote each marker's `reason=` so Step 6's fidelity rubric can judge whether it carries substance or restates the rule.
 - Fidelity Review verdicts (Step 6, summarized): [artifact → verdict, or "none applicable at this tier"]
 
 ## Telemetry

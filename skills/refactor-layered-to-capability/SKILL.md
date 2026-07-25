@@ -1,6 +1,8 @@
 ---
 name: refactor-layered-to-capability
 description: Migrate a legacy codebase organized by technical layer (controllers/, services/, models/, utils/) into capability-driven vertical slices, incrementally and safely with no big-bang rewrite.
+user-invocable: true
+disable-model-invocation: false
 ---
 
 # Refactor Layered to Capability

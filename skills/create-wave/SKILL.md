@@ -30,29 +30,27 @@ This skill creates the wave scaffold. After the scaffold exists:
 This skill assumes the host project defines:
 
 - A **wave directory** (commonly `docs/product/waves/`)
-- A **product dashboard** (commonly `docs/product/PRODUCT.md`)
-- A **wave naming convention** (e.g. `wave-feature-*`, `wave-platform-*`, `wave-ext-*`)
+- A **product dashboard** (commonly `docs/product/README.md`)
+- Optionally, a **wave naming convention** beyond `wave-<name>` — this skill imposes none
 
-Read the project's `project-context.md` and existing wave directory before invoking this skill. If those conventions don't exist yet, define them in the project's own context first.
+Read the project's `docs/project-context.md` and existing wave directory before invoking this skill. If those conventions don't exist yet, define them in the project's own context first.
 
 ---
 
-## Step 1 — Name and Categorize the Wave
+## Step 1 — Name the Wave
 
-| Category          | Pattern                | Use When                        |
-| ----------------- | ---------------------- | ------------------------------- |
-| `wave-feature-*`  | User-facing capability | New user-visible feature set    |
-| `wave-platform-*` | Infrastructure         | Foundation required by features |
-| `wave-ext-*`      | Extension              | Optional add-on capability      |
+Name the wave `wave-<name>`, after the product outcome it delivers. A reader should be able to tell from the name alone what the product does differently once the wave lands.
 
-Examples: `wave-feature-home-shell`, `wave-platform-identity-access`, `wave-ext-business-booking`.
+Examples: `wave-home-shell`, `wave-identity-access`, `wave-business-booking`.
+
+**This skill imposes no category taxonomy.** A wave is the unit of intent; sorting it into a product-org bucket does not change what gets built or how faithfully it ships. If a project wants a grouping convention — by feature/platform/extension, by team, by release train — that is a host-project decision: record it in `docs/project-context.md` and follow it there. Waves named without one are valid, and existing waves that already carry a category prefix remain valid unchanged.
 
 ---
 
 ## Step 2 — Create Wave Folder + Four Documents
 
 ```
-<wave-root>/wave-<category>-<name>/
+<wave-root>/wave-<name>/
   README.md
   product-design.md
   product-architecture.md
@@ -68,7 +66,7 @@ All four documents open with the planning-stage banner directly under their titl
 ### `README.md` — Intent + Thin-Slice Tracking
 
 ```markdown
-# WAVE-[CATEGORY]: [Wave Name]
+# WAVE: [Wave Name]
 
 > **Planning-stage document — an educated theory, not yet the truth.** The best approach given what we know today; current-state architecture lives in [docs/architecture/](../../../architecture/), promoted there by `close-sprint`.
 
@@ -163,7 +161,7 @@ If the wave introduces system-wide concerns (new subsystem, integration, runtime
 
 ## Step 3 — Register in the Product Dashboard
 
-Add or update the wave row in the project's product dashboard (e.g. `docs/product/PRODUCT.md`):
+Add or update the wave row in the project's product dashboard (e.g. `docs/product/README.md`):
 
 - Wave row in the roadmap table
 - Wave summary section if the dashboard tracks that wave family

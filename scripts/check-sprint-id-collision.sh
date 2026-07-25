@@ -2,7 +2,7 @@
 # check-sprint-id-collision.sh
 #
 # The coordination-artifact gate for emergent parallelism (plan:
-# executable-seams-first.md, Bundle D / D2). When sprints may be created
+# the executable-seams wave, Bundle D / D2). When sprints may be created
 # concurrently — siblings worked in parallel sessions or dispatched by an
 # orchestration runtime — a bare "highest NNN + 1" increment collides: two
 # slices both grab the same next id and race the coordination layer before
@@ -94,7 +94,8 @@ fi
 # (a ledger shares its sprint's id by design and is not a collision).
 
 set +e
-FILES=$(find "$ROOT/$SPRINT_DIR" -type f \( -name 'SPRINT.*.md' -o -name 'sprint-*.md' \) ! -name '*.ledger.md' 2>/dev/null)
+FILES=$(find "$ROOT/$SPRINT_DIR" -type f \( -name 'SPRINT.*.md' -o -name 'sprint-*.md' \) ! -name '*.ledger.md' \
+  ! -path '*/__fixtures__/*' ! -path '*/.claude/*' ! -path '*/node_modules/*' 2>/dev/null)
 FIND_RC=$?
 set -e 2>/dev/null || true
 

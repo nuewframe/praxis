@@ -104,5 +104,5 @@ Resilience posture committed by this decision: none — this is an authoring-tim
 - **Capability record (living architecture this decision shapes):** `docs/architecture/skills/README.md`
 - **System overview:** `docs/architecture/README.md`
 - **Supersedes / Superseded by:** none
-- **Course-correction plan that triggered this decision:** `docs/plans/praxis-course-correction-2026-07.md`
+- **Course-correction plan that triggered this decision:** `docs/plans/praxis-course-correction-2026-07.md` <!-- praxis:allow-path reason="immutable decision record citing the plan that motivated it; that plan was removed with the pre-adoption archive" -->
 - **Related ADR:** `ADR.260720.02` (generated tier table) — same `skills` capability, same course-correction pass

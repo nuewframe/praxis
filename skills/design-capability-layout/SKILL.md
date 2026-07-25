@@ -3,6 +3,8 @@ name: design-capability-layout
 mode: architect
 tools: [read_file, file_search, grep_search, semantic_search, create_file, replace_string_in_file]
 description: Phase 4 of the principal-engineer workflow (architect mode). Use after system architecture is approved to design the per-capability folder structure, map functional core vs. imperative shell, declare Ports, and produce the ADR. Stops for human review before implementation. Architect mode forbids edits to source code.
+user-invocable: true
+disable-model-invocation: false
 ---
 
 # Design Capability Layout

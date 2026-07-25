@@ -2,7 +2,7 @@
 # check-observability-at-seams.sh
 #
 # Executable probe for the "Observable" production-readiness anchor
-# (plan: executable-seams-first.md, Bundle B3). Converts the anchor from an
+# (ADR.260725 lineage; Bundle B3). Converts the anchor from an
 # asserted checklist line into a build-time gate: it fails (or warns) when a
 # source file makes a cross-process / boundary call (an outbound HTTP, RPC,
 # queue, or DB-client call) but carries NO observability signal anywhere — no

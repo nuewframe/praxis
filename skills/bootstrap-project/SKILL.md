@@ -1,6 +1,8 @@
 ---
 name: bootstrap-project
 description: Scaffold a new project from empty (greenfield) with capability-driven architecture, anti-dumping enforcement, ADR discipline, and the principal-engineer phased workflow wired in. Generates .github/, .claude/, docs/, and a capability-driven src/ skeleton.
+user-invocable: true
+disable-model-invocation: false
 ---
 
 # Bootstrap Project
@@ -60,6 +62,7 @@ Create this layout (paths adapted to the language):
 │   │   ├── <capability-1>/                # capability guide: concepts + how-tos
 │   │   └── tutorials/                     # cross-capability journey tutorials
 │   ├── product/
+│   │   ├── README.md                     # product dashboard — intent + wave table (rows owned by create-wave)
 │   │   ├── waves/
 │   │   │   └── wave-000-bootstrap/
 │   │   │       ├── README.md
@@ -303,6 +306,29 @@ And one sprint placeholder:
 
 These stubs make the workflow legible to a new contributor without forcing them to learn the persona-mode model first.
 
+### Step 9c — Scaffold the product dashboard
+
+Create `docs/product/README.md`. Every product skill assumes this file already exists — `create-wave` registers each new wave in it, `close-sprint` updates the wave's status there, and the product-manager persona reads it before every session — so bootstrap creates the anchor rather than leaving the first wave to invent it:
+
+```markdown
+# <project-name> — Product
+
+Product overview and dashboard for <project-name>: the live view of what is being built, for whom, and where each wave stands.
+
+**Product intent lives here. Engineering truth lives in [`../architecture/README.md`](../architecture/README.md).** Wave documents are *educated theory*; the architecture tree is validated truth, promoted there by `close-sprint`.
+
+---
+
+## Wave dashboard
+
+| Wave | Intent | Status | Slices |
+| ---- | ------ | ------ | ------ |
+```
+
+The authority line is not decoration. It is the same planning-vs-durable split Step 7 writes into `docs/architecture/README.md`, stated from the product side; a dashboard without it invites the wave documents to be read as current-state truth.
+
+**Ship the table empty — `create-wave` owns every row.** This step creates the file, the authority line, and the header row, and stops there. Row content, including the row for `wave-000-bootstrap`, is added by `create-wave` when the PM persona fills that wave in (Step 9b), and revised by `close-sprint` as slices land. Two skills writing rows into one table is how a dashboard drifts from the waves it summarizes, so do not seed a placeholder row here.
+
 ### Step 10 — Generate `BOOTSTRAP.md`
 
 ```markdown
@@ -316,6 +342,7 @@ This project was scaffolded by the `praxis` plugin's `bootstrap-project` skill o
 - `.claude/CLAUDE.md`
 - `docs/project-context.md`
 - `docs/architecture/README.md` and `docs/architecture/adr/ADR.<ID>-technology-stack.md`
+- `docs/product/README.md` (product dashboard — empty wave table; `create-wave` fills the rows)
 - `docs/guides/` (user-facing docs home — TEACH; populated once capabilities ship)
 - `src/<capability>/` skeletons for: <list>
 - `scripts/verify.sh` plus every `scripts/check-*.sh` from the plugin

@@ -33,14 +33,17 @@ jobs:
           fi
           jq --version
 
-      - name: validate-plugin (frontmatter, refs, fences, agents, inventory)
+      - name: validate-plugin (16 structural checks)
         run: bash scripts/validate-plugin.sh
 
-      - name: anti-dumping (plugin scans itself)
-        run: bash scripts/check-anti-dumping.sh
+      - name: shipped gates run against Praxis
+        run: bash .github/run-self-conformance.sh
 
       - name: probe language-coverage self-test
         run: bash scripts/test-probes.sh
+
+      - name: sprint-coordination probe self-test
+        run: bash scripts/test-sprint-coordination.sh
 
       - name: coverage matrix is current
         run: bash scripts/gen-coverage-matrix.sh --check
@@ -48,10 +51,13 @@ jobs:
       - name: tier table is current
         run: bash scripts/gen-tier-table.sh --check
 
+      - name: doctrine index is current
+        run: bash scripts/gen-doctrine-index.sh --check
+
       - name: enforcement scripts parse under this bash
         run: |
           rc=0
-          for s in scripts/check-*.sh scripts/*.sh; do
+          for s in scripts/check-*.sh scripts/*.sh .github/*.sh; do
             bash -n "$s" || { echo "syntax error: $s"; rc=1; }
           done
           exit $rc

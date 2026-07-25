@@ -36,7 +36,7 @@ A strong `product-design.md` answers:
 
 Read before drafting:
 
-- The project's `project-context.md` (or equivalent)
+- The project's `docs/project-context.md` (or the path its `praxis.config.yaml` declares)
 - The product dashboard
 - The wave `README.md`
 - The existing `product-design.md` if updating

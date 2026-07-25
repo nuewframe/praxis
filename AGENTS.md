@@ -7,7 +7,7 @@ If your harness auto-loads `AGENTS.md` (Codex, Aider, Sourcegraph Amp, and other
 ## Bootstrap
 
 - **Skill index, personas, always-on guardrails, and skill triggers:** [`skills/using-praxis/SKILL.md`](./skills/using-praxis/SKILL.md)
-- **Plugin governance and scope rules:** [`project-context.md`](./project-context.md)
+- **The method, its doctrine, and governance:** [`docs/project-context.md`](./docs/project-context.md)
 
 ## Personas
 

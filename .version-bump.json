@@ -1,11 +1,29 @@
 {
   "files": [
-    { "path": "package.json", "field": "version" },
-    { "path": ".claude-plugin/plugin.json", "field": "version" },
-    { "path": ".cursor-plugin/plugin.json", "field": "version" },
-    { "path": ".codex-plugin/plugin.json", "field": "version" },
-    { "path": ".claude-plugin/marketplace.json", "field": "plugins.0.version" },
-    { "path": "gemini-extension.json", "field": "version" }
+    {
+      "path": "package.json",
+      "field": "version"
+    },
+    {
+      "path": ".claude-plugin/plugin.json",
+      "field": "version"
+    },
+    {
+      "path": ".cursor-plugin/plugin.json",
+      "field": "version"
+    },
+    {
+      "path": ".codex-plugin/plugin.json",
+      "field": "version"
+    },
+    {
+      "path": ".claude-plugin/marketplace.json",
+      "field": "plugins.0.version"
+    },
+    {
+      "path": "gemini-extension.json",
+      "field": "version"
+    }
   ],
   "audit": {
     "exclude": [
@@ -15,6 +33,16 @@
       ".git",
       ".version-bump.json",
       "scripts/bump-version.sh"
+    ],
+    "scan": [
+      "README.md",
+      "AGENTS.md",
+      "GEMINI.md",
+      "docs",
+      "skills",
+      "agents",
+      "instructions"
     ]
-  }
+  },
+  "_comment": "Version single-source registry. package.json is the source of truth; every file in 'files' is synced mechanically by scripts/bump-version.sh. No other file may state the plugin's version. audit.scan paths are scanned for semver literals; a literal inside a fenced block, blockquote, or inline code span is a citation and is not reported, and one in running prose must carry an inline <!-- praxis:allow-version-literal reason=\"...\" --> marker on the preceding line. Path allowlists were retired by ADR.260725 \u2014 they exempted whole directories and so inverted default-deny."
 }

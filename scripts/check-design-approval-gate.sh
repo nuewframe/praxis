@@ -68,7 +68,11 @@ fi
 # SPRINT.<id>-<slug>.md, excluding *.ledger.md progress ledgers.
 
 set +e
-SPRINT_FILES=$(find "$ROOT" -type f -name 'SPRINT.*.md' ! -name '*.ledger.md' 2>/dev/null)
+# -path exclusions: __fixtures__ holds sprint-SHAPED test data for the probe
+# self-tests, and .claude holds git worktrees created for concurrent dispatch —
+# a full second copy of the tree. Neither contains real sprints.
+SPRINT_FILES=$(find "$ROOT" -type f -name 'SPRINT.*.md' ! -name '*.ledger.md' \
+  ! -path '*/__fixtures__/*' ! -path '*/.claude/*' ! -path '*/node_modules/*' 2>/dev/null)
 FIND_RC=$?
 set -e 2>/dev/null || true
 

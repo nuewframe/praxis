@@ -1,6 +1,8 @@
 ---
 name: provision-project-overlay
-description: Generate a project-specific `.github/` overlay (skills, agents, prompts, persona instructions) on top of an existing repo that has just installed the praxis plugin. Interview the human for stack, paths, persona aliases, and quality gates; write `praxis.config.yaml`; emit a managed set of overlay files from the plugin templates with placeholders substituted; optionally bootstrap `docs/project-context.md`, `docs/product/PRODUCT.md`, and a first ADR file that follows `create-adr` ID rules. Idempotent — re-running with `--reconfigure` re-runs the interview; re-running without it regenerates managed files from the current config and shows diffs for human-edited files before overwriting.
+description: Generate a project-specific `.github/` overlay (skills, agents, prompts, persona instructions) on top of an existing repo that has just installed the praxis plugin. Interview the human for stack, paths, persona aliases, and quality gates; write `praxis.config.yaml`; emit a managed set of overlay files from the plugin templates with placeholders substituted; optionally bootstrap `docs/project-context.md`, `docs/product/README.md`, and a first ADR file that follows `create-adr` ID rules. Idempotent — re-running with `--reconfigure` re-runs the interview; re-running without it regenerates managed files from the current config and shows diffs for human-edited files before overwriting.
+user-invocable: true
+disable-model-invocation: false
 ---
 
 # Provision Project Overlay
@@ -71,7 +73,8 @@ If the human is unsure on any of these, push back. They shape the overlay; do no
 | `paths.sprints`           | `docs/product/sprints`    |
 | `paths.engineering`       | `docs/engineering`        |
 | `paths.project_context`   | `docs/project-context.md` |
-| `paths.product_dashboard` | `docs/product/PRODUCT.md` |
+| `paths.product_dashboard` | `docs/product/README.md` |
+| `paths.product_root`      | *(omitted)* — set only when this repository is one **part** of a product that spans several repositories; names where the whole product's intent lives (a relative path or a URL). Omitted means this repository *is* the product. |
 
 **Group D — Quality gates** (show defaults derived from runtime; accept or override)
 
@@ -96,7 +99,8 @@ If yes, ask one alias per role. If no, set `personas.use_aliases: false` and ski
 **Group F — Bootstrap docs** (yes/no per artifact)
 
 1. Generate `docs/project-context.md` skeleton? (default: yes if file does not exist)
-2. Generate `docs/product/PRODUCT.md` skeleton? (default: yes if file does not exist)
+2. Generate `docs/product/README.md` skeleton? (default: yes if file does not exist)
+3. Is this repository the whole product, or one part of a product spanning several repositories? (default: the whole product — leaves `paths.product_root` unset). If it is a part, capture where the whole lives; the generated dashboard then opens by declaring its scope instead of presenting a fragment as the entire picture.
 3. Generate `docs/architecture/adr/ADR.<ID>-technology-stack.md` from the stack answers? (default: yes if file does not exist)
 4. If yes, what is the first ADR `<ID>`? (must follow `create-adr` convention)
 5. Generate `.claude/system-prompt.md` for Claude API / agentic use (Bedrock, Cursor, custom CLIs)? (default: no — only needed if the team uses Claude outside Claude Code)

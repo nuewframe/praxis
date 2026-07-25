@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
 # check-config-externalized.sh
 #
-# The first executable seam-conformance probe (plan: executable-seams-first.md,
-# decision D1). Converts the "Configurable" production-readiness anchor from an
+# The first executable seam-conformance probe (ADR.260725 lineage; # decision D1). Converts the "Configurable" production-readiness anchor from an
 # asserted checklist line into a build-time gate: it fails (or warns) when a
 # source file hardcodes a value that belongs in configuration — a remote URL,
 # a host:port endpoint, or a credential/secret literal — instead of reading it

@@ -159,7 +159,7 @@ For any descoped thin-slice, leave as `⚪ Not Started`.
 
 ## Step 8 — Update the Product Dashboard
 
-In the project's product dashboard (e.g. `PRODUCT.md`):
+In the project's product dashboard (e.g. `docs/product/README.md`):
 
 - Update the wave's progress to reflect completed thin-slices
 - Update wave status if fully complete

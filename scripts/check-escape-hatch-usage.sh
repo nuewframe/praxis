@@ -13,13 +13,17 @@
 # marker strings in diff text. There is no judgment call in the matching
 # itself; the judgment call belongs to the human reviewer who sees the hit.
 #
-# The four markers (repo-wide grep confirmed; do not add a fifth without
-# updating this list and the header comments of the check-*.sh probes that
-# define them):
-#   praxis:allow-config-literal
-#   praxis:allow-local-state
-#   praxis:allow-unguarded-boundary
-#   praxis:allow-unobserved-boundary
+# The marker vocabulary is defined ONCE, in the MARKERS array below. It used to
+# be restated here as a header list, and nothing kept the two in agreement — a
+# fact stated twice drifts. Read the array; it is the only authority.
+#
+# Four markers come from the anchor probes (config literal, local state,
+# unguarded boundary, unobserved boundary). Two more come from ADR.260725's
+# declared exceptions for the literal scanners: a version literal or a retired
+# doctrine term that a document *cites* rather than *asserts*. Those two differ
+# from the other four in one way worth knowing — they carry a MANDATORY
+# reason="..." and the scanner FAILS on a marker without one, because an
+# unexplained exemption is the defect that ADR removes.
 #
 # Usage:
 #   scripts/check-escape-hatch-usage.sh [--base <ref>]
@@ -41,11 +45,16 @@
 
 set -euo pipefail
 
+# The single authority for the marker vocabulary. Adding one here is all that is
+# required; the header comment deliberately does not restate the list.
 MARKERS=(
   "praxis:allow-config-literal"
   "praxis:allow-local-state"
   "praxis:allow-unguarded-boundary"
   "praxis:allow-unobserved-boundary"
+  "praxis:allow-version-literal"
+  "praxis:allow-term"
+  "praxis:allow-path"
 )
 
 # ---- Argument parsing --------------------------------------------------------
