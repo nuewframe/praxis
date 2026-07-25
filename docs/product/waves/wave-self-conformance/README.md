@@ -126,16 +126,20 @@ Praxis's product is **trust transfer** — an adopter believes a green check bec
 
 ### TS-006: The product dashboard has one name
 
-> **Status:** ⚪ Not Started
+> **Status:** ✅ Complete
 
 **User Value:** As an adopter following Praxis's own tree as a template, I need the dashboard filename Praxis uses to be the filename Praxis tells me to use so that I do not have to guess which of two conventions is current.
 
 **Acceptance Criteria:**
 
-- [ ] Given any skill, agent, or instruction that names the product dashboard, when it is read, then it names one path, matching the one in Praxis's own tree
-- [ ] Given the rename, when it ships, then the `CHANGELOG.md` entry states whether adopters must migrate and how
+- [x] Given any skill, agent, or instruction that names the product dashboard, when it is read, then it names one path, matching the one in Praxis's own tree
+- [x] Given the rename, when it ships, then the `CHANGELOG.md` entry states whether adopters must migrate and how
 
 **Dependencies:** TS-002
+
+**Tracking note:** The name is `docs/product/README.md`, matching the `<tree>/README.md` convention the architecture tree already uses. The path stays advisory rather than mandated — converging the example was the change; promoting it to a requirement would have been a different and breaking one. Adopters need not migrate: the evolution policy's breakage test finds no tree that validated before and fails after, because nothing parses the path and every reference hedged it.
+
+**Open residue, deliberately not folded into this slice:** every surface now *names* the dashboard consistently, but no surface *creates* it — `bootstrap-project` scaffolds `docs/product/waves/` and `docs/product/sprints/` and stops there, while the dashboard itself asserts Praxis "instructs host repos to keep" it. Naming consistency was this slice's outcome; the missing creation step is a separate defect against `bootstrap-project`.
 
 ---
 

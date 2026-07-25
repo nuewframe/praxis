@@ -30,7 +30,7 @@ This skill creates the wave scaffold. After the scaffold exists:
 This skill assumes the host project defines:
 
 - A **wave directory** (commonly `docs/product/waves/`)
-- A **product dashboard** (commonly `docs/product/PRODUCT.md`)
+- A **product dashboard** (commonly `docs/product/README.md`)
 - Optionally, a **wave naming convention** beyond `wave-<name>` — this skill imposes none
 
 Read the project's `docs/project-context.md` and existing wave directory before invoking this skill. If those conventions don't exist yet, define them in the project's own context first.
@@ -161,7 +161,7 @@ If the wave introduces system-wide concerns (new subsystem, integration, runtime
 
 ## Step 3 — Register in the Product Dashboard
 
-Add or update the wave row in the project's product dashboard (e.g. `docs/product/PRODUCT.md`):
+Add or update the wave row in the project's product dashboard (e.g. `docs/product/README.md`):
 
 - Wave row in the roadmap table
 - Wave summary section if the dashboard tracks that wave family
