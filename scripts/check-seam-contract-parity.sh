@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
 # check-seam-contract-parity.sh
 #
-# The keystone seam-conformance probe (plan: executable-seams-first.md,
-# Bundle A / decision D2). Generalizes the existing Port/Adapter parity gate
+# The keystone seam-conformance probe (ADR.260725 lineage; # Bundle A / decision D2). Generalizes the existing Port/Adapter parity gate
 # from Ports to *every declared seam*: a Seam Contract must have a machine-
 # readable **Shape** and a shared **Behavior** suite. This script proves the
 # structural half — for each seam declared in the manifest, the Shape file and

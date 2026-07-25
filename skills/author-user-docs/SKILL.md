@@ -127,7 +127,7 @@ Re-read the capability record and confirm every claim in the guide matches curre
 
 - Link the guide from the capability record (`docs/architecture/<capability>/README.md`) so the source points at its rendering.
 - Link capability guides from any tutorial that traverses them.
-- Register the guide in `docs/guides/README.md` (the guides index) if the project keeps one.
+- Register the guide in `docs/guides/README.md` (the guides index) if the project keeps one. <!-- praxis:allow-path reason="host-repo path the adopter creates, not a file this plugin ships; the sentence itself says 'if the project keeps one'" -->
 
 ---
 

@@ -7,8 +7,10 @@
 #      form silently breaks Claude Code skill registration).
 #   2. Every JSON file in the repo parses cleanly.
 #   3. Every YAML file in the repo parses cleanly.
-#   4. Every cross-reference (`<plugin-root>/...`, `skills/<name>/...`,
-#      `agents/<name>...`, `instructions/<name>...`) resolves to a real file.
+#   4. Every repository FILE path named in markdown prose — backticked or bare,
+#      under docs/, skills/, agents/, instructions/, or scripts/ — resolves.
+#      Fence/blockquote/praxis:allow-path aware; markdown links excluded (#14
+#      owns those and resolves them file-relative).
 #   5. Manifest versions are in parity across all declared manifests.
 #   6. Every enforcement script parses and is executable.
 #   7. Inventory parity: every skill, script, and instruction on disk is
@@ -192,51 +194,81 @@ else
   echo "  ok"
 fi
 
-# 4. Cross-references in markdown.
+# 4. Cross-references in markdown — a repository path named in PROSE must
+#    resolve, not only one written as a markdown link. Link resolution (#14)
+#    proves a link works; it says nothing about the far more common backticked
+#    or bare path in running text. Removing a directory used to strand every
+#    such reference silently, findable only by grep.
+#
+#    Four rules keep the signal meaningful:
+#      - FILE paths only (a segment carrying an extension). Bare directory names
+#        are where illustrative host-repo structure concentrates, and matching
+#        them buried the real defects under examples.
+#      - Markdown link constructs are EXCLUDED. A prose path resolves from the
+#        repo root; a link target resolves from the linking file's directory.
+#        Conflating them reported a README in the skills tree as broken when the
+#        link was correct. Check #14 owns links and resolves them correctly.
+#      - Fence, blockquote, and `praxis:allow-path` exemption via citation_scan
+#        — the SAME implementation checks #10 and #14 use. Code-span exemption
+#        is deliberately NOT applied: for a path, backticks are the ordinary
+#        notation, so exempting them would excuse nearly every reference.
+#      - `<placeholder>` segments stay unmatched.
 echo "validate-plugin: checking cross-references..."
 XREF_REPORT=$(python3 <<'PY'
 import os, re, sys
+sys.path.insert(0, 'scripts')
+import citation_scan
 
-# Match relative refs to skills/<name>, agents/<name>, instructions/<name>,
-# scripts/<name>. Only check existence of the directory or file root, not deep
-# anchors. Backtick-wrapped paths are fine; angle-bracket links too.
-patterns = [
-    re.compile(r'`(skills/[A-Za-z0-9_./-]+)`'),
-    re.compile(r'`(agents/[A-Za-z0-9_./-]+)`'),
-    re.compile(r'`(instructions/[A-Za-z0-9_./-]+)`'),
-    re.compile(r'`(scripts/[A-Za-z0-9_./-]+)`'),
-]
+ROOTS = ('docs/', 'skills/', 'agents/', 'instructions/', 'scripts/')
+
+# A repository file path: rooted at a known top-level dir, ending in a segment
+# with an extension. Captured either inside backticks or bare in prose.
+PATH_RE = re.compile(
+    r'`((?:docs|skills|agents|instructions|scripts)/[A-Za-z0-9_./-]+\.[A-Za-z0-9]+)`'
+    r'|(?<![\w./-])((?:docs|skills|agents|instructions|scripts)/[A-Za-z0-9_./-]+\.[A-Za-z0-9]+)')
+
+# Markdown link constructs — both the [text] and the (target) halves. These
+# resolve file-relative and belong to check #14.
+LINK_RE = re.compile(r'\[[^\]]*\]\([^)]*\)')
 
 # Refs to project-bootstrapped files (created by bootstrap-project in target
-# repos, not shipped by the plugin itself).
+# repos, not shipped by the plugin itself). NOT an exemption for a path that
+# should exist here — this file genuinely never exists in this repo.
 allowed_missing = {
     'scripts/verify.sh',
 }
 
-problems = []
-md_files = [p for p in os.popen("find . -type f -name '*.md' -not -path './node_modules/*' -not -path './.git/*'").read().splitlines() if p]
+SKIP_DIRS = {'.git', 'node_modules'}
+md_files = []
+for dirpath, dirnames, filenames in os.walk('.'):
+    dirnames[:] = [d for d in dirnames if d not in SKIP_DIRS]
+    for fn in filenames:
+        if fn.endswith('.md'):
+            md_files.append(os.path.join(dirpath, fn).replace('./', '', 1))
 
+problems = []
 for path in sorted(md_files):
+    result = citation_scan.analyze(path, marker='praxis:allow-path')
+    for lineno, msg in result.bad_markers:
+        problems.append('%s:%d: %s' % (path, lineno, msg))
     try:
-        text = open(path).read()
+        lines = open(path, errors='replace').read().split('\n')
     except Exception:
         continue
-    for pat in patterns:
-        for m in pat.finditer(text):
-            ref = m.group(1).rstrip('/.')
-            # Strip line/anchor suffixes.
-            ref = ref.split('#', 1)[0]
-            # Allow templates folder references that include placeholders.
-            if '<' in ref or '{' in ref:
+    for lineno, line in enumerate(lines, 1):
+        if lineno in result.exempt:
+            continue
+        # Blank out link constructs so their halves are never matched as prose.
+        scrubbed = LINK_RE.sub(lambda m: ' ' * len(m.group(0)), line)
+        for m in PATH_RE.finditer(scrubbed):
+            ref = (m.group(1) or m.group(2))
+            ref = ref.split('#', 1)[0].rstrip('/.,;:)')
+            if '<' in ref or '>' in ref or '{' in ref or '*' in ref:
                 continue
             if ref in allowed_missing:
                 continue
-            # Bare directory refs like skills/foo (no trailing file) → check dir.
             if not os.path.exists(ref):
-                # Try as directory with SKILL.md.
-                if os.path.isdir(ref):
-                    continue
-                problems.append(f'{path}: broken ref `{m.group(1)}`')
+                problems.append('%s:%d: broken path reference `%s`' % (path, lineno, ref))
 
 for p in problems:
     print(p)
@@ -265,7 +297,7 @@ else
 fi
 
 # 6. Enforcement script syntax + executability (meta-loop: the quality
-#    instruments are themselves under validation — see executable-seams-first.md D5).
+#    instruments are themselves under validation — see the executable-seams wave).
 echo "validate-plugin: checking enforcement scripts..."
 ENFORCE_REPORT=""
 ENFORCE_FAIL=0

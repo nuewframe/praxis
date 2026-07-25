@@ -39,7 +39,7 @@ These probes have no `mode: enforce` config to flip because they never shipped a
 
 ### Informational, never fails
 
-- `check-escape-hatch-usage.sh` — reports every `praxis:allow-*` marker it finds by file:line, but always exits 0. Its job is visibility for a human reviewer, not gatekeeping. Its vocabulary is **six** markers, defined once in the script's `MARKERS` array; the header comment used to restate the list with nothing keeping the two in agreement, and no longer does.
+- `check-escape-hatch-usage.sh` — reports every `praxis:allow-*` marker it finds by file:line, but always exits 0. Its job is visibility for a human reviewer, not gatekeeping. Its vocabulary is **seven** markers, defined once in the script's `MARKERS` array; the header comment used to restate the list with nothing keeping the two in agreement, and no longer does.
 
 ## Declared exceptions — citation is not assertion
 
@@ -54,6 +54,8 @@ Both lists are gone. [ADR.260725](../adr/ADR.260725-inline-declared-exceptions.m
 Migrating this way changed what the checks can see. Under the old rules a planted stale current-version claim in an ADR passed; under the new rules it fails. In practice **Layer 1 absorbed almost the whole migration** — the citations that surfaced were version tokens that read better as code literals anyway, and backticking them is what a careful author would have done regardless. That matters for the open question ADR.260725 deliberately left undecided: a marker *range* form for a paragraph of several citations was never needed, because the one shape that would have required it — a literal inside a markdown table row, where a comment line would break the table — is solved by Layer 1 instead. The range form stays uninvented.
 
 Two of the three retired terminology entries turned out to be dead weight: `CHANGELOG.md` and `.praxis-canon.json` sit outside the scanned directories, so they were exempting files the check never read.
+
+Check **#4** (cross-references) consumes the same module. It checks a repository *file* path named in markdown prose — backticked or bare, under `docs/` as well as the four code prefixes — which link resolution cannot see: #14 proves a link works and says nothing about the far more common path in running text. Three rules keep its signal meaningful. It matches file paths only, because bare directory names are where illustrative host-repo structure concentrates and matching them buried the real defects under examples. It excludes markdown link constructs, because a prose path resolves from the repo root while a link target resolves from the linking file's directory — conflating the two reported a correct link as broken. And it applies fence, blockquote, and `praxis:allow-path` exemption but deliberately **not** code-span exemption: for a path, backticks are the ordinary notation, so exempting them would excuse nearly every reference the check exists to validate. That asymmetry with the version scanner is the point — the same module serves both because the citation *positions* differ per literal kind.
 
 Check #10 also had to change shape before Layer 2 was possible at all. It scanned whole files and reported the file, so there was no line for a marker to attach to; it is now line-scoped and reports `file:line`.
 

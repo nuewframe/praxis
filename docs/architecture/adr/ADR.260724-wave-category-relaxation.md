@@ -149,6 +149,6 @@ Kept here because an ADR is an immutable historical record, and the wave documen
 - **Capability record (living architecture this decision shapes):** `docs/architecture/skills/README.md`
 - **System overview:** `docs/architecture/README.md`
 - **Governance clause amended:** `docs/project-context.md` § *Evolution policy* → *Removing or breaking a rule*
-- **Active sprint (TS-001):** `docs/product/sprints/SPRINT.260724-praxis-self-conformance.md`
+- **Active sprint (TS-001):** `docs/product/sprints/SPRINT.260724-praxis-self-conformance.md` <!-- praxis:allow-path reason="cites the sprint this decision was taken in; sprint files are ephemeral by design and deleted at close, so this reference is historical and can never resolve" -->
 - **Supersedes / Superseded by:** none
 - **Related ADR:** `ADR.260720.01` (Design Approval git hook gate) — the gate this ADR's `status` must satisfy for the Major-tier sprint carrying TS-001

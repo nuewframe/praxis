@@ -2,7 +2,7 @@
 # check-sprint-id-collision.sh
 #
 # The coordination-artifact gate for emergent parallelism (plan:
-# executable-seams-first.md, Bundle D / D2). When sprints may be created
+# the executable-seams wave, Bundle D / D2). When sprints may be created
 # concurrently — siblings worked in parallel sessions or dispatched by an
 # orchestration runtime — a bare "highest NNN + 1" increment collides: two
 # slices both grab the same next id and race the coordination layer before

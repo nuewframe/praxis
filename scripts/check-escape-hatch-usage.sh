@@ -54,6 +54,7 @@ MARKERS=(
   "praxis:allow-unobserved-boundary"
   "praxis:allow-version-literal"
   "praxis:allow-term"
+  "praxis:allow-path"
 )
 
 # ---- Argument parsing --------------------------------------------------------
