@@ -188,9 +188,11 @@ Praxis's product is **trust transfer** — an adopter believes a green check bec
 - [ ] Given a path that is illustrative rather than real (a host-repo example, a `<placeholder>` segment, a path inside a fenced block), when the check runs, then it is not reported
 - [ ] Given the new coverage, when it is added, then a deliberately broken prose path is confirmed to fail the build, then reverted
 
-**Dependencies:** None.
+**Dependencies:** TS-008. A repository-wide sweep finds 19 distinct unresolved prose paths, and a large share of them are **historical citations** — `CHANGELOG.md` entries and ADRs naming files that existed when they were written, including a deleted ephemeral sprint file that was always designed to be deleted. Those are not defects; suppressing them by directory would reintroduce exactly the path allowlists [ADR.260725](../../../architecture/adr/ADR.260725-inline-declared-exceptions.md) removes. This slice therefore needs TS-008's inline `praxis:allow-*` markers to exist first, so a citation can declare itself at the line where it appears.
 
 **Tracking note:** Evidenced rather than hypothetical. Removing the pre-adoption plans directory left `skills/define-seam-contract/SKILL.md` pointing at a deleted file, and neither existing check caught it — check #14 validates markdown links only, and the cross-reference check matches only the four code-directory prefixes. A shipped skill carried a dangling reference that had to be found by grep.
+
+The sweep also separates the two populations this check must tell apart. Genuine defects: a README under the skills tree referenced from the architecture tree but never created, and seven script headers citing a plan file deleted along with the pre-adoption plans directory. Legitimate non-defects: host-repo example paths in skill templates (`docs/adr`, `docs/engineering`, `docs/product/contracts`), and the override-only `docs/waves/**` and `docs/sprints/**` globs TS-004 already documents. The check must be built against both populations, not just the first.
 
 ---
 
