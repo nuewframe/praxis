@@ -2,7 +2,7 @@
 
 > **Planning-stage document — an educated theory, not yet the truth.** The best approach given what we know today; current-state architecture lives in [docs/architecture/](../../../architecture/), promoted there by `close-sprint`.
 
-**Status:** 🔄 In Progress\
+**Status:** ✅ Delivered\
 **Goal:** An adopter can trust that every convention and gate Praxis prescribes is one Praxis demonstrably follows and runs against itself.
 
 ---
@@ -208,35 +208,35 @@ The sweep also separates the two populations this check must tell apart. Genuine
 
 ### TS-010: The dashboard convention has a creator, not just a name
 
-> **Status:** ⚪ Not Started
+> **Status:** ✅ Complete
 
 **User Value:** As a team bootstrapping a repo with Praxis, I need the product dashboard to be created for me, so that the convention Praxis tells me to keep is one its own scaffolding actually produces.
 
 **Acceptance Criteria:**
 
-- [ ] Given `bootstrap-project` runs, when scaffolding completes, then `docs/product/README.md` exists with the wave-dashboard structure
-- [ ] Given the dashboard is created, when it is read, then its authority statement matches what `docs/product/README.md` claims Praxis instructs host repos to keep
+- [x] Given `bootstrap-project` runs, when scaffolding completes, then `docs/product/README.md` exists with the wave-dashboard structure
+- [x] Given the dashboard is created, when it is read, then its authority statement matches what `docs/product/README.md` claims Praxis instructs host repos to keep
 
 **Dependencies:** TS-006.
 
-**Tracking note:** Found during TS-006. Every surface now *names* the dashboard consistently, but no surface *creates* it — `bootstrap-project` scaffolds `docs/product/waves/` and `docs/product/sprints/` and stops, while the dashboard asserts Praxis "instructs host repos to keep" it. Naming consistency was TS-006's outcome; the missing creation step is this slice.
+**Tracking note:** The acceptance criterion spans two footprints — the scaffold template is written in `bootstrap-project` but the criterion can only be checked against the dashboard itself. The two are bound by a `.praxis-canon.json` required phrase so the match is mechanical rather than coincidental. Originally found during TS-006: every surface *named* the dashboard, none *created* it — `bootstrap-project` scaffolds `docs/product/waves/` and `docs/product/sprints/` and stops, while the dashboard asserts Praxis "instructs host repos to keep" it. Naming consistency was TS-006's outcome; the missing creation step is this slice.
 
 ---
 
 ### TS-011: The fence rule has one implementation, including its origin
 
-> **Status:** ⚪ Not Started
+> **Status:** ✅ Complete
 
 **User Value:** As a maintainer writing about markdown syntax, I need a link construct quoted inside a code span to be read as a citation, so that documenting the link checker does not trip the link checker.
 
 **Acceptance Criteria:**
 
-- [ ] Given a markdown link construct inside an inline code span or fence, when check #14 runs, then it is treated as a citation and not reported
-- [ ] Given check #14, when it resolves links, then it consumes `citation_scan` rather than carrying its own fence loop
+- [x] Given a markdown link construct inside an inline code span or fence, when check #14 runs, then it is treated as a citation and not reported
+- [x] Given check #14, when it resolves links, then it consumes `citation_scan` rather than carrying its own fence loop
 
 **Dependencies:** TS-008, TS-009.
 
-**Tracking note:** Found during TS-009. The fence rule originated in check #14 and was moved into `citation_scan` for checks #10 and #4 — but #14 itself was never converted, so the module's origin is the one caller not using it. Writing the bracket-paren link syntax inside backticks still fails the build.
+**Tracking note:** Check #14 keeps its own blockquote handling deliberately — a link in a blockquote renders live, so it must still resolve, where a *literal* in a blockquote is a citation. 28 real relative links in this tree sit on blockquote lines; adopting the module wholesale would have dropped every one of them from the link checker. Originally found during TS-009: the fence rule originated in check #14 and was moved into `citation_scan` for checks #10 and #4 — but #14 itself was never converted, so the module's origin is the one caller not using it. Writing the bracket-paren link syntax inside backticks still fails the build.
 
 ---
 

@@ -422,6 +422,9 @@ plugin/
 │   ├── test-probes.sh                           # self-test: probe language coverage (fixtures)
 │   ├── test-citation-scan.sh                    # self-test: citation_scan.py (fence/quote/span + markers)
 │   ├── gen-doctrine-index.sh                    # generator: guardrail applyTo scope table (--write/--check)
+│   ├── check-sprint-disjointness.sh             # probe: two active sprints must not overlap
+│   ├── check-contract-freshness.sh              # probe: a depended-on seam contract must not have moved
+│   ├── test-sprint-coordination.sh              # self-test: both concurrency probes
 │   ├── citation_scan.py                         # shared citation-vs-assertion rules (ADR.260725)
 │   ├── gen-coverage-matrix.sh                   # generate/check docs/coverage-matrix.md from probe includes
 │   ├── gen-tier-table.sh                        # generate/check the tier table across 3 surfaces from scripts/data/tier-classification.json

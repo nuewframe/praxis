@@ -14,7 +14,7 @@ Check #16 — **self-conformance declaration parity** — is the one that closes
 
 ## The three enforcement postures
 
-Twelve `check-*.sh` probes ship for host projects. Each falls into exactly one of three postures:
+Fourteen `check-*.sh` probes ship for host projects. Each falls into exactly one of three postures:
 
 ### Warn-first, mode-promotable
 
@@ -26,6 +26,8 @@ Each probe below reads its own `.{name}.json` config, defaults to `mode: warn` (
 - `check-resilient-boundary.sh` — Resilient anchor (a boundary call with no timeout/retry/circuit-breaker/fallback)
 - `check-seam-contract-parity.sh` — every seam in `.seam-contracts.json` has a machine-readable Shape and a shared Behavior suite on disk
 - `check-sprint-id-collision.sh` — no two active sprint files share an id token (exact, not heuristic, but still warn-first via `.sprint-coordination.json` until a project promotes it)
+- `check-sprint-disjointness.sh` — two active sprints must not overlap on capabilities/file globs, persistent resources, config keys, or a dependency on a sibling's in-flight capability
+- `check-contract-freshness.sh` — a depended-on seam contract must not have moved since the sprint's bridge froze
 
 ### Hard-fail, no warn mode
 
@@ -35,7 +37,7 @@ These probes have no `mode: enforce` config to flip because they never shipped a
 - `check-no-skipped-tests.sh`
 - `check-no-sleep-waits.sh`
 - `check-port-adapter-parity.sh`
-- `check-design-approval-gate.sh` — the newest of the twelve, and deliberately hard-fail with no opt-out by design (see ADR.260720.01, below): unlike every other probe in this repo it ships with no `.{name}.json` config at all, because there is nothing to configure.
+- `check-design-approval-gate.sh` — deliberately and deliberately hard-fail with no opt-out by design (see ADR.260720.01, below): unlike every other probe in this repo it ships with no `.{name}.json` config at all, because there is nothing to configure.
 
 ### Informational, never fails
 
@@ -58,6 +60,21 @@ Two of the three retired terminology entries turned out to be dead weight: `CHAN
 Check **#4** (cross-references) consumes the same module. It checks a repository *file* path named in markdown prose — backticked or bare, under `docs/` as well as the four code prefixes — which link resolution cannot see: #14 proves a link works and says nothing about the far more common path in running text. Three rules keep its signal meaningful. It matches file paths only, because bare directory names are where illustrative host-repo structure concentrates and matching them buried the real defects under examples. It excludes markdown link constructs, because a prose path resolves from the repo root while a link target resolves from the linking file's directory — conflating the two reported a correct link as broken. And it applies fence, blockquote, and `praxis:allow-path` exemption but deliberately **not** code-span exemption: for a path, backticks are the ordinary notation, so exempting them would excuse nearly every reference the check exists to validate. That asymmetry with the version scanner is the point — the same module serves both because the citation *positions* differ per literal kind.
 
 Check #10 also had to change shape before Layer 2 was possible at all. It scanned whole files and reported the file, so there was no line for a marker to attach to; it is now line-scoped and reports `file:line`.
+
+## Concurrency probes, and what a real dispatch taught them
+
+`check-sprint-disjointness.sh` and `check-contract-freshness.sh` read a **Sprint Footprint** block (schema: `scripts/data/sprint-footprint.schema.json`) declared per sprint. They were designed long before they were built, and deliberately deferred against a named trigger — the first time two slices were dispatched concurrently — on the reasoning that the footprint's correct shape is better learned from a real dispatch than guessed.
+
+That reasoning proved correct. The wave's four-condition disjointness rule (capabilities/files, persistent resources, config keys, frozen-contract dependency) reported the first two concurrently-dispatched sprints as **fully disjoint**. They collided anyway, twice:
+
+- **At close, not during implementation.** Both had to write the CHANGELOG, the product dashboard, the wave README, and — for the enforcement-side slice — this file. The four conditions describe what a sprint touches while working, not what it touches when it lands. The footprint therefore carries `closeArtifacts`, reported as **advisory**: overlap there does not forbid concurrency, it requires close to be reconciled centrally rather than raced.
+- **At the base revision.** Both worktrees were cut two releases behind the frozen tip. Every contract hash still matched — there were no contracts — so contract freshness could not see it. The footprint carries `baseRevision`, and freshness now checks it is an ancestor of HEAD.
+
+A third finding was recorded rather than mechanized: an acceptance criterion can **span** footprints, writable by one sprint but verifiable only against a file that sprint may not touch. That case was bound with a `.praxis-canon.json` required phrase, which is a binding rather than a probe.
+
+The dispatch also broke two repo-wide scans, because a dispatch's own artifacts belong to no sprint's footprint: git worktrees created **inside** the repo hold a full second copy of the tree, and sprint-shaped test fixtures look like sprints to a probe that walks from the root. Both are now excluded from every scanning check. A footprint model that describes only source files does not see either.
+
+Both probes are warn-first via `.sprint-coordination.json`, and both skip cleanly when fewer than two sprints declare a footprint — the artifact is deliberately not mandatory before concurrent dispatch happens. `scripts/test-sprint-coordination.sh` is their self-test, and its fixtures are the two sprints that actually ran concurrently rather than invented ones.
 
 ## The three generators
 

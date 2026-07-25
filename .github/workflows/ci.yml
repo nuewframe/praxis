@@ -42,6 +42,9 @@ jobs:
       - name: probe language-coverage self-test
         run: bash scripts/test-probes.sh
 
+      - name: sprint-coordination probe self-test
+        run: bash scripts/test-sprint-coordination.sh
+
       - name: coverage matrix is current
         run: bash scripts/gen-coverage-matrix.sh --check
 

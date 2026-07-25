@@ -2,7 +2,7 @@
 
 > **Delivered before wave adoption — a derived record, not a plan.** Reconstructed from validated truth (release history, ADRs, capability records) after the work shipped. It carries no hypothesis card and no acceptance criteria because none were written at the time; each slice cites the evidence for what it delivered. Current-state architecture lives in [docs/architecture/](../../../architecture/). Derivation rules: [ADR.260725.10](../../../architecture/adr/ADR.260725.10-brownfield-wave-retrofit.md).
 
-**Status:** 🔄 In Progress — delivered before wave adoption, with one slice deliberately deferred\
+**Status:** ✅ Delivered\
 **Goal:** A team can build a unit of work against another unit's frozen promise instead of waiting for its internals to merge, and can trust that the promise is machine-checked rather than described.
 
 ---
@@ -81,25 +81,32 @@ GenAI inverts the usual constraint: producing code stops being the bottleneck, a
 
 ### TS-005: Disjointness and contract freshness become mechanical
 
-> **Status:** ⚪ Not Started
+> **Status:** ✅ Complete
 
 **User Value:** As a team actually running slices concurrently, I need disjointness and contract freshness checked by a script rather than by discipline, so that a violation fails the build instead of being noticed later.
 
 **Acceptance Criteria:**
 
-- [ ] Given a machine-readable sprint footprint (touched capabilities and file globs, persistent resources, config keys, depended-on `<name>@vN`), when two active sprints overlap on any axis, then `check-sprint-disjointness.sh` reports the overlap
-- [ ] Given a sprint depending on a seam contract that moved since the bridge froze, when `check-contract-freshness.sh` runs, then it fails and names the contract
-- [ ] Given no concurrent dispatch has occurred, when the build runs, then neither check is required — the footprint artifact does not become mandatory before it is used
+- [x] Given a machine-readable sprint footprint (touched capabilities and file globs, persistent resources, config keys, depended-on `<name>@vN`), when two active sprints overlap on any axis, then `check-sprint-disjointness.sh` reports the overlap
+- [x] Given a sprint depending on a seam contract that moved since the bridge froze, when `check-contract-freshness.sh` runs, then it fails and names the contract
+- [x] Given no concurrent dispatch has occurred, when the build runs, then neither check is required — the footprint artifact does not become mandatory before it is used
 
 **Dependencies:** TS-001, TS-004.
 
-**Tracking note:** Designed and deliberately deferred, not forgotten. Both checks are mechanizable only once a sprint footprint artifact exists, and building that plus two probes before any real concurrent run is speculative generality. **Named build trigger:** the first time two slices are dispatched concurrently. Until then the rule stands as prose discipline in the guardrails and intake gate. The full design — footprint shape, both probes, the four disjointness conditions, and the enforceability split governing why this slice defers while its sibling shipped — is in [product-architecture.md](product-architecture.md).
+**Tracking note:** The deferral held to its terms and was vindicated by them. The named trigger fired when two slices were dispatched concurrently in parallel worktrees, and the footprint's shape was learned from that dispatch rather than guessed — which mattered, because the four conditions alone were insufficient. Both sprints were disjoint on all four axes and still collided, so the footprint carries two fields the design did not anticipate:
+
+- **`closeArtifacts`** — the four conditions model *implementation* footprint. Two sprints can be disjoint for their entire working life and still collide the moment they land, on the CHANGELOG, the dashboard, the wave README, and the capability record. Overlap here does not forbid concurrency; it requires close to be reconciled centrally rather than raced. Reported as advisory, never as a violation.
+- **`baseRevision`** — both worktrees were cut two releases behind the frozen tip. Every contract hash still matched, because there were no contracts; the staleness lived in the base revision. Contract freshness alone cannot see this.
+
+A third finding is recorded but not mechanized: an acceptance criterion can *span* footprints — writable by one sprint, verifiable only against a file that sprint may not touch. That one was bound with a required phrase rather than a probe.
+
+The dispatch also broke two repo-wide scans, because its own artifacts belong to no footprint: worktrees created inside the repo, and sprint-shaped test fixtures. Both are now excluded.
 
 ---
 
 ## Success Criteria
 
-Wave is complete when TS-005's named trigger is reached and its two checks ship. Until then this wave is honestly in progress rather than complete — the discipline exists, its mechanical enforcement does not.
+TS-005's named trigger was reached and its two checks shipped. The discipline and its mechanical enforcement now both exist.
 
 ---
 

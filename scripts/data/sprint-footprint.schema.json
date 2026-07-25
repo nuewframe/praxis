@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "praxis/sprint-footprint",
+  "title": "Sprint footprint",
+  "description": "The machine-readable declaration of what a sprint touches, so two active sprints can be checked for disjointness instead of trusted. Emitted as a fenced `json` block titled `Sprint Footprint` in the sprint file. The four implementation axes come from wave-executable-seams' four-condition disjointness rule; `closeArtifacts` and `baseRevision` were added after the first real concurrent dispatch showed the four axes call two sprints disjoint that demonstrably collide.",
+  "type": "object",
+  "required": ["sprint", "capabilities", "fileGlobs", "persistentResources", "configKeysWritten", "dependsOnContracts", "closeArtifacts", "baseRevision"],
+  "additionalProperties": false,
+  "properties": {
+    "sprint": {
+      "type": "string",
+      "description": "The sprint id token, matching SPRINT.<ID> in the filename.",
+      "pattern": "^[0-9]{6}(\\.[0-9]{2,6})*$"
+    },
+    "capabilities": {
+      "type": "array",
+      "description": "Disjointness condition 1. Capability names this sprint writes into.",
+      "items": { "type": "string" }
+    },
+    "fileGlobs": {
+      "type": "array",
+      "description": "Disjointness condition 1. Globs this sprint may modify. Anything outside is out of footprint.",
+      "items": { "type": "string" }
+    },
+    "persistentResources": {
+      "type": "array",
+      "description": "Disjointness condition 2. Tables, topics, queues, caches, migrations.",
+      "items": { "type": "string" }
+    },
+    "configKeysWritten": {
+      "type": "array",
+      "description": "Disjointness condition 3. Configuration keys this sprint writes.",
+      "items": { "type": "string" }
+    },
+    "dependsOnContracts": {
+      "type": "array",
+      "description": "Disjointness condition 4. Frozen `<name>@vN` seam contracts this sprint builds against, never the producer's in-flight internals.",
+      "items": { "type": "string", "pattern": "^[A-Za-z0-9_.-]+@v[0-9]+$" }
+    },
+    "closeArtifacts": {
+      "type": "array",
+      "description": "Files this sprint must write at close but not during implementation — CHANGELOG, product dashboard, wave README, capability records. NOT part of the four-condition rule, and the reason it was insufficient: two sprints can be disjoint on all four implementation axes for their entire lifetime and still collide the moment they land. Overlap here does not forbid concurrency; it requires close to be reconciled centrally rather than raced.",
+      "items": { "type": "string" }
+    },
+    "baseRevision": {
+      "type": "string",
+      "description": "The commit the sprint's engineering current-state snapshot was frozen against. A concurrent dispatch that cuts a worktree from the wrong base builds against a stale tree while every contract hash still matches, so contract freshness alone cannot catch it.",
+      "minLength": 7
+    },
+    "crossFootprintCriteria": {
+      "type": "array",
+      "description": "Acceptance criteria that can be written by this sprint but only verified against a file outside its fileGlobs. Each needs a mechanical binding (a required phrase, a generated block) or it matches by construction today and silently un-closes tomorrow.",
+      "items": {
+        "type": "object",
+        "required": ["criterion", "verifiedAgainst", "boundBy"],
+        "additionalProperties": false,
+        "properties": {
+          "criterion": { "type": "string" },
+          "verifiedAgainst": { "type": "string" },
+          "boundBy": { "type": "string" }
+        }
+      }
+    }
+  }
+}

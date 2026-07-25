@@ -94,7 +94,8 @@ fi
 # (a ledger shares its sprint's id by design and is not a collision).
 
 set +e
-FILES=$(find "$ROOT/$SPRINT_DIR" -type f \( -name 'SPRINT.*.md' -o -name 'sprint-*.md' \) ! -name '*.ledger.md' 2>/dev/null)
+FILES=$(find "$ROOT/$SPRINT_DIR" -type f \( -name 'SPRINT.*.md' -o -name 'sprint-*.md' \) ! -name '*.ledger.md' \
+  ! -path '*/__fixtures__/*' ! -path '*/.claude/*' ! -path '*/node_modules/*' 2>/dev/null)
 FIND_RC=$?
 set -e 2>/dev/null || true
 
