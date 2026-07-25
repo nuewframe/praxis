@@ -2,7 +2,7 @@
 
 > **Planning-stage document — an educated theory, not yet the truth.** The best approach given what we know today; current-state architecture lives in [docs/architecture/](../../../architecture/), promoted there by `close-sprint`.
 
-**Status:** ✅ Delivered\
+**Status:** 🔄 In Progress\
 **Goal:** An adopter can trust that every convention and gate Praxis prescribes is one Praxis demonstrably follows and runs against itself.
 
 ---
@@ -203,6 +203,40 @@ Praxis's product is **trust transfer** — an adopter believes a green check bec
 **Tracking note:** The check matches repository *file* paths, not bare directory names — directories are where illustrative host-repo structure concentrates, and matching them buried real defects under examples (19 distinct misses became 7). Markdown links are excluded because a prose path resolves from the repo root while a link target resolves from the linking file's directory; conflating them produced a false positive on a correct link. After migration, markdown carries zero genuine dangling references — the class survives only in `.sh` header comments, which this check does not reach. The seven instances there are fixed; the coverage boundary is deliberate and recorded.
 
 The sweep also separates the two populations this check must tell apart. Genuine defects: a README under the skills tree referenced from the architecture tree but never created, and seven script headers citing a plan file deleted along with the pre-adoption plans directory. Legitimate non-defects: host-repo example paths in skill templates (`docs/adr`, `docs/engineering`, `docs/product/contracts`), and the override-only `docs/waves/**` and `docs/sprints/**` globs TS-004 already documents. The check must be built against both populations, not just the first.
+
+---
+
+### TS-010: The dashboard convention has a creator, not just a name
+
+> **Status:** ⚪ Not Started
+
+**User Value:** As a team bootstrapping a repo with Praxis, I need the product dashboard to be created for me, so that the convention Praxis tells me to keep is one its own scaffolding actually produces.
+
+**Acceptance Criteria:**
+
+- [ ] Given `bootstrap-project` runs, when scaffolding completes, then `docs/product/README.md` exists with the wave-dashboard structure
+- [ ] Given the dashboard is created, when it is read, then its authority statement matches what `docs/product/README.md` claims Praxis instructs host repos to keep
+
+**Dependencies:** TS-006.
+
+**Tracking note:** Found during TS-006. Every surface now *names* the dashboard consistently, but no surface *creates* it — `bootstrap-project` scaffolds `docs/product/waves/` and `docs/product/sprints/` and stops, while the dashboard asserts Praxis "instructs host repos to keep" it. Naming consistency was TS-006's outcome; the missing creation step is this slice.
+
+---
+
+### TS-011: The fence rule has one implementation, including its origin
+
+> **Status:** ⚪ Not Started
+
+**User Value:** As a maintainer writing about markdown syntax, I need a link construct quoted inside a code span to be read as a citation, so that documenting the link checker does not trip the link checker.
+
+**Acceptance Criteria:**
+
+- [ ] Given a markdown link construct inside an inline code span or fence, when check #14 runs, then it is treated as a citation and not reported
+- [ ] Given check #14, when it resolves links, then it consumes `citation_scan` rather than carrying its own fence loop
+
+**Dependencies:** TS-008, TS-009.
+
+**Tracking note:** Found during TS-009. The fence rule originated in check #14 and was moved into `citation_scan` for checks #10 and #4 — but #14 itself was never converted, so the module's origin is the one caller not using it. Writing the bracket-paren link syntax inside backticks still fails the build.
 
 ---
 
