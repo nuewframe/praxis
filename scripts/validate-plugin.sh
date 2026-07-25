@@ -149,7 +149,7 @@ echo "validate-plugin: checking JSON files..."
 JSON_REPORT=$(python3 <<'PY'
 import json, os, sys
 problems = []
-for path in sorted(os.popen("find . -type f -name '*.json' -not -path './node_modules/*' -not -path './.git/*'").read().splitlines()):
+for path in sorted(os.popen("find . -type f -name '*.json' -not -path './node_modules/*' -not -path './.git/*' -not -path './.claude/*'").read().splitlines()):
     try:
         json.load(open(path))
     except Exception as e:
@@ -177,7 +177,7 @@ except ImportError:
     print('skipped (PyYAML not installed)')
     sys.exit(0)
 problems = []
-for path in sorted(os.popen("find . -type f \\( -name '*.yaml' -o -name '*.yml' \\) -not -path './node_modules/*' -not -path './.git/*'").read().splitlines()):
+for path in sorted(os.popen("find . -type f \\( -name '*.yaml' -o -name '*.yml' \\) -not -path './node_modules/*' -not -path './.git/*' -not -path './.claude/*'").read().splitlines()):
     try:
         with open(path) as f:
             list(yaml.safe_load_all(f))
@@ -240,7 +240,7 @@ allowed_missing = {
     'scripts/verify.sh',
 }
 
-SKIP_DIRS = {'.git', 'node_modules'}
+SKIP_DIRS = {'.git', 'node_modules', '.claude'}
 md_files = []
 for dirpath, dirnames, filenames in os.walk('.'):
     dirnames[:] = [d for d in dirnames if d not in SKIP_DIRS]
@@ -470,7 +470,7 @@ FENCE_REPORT=$(python3 <<'PY'
 import os, re, sys
 problems = []
 files = os.popen(r"find . -type f \( -name '*.md' -o -name '*.md.tmpl' \) "
-                 r"-not -path './node_modules/*' -not -path './.git/*'").read().splitlines()
+                 r"-not -path './node_modules/*' -not -path './.git/*' -not -path './.claude/*'").read().splitlines()
 for path in sorted(f for f in files if f):
     stack = []
     for line in open(path, errors='replace'):
@@ -673,7 +673,7 @@ import os, re, sys
 sys.path.insert(0, 'scripts')
 import citation_scan
 
-SKIP_DIRS = {'.git', 'node_modules'}
+SKIP_DIRS = {'.git', 'node_modules', '.claude'}
 # One regex, used both as the citation_scan `pattern` (for code-span precision)
 # and as the matcher below, so the two can never disagree about what a link is.
 LINK_PATTERN = r'\[[^\]]*\]\(([^)\s]+)'
