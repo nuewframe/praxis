@@ -21,9 +21,9 @@ Use this skill when a wave or slice crosses a **seam** — any boundary where on
 depends on another unit's promise — and that boundary needs to be honored by both sides
 *executably*, not asserted in prose.
 
-This is the keystone of the **Executable Seams First** plan (`docs/plans/executable-seams-first.md`):
-quality is a property of the seam, and a Seam Contract is the one new first-class artifact
-that converts a seam from *asserted-correct in markdown* to *executed-correct in the pipeline*.
+This is the keystone of the **Executable Seams** intent: quality is a property of the seam, and a
+Seam Contract is the one new first-class artifact that converts a seam from *asserted-correct in
+markdown* to *executed-correct in the pipeline*.
 
 ---
 
