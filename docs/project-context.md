@@ -421,6 +421,7 @@ plugin/
 │   ├── bump-version.sh                          # version-parity tool across manifests
 │   ├── test-probes.sh                           # self-test: probe language coverage (fixtures)
 │   ├── test-citation-scan.sh                    # self-test: citation_scan.py (fence/quote/span + markers)
+│   ├── gen-doctrine-index.sh                    # generator: guardrail applyTo scope table (--write/--check)
 │   ├── citation_scan.py                         # shared citation-vs-assertion rules (ADR.260725)
 │   ├── gen-coverage-matrix.sh                   # generate/check docs/coverage-matrix.md from probe includes
 │   ├── gen-tier-table.sh                        # generate/check the tier table across 3 surfaces from scripts/data/tier-classification.json

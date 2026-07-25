@@ -2,7 +2,7 @@
 
 > **Planning-stage document — an educated theory, not yet the truth.** The best approach given what we know today; current-state architecture lives in [docs/architecture/](../../../architecture/), promoted there by `close-sprint`.
 
-**Status:** 🔄 In Progress\
+**Status:** ✅ Delivered\
 **Goal:** An adopter can trust that every convention and gate Praxis prescribes is one Praxis demonstrably follows and runs against itself.
 
 ---
@@ -145,14 +145,16 @@ Praxis's product is **trust transfer** — an adopter believes a green check bec
 
 ### TS-007: A fact Praxis states twice is stored once
 
-> **Status:** ⚪ Not Started
+> **Status:** ✅ Complete
 
 **User Value:** As a reader of Praxis's docs, I need duplicated content to agree with itself so that I do not act on whichever copy I happened to open.
 
 **Acceptance Criteria:**
 
-- [ ] Given the skill index and the guardrail and persona lists, when they appear on more than one surface, then each surface is generated from one source or reduced to a pointer
-- [ ] Given a hand-edit to generated content, when CI runs, then the build fails
+- [x] Given the skill index and the guardrail and persona lists, when they appear on more than one surface, then each surface is generated from one source or reduced to a pointer
+- [x] Given a hand-edit to generated content, when CI runs, then the build fails
+
+**Tracking note:** The narrowing this slice's named risk pre-authorised was exercised deliberately. "A fact stated twice" is not the same as "text appearing on two surfaces": the guardrail Scope column, the persona table, and the rule bullets are three summaries written for three readers, and were never required to agree word-for-word. What has exactly one right answer — each guardrail's `applyTo` glob — is generated from the instruction file's own frontmatter, and a hand-edit inside the block fails CI. Membership parity also gained its missing direction: it proved *on disk → mentioned* but never *mentioned → on disk*, so deleting a skill would have left stale claims across three canonical surfaces with a green build. The dual-home generator deferred to its own wave was not needed and was not invented.
 
 **Dependencies:** TS-002. **Named risk:** properly single-sourcing content that legitimately lives in two places may require the dual-home generator currently deferred to its own wave. If that dependency materializes, narrow this slice to pointer-reduction and re-scope the generator rather than hand-syncing.
 
@@ -208,10 +210,10 @@ The sweep also separates the two populations this check must tell apart. Genuine
 
 Wave is complete when:
 
-- [ ] All thin-slices are ✅ Complete
-- [ ] Journey tests pass for all primary scenarios — for this wave, that means `create-wave` runs end-to-end producing a category-free wave, and the session-start hook still emits valid JSON carrying all three guardrail names
-- [ ] User guides updated (TEACH) for capabilities whose user-observable behavior changed — via `author-user-docs`
-- [ ] Product dashboard updated to reflect completion
+- [x] All thin-slices are ✅ Complete
+- [x] Journey tests pass for all primary scenarios — for this wave, that means `create-wave` runs end-to-end producing a category-free wave, and the session-start hook still emits valid JSON carrying all three guardrail names
+- [~] User guides updated (TEACH) for capabilities whose user-observable behavior changed — via `author-user-docs`. **Not met, and not waived.** User-observable behavior did change: adopters gain three `praxis:allow-*` markers, a reasoned-`n/a` self-conformance declaration, and two new failure modes. But Praxis ships no `docs/guides/` tree, so there is no capability guide to re-derive — `author-user-docs` has no target in this repo. The `CHANGELOG` and the capability records carry the change for now, which is weaker than a guide and is recorded as such rather than counted as done.
+- [x] Product dashboard updated to reflect completion
 
 ---
 

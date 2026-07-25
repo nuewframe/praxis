@@ -59,14 +59,20 @@ Check **#4** (cross-references) consumes the same module. It checks a repository
 
 Check #10 also had to change shape before Layer 2 was possible at all. It scanned whole files and reported the file, so there was no line for a marker to attach to; it is now line-scoped and reports `file:line`.
 
-## The two generators
+## The three generators
 
 Two scripts keep documentation honest against reality rather than hand-maintained:
 
 - `gen-coverage-matrix.sh` derives `docs/coverage-matrix.md` from each text probe's actual `--include` glob, so the coverage claim cannot drift from what the probes really scan.
 - `gen-tier-table.sh` derives the tier-classification table rendered into three skill/agent surfaces from one JSON source, `scripts/data/tier-classification.json` (see ADR.260720.02, homed in the `skills` capability record — the generator pattern proven here with `gen-coverage-matrix.sh` is the precedent that pilot reuses).
 
-Both run in `--check` mode in `.github/workflows/ci.yml`.
+- `gen-doctrine-index.sh` renders each always-on guardrail's `applyTo` scope table into `using-praxis` from the instruction files' own frontmatter, so the one doctrine fact that was duplicated *verbatim* has a single home.
+
+All three run in `--check` mode in `.github/workflows/ci.yml`, so a hand-edit inside a generated block fails the build.
+
+The third generator is where [ADR.260720.02](../adr/ADR.260720.02-generated-tier-table.md)'s pilot was cashed in — that ADR framed the tier table as one fact proven before any decision to generalize. Generalizing it required drawing a line the pilot did not have to: **a fact stated twice is not the same as text appearing on two surfaces.** README's guardrail Scope column, the persona table's "when to be this persona" column, and the rule bullets are three summaries written for three different readers; they were never required to agree word-for-word, and generating them would replace curated prose with frontmatter text — a readability loss for a rigour that was not missing. The `applyTo` glob has exactly one right answer, so it is generated. That distinction, not the generator, is the durable part.
+
+Inventory parity (#7) also gained its missing direction. It proved *on disk → mentioned* and never *mentioned → on disk*, so deleting a skill would have left stale claims across all three canonical surfaces with a green build — and check #4 does not cover it, because those references are directory-shaped while #4 matches file paths. A name claimed by a canonical doc must now exist, with the same fence and marker exemption the other checks use.
 
 ## CI wiring
 

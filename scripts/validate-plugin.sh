@@ -372,6 +372,41 @@ for instr in sorted(f for f in os.listdir('instructions') if f.endswith('.instru
     if instr not in bootstrap:
         problems.append(f'instructions/{instr}: not referenced in skills/using-praxis/SKILL.md')
 
+# Reverse direction: a name claimed by a canonical doc must exist on disk.
+# The loops above prove "on disk -> mentioned"; nothing proved "mentioned -> on
+# disk", so deleting a skill left stale claims across three surfaces with a
+# green build. Check #4 does not cover this: it matches FILE paths, and these
+# references are directory-shaped.
+import re
+sys.path.insert(0, 'scripts')
+import citation_scan
+
+CANONICAL = ['README.md', 'docs/project-context.md', 'skills/using-praxis/SKILL.md']
+CLAIM_RE = re.compile(
+    r'`?(skills/([a-z0-9][a-z0-9-]*)/)`?'
+    r'|`?(instructions/([a-z0-9][a-z0-9-]*\.instructions\.md))`?'
+    r'|`?(agents/([a-z0-9][a-z0-9-]*\.agent\.md))`?')
+
+for doc in CANONICAL:
+    if not os.path.isfile(doc):
+        continue
+    result = citation_scan.analyze(doc, marker='praxis:allow-path')
+    for lineno, line in enumerate(open(doc, errors='replace').read().split('\n'), 1):
+        if lineno in result.exempt:
+            continue
+        for m in CLAIM_RE.finditer(line):
+            ref = m.group(1) or m.group(3) or m.group(5)
+            if not ref or '<' in ref or '>' in ref:
+                continue
+            target = ref.rstrip('/') if ref.startswith('skills/') else ref
+            if ref.startswith('skills/'):
+                if not os.path.isfile(os.path.join(target, 'SKILL.md')):
+                    problems.append('%s:%d: names `%s` but no such skill exists on disk'
+                                    % (doc, lineno, ref))
+            elif not os.path.isfile(target):
+                problems.append('%s:%d: names `%s` but no such file exists on disk'
+                                % (doc, lineno, ref))
+
 for p in problems:
     print(p)
 sys.exit(1 if problems else 0)

@@ -41,9 +41,18 @@ Load the persona's full file before acting in that role.
 
 These ship as `applyTo`-scoped `.instructions.md` files. **Copilot** auto-applies each one whenever you edit a file matching its glob. **Claude Code and other harnesses have no `applyTo` mechanism** and do not auto-load `instructions/` — for those, the summary below is the always-on surface, and you must treat each rule set as in force whenever you touch the matching paths. In a provisioned repo, `provision-project-overlay` copies these into `.github/instructions/` so Copilot picks them up natively.
 
+Each guardrail's scope is generated from its own frontmatter — the table below is rendered by `scripts/gen-doctrine-index.sh`, and CI fails on a hand-edit inside it.
+
+<!-- BEGIN GENERATED: guardrail-scope (source: instructions/*.instructions.md frontmatter; regenerate with scripts/gen-doctrine-index.sh --write) -->
+| Guardrail | Applies to |
+| --------- | ---------- |
+| [Capability-Driven Engineering Guardrails](../../instructions/capability-driven-guardrails.instructions.md) | `src/**`, `packages/**`, `services/**`, `apps/**`, `libs/**`, `modules/**` |
+| [Code Contribution Intake Guardrails](../../instructions/code-contribution-intake.instructions.md) | `**` |
+| [Lean Delivery Guardrails](../../instructions/lean-delivery-guardrails.instructions.md) | `docs/product/**`, `docs/architecture/**`, `docs/guides/**`, `docs/waves/**`, `docs/sprints/**` |
+<!-- END GENERATED -->
+
 ### Lean Delivery — `instructions/lean-delivery-guardrails.instructions.md`
 
-Applies to `docs/product/**`, `docs/architecture/**`, `docs/guides/**`, `docs/waves/**`, `docs/sprints/**`.
 
 - Waves are intent, not bigger sprints. Each wave has four documents: README, product-design, product-architecture, qa.
 - Thin-slices are atomic user outcomes with stable IDs (`TS-NNN`). Corrections keep the same ID.
@@ -56,7 +65,6 @@ Applies to `docs/product/**`, `docs/architecture/**`, `docs/guides/**`, `docs/wa
 
 ### Capability-Driven Engineering — `instructions/capability-driven-guardrails.instructions.md`
 
-Applies to `src/**`, `packages/**`, `services/**`, `apps/**`, `libs/**`, `modules/**`.
 
 - Organize by **business capability**, not technical layer. No `controllers/`, `models/`, `services/`, `views/`, `handlers/` silos.
 - **Anti-dumping:** `utils/`, `helpers/`, `common/`, `shared/`, `misc.*`, `lib.*` are forbidden. Name the actual capability or duplicate.
