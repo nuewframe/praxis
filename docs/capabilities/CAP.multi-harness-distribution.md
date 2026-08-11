@@ -53,7 +53,6 @@
 ## 5. Capability History & Lineage
 
 - **Initiatives Delivered:**
-  <!-- praxis:allow-version-literal reason="cites release initiative" -->
-  - [INIT.praxis-v0.6.0-consolidation](../product/initiatives/INIT.praxis-v0.6.0-consolidation.md) — Unified distribution version bump to `0.6.0`.
+  - [INIT.iterative-wave-and-dashboard-consolidation](../product/initiatives/INIT.iterative-wave-and-dashboard-consolidation.md) — Unified distribution version bump to `v0.6.0`.
 - **Durable Decisions:**
   - [ADR.260725.17](../architecture/adr/ADR.260725.17-context-placement-beyond-one-repo.md) — Multi-repo context placement and precedence stack.

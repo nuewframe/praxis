@@ -1,14 +1,11 @@
-<!-- praxis:allow-path reason="unreleased script planned for TS-030 in `v0.7.0`" -->
 # INIT.ast-seam-and-probe-validation: AST-Backed Seam & Probe Validation (Praxis `v0.7.0`)
 
 **Status:** ⚪ Proposed  
 **Capabilities Touched:** `CAP.plugin-conformance-and-validation-probes`, `CAP.method-spine-and-execution`  
-<!-- praxis:allow-version-literal reason="cites target release horizon" -->
-**Target Horizon:** Praxis v0.7.0 Release  
+**Target Horizon:** Praxis `v0.7.0` Release  
 
 ---
 
-<!-- praxis:allow-version-literal reason="cites target milestone in initiative summary" -->
 ## Executive Summary & Hypothesis ($Iteration_1$)
 
 - **Business Intent & ROI:** Replace regex text heuristics in seam parity and port-adapter probes (`check-port-adapter-parity.sh`, `check-seam-contract-parity.sh`, `check-observability-at-seams.sh`) with AST-backed static analysis for TypeScript, Go, and Python. Establish automated seam contract extraction directly from AST interfaces into `.seam-contracts.json`.

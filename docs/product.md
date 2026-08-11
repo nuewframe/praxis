@@ -31,8 +31,7 @@ Initiatives (waves) represent growth vectors delivered as transient, single-file
 | `INIT.trust-transfer` <!-- praxis:allow-path reason="illustrative index entry" --> | Make agent discipline visible and script-checkable rather than hidden. | ✅ Delivered† | 5 — 5 ✅ |
 | `INIT.self-conformance` <!-- praxis:allow-path reason="illustrative index entry" --> | Praxis demonstrably follows and runs every gate against itself. | ✅ Delivered | 11 — 11 ✅ |
 | `INIT.brownfield-adoption` <!-- praxis:allow-path reason="illustrative index entry" --> | Adapt Praxis against existing products with release history. | ✅ Delivered | 2 — 2 ✅ |
-<!-- praxis:allow-version-literal reason="cites release initiative in roadmap index" -->
-| [`INIT.praxis-v0.6.0-consolidation`](product/initiatives/INIT.praxis-v0.6.0-consolidation.md) | Single-file INIT. initiatives, CAP. living records, and docs/product.md hub. | ✅ Delivered | 8 — 8 ✅ |
+| [`INIT.iterative-wave-and-dashboard-consolidation`](product/initiatives/INIT.iterative-wave-and-dashboard-consolidation.md) | Single-file INIT. initiatives, CAP. living records, and `docs/product.md` hub (`v0.6.0`). | ✅ Delivered | 8 — 8 ✅ |
 | [`INIT.ast-seam-and-probe-validation`](product/initiatives/INIT.ast-seam-and-probe-validation.md) | AST-backed static analysis for port/adapter, seam contract, and probe validation (`v0.7.0`). | ⚪ Proposed | 5 — 0 ✅ |
 
 *† Derived records reconstructed from release history and capability records after initial delivery.*

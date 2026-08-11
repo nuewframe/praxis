@@ -63,7 +63,6 @@
 ## 5. Capability History & Lineage
 
 - **Initiatives Delivered:**
-  <!-- praxis:allow-version-literal reason="cites release initiative" -->
-  - [INIT.praxis-v0.6.0-consolidation](../product/initiatives/INIT.praxis-v0.6.0-consolidation.md) — Self-conformance declaration parity (Check #16) and `docs/product.md` inventory parity.
+  - [INIT.iterative-wave-and-dashboard-consolidation](../product/initiatives/INIT.iterative-wave-and-dashboard-consolidation.md) — Self-conformance declaration parity (Check #16) and `docs/product.md` inventory parity.
 - **Durable Decisions:**
   - [ADR.260725](../architecture/adr/ADR.260725-inline-declared-exceptions.md) — Declared exceptions move inline (`praxis:allow-*` markers).

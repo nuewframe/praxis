@@ -56,8 +56,7 @@
 ## 5. Capability History & Lineage
 
 - **Initiatives Delivered:**
-  <!-- praxis:allow-version-literal reason="cites release initiative" -->
-  - [INIT.praxis-v0.6.0-consolidation](../product/initiatives/INIT.praxis-v0.6.0-consolidation.md) — Single-file initiatives, living capability records, and unified product dashboard.
+  - [INIT.iterative-wave-and-dashboard-consolidation](../product/initiatives/INIT.iterative-wave-and-dashboard-consolidation.md) — Single-file initiatives, living capability records, and unified product dashboard.
 - **Durable Decisions:**
   - [ADR.260720.02](../architecture/adr/ADR.260720.02-generated-tier-table.md) — Single source for tier-classification table.
   - [ADR.260724](../architecture/adr/ADR.260724-wave-category-relaxation.md) — Relaxation of wave category taxonomy.

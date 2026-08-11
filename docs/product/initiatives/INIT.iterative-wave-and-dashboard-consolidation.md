@@ -1,10 +1,8 @@
-<!-- praxis:allow-version-literal reason="cites release version in initiative title" -->
-# INIT.praxis-v0.6.0-consolidation: Iterative Initiative Refinement & Product Dashboard Consolidation
+# INIT.iterative-wave-and-dashboard-consolidation: Iterative Initiative Refinement & Product Dashboard Consolidation
 
 **Status:** ✅ Delivered  
 **Capabilities Touched:** `CAP.method-spine-and-execution`, `CAP.multi-harness-distribution`, `CAP.plugin-conformance-and-validation-probes`  
-<!-- praxis:allow-version-literal reason="cites release horizon" -->
-**Target Horizon:** Praxis v0.6.0 Release  
+**Target Horizon:** Praxis `v0.6.0` Release  
 
 ---
 
