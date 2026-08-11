@@ -149,6 +149,14 @@ managed_files:
   # ---------------------------------------------------------------------------
   # Skill overlays (always — thin pointers to plugin skills with project paths)
   # ---------------------------------------------------------------------------
+  - template: templates/.github/skills/create-initiative/SKILL.md.tmpl
+    target: .github/skills/create-initiative/SKILL.md
+    condition: always
+
+  - template: templates/.github/skills/create-capability-record/SKILL.md.tmpl
+    target: .github/skills/create-capability-record/SKILL.md
+    condition: always
+
   - template: templates/.github/skills/create-wave/SKILL.md.tmpl
     target: .github/skills/create-wave/SKILL.md
     condition: always
