@@ -30,11 +30,53 @@
 
 ## Progressive Refinement ($Iteration_2 \rightarrow Iteration_N$)
 
-### User Experience (UX Deltas)
-- Probe failure output states exact AST node (Interface name, Method signature, Contract version) rather than raw regex diff.
+### 1. User Experience & Acceptance Criteria (Given/When/Then)
 
-### Technical Architecture (Seams & Educated Theory)
-- `scripts/ast_parse.py` <!-- praxis:allow-path reason="unreleased script planned for TS-030 in `v0.7.0`" --> provides lightweight AST parsing wrappers for Python `ast`, TypeScript JSON AST, and Go AST.
+#### AC-1: Happy Path — Valid AST Interface Parity
+- **Given:** A repository containing TypeScript interfaces, Go structs, or Python protocols implementing declared seam contracts (`<name>@vN`).
+- **When:** `check-seam-contract-parity.sh` or `check-port-adapter-parity.sh` is executed.
+- **Then:** The AST parser extracts exact method signatures and field types, confirms matching shapes in `.seam-contracts.json`, and outputs `ok` in $< 500\text{ms}$ with exit code 0.
 
-### Quality & NFR Invariants
-- AST parsing completes in $< 500\text{ms}$ across large repositories without requiring native C compilation dependencies.
+#### AC-2: Boundary Violation — AST Method Signature Mismatch
+- **Given:** An adapter method signature diverges from its declared Port interface (e.g. missing `ctx context.Context` parameter or changed return type).
+- **When:** `check-port-adapter-parity.sh` runs.
+- **Then:** The probe outputs structured AST line-level error:
+  ```text
+  check-port-adapter-parity: src/checkout/adapter.ts:42
+    Interface: CheckoutPort (contract checkout-service@v1)
+    Expected:  processOrder(order: OrderPayload): Promise<OrderResult>
+    Actual:    processOrder(order: OrderPayload, flag?: boolean): Promise<OrderResult>
+    Error:     Adapter method signature diverges from declared Port AST node.
+  ```
+  and fails closed with exit code 1.
+
+#### AC-3: Fault Tolerance — Unparseable Source Syntax Recovery
+- **Given:** A source code file containing a syntax error or unparseable experimental syntax feature.
+- **When:** `scripts/ast_parse.py` <!-- praxis:allow-path reason="unreleased script planned for TS-030 in `v0.7.0`" --> attempts to parse the AST.
+- **Then:** The parser catches the parse exception, emits a warning stating `[WARN] AST parse skipped on src/legacy/broken.ts (line 12: syntax error), falling back to structural scan`, and continues validating remaining files without crashing.
+
+---
+
+### 2. UX State Transition & Ambiguity Matrix
+
+| Input State | Condition / Trigger | Terminal UX Output | System Exit Code |
+| ----------- | ------------------- | ------------------ | ---------------- |
+| **Empty Codebase** | 0 seam contracts or ports declared | `check-seam-contract-parity: no contracts declared (n/a)` | `0` (Success) |
+| **Valid AST Alignment** | 100% method signature & contract shape parity | `check-port-adapter-parity: all 12 ports verified ok` | `0` (Success) |
+| **Signature Drift** | Method parameters or field types diverge | Prints AST node location, expected vs actual signature | `1` (Failure) |
+| **Unparseable Syntax** | Syntax error in source file | Emits non-fatal warning + falls back to structural scan | `0` (Warn) |
+| **Missing Contract ID** | Boundary call lacks frozen `<name>@vN` id | Prints file:line and instructions to run `define-seam-contract` | `1` (Failure) |
+
+---
+
+### 3. Technical Architecture (Seams & Educated Theory)
+
+- **`scripts/ast_parse.py`** <!-- praxis:allow-path reason="unreleased script planned for TS-030 in `v0.7.0`" --> provides lightweight AST parsing wrappers for Python `ast`, TypeScript JSON AST parser, and Go `go/ast` CLI output.
+- **Seam Contract Generator:** Automatically serializes extracted AST interface types into `.seam-contracts.json`.
+
+---
+
+### 4. Quality & NFR Invariants
+
+- **Performance SLA:** AST parsing completes in $< 500\text{ms}$ across repositories with 500+ source files.
+- **Zero Binary Dependency:** Uses standard library / lightweight JSON AST formatters without native C tree-sitter compilation requirements.
