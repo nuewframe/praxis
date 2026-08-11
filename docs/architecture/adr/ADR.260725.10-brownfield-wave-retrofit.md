@@ -145,7 +145,7 @@ Resilience posture committed by this decision: none. This is a documentation and
 
 ## Related Documents
 
-- **Capability record (living architecture this decision shapes):** `docs/architecture/skills/README.md`
+- **Capability record (living architecture this decision shapes):** [CAP.method-spine-and-execution](../../capabilities/CAP.method-spine-and-execution.md)
 - **System overview:** `docs/architecture/README.md`
 - **Product dashboard carrying the derived index:** `docs/product.md`
 - **Wave slice generalizing this into an adoption path:** `TS-001` of `wave-brownfield-adoption`

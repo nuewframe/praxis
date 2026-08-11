@@ -144,7 +144,7 @@ Resilience posture committed by this decision: none. These are build-time linter
 
 ## Related Documents
 
-- **Capability record (living architecture this decision shapes):** `docs/architecture/enforcement/README.md`
+- **Capability record (living architecture this decision shapes):** [CAP.plugin-conformance-and-validation-probes](../../capabilities/CAP.plugin-conformance-and-validation-probes.md)
 - **System overview:** `docs/architecture/README.md`
 - **Wave slice implementing this:** `TS-008` of `wave-self-conformance`
 - **Supersedes / Superseded by:** none

@@ -1,28 +1,28 @@
-This tree is current-state truth, promoted by `close-sprint`. Planning-stage intent lives in `docs/product/waves/`.
+This tree is current-state truth, promoted by `close-sprint`. Planning-stage intent lives in `docs/product/initiatives/`.
 
 ## Identity
 
-Praxis is a portable agent plugin that fuses lean wave-based product delivery with Principal Engineer discipline, distributed across six harnesses from one single-source tree. For the plugin's identity, the trust-transfer problem it exists to close, and the scope-rule doctrine that governs what belongs here, see [`../product.md`](../product.md) — this overview does not restate that content; it states the engineering-truth picture and points at the three capability records below for the current-state detail behind each capability.
+Praxis is a portable agent plugin that fuses lean wave-based product delivery with Principal Engineer discipline, distributed across six harnesses from one single-source tree. For the plugin's identity, the trust-transfer problem it exists to close, and the scope-rule doctrine that governs what belongs here, see [`../product.md`](../product.md) — this overview does not restate that content; it states the engineering-truth picture and points at the three living capability records in [`../capabilities/`](../capabilities/) for current-state detail behind each domain.
 
-## The three capabilities
+## The three living capability records (`CAP.`)
 
-### Skills
+### Method Spine & Execution Infrastructure
 
-The ordered delivery-plus-engineering pipeline — PLAN → TRIAGE → tier branch (Trivial / Standard / Major) → BUILD → LEARN → TEACH — that carries a unit of work from wave intent through a sprint bridge to a reviewed, closed PR. It hosts the `verify-and-assemble-pr` review chain (Pyramid Test Strategy through the artifact-fidelity review and Trust Receipt) and both sprint approval gates (Sprint Plan Approval, Design Approval).
+The ordered delivery-plus-engineering pipeline — PLAN → TRIAGE → tier branch (Trivial / Standard / Major) → BUILD → LEARN → TEACH — that carries a unit of work from initiative intent through a sprint bridge to a reviewed, closed PR. It hosts the `verify-and-assemble-pr` review chain (Pyramid Test Strategy through the artifact-fidelity review and Trust Receipt) and both sprint approval gates (Sprint Plan Approval, Design Approval).
 
-→ [skills/README.md](skills/README.md)
+→ [`CAP.method-spine-and-execution`](../capabilities/CAP.method-spine-and-execution.md)
 
-### Enforcement
+### Plugin Conformance & Validation Probes
 
-The generic, project-agnostic `scripts/` tooling: 11 `check-*.sh` probes bucketed into three enforcement postures (warn-first mode-promotable, hard-fail with no warn mode, informational never-fails), two generators that keep documentation honest against the file tree (`gen-coverage-matrix.sh`, `gen-tier-table.sh`), and `validate-plugin.sh`, the plugin's own 12-check self-test.
+The generic, project-agnostic `scripts/` tooling: automated probes bucketed into enforcement postures, generators that keep documentation honest against the file tree (`gen-coverage-matrix.sh`, `gen-tier-table.sh`), and `validate-plugin.sh`, the plugin's 15-check self-test.
 
-→ [`enforcement/README.md`](enforcement/README.md)
+→ [`CAP.plugin-conformance-and-validation-probes`](../capabilities/CAP.plugin-conformance-and-validation-probes.md)
 
-### Distribution
+### Multi-Harness Distribution & Session Injection
 
-How Praxis actually reaches a host project across six harnesses — Claude Code, Codex CLI/App, Cursor, Gemini CLI, OpenCode, and GitHub Copilot CLI/VS Code — from one single-source tree: the session-start injection pattern, the `provision-project-overlay` interview and glob-copy mechanism, the generated 15-step `verify.sh`, and the git hooks that consume it.
+How Praxis reaches a host project across six harnesses — Claude Code, Codex CLI/App, Cursor, Gemini CLI, OpenCode, and GitHub Copilot — from one single-source tree: the session-start injection pattern, the `provision-project-overlay` interview and glob-copy mechanism, the generated 15-step `verify.sh`, and the git hooks that consume it.
 
-→ [`distribution/README.md`](distribution/README.md)
+→ [`CAP.multi-harness-distribution`](../capabilities/CAP.multi-harness-distribution.md)
 
 ## Agents and instructions
 

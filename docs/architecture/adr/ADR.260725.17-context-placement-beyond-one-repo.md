@@ -146,7 +146,7 @@ Resilience posture committed by this decision: none. Context resolution is read-
 
 ## Related Documents
 
-- **Capability record:** [docs/architecture/skills/README.md](../skills/README.md)
+- **Capability record:** [CAP.method-spine-and-execution](../../capabilities/CAP.method-spine-and-execution.md)
 - **System overview:** [docs/architecture/README.md](../README.md)
 - **Wave slice implementing this:** `TS-002` of `wave-brownfield-adoption`
 - **Supersedes / Superseded by:** none
