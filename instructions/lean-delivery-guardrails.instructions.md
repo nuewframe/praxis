@@ -87,6 +87,22 @@ Use `create-adr` whenever a sprint or initiative makes a decision that binds fut
 
 ---
 
+## 8. Anti-Meta-Commentary & Bare Assertion Discipline
+
+Prohibit **meta-commentary** — prose whose subject is *the document* rather than the schema or architecture, specifically **disclaimer-and-deflection** (justifying what's absent or pre-empting an argument).
+
+- **The Three-Part Test (Cut a line if it)**:
+  1. **Talks about the file** — *"The SDL delta only"*, *"This section covers..."*
+  2. **Justifies an absence** — *"..are held in the architecture record"*
+  3. **Instructs the reader's behavior** — *"before debating a decision here"*
+- **The Conversion Rule:** Rationale reads *because X, therefore Y*. A decision reads *Y*. Delete the *because-clause*; keep *Y* as a bare assertion. If a fact is load-bearing, state it flat — do not argue it.
+- **The Three Tells (Catch & Remove)**:
+  - `so` / `because` / `since` — the joint where rationale attaches. Cut left of it, keep right.
+  - ``"by design, not by oversight"`` — pure defensiveness. It answers a challenge nobody made. State the reason it's omitted as a flat fact and stop.
+  - `"today"` / `"already"` / `"in production"` — intensifiers that argue a fact is true rather than stating it.
+
+---
+
 ## Anti-Patterns (Always Refuse)
 
 - ❌ Editing a sprint's **locked scope** after it has started.
@@ -95,3 +111,4 @@ Use `create-adr` whenever a sprint or initiative makes a decision that binds fut
 - ❌ Annotating initiative docs with sprint history (rewrite intent instead).
 - ❌ Inventing replacement thin-slice IDs for corrections.
 - ❌ Closing a sprint without updating living capability records (`CAP.<name>.md`).
+- ❌ Writing meta-commentary, throat-clearing, or defensive rationale (``"by design, not by oversight"``) in documentation.

@@ -32,6 +32,10 @@
     {
       "pattern": "lite \\| standard \\| full",
       "reason": "the three-way adoption-profile enum was cut pre-release; full is the only supported profile"
+    },
+    {
+      "pattern": "by design, not by oversight",
+      "reason": "meta-commentary anti-pattern: defensive throat-clearing that pre-empts an unmade challenge. State the reason as a bare flat assertion instead."
     }
   ],
   "terminologyScanDirs": [

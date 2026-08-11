@@ -23,7 +23,7 @@
 | `TS-035` | Dedicated AST Onboarding Skill (`skills/prepare-project-for-ast/SKILL.md`) | ✅ Complete | [SPRINT.260811.02](../sprints/SPRINT.260811.02-ast-readiness-skill-and-instructions.md) |
 | `TS-036` | AST Guardrails & Instruction Mandate (`instructions/capability-driven-guardrails.instructions.md`) | ✅ Complete | [SPRINT.260811.02](../sprints/SPRINT.260811.02-ast-readiness-skill-and-instructions.md) |
 | `TS-037` | Boundary Skill Integration (`skills/define-seam-contract/SKILL.md` & `skills/provision-project-overlay/SKILL.md`) | ✅ Complete | [SPRINT.260811.02](../sprints/SPRINT.260811.02-ast-readiness-skill-and-instructions.md) |
-| `TS-038` | Anti-Meta-Commentary Guardrails (`instructions/lean-delivery-guardrails.instructions.md`, `validate-plugin.sh`) | ⚪ | [SPRINT.260811.02](../sprints/SPRINT.260811.02-ast-readiness-skill-and-instructions.md) |
+| `TS-038` | Anti-Meta-Commentary Guardrails (`instructions/lean-delivery-guardrails.instructions.md`, `validate-plugin.sh`) | ✅ Complete | [SPRINT.260811.02](../sprints/SPRINT.260811.02-ast-readiness-skill-and-instructions.md) |
 | `TS-039` | Praxis `v0.7.1` Release & Verification (`scripts/bump-version.sh 0.7.1`) | ⚪ | [SPRINT.260811.02](../sprints/SPRINT.260811.02-ast-readiness-skill-and-instructions.md) |
 
 ---
@@ -45,4 +45,4 @@
 #### AC-3: Anti-Meta-Commentary Prose Enforcement
 - **Given:** An AI agent drafting or editing specification, design, or architecture documentation.
 - **When:** The agent writes text.
-- **Then:** The agent applies the 3-part test to eliminate meta-commentary, throat-clearing, and defensive rationale deflection ("by design, not by oversight"), writing bare assertions instead of rationale arguments.
+- **Then:** The agent applies the 3-part test to eliminate meta-commentary, throat-clearing, and defensive rationale deflection (``"by design, not by oversight"``), writing bare assertions instead of rationale arguments.

@@ -9,7 +9,7 @@ _Mutable execution state. Survives session death. Deleted at `close-sprint` afte
 - [x] Phase 1: AST Readiness Skill (`skills/prepare-project-for-ast/SKILL.md`)
 - [x] Phase 2: Instruction Mandate (`instructions/capability-driven-guardrails.instructions.md`)
 - [x] Phase 3: Boundary Skill Integration (`define-seam-contract`, `provision-project-overlay`)
-- [ ] Phase 4: Anti-Meta-Commentary Guardrails (`instructions/lean-delivery-guardrails.instructions.md`, `validate-plugin.sh`)
+- [x] Phase 4: Anti-Meta-Commentary Guardrails (`instructions/lean-delivery-guardrails.instructions.md`, `validate-plugin.sh`)
 - [ ] Phase 5: Release & Verification (`bump-version.sh 0.7.1`, `CHANGELOG.md`, `bump-version.sh --audit`)
 
 ---
