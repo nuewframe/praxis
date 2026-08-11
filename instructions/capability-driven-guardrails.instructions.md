@@ -173,3 +173,12 @@ Two units of work may be built concurrently **only if all four conditions hold**
 4. **Frozen-contract dependent** — each depends only on a frozen `<name>@vN` seam contract, never on the other's in-flight internals.
 
 Capability-disjointness **alone is not safe**: two slices in different capabilities still collide if they share a table, a config key, or one consumes the other's unfrozen surface. The three disjointness axes (conditions 1–3) plus the frozen-contract rule (condition 4) must all hold; if any condition fails, the units are sequential, not parallel. Praxis never schedules this — parallelism is a permission the human or an orchestration runtime exercises, granted only when these conditions are met.
+
+## 15. Polyglot AST-Backed Seam Conformance (ast-parser@v1)
+
+When evaluating or generating boundary seams, Port interfaces, or Adapter implementations across language stacks:
+
+- **Mandatory AST Parser Dispatch:** Always invoke `scripts/ast_parse.sh` (`ast-parser@v1`) to extract exact interface AST nodes, method names, line numbers, parameter shapes, and return types. Do not rely on line-based regex text matching for interface verification.
+- **Polyglot Stack Support:** AST parsing must support all 6 primary enterprise stacks: TypeScript/JavaScript (`node scripts/ast_parse_ts.cjs`), Python (`python3 scripts/ast_parse_py.py`), Go (`go/ast`), Rust (`syn` parser), C# (Roslyn AST), and Java/Kotlin (JVM compiler API).
+- **Automated Seam Onboarding:** Use `skills/prepare-project-for-ast` or `scripts/check-seam-contract-parity.sh --generate` to auto-discover interface declarations (`*.ports.*`, `@seam`) and populate `.seam-contracts.json`.
+

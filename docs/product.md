@@ -33,6 +33,7 @@ Initiatives (waves) represent growth vectors delivered as transient, single-file
 | `INIT.brownfield-adoption` <!-- praxis:allow-path reason="illustrative index entry" --> | Adapt Praxis against existing products with release history. | ✅ Delivered | 2 — 2 ✅ |
 | [`INIT.iterative-wave-and-dashboard-consolidation`](product/initiatives/INIT.iterative-wave-and-dashboard-consolidation.md) | Single-file INIT. initiatives, CAP. living records, and `docs/product.md` hub (`v0.6.0`). | ✅ Delivered | 8 — 8 ✅ |
 | [`INIT.ast-seam-and-probe-validation`](product/initiatives/INIT.ast-seam-and-probe-validation.md) | AST-backed static analysis for port/adapter, seam contract, and probe validation (`v0.7.0`). | ✅ Delivered | 5 — 5 ✅ |
+| [`INIT.ast-onboarding-and-guardrails`](product/initiatives/INIT.ast-onboarding-and-guardrails.md) | Dedicated AST onboarding skill, mandatory agent instructions, and anti-meta-commentary guardrails (`v0.7.1`). | ✅ Delivered | 5 — 5 ✅ |
 
 *† Derived records reconstructed from release history and capability records after initial delivery.*
 
@@ -139,6 +140,7 @@ docs/
 - [`implement-with-defensive-patterns`](../skills/implement-with-defensive-patterns/SKILL.md)
 - [`ingest-operational-feedback`](../skills/ingest-operational-feedback/SKILL.md)
 - [`intake-code-contribution`](../skills/intake-code-contribution/SKILL.md)
+- [`prepare-project-for-ast`](../skills/prepare-project-for-ast/SKILL.md)
 - [`provision-project-overlay`](../skills/provision-project-overlay/SKILL.md)
 - [`refactor-layered-to-capability`](../skills/refactor-layered-to-capability/SKILL.md)
 - [`start-thin-slice`](../skills/start-thin-slice/SKILL.md)

@@ -126,14 +126,20 @@ For each entry in `manifest.yaml`:
 
 Step 4 emits `scripts/verify.sh`, but that skeleton **calls** every `check-*.sh` guardrail script. Those scripts are shipped verbatim by the plugin (not templates — no substitution) and are **not** in `manifest.yaml`, so they must be copied here. Skipping this leaves `verify.sh` dead on arrival: step 4 (anti-dumping) fails with `exit 127` the first time anyone runs `bash scripts/verify.sh`.
 
-Copy or symlink **every** `check-*.sh` from `<plugin-root>/scripts/` into the project's `scripts/`. Do not hand-pick a subset — `verify.sh` calls all of them, and a missing script breaks the quality gate on day one. (`validate-plugin.sh` is the one exception — it is a plugin self-test; copy it only if you want it.)
+Copy or symlink **every** `check-*.sh` and `ast_parse*` from `<plugin-root>/scripts/` into the project's `scripts/`. Do not hand-pick a subset — `verify.sh` calls all of them, and a missing script breaks the quality gate on day one. (`validate-plugin.sh` is the one exception — it is a plugin self-test; copy it only if you want it.)
 
 ```bash
 mkdir -p scripts
-for src in "<plugin-root>"/scripts/check-*.sh; do
+for src in "<plugin-root>"/scripts/check-*.sh "<plugin-root>"/scripts/ast_parse*; do
   cp "$src" scripts/
 done
-chmod +x scripts/check-*.sh scripts/verify.sh
+chmod +x scripts/check-*.sh scripts/ast_parse.sh scripts/verify.sh
+```
+
+Run AST seam initialization (`prepare-project-for-ast` or `--generate`):
+
+```bash
+bash scripts/check-seam-contract-parity.sh --generate .
 ```
 
 Then run the parity check — every check `verify.sh` calls must exist on disk:

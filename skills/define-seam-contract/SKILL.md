@@ -159,11 +159,17 @@ file if it does not exist:
 
 ---
 
-## Step 6 — Verify parity locally
+## Step 6 — Extract & verify AST contract parity locally
 
-Run the conformance gate before handing off:
+To auto-discover native interface files (`*.ports.*`, `@seam`) across polyglot stacks and extract AST shape declarations into `.seam-contracts.json`, invoke `prepare-project-for-ast` or run:
 
+```bash
+bash scripts/check-seam-contract-parity.sh --generate .
 ```
+
+Then run the conformance gate before handing off:
+
+```bash
 bash scripts/check-seam-contract-parity.sh .
 ```
 
