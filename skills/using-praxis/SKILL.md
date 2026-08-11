@@ -15,7 +15,7 @@ In a **monorepo**, a package tier sits above the repository: `<pkg>/.praxis/cont
 
 This file is your **router** — what to do right now. It is re-injected at session start and after `/clear` or compaction so the guardrails below stay in force. Skim it; load specific skills on demand.
 
-For the *why* — the trust-transfer problem, the ten opinions, the full enforcement rationale, and plugin governance — read [`docs/project-context.md`](../../docs/project-context.md). Don't load it mid-task unless the question is about the method itself.
+For the *why* — the trust-transfer problem, the ten opinions, the full enforcement rationale, and plugin governance — read [`docs/product.md`](../../docs/product.md). Don't load it mid-task unless the question is about the method itself.
 
 ---
 
@@ -50,7 +50,7 @@ Each guardrail's scope is generated from its own frontmatter — the table below
 | --------- | ---------- |
 | [Capability-Driven Engineering Guardrails](../../instructions/capability-driven-guardrails.instructions.md) | `src/**`, `packages/**`, `services/**`, `apps/**`, `libs/**`, `modules/**` |
 | [Code Contribution Intake Guardrails](../../instructions/code-contribution-intake.instructions.md) | `**` |
-| [Lean Delivery Guardrails](../../instructions/lean-delivery-guardrails.instructions.md) | `docs/product/**`, `docs/architecture/**`, `docs/guides/**`, `docs/waves/**`, `docs/sprints/**` |
+| [Lean Delivery Guardrails](../../instructions/lean-delivery-guardrails.instructions.md) | `docs/product/**`, `docs/architecture/**`, `docs/capabilities/**`, `docs/guides/**`, `docs/sprints/**` |
 <!-- END GENERATED -->
 
 ### Lean Delivery — `instructions/lean-delivery-guardrails.instructions.md`
@@ -109,11 +109,14 @@ Load the `SKILL.md` of any skill you intend to follow.
 | **Enter** | `bootstrap-project` | Greenfield repo needs `.github/` + `.claude/` + capability-driven `src/` |
 | | `provision-project-overlay` | Existing repo just installed Praxis; needs a project overlay (interview-driven, idempotent) |
 | | `refactor-layered-to-capability` | Legacy `controllers/` + `services/` → vertical slices, one shippable slice at a time |
-| **PLAN** | `create-wave` | Starting a wave; scaffolds the four-document pattern |
-| **PLAN** | `derive-waves-from-history` | Adopting on a product that already shipped; derives waves from its own record instead of inventing criteria |
-| | `create-product-design-spec` | `product-design.md` — journeys, UX states, ambiguity handling, recovery paths |
-| | `create-product-architecture-spec` | wave `product-architecture.md` — domain ownership, contracts, seams, integrations |
-| | `create-quality-spec` | `qa.md` — risk tiers, test layer mapping, security coverage, observable DoD |
+| **PLAN** | `event-storming` | Upstream domain discovery — map business events to bounded contexts & candidate `CAP.` records |
+| | `create-initiative` | Scaffold or refine a single-file growth initiative (`INIT.<initiative-name>.md`) |
+| | `create-capability-record` | Scaffold or update a living capability record (`CAP.<capability-name>.md`) |
+| | `create-wave` | Alias for `create-initiative` — single-file growth initiative on `docs/product.md` |
+| | `derive-waves-from-history` | Adopting on a product that already shipped; derives waves from its own record instead of inventing criteria |
+| | `create-product-design-spec` | `INIT.` / `CAP.` — journeys, Given/When/Then criteria, UX state matrices, recovery paths |
+| | `create-product-architecture-spec` | `INIT.` / `CAP.` — domain ownership, seam contracts (`<name>@vN`), Ports/Adapters breakdown |
+| | `create-quality-spec` | `INIT.` / `CAP.` — test layer mapping, quantitative NFR targets, 4 Production Readiness anchors |
 | **TRIAGE** | `start-thin-slice` | Front door ("Work on TS-NNN"); precondition hard-gate, provisional tier, route |
 | **ARCHITECT**<br>*(Major only)* | `discovery-and-ambiguity-log` | Phase 1 — assumptions, SLO/SLA, Ambiguity Log |
 | | `design-system-architecture` | Phases 2–3 — topology, resilience, contract-first APIs, persistence, migrations |
@@ -126,6 +129,7 @@ Load the `SKILL.md` of any skill you intend to follow.
 | | `implement-with-defensive-patterns` | Phase 5 — composition over inheritance, shift-left security, structured telemetry |
 | | `verify-and-assemble-pr` | Phase 6 — captured `verify` output, refactor matrix, PR narrative + rollback |
 | **LEARN** | `close-sprint` | Outcome evidence + continue/pivot/stop into product AND engineering artifacts; deletes the sprint |
+| | `ingest-operational-feedback` | Process incident post-mortems, operator friction logs, and SLO reviews into `CAP.` invariants |
 | **TEACH** | `author-user-docs` | Validated capability record → Diátaxis guides in `docs/guides/` (product-designer-owned) |
 
 ---
@@ -144,7 +148,7 @@ Three kinds of gate. Knowing which is which is the difference between a guarante
 
 Exception: `check-design-approval-gate.sh` **hard-fails** a Major-tier sprint whose ADR is not `Accepted` or whose Design Approval is unsigned.
 
-Probes live in `scripts/` — wire them into the project's `verify` entry point. Full table in `README.md`; rationale in `docs/project-context.md`.
+Probes live in `scripts/` — wire them into the project's `verify` entry point. Full table in `README.md`; rationale in `docs/product.md`.
 
 ---
 
@@ -173,7 +177,7 @@ plugin instructions, agents, skills                       (defaults — Praxis)
 user ~/.claude/CLAUDE.md, VS Code user prompts            (personal preferences only)
 ```
 
-Praxis sets defaults; it never claims the final word. Praxis is artifact discipline, not runtime orchestration — delegation, ticketing, and branch protection belong to a runtime such as Claude MPM (see `docs/project-context.md`).
+Praxis sets defaults; it never claims the final word. Praxis is artifact discipline, not runtime orchestration — delegation, ticketing, and branch protection belong to a runtime such as Claude MPM (see `docs/product.md`).
 
 ---
 

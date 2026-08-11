@@ -34,18 +34,22 @@ Give your agent Praxis: [Claude Code](#claude-code) · [Codex CLI](#codex-cli) �
 
 | Skill                                      | Purpose                                                                                                                      |
 | ------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------- |
-| `skills/create-wave/`                      | Scaffold a new wave with the four-document pattern (README, design, architecture, qa).                                       |
+| `skills/event-storming/`                   | Upstream domain discovery — map business events to bounded contexts, candidate `CAP.` records, and `INIT.` initiatives.      |
+| `skills/create-initiative/`                | Scaffold or refine a single-file growth initiative (`INIT.<initiative-name>.md`) and register it on `docs/product.md`.       |
+| `skills/create-capability-record/`        | Scaffold or update a living capability record (`CAP.<capability-name>.md`) as the single living source of truth per domain.  |
+| `skills/create-wave/`                      | Scaffold a new wave/initiative as a single-file growth initiative (`INIT.<initiative-name>.md`) on `docs/product.md`.       |
 | `skills/derive-waves-from-history/`        | Derive a wave structure for a product that already shipped, from the record it already has — without inventing the acceptance criteria that were never written. The late-adoption entry point, between greenfield `bootstrap-project` and code-level `refactor-layered-to-capability`. |
-| `skills/create-product-design-spec/`       | Author `product-design.md` — user journeys, ambiguity handling, recovery paths.                                              |
-| `skills/create-product-architecture-spec/` | Author wave-scoped `product-architecture.md` — the wave's **educated theory**: domain ownership, contracts, seams, integrations, pointing into the durable capability records.         |
-| `skills/create-quality-spec/`              | Author `qa.md` — risk tiers, test layer mapping, security coverage matrix, observable definition-of-done.                    |
+| `skills/create-product-design-spec/`       | Author or refine UX specifications, Given/When/Then criteria, and state transition matrices in `INIT.` or `CAP.` files.       |
+| `skills/create-product-architecture-spec/` | Author or refine technical architecture theory, seam contracts (`<name>@vN`), and Ports/Adapters breakdown in `INIT.` or `CAP.` files.|
+| `skills/create-quality-spec/`              | Author or refine quality specs, test-layer mappings, and quantitative 4 Production-Readiness anchors in `INIT.` or `CAP.` files. |
 | `skills/test-by-ownership/`                | Universal Pyramid Test Strategy: Logic base through Journey tip, with "one property of a behavior, one layer" rule.          |
 | `skills/intake-code-contribution/`         | Pre-implementation GenAI contribution gate: wave, thin-slice, specs, sprint, current code, and red/green test posture.       |
 | `skills/start-thin-slice/`                 | Front door for slice work ("Work on TS-NNN"): checks dependency/status preconditions, runs a provisional tier + lightweight ambiguity/pre-mortem, then routes to `create-sprint` or the architect path. |
 | `skills/create-sprint/`                    | Lock the immutable bridge: thin-slice intent + engineering current-state snapshot + hypothesis card + test plan.             |
-| `skills/close-sprint/`                     | Bidirectional outflow: distill learnings into both product artifacts AND engineering artifacts, then delete the sprint file. |
+| `skills/close-sprint/`                     | Bidirectional outflow: distill learnings into initiative files (`INIT.`), dashboard (`docs/product.md`), and capability records (`CAP.`), then delete the sprint file. |
+| `skills/ingest-operational-feedback/`     | Downstream feedback intake — process incident post-mortems, operator friction logs, and SLO reviews into `CAP.` invariants. |
 | `skills/author-user-docs/`                 | TEACH phase — render a validated capability record into Diátaxis user guides (`docs/guides/`); product-designer-owned.       |
-| `skills/create-adr/`                       | Immutable Architecture Decision Records (with an as-of-decision diagram + mandatory alternatives table), homed in the durable architecture tree `docs/architecture/<capability>/adr/`. |
+| `skills/create-adr/`                       | Immutable Architecture Decision Records (with an as-of-decision diagram + mandatory alternatives table), homed in `docs/architecture/adr/`. |
 | `skills/define-seam-contract/`             | Define a Seam Contract for a boundary: machine-readable Shape + shared Behavior suite + frozen `<name>@vN` id in `.seam-contracts.json`. |
 
 ### Skills — Principal Engineer discipline (phased delivery + bootstrap)
@@ -258,7 +262,7 @@ The agent should name the three personas, the always-on guardrails, and at least
 
 ## Documentation
 
-- [docs/project-context.md](docs/project-context.md) — the method, its doctrine, scope rules, and evolution policy.
+- [docs/product.md](docs/product.md) — the method, its doctrine, scope rules, and evolution policy.
 - [CHANGELOG.md](CHANGELOG.md) — version history.
 
 ## License

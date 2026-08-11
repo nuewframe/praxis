@@ -6,8 +6,7 @@
 **Related Documents:**
 
 - [RFC.260725-SDLC-Observation.md](RFC.260725-SDLC-Observation.md)
-- [../project-context.md](../project-context.md)
-- [README.md](README.md)
+- [../product.md](../product.md)
 - [../architecture/README.md](../architecture/README.md)
 
 ---
@@ -16,7 +15,7 @@
 
 Software development across industry practice alternates between high-level intent definition and low-level code implementation. [RFC.260725-SDLC-Observation.md](RFC.260725-SDLC-Observation.md) captures this reality across four observed workflows: **Business Process Requirements**, **Agile Blueprint**, **System Development**, and **Software Runtime**.
 
-This RFC correlates those observed workflows against the governing doctrine of Praxis in [../project-context.md](../project-context.md). It demonstrates that Praxis currently provides an industry-leading execution engine for the **Agile Blueprint** loop (`PLAN -> TRIAGE -> BUILD -> LEARN -> TEACH`) and **System Development** discipline. However, it also uncovers three strategic gaps:
+This RFC correlates those observed workflows against the governing doctrine of Praxis in [../product.md](../product.md). It demonstrates that Praxis currently provides an industry-leading execution engine for the **Agile Blueprint** loop (`PLAN -> TRIAGE -> BUILD -> LEARN -> TEACH`) and **System Development** discipline. However, it also uncovers three strategic gaps:
 
 1. **Upstream Gap:** Lack of formal domain-mapping skills (e.g., Event Storming to Capability boundaries) prior to wave creation.
 2. **Incomplete Workflow Articulation:** Section 3 (**System Development**) of the observation RFC remained unarticulated (`...`).
@@ -28,7 +27,7 @@ To achieve exponential growth in value and skill, Praxis must evolve from a **di
 
 ## Part I: Systematic Correlation Matrix
 
-The table below maps the four observed SDLC workflows from [RFC.260725-SDLC-Observation.md](RFC.260725-SDLC-Observation.md) directly to Praxis doctrine in [../project-context.md](../project-context.md).
+The table below maps the four observed SDLC workflows from [RFC.260725-SDLC-Observation.md](RFC.260725-SDLC-Observation.md) directly to Praxis doctrine in [../product.md](../product.md).
 
 | Observed SDLC Workflow                                                                                    | Praxis Core Analogue                                                                                                                         | Degree of Alignment            | Key Strengths in Praxis Today                                                                                                                                                                                                                                          | Uncovered Gaps & Opportunities                                                                                                                                                                        |
 | --------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -182,4 +181,4 @@ Phase 3: Living Blueprint Graph   ──► Phase 4: Self-Evolving Engine
 
 ## Conclusion
 
-By correlating [RFC.260725-SDLC-Observation.md](RFC.260725-SDLC-Observation.md) against [../project-context.md](../project-context.md), we have defined the missing **System Development** workflow and identified the key frontiers for Praxis. Expanding Praxis upstream into **Domain Event Storming**, downstream into **Human-in-the-Loop Operational Feedback**, and internally into a **Living Architecture Graph** will exponentially increase its value—enabling AI coding agents to deliver software with unassailable discipline, true trust transfer, and continuous real-world validation.
+By correlating [RFC.260725-SDLC-Observation.md](RFC.260725-SDLC-Observation.md) against [../product.md](../product.md), we have defined the missing **System Development** workflow and identified the key frontiers for Praxis. Expanding Praxis upstream into **Domain Event Storming**, downstream into **Human-in-the-Loop Operational Feedback**, and internally into a **Living Architecture Graph** will exponentially increase its value—enabling AI coding agents to deliver software with unassailable discipline, true trust transfer, and continuous real-world validation.

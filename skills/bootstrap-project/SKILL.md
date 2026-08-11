@@ -177,15 +177,15 @@ The pipeline is:
 
 This file mirrors `.github/copilot-instructions.md` for Claude Code. Both apply.
 
-See [docs/project-context.md](../docs/project-context.md) before starting any work.
+See [docs/product.md](../docs/product.md) before starting any work.
 
-The `praxis` plugin provides the universal engineering discipline. This project's specific rules (capability list, stack-specific patterns) live in `.github/copilot-instructions.md` and `docs/project-context.md`.
+The `praxis` plugin provides the universal engineering discipline. This project's specific rules (capability list, stack-specific patterns) live in `.github/copilot-instructions.md` and `docs/product.md`.
 ```
 
-### Step 6 — Generate `docs/project-context.md`
+### Step 6 — Generate `docs/product.md`
 
 ```markdown
-# <project-name> — Project Context
+# <project-name> — Product & Method Context
 
 Single entry point. Read this first.
 
@@ -197,14 +197,14 @@ Single entry point. Read this first.
 
 ## Capabilities
 
-| Capability       | Responsibility | Owner |
-| ---------------- | -------------- | ----- |
-| `<capability-1>` | …              | TBD   |
-| `<capability-2>` | …              | TBD   |
+| Capability | Responsibility | Owner | Living Record |
+| --- | --- | --- | --- |
+| `<capability-1>` | … | TBD | [CAP.<capability-1>.md](capabilities/CAP.<capability-1>.md) |
+| `<capability-2>` | … | TBD | [CAP.<capability-2>.md](capabilities/CAP.<capability-2>.md) |
 
 ## Architecture
 
-Durable architecture lives in [docs/architecture/](architecture/): the system overview ([README.md](architecture/README.md)), per-capability records (`<capability>/README.md`, the current-state truth), and ADRs (`architecture/adr/` for cross-capability, `<capability>/adr/` for capability-scoped). Start at [docs/architecture/adr/ADR.<ID>-technology-stack.md](architecture/adr/ADR.<ID>-technology-stack.md).
+Durable architecture lives in [docs/architecture.md](architecture.md) (system topology & NFRs), living capability records in [docs/capabilities/](capabilities/) (`CAP.<capability>.md`, current-state truth), and ADRs in `docs/architecture/adr/`. Start at [docs/architecture/adr/ADR.<ID>-technology-stack.md](architecture/adr/ADR.<ID>-technology-stack.md).
 
 ## Conventions
 
@@ -308,14 +308,14 @@ These stubs make the workflow legible to a new contributor without forcing them 
 
 ### Step 9c — Scaffold the product dashboard
 
-Create `docs/product/README.md`. Every product skill assumes this file already exists — `create-wave` registers each new wave in it, `close-sprint` updates the wave's status there, and the product-manager persona reads it before every session — so bootstrap creates the anchor rather than leaving the first wave to invent it:
+Create `docs/product.md`. Every product skill assumes this file already exists — `create-wave` registers each new initiative in it, `close-sprint` updates initiative status there, and the product-manager persona reads it before every session — so bootstrap creates the anchor rather than leaving the first initiative to invent it:
 
 ```markdown
 # <project-name> — Product
 
 Product overview and dashboard for <project-name>: the live view of what is being built, for whom, and where each wave stands.
 
-**Product intent lives here. Engineering truth lives in [`../architecture/README.md`](../architecture/README.md).** Wave documents are *educated theory*; the architecture tree is validated truth, promoted there by `close-sprint`.
+**Product intent lives here. Engineering truth lives in [`architecture/README.md`](architecture/README.md).** Wave documents are *educated theory*; the architecture tree is validated truth, promoted there by `close-sprint`.
 
 ---
 

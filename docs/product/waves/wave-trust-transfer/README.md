@@ -44,7 +44,7 @@ This is the problem the whole method exists to solve, named explicitly. An agent
 
 **User Value:** As an adopter, I need to know what the method is *for* so that I can judge whether it delivers, rather than inferring its purpose from a list of skills.
 
-**Evidence:** The `## Problem` section in [docs/project-context.md](../../../project-context.md) § 2 — trust transfer, with execution fidelity named as the primary output — plus the method-at-a-glance spine and the stage-by-stage "where fidelity is made" table. Shipped in the [course-correction release](../../../../CHANGELOG.md#040--2026-07-20).
+**Evidence:** The `## Problem` section in [docs/product.md](../../../product.md) § 2 — trust transfer, with execution fidelity named as the primary output — plus the method-at-a-glance spine and the stage-by-stage "where fidelity is made" table. Shipped in the [course-correction release](../../../../CHANGELOG.md#040--2026-07-20).
 
 ---
 
@@ -54,7 +54,7 @@ This is the problem the whole method exists to solve, named explicitly. An agent
 
 **User Value:** As a maintainer, I need a test that rejects a rule which is universal and disciplined but does not measurably help, so that the method stops accreting reasonable-sounding weight.
 
-**Evidence:** The fourth scope-litmus question in [docs/project-context.md](../../../project-context.md) § Governance — "does it measurably improve the agent's execution fidelity, or close a known agent failure mode?" — with universality made necessary but not sufficient. The evolution policy was strengthened in the same release to make real-repo validation non-negotiable before a minor bump, and to require a bump's entry to cite that evidence.
+**Evidence:** The fourth scope-litmus question in [docs/product.md](../../../product.md) § Governance — "does it measurably improve the agent's execution fidelity, or close a known agent failure mode?" — with universality made necessary but not sufficient. The evolution policy was strengthened in the same release to make real-repo validation non-negotiable before a minor bump, and to require a bump's entry to cite that evidence.
 
 **Tracking note:** The question has since removed a shipped rule, which is the test working rather than decorating: the wave category taxonomy failed it and was deleted per [ADR.260724](../../../architecture/adr/ADR.260724-wave-category-relaxation.md).
 

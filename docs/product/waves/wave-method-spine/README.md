@@ -63,7 +63,7 @@ An LLM coding agent will produce *something* for any request. Without a method i
 
 **User Value:** As a team, I need each moment of delivery to have exactly one skill that owns it so that the agent's next step is determined by where the work is, not by which instruction it recalls.
 
-**Evidence:** The PLAN → TRIAGE → BUILD → LEARN → TEACH spine documented in [docs/project-context.md](../../../project-context.md) § 4, realized as the `skills/` pipeline whose authoritative ordering lives in `skills/start-thin-slice/SKILL.md` Step 5. Tier branching (Trivial / Standard / Major) keeps process proportional to risk, generated from one source per [ADR.260720.02](../../../architecture/adr/ADR.260720.02-generated-tier-table.md). Capability record: [docs/architecture/skills/README.md](../../../architecture/skills/README.md).
+**Evidence:** The PLAN → TRIAGE → BUILD → LEARN → TEACH spine documented in [docs/product.md](../../../product.md) § 4, realized as the `skills/` pipeline whose authoritative ordering lives in `skills/start-thin-slice/SKILL.md` Step 5. Tier branching (Trivial / Standard / Major) keeps process proportional to risk, generated from one source per [ADR.260720.02](../../../architecture/adr/ADR.260720.02-generated-tier-table.md). Capability record: [docs/architecture/skills/README.md](../../../architecture/skills/README.md).
 
 ---
 

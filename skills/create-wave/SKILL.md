@@ -1,102 +1,89 @@
 ---
 name: create-wave
 description: >
-  Create a new product wave following the four-document wave pattern: README (intent + thin-slices),
-  product-design, product-architecture, and quality spec. Registers the wave in the project's
-  product dashboard. Invoke when planning a new feature wave or platform initiative.
+  Create a new product initiative (wave) as a single, intent-named file (INIT.<initiative-name>.md)
+  that refines iteratively from high-level intent into detailed specs. Registers the initiative
+  in the unified product dashboard (docs/product.md). Invoke when planning a new growth initiative.
 user-invocable: true
 disable-model-invocation: false
 ---
 
-# Skill: Create Wave
+# Skill: Create Initiative (Wave)
 
-Use this skill when starting a new product wave.
+Use this skill when starting a new product initiative (wave).
 
-A **wave** is the unit of intent in the Nuewframe Method — a coherent slice of product value delivered through a coordinated set of thin-slices. Waves outlive sprints and survive reorganization. They are how the team holds the line on what the product is becoming.
+An **initiative** (wave) is the unit of intent in the Nuewframe Method — a coherent slice of product value delivered through a coordinated set of thin-slices. Initiatives outlive sprints and survive reorganization. They are how the team holds the line on what the product is becoming.
 
-This skill creates the wave scaffold. After the scaffold exists:
+This skill creates a single, intent-named initiative file: `docs/product/initiatives/INIT.<initiative-name>.md`.
 
-- Use `create-product-design-spec` to author `product-design.md`
-- Use `create-product-architecture-spec` to author `product-architecture.md` (the wave's **educated theory**, not the durable record)
-- Use `create-quality-spec` to author `qa.md`
-- Use `design-system-architecture` when the wave introduces a new subsystem, runtime boundary, or platform-wide constraint — it persists the durable architecture into `docs/architecture/`
-- Use `create-adr` when the wave makes a durable technical decision
-- Use `author-user-docs` (TEACH) once a capability's behavior ships, to render the capability record into user guides in `docs/guides/`
+Initiatives start **lean** on Iteration 1 (high-level intent + thin-slices) and **refine progressively** across iterations as data, prototypes, or telemetry arrive:
 
-**Wave = educated theory; capability record = truth.** The wave's `product-architecture.md` is a planning-stage hypothesis. The living, validated architecture lives in the durable tree — `docs/architecture/README.md` (system overview) and `docs/architecture/<capability>/` (capability records) — and is promoted there by `close-sprint`.
+- Use `create-product-design-spec` to refine the UX section inside `INIT.<name>.md` (or `docs/product/design.md` <!-- praxis:allow-path reason="illustrative global design path" --> for global system UX)
+- Use `create-product-architecture-spec` to refine technical seams inside `INIT.<name>.md` (the educated theory, promoted to `docs/capabilities/CAP.<name>.md` at sprint close)
+- Use `create-quality-spec` to refine NFRs and QA invariants inside `INIT.<name>.md`
+- Use `create-adr` when the initiative makes a durable technical decision (`docs/architecture/adr/ADR.<YYMMDD>.<seq>.md`)
+- Use `author-user-docs` (TEACH) once capability behavior ships to render user guides
+
+**Initiative = educated theory; capability record = truth.** An initiative's design and architecture notes are a planning-stage hypothesis. The living, validated architecture lives in `docs/capabilities/CAP.<capability-name>.md` and is promoted there by `close-sprint`. Once validated, the initiative dissolves/archives—preventing document bloat.
+
+---
 
 ## Project conventions
 
 This skill assumes the host project defines:
 
-- A **wave directory** (commonly `docs/product/waves/`)
-- A **product dashboard** (commonly `docs/product/README.md`)
-- Optionally, a **wave naming convention** beyond `wave-<name>` — this skill imposes none
+- An **initiatives directory** (`docs/product/initiatives/`)
+- A **product dashboard** ([`docs/product.md`](../../docs/product.md))
+- An **initiative naming grammar**: `INIT.<initiative-name>.md`
 
-Read the project's `docs/project-context.md` and existing wave directory before invoking this skill. If those conventions don't exist yet, define them in the project's own context first.
-
----
-
-## Step 1 — Name the Wave
-
-Name the wave `wave-<name>`, after the product outcome it delivers. A reader should be able to tell from the name alone what the product does differently once the wave lands.
-
-Examples: `wave-home-shell`, `wave-identity-access`, `wave-business-booking`.
-
-**This skill imposes no category taxonomy.** A wave is the unit of intent; sorting it into a product-org bucket does not change what gets built or how faithfully it ships. If a project wants a grouping convention — by feature/platform/extension, by team, by release train — that is a host-project decision: record it in `docs/project-context.md` and follow it there. Waves named without one are valid, and existing waves that already carry a category prefix remain valid unchanged.
+Read [`docs/product.md`](../../docs/product.md) before invoking this skill.
 
 ---
 
-## Step 2 — Create Wave Folder + Four Documents
+## Step 1 — Name the Initiative
 
-```
-<wave-root>/wave-<name>/
-  README.md
-  product-design.md
-  product-architecture.md
-  qa.md
-```
+Name the file `INIT.<initiative-name>.md`, after the product outcome it delivers. A reader should be able to tell from the name alone what the product does differently once the initiative lands.
 
-All four documents open with the planning-stage banner directly under their title — it makes the "wave = educated theory" doctrine visible in the artifact itself, and authoring skills must preserve it when filling a stub in:
+Examples: `INIT.home-shell.md`, `INIT.passkey-authentication.md`, `INIT.annual-subscriptions.md`.
 
-```markdown
-> **Planning-stage document — an educated theory, not yet the truth.** The best approach given what we know today; current-state architecture lives in [docs/architecture/](../../../architecture/), promoted there by `close-sprint`.
-```
+---
 
-### `README.md` — Intent + Thin-Slice Tracking
+## Step 2 — Scaffold the Initiative File (`INIT.<initiative-name>.md`)
+
+Create `docs/product/initiatives/INIT.<initiative-name>.md` from this template:
 
 ```markdown
-# WAVE: [Wave Name]
+# INITIATIVE: [Initiative Name]
 
-> **Planning-stage document — an educated theory, not yet the truth.** The best approach given what we know today; current-state architecture lives in [docs/architecture/](../../../architecture/), promoted there by `close-sprint`.
+> **Planning-stage document — an educated theory, not yet the truth.** The best approach given what we know today; living capability truth lives in [docs/capabilities/](../../capabilities/), promoted there by `close-sprint`.
 
 **Status:** ⚪ Not Started | 🔄 In Progress | ✅ Complete\
-**Goal:** [One sentence describing the user outcome this wave delivers.]
+**Goal:** [One sentence describing the user outcome this initiative delivers.]
 
 ---
 
 ## Tracking Rules
 
 - Track each thin-slice by intended user outcome and current state only.
-- If a thin-slice is reopened or corrected, keep the same slice ID and add one short tracking note next to that slice.
-- Keep implementation history in sprint files and version control. This README stays focused on product intent.
+- If a thin-slice is reopened or corrected, keep the same slice ID (`TS-NNN`) and add one short tracking note.
+- Keep implementation history in sprint files and version control. This initiative file stays focused on intent.
 
 ---
 
-## Value Theme
+## Value Theme & Strategic Context
 
-_[One sentence describing the product outcome or value theme.]_
+_[One sentence describing the product outcome, business metric target, or value theme.]_
 
 ---
 
 ## Scope
 
-- [Core capability this wave owns]
-- [Core capability this wave owns]
+- [Core capability this initiative owns]
+- [Core capability this initiative owns]
 
 **Out of scope:**
 
-- [Adjacent work tracked in another wave]
+- [Adjacent work tracked in another initiative]
 
 ---
 
@@ -120,71 +107,69 @@ _[One sentence describing the product outcome or value theme.]_
 
 ---
 
-### TS-002: [Slice Name]
+## Progressive Refinement (Iterative Specs)
 
-> **Status:** ⚪ Not Started
+_Fill these sections in iteratively as data, prototypes, or telemetry arrive across iterations. Small initiatives may leave these lean; complex initiatives expand them in-place._
 
-[repeat pattern]
+### User Experience (UX Deltas)
+
+- [Primary flow transitions, UI states, error handling]
+
+### Technical Architecture (Seams & Educated Theory)
+
+- [Seam contracts touched, Ports/Adapters, storage changes]
+
+### Quality & NFR Invariants
+
+- [Target latency p99, throughput, error budget, test layer mapping]
 
 ---
 
 ## Success Criteria
 
-Wave is complete when:
+Initiative is complete when:
 
 - [ ] All thin-slices are ✅ Complete
 - [ ] Journey tests pass for all primary scenarios
 - [ ] User guides updated (TEACH) for capabilities whose user-observable behavior changed — via `author-user-docs`
-- [ ] Product dashboard updated to reflect completion
+- [ ] Learnings promoted to `docs/capabilities/CAP.<name>.md` and dashboard index updated in `docs/product.md`
 
 ---
 
 ## Dependencies
 
-- **Requires:** [What must be done before this wave]
-- **Enables:** [What this wave unlocks]
+- **Requires:** [What must be done before this initiative]
+- **Enables:** [What this initiative unlocks]
 ```
-
----
-
-### `product-design.md`, `product-architecture.md`, `qa.md`
-
-Create empty stubs with file titles. Author each through its dedicated skill:
-
-- `product-design.md` → `create-product-design-spec`
-- `product-architecture.md` → `create-product-architecture-spec`
-- `qa.md` → `create-quality-spec`
-
-If the wave introduces system-wide concerns (new subsystem, integration, runtime boundary), also invoke `design-system-architecture` — which writes the durable topology and resilience posture into `docs/architecture/` — and pair with `create-adr`. The wave documents stay the educated theory; the durable record lives under `docs/architecture/`.
 
 ---
 
 ## Step 3 — Register in the Product Dashboard
 
-Add or update the wave row in the project's product dashboard (e.g. `docs/product/README.md`):
+Add the initiative entry to the active roadmap index in [`docs/product.md`](../../docs/product.md):
 
-- Wave row in the roadmap table
-- Wave summary section if the dashboard tracks that wave family
-- Keep the dashboard quick-glance only: counts, current state, links
-- Do not duplicate thin-slice correction notes from the wave README
+```markdown
+- [INIT.<initiative-name>.md](product/initiatives/INIT.<initiative-name>.md) — ⚪ Not Started ([Target Outcome])
+```
+
+Keep the dashboard index quick-glance only: state, title, links. Do not duplicate thin-slice details in `docs/product.md`.
 
 ---
 
 ## Quality Checklist
 
-- [ ] Wave folder created with correct naming pattern
-- [ ] All four documents created (README, product-design, product-architecture, qa)
-- [ ] At least one thin-slice defined with acceptance criteria in README
-- [ ] Thin-slices are written as atomic user outcomes, not implementation buckets
-- [ ] Any correction or reopen stays on the same slice ID with a short tracking note
-- [ ] Wave registered in the product dashboard
+- [ ] Initiative file created as `docs/product/initiatives/INIT.<initiative-name>.md`
+- [ ] Title opens with the planning-stage educated-theory banner
+- [ ] At least one thin-slice defined with acceptance criteria
+- [ ] Thin-slices are written as atomic user outcomes (`TS-NNN`), not implementation buckets
+- [ ] Initiative registered in `docs/product.md` roadmap index
 - [ ] Dependencies documented
 
 ---
 
 ## Anti-Patterns
 
-- Treating waves as sprints with bigger scope (waves are intent; sprints are bridges to reality)
+- Creating subfolders or nested generic `README.md` files for an initiative (initiatives are single files)
+- Forcing full 4-document scaffolding up front before data is collected (refine iteratively instead)
 - Writing thin-slices as implementation tasks instead of user outcomes
-- Allowing thin-slice tracking notes to become a changelog
-- Splitting a single user outcome across multiple thin-slices to look like progress
+- Letting initiative tracking notes become a changelog

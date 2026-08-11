@@ -2,7 +2,7 @@ This tree is current-state truth, promoted by `close-sprint`. Planning-stage int
 
 ## Identity
 
-Praxis is a portable agent plugin that fuses lean wave-based product delivery with Principal Engineer discipline, distributed across six harnesses from one single-source tree. For the plugin's identity, the trust-transfer problem it exists to close, and the scope-rule doctrine that governs what belongs here, see [`../project-context.md`](../project-context.md) — this overview does not restate that content; it states the engineering-truth picture and points at the three capability records below for the current-state detail behind each capability.
+Praxis is a portable agent plugin that fuses lean wave-based product delivery with Principal Engineer discipline, distributed across six harnesses from one single-source tree. For the plugin's identity, the trust-transfer problem it exists to close, and the scope-rule doctrine that governs what belongs here, see [`../product.md`](../product.md) — this overview does not restate that content; it states the engineering-truth picture and points at the three capability records below for the current-state detail behind each capability.
 
 ## The three capabilities
 
