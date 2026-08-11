@@ -146,6 +146,6 @@ Resilience posture committed by this decision: none. These are build-time linter
 
 - **Capability record (living architecture this decision shapes):** `docs/architecture/enforcement/README.md`
 - **System overview:** `docs/architecture/README.md`
-- **Wave slice implementing this:** `TS-008` of [wave-self-conformance](../../product/waves/wave-self-conformance/README.md)
+- **Wave slice implementing this:** `TS-008` of `wave-self-conformance`
 - **Supersedes / Superseded by:** none
 - **Related ADRs:** `ADR.260724` (wave category relaxation) — the ADR whose authoring exposed this defect; `ADR.260720.03` (fidelity review and Trust Receipt) — supplies the visibility surface Layer 3 uses; `ADR.260720.02` (generated tier table) — same underlying principle, that a fact restated in two places drifts.

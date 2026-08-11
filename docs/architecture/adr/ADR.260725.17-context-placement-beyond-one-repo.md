@@ -17,7 +17,7 @@ Praxis assumes the repository is the unit of the product. `docs/project-context.
 
 **A product spanning several repositories.** `docs/product/waves/` in any single repository is a partial truth presented as the whole. A reader opening the dashboard in the payments repo sees "the product" and is looking at a fragment, with nothing telling them so.
 
-This was carried as explicitly out of scope by [wave-self-conformance](../../product/waves/wave-self-conformance/README.md) — *"genuinely unsolved design work, not merely unscheduled"* — and by [wave-multi-harness-reach](../../product/waves/wave-multi-harness-reach/README.md), which solved single-tree reach across six harnesses and deliberately did not solve this. It is `TS-002` of [wave-brownfield-adoption](../../product/waves/wave-brownfield-adoption/README.md).
+This was carried as explicitly out of scope by `wave-self-conformance` — *"genuinely unsolved design work, not merely unscheduled"* — and by `wave-multi-harness-reach`, which solved single-tree reach across six harnesses and deliberately did not solve this. It is `TS-002` of `wave-brownfield-adoption`.
 
 That wave's `product-architecture.md` states the decision this ADR owes an answer to:
 
@@ -148,6 +148,6 @@ Resilience posture committed by this decision: none. Context resolution is read-
 
 - **Capability record:** [docs/architecture/skills/README.md](../skills/README.md)
 - **System overview:** [docs/architecture/README.md](../README.md)
-- **Wave slice implementing this:** `TS-002` of [wave-brownfield-adoption](../../product/waves/wave-brownfield-adoption/README.md)
+- **Wave slice implementing this:** `TS-002` of `wave-brownfield-adoption`
 - **Supersedes / Superseded by:** none
 - **Related ADRs:** [ADR.260725.10](ADR.260725.10-brownfield-wave-retrofit.md) (deriving waves from delivered history — the sibling slice in this wave); [ADR.260725](ADR.260725-inline-declared-exceptions.md) (retiring maintained path lists, the precedent that rejects the registry alternative).

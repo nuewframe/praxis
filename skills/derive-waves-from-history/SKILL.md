@@ -47,7 +47,7 @@ Inventory what actually exists, and write the inventory down. You are deriving *
 
 Do not assume one tree.
 
-A product may be several generations in one repository, several packages in a monorepo, or several repositories. In each case **no single `docs/product/waves/` holds the product's intent**, and a dashboard inside any one of them is a partial truth presented as the whole.
+A product may be several generations in one repository, several packages in a monorepo, or several repositories. In each case **no single `docs/product/initiatives/` holds the product's intent**, and a dashboard inside any one of them is a partial truth presented as the whole.
 
 - **One root** → the dashboard is `docs/product.md` and it is complete.
 - **Several roots in one repository** → the dashboard sits **above** them and names each root; each root keeps its own waves.

@@ -50,27 +50,20 @@ Create this layout (paths adapted to the language):
 ├── .claude/
 │   └── CLAUDE.md                        # mirrors copilot-instructions; entry point for Claude Code
 ├── docs/
-│   ├── project-context.md               # single entry point — how to navigate this repo
-│   ├── architecture/                     # durable architecture tree (living = the truth)
-│   │   ├── README.md                     # system overview: cross-capability topology + posture
-│   │   ├── adr/
-│   │   │   └── ADR.<ID>-technology-stack.md   # cross-capability decisions
-│   │   └── <capability-1>/
-│   │       ├── README.md                 # capability record (current-state truth)
-│   │       └── adr/                       # capability-scoped decisions
-│   ├── guides/                        # user-facing docs (TEACH) — rendered from capability records
-│   │   ├── <capability-1>/                # capability guide: concepts + how-tos
-│   │   └── tutorials/                     # cross-capability journey tutorials
-│   ├── product/
-│   │   ├── README.md                     # product dashboard — intent + wave table (rows owned by create-wave)
-│   │   ├── waves/
-│   │   │   └── wave-000-bootstrap/
-│   │   │       ├── README.md
-│   │   │       ├── product-design.md
-│   │   │       ├── product-architecture.md
-│   │   │       └── qa.md
-│   │   └── sprints/                       # flat, ephemeral — SPRINT.<ID>-<slug>.md, never nested in a wave
-│   │       └── SPRINT.<ID>-placeholder.md
+│   ├── product.md                       # single entry point — product dashboard, doctrine, & method context
+│   ├── capabilities/
+│   │   └── CAP.<capability-name>.md     # living capability records (1 file per domain)
+│   ├── architecture/                    # durable architecture tree (living = the truth)
+│   │   ├── README.md                    # system overview: cross-capability topology + posture
+│   │   └── adr/                         # architectural decision records (ADR.<YYMMDD>.<seq>.md)
+│   ├── guides/                          # user-facing docs (TEACH) — rendered from capability records
+│   │   ├── <capability-1>/              # capability guide: concepts + how-tos
+│   │   └── tutorials/                   # cross-capability journey tutorials
+│   └── product/
+│       ├── design.md                    # global UX design system & personas
+│       ├── initiatives/
+│       │   └── INIT.<initiative-name>.md# single-file iterative growth initiatives
+│       └── sprints/                     # flat, ephemeral — SPRINT.<YYMMDD>-<slug>.md
 │   └── README.md
 ├── src/                                 # or services/ or pkg/ depending on language convention
 │   ├── <capability-1>/
