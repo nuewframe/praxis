@@ -2,9 +2,8 @@
 name: close-sprint
 description: >
   Close a completed sprint: verify acceptance criteria, record outcome evidence, then distill
-  learnings BIDIRECTIONALLY into both product artifacts (wave docs, dashboard) AND engineering
-  artifacts (handbook, ADRs, capability layouts, refactor records). The sprint file is deleted —
-  the bridge dissolves once both shores are updated.
+  learnings BIDIRECTIONALLY into both product artifacts (initiative files, docs/product.md) AND engineering
+  artifacts (living capability records docs/capabilities/CAP.<name>.md, ADRs). The sprint file is deleted.
 user-invocable: true
 disable-model-invocation: false
 ---
@@ -13,13 +12,13 @@ disable-model-invocation: false
 
 Use this skill when a sprint's thin-slices are complete or the work is done.
 
-**Sprints are ephemeral.** The sprint file exists only while work is in progress. Closing means deleting the file — not archiving. The wave documents and engineering artifacts become the lasting record.
+**Sprints are ephemeral.** The sprint file exists only while work is in progress. Closing means deleting the file — not archiving. The living capability records (`docs/capabilities/CAP.<capability-name>.md`) and product dashboard ([`docs/product.md`](../../docs/product.md)) become the lasting record.
 
 ---
 
 ## Core Mental Model — Bidirectional Outflow
 
-A sprint is a bridge between product intent and engineering reality. When it closes, the bridge dissolves and learnings flow to **both** shores. This is the moment the wave's **hypothesis** (the educated theory) is promoted into the durable **record** (the truth) now that it has been built and measured:
+A sprint is a bridge between product intent and engineering reality. When it closes, the bridge dissolves and learnings flow to **both** shores:
 
 ```
                     SPRINT (closing)
@@ -28,178 +27,76 @@ A sprint is a bridge between product intent and engineering reality. When it clo
         ↓                                   ↓
 PRODUCT-side outflow              ENGINEERING-side outflow
 ─────────────────────             ──────────────────────────
-wave README                       system overview (docs/architecture/README.md)
-product-design.md                 capability record (docs/architecture/<capability>/)
-product-architecture.md (theory)  ADRs (new or superseded)
-qa.md                             capability layout docs
-PRODUCT dashboard                 refactor records / anti-dumping baseline
+INIT.<initiative-name>.md         living capability record (docs/capabilities/CAP.<capability-name>.md)
+docs/product/design.md            system overview (docs/architecture.md)
+docs/product.md                   ADRs (new or superseded)
+qa spec / NFR invariants          capability layout docs
 user guides (docs/guides/, TEACH) ← rendered from the capability record
 ```
 
-The wave `product-architecture.md` is the educated theory; the **capability record is the truth**. Promoting validated learning into the capability record is also what feeds the *next* phase downstream — user docs (how-tos, tutorials, product concepts) are generated from the capability record, not from sprint notes.
-
-If a sprint only updates the product side, you've lost half the learning.
+Promoting validated learning into `docs/capabilities/CAP.<capability-name>.md` is what transforms an educated theory into durable truth.
 
 ---
 
 ## Step 1 — Verify Completion
 
-For each acceptance criterion, confirm it is met. Run the project's quality gates (typically: tests, lint, format).
-
-If any criterion is unmet: **do not close the sprint.** Either finish the work, or explicitly descope — move the unfinished thin-slice back to `⚪ Not Started` in the wave README, then close what was actually delivered.
+Confirm all acceptance criteria are met and project quality gates (`verify`) pass clean. If any criterion is unmet, do not close the sprint — descope or complete the work first.
 
 ---
 
-## Step 2 — Record Outcome Evidence (Lean Validation)
+## Step 2 — Record Outcome Evidence
 
-Before extracting learnings, capture outcome evidence for the sprint hypothesis:
-
-- **Outcome evidence:** What observable result occurred? Cite test evidence, behavior evidence, or delivery evidence.
-- **Decision:** Continue / Pivot / Stop
-- **Decision rationale:** Why this decision was made based on the evidence
-
-If outcome evidence is missing, the sprint cannot close.
+Capture outcome evidence for the hypothesis:
+- Outcome evidence (test results, behavior evidence)
+- Decision (Continue / Pivot / Stop)
+- Rationale
 
 ---
 
 ## Step 3 — Extract Learnings (Both Sides)
 
-Read the sprint working notes and any deviations from the original plan. Ask in **both** directions:
-
-### Product-side learning prompts
-
-- Did the user experience need adjustment from `product-design.md`? What is the correct picture now?
-- Do any wave README thin-slices need to be reworded, split, or resequenced?
-- Did the wave goal itself sharpen?
-- Did the qa.md spec miss a risk that should be added for future waves?
-
-### Engineering-side learning prompts
-
-- Did the technical approach differ from the wave `product-architecture.md` educated theory? What is the correct picture now, and does the **capability record** (`docs/architecture/<capability>/`) need to be rewritten to that truth?
-- Did the cross-capability topology or product-wide posture change? Update the **system overview** (`docs/architecture/README.md`).
-- Did this sprint make a durable technical decision that needs an ADR? Or supersede an existing one?
-- Did capability ownership shift? Does the capability layout doc need to update?
-- Did the work surface anti-dumping or layout debt that should be tracked?
-- Were there refactor moves worth recording for future similar work?
-- Did user-observable behavior change? If so, which capability guide or journey tutorial must be re-derived (TEACH)?
-
-If nothing changed on a side, skip its updates. But always check both sides.
+Ask in both directions:
+- **Product side:** Did user experience in `INIT.<initiative>.md` or `docs/product/design.md` <!-- praxis:allow-path reason="illustrative global design path" --> need adjustment?
+- **Engineering side:** Update the **living capability record** (`docs/capabilities/CAP.<capability-name>.md`) to reflect current-state truth. Update `docs/architecture/README.md` if system topology changed. Create/supersede ADRs as needed.
 
 ---
 
 ## Step 4 — Update Product Artifacts
 
-Update the wave documents and dashboard. Apply learnings as **corrections to intent — not as annotations or history**.
-
-### Tone rules — non-negotiable
-
-- Write in clean present tense as if this was always the design
-- No `SPRINT.<ID> discovered…`, `Note:`, `TODO:`, or `Updated after sprint`
-- No sprint number or date references in wave content
-- No passive-voice history (`was changed to`, `previously`)
-- If the architecture evolved, rewrite the section to reflect the current correct design
-- If the experience changed, rewrite the section to reflect the current correct experience
-- Wave documents capture **intent**, not **history**
-
-### Which file to update
-
-| What changed                               | Update this file               |
-| ------------------------------------------ | ------------------------------ |
-| Technical approach within the wave         | wave `product-architecture.md` |
-| User-facing behavior, flows, UI            | wave `product-design.md`       |
-| Risk model, test layer mapping, invariants | wave `qa.md`                   |
-| Thin-slice scope, sequencing, definition   | wave `README.md`               |
-| Wave goal sharpened                        | wave `README.md`               |
-
-If the sprint corrects or reopens a thin-slice: keep the same ID, update the text to the current intended outcome, add one short tracking note only if it explains the correction.
+Update the initiative file (`docs/product/initiatives/INIT.<initiative>.md`) and the roadmap index in [`docs/product.md`](../../docs/product.md). Apply learnings as present-tense intent (no sprint numbers or date references in initiative prose).
 
 ---
 
-## Step 5 — Update Engineering Artifacts
+## Step 5 — Update Living Capability Records
 
-Update the engineering side artifacts. Same tone rules — intent only, no history.
-
-| What changed                                              | Update this artifact                                         |
-| --------------------------------------------------------- | ------------------------------------------------------------ |
-| Technical approach validated — the educated theory is now truth        | Capability record `docs/architecture/<capability>/` (rewrite current-state in place) |
-| Cross-capability topology or product-wide posture          | System overview `docs/architecture/README.md`                |
-| Durable technical decision (selection, pattern, boundary) | New ADR via `create-adr` (or supersede an existing one)      |
-| Capability ownership or vertical-slice layout             | Capability layout doc + `design-capability-layout` if needed |
-| Cross-cutting platform constraint                         | System overview or `design-system-architecture` output       |
-| Anti-dumping debt discovered                              | Anti-dumping baseline / debt log                             |
-| Refactor pattern worth reusing                            | Refactor record / handbook section                           |
-| Test layer convention shifted                             | `test-by-ownership` reference in project context             |
-
-Engineering artifacts are not just docs — they bind future work. The capability record is doubly load-bearing: it is where the next sprint inherits this sprint's learning **and** the source the user-facing docs are generated from. Rewrite it in clean present tense (same tone rules as the product side) — current-state truth, not sprint history.
+Update `docs/capabilities/CAP.<capability-name>.md`. Rewrite current-state truth in place. The capability record is the source of truth that feeds downstream user guides (TEACH).
 
 ---
 
 ## Step 6 — Refresh User Docs (TEACH)
 
-If this sprint changed **user-observable behavior**, promote the validated learning one more step: into user-facing teaching. A pure refactor with no observable effect skips this step.
-
-- Refresh the affected **capability guide** (`docs/guides/<capability>/`) and any **journey tutorial** (`docs/guides/tutorials/`) that traverses the changed capability, using `author-user-docs`.
-- Derive from the now-updated capability record — never from sprint notes or the wave `product-architecture.md` educated theory.
-- Same tone rules: clean present tense, no sprint history. Update each guide's `last-validated` date.
-
-This is the phase the capability record exists to feed. A record updated in Step 5 but a guide left stale means the next user learns yesterday's behavior.
+If user-observable behavior changed, invoke `author-user-docs` to refresh guides in `docs/guides/<capability>/`, derived directly from `docs/capabilities/CAP.<capability-name>.md`.
 
 ---
 
-## Step 7 — Mark Thin-Slices Complete
+## Step 7 — Mark Thin-Slices Complete & Delete Ephemeral Sprint Files
 
-In the wave README, update each delivered thin-slice status:
-
-- `⚪ Not Started` → `✅ Complete`
-- `🔄 In Progress` → `✅ Complete`
-
-For any descoped thin-slice, leave as `⚪ Not Started`.
-
----
-
-## Step 8 — Update the Product Dashboard
-
-In the project's product dashboard (e.g. `docs/product/README.md`):
-
-- Update the wave's progress to reflect completed thin-slices
-- Update wave status if fully complete
-- Remove the sprint from the active work section
-- Keep dashboard quick-glance only: counts, state, links
-
----
-
-## Step 9 — Delete the Sprint File
-
-```
-rm <sprint-dir>/SPRINT.<ID>-<slug>.md
-rm -f <sprint-dir>/SPRINT.<ID>-<slug>.ledger.md
-```
-
-The sprint file is ephemeral collaboration space. Once both shores are updated, delete it. Delete the progress ledger too — it is execution state, not a durable record. Any learning worth keeping has already flowed into the product and engineering artifacts in Steps 4–6.
+1. Mark thin-slices `✅ Complete` in `INIT.<initiative>.md`.
+2. Update progress index in `docs/product.md`.
+3. Delete the sprint file and progress ledger:
+   ```bash
+   rm docs/product/sprints/SPRINT.<ID>-*.md
+   rm -f docs/product/sprints/SPRINT.<ID>-*.ledger.md
+   ```
 
 ---
 
 ## Quality Checklist
 
-- [ ] All acceptance criteria verified as met (unfinished work moved back to wave if descoped)
-- [ ] Outcome evidence recorded and continue/pivot/stop decision documented
-- [ ] **Product-side artifacts updated — intent only, no annotations, no sprint references**
-- [ ] **Engineering-side artifacts updated — capability record + system overview (`docs/architecture/`), ADRs, capability layout, refactor record as applicable**
-- [ ] **User docs refreshed (TEACH) when user-observable behavior changed — capability guide / journey tutorial re-derived via `author-user-docs`**
-- [ ] Thin-slices marked ✅ Complete in wave README
-- [ ] Product dashboard reflects current reality
-- [ ] Sprint file deleted
-- [ ] Progress ledger deleted (after learnings distilled)
-
----
-
-## Anti-Patterns
-
-- Closing with only product-side updates ("the wave docs are updated, ship it") — half the learning is lost
-- Annotating wave docs with sprint history instead of rewriting intent
-- Skipping ADR creation for a durable decision because "we'll do it later"
-- Updating ADRs but leaving the capability record stale — the record is the source of truth *and* of the downstream user docs; a stale record misleads the next sprint and the docs author
-- Updating the capability record but leaving the user guide stale after user-observable behavior changed — TEACH is the phase the record exists to feed
-- Letting a descoped thin-slice silently disappear — it must move back to `⚪ Not Started` with intent intact
-- Archiving the sprint file instead of deleting it — the bridge dissolves on close
-- Leaving the progress ledger behind after close — it is execution state, not a record; distill then delete
+- [ ] All acceptance criteria verified
+- [ ] Outcome evidence recorded
+- [ ] Product artifacts updated (intent only, present tense)
+- [ ] **Living capability record (`docs/capabilities/CAP.<capability-name>.md`) updated with current-state truth**
+- [ ] Product dashboard [`docs/product.md`](../../docs/product.md) index updated
+- [ ] User docs refreshed (TEACH) via `author-user-docs` if observable behavior changed
+- [ ] Ephemeral sprint and ledger files deleted

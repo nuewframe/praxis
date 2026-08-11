@@ -1,8 +1,25 @@
 # Changelog
 
-All notable changes to the Praxis plugin are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this plugin uses semantic versioning (see [docs/project-context.md](docs/project-context.md) for the policy).
+All notable changes to the Praxis plugin are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this plugin uses semantic versioning (see [docs/product.md](docs/product.md) for the policy).
 
 ## [Unreleased]
+
+## [0.6.0] — 2026-08-10
+
+### Added
+- **Single-File Growth Initiatives (`INIT.`) & `create-initiative` Skill** — Refactored `skills/create-wave` and added `skills/create-initiative` to initialize single, intent-named initiative files (`docs/product/initiatives/INIT.<initiative-name>.md`) that refine progressively from high-level intent ($Iteration_1$) into detailed specs ($Iteration_N$), eliminating big-bang 4-file folder scaffolding.
+- **Living Capability Records (`CAP.`) & `create-capability-record` Skill** — Established `skills/create-capability-record` to scaffold and update `docs/capabilities/CAP.<capability-name>.md` as the single living source of truth per domain for UX, technical architecture, seam contracts (`<name>@vN`), and quality invariants.
+- **Upstream Domain Event Storming (`skills/event-storming`)** — Added upstream discovery skill to map raw business requirements and domain events to bounded contexts, candidate `CAP.` records, and initial `INIT.` growth initiatives.
+- **Downstream Operational Feedback Intake (`skills/ingest-operational-feedback`)** — Added downstream human-in-the-loop operational feedback intake skill to distill incident post-mortems, operator friction logs, and SLO reviews directly into `CAP.` invariants and remediation initiatives.
+- **Unified Product Dashboard & Context (`docs/product.md`)** — Consolidated doctrine, governance, and living roadmap into a single, unified `docs/product.md` hub at the root of `docs/`.
+- **Search-Optimized Intent Prefixes** — Adopted standard file naming prefixes across all core artifacts: `CAP.` for living capabilities, `INIT.` for growth initiatives, `ADR.` for architectural decisions, and `SPRINT.` for ephemeral implementation bridges.
+
+### Changed
+- **Anti-Over-Refinement Rule Enforced** — Explicitly updated `instructions/lean-delivery-guardrails.instructions.md` and `skills/create-initiative` to forbid up-front $Iteration_N$ over-refinement for early exploratory spikes, keeping $Iteration_1$ lean.
+- **Agent Personas Updated** — Refactored [`agents/product-manager.agent.md`](agents/product-manager.agent.md), [`agents/product-designer.agent.md`](agents/product-designer.agent.md), and [`agents/principal-engineer.agent.md`](agents/principal-engineer.agent.md) to operate directly on single-file `INIT.` initiatives, `CAP.` living records, `docs/product.md`, and `docs/product.md`.
+- **Always-On Instructions Updated** — Refactored [`instructions/lean-delivery-guardrails.instructions.md`](instructions/lean-delivery-guardrails.instructions.md), [`instructions/capability-driven-guardrails.instructions.md`](instructions/capability-driven-guardrails.instructions.md), and [`instructions/code-contribution-intake.instructions.md`](instructions/code-contribution-intake.instructions.md).
+- **Sub-Skills Refactored & Enhanced** — Updated `skills/create-product-design-spec` (with Given/When/Then templates & UX matrices), `skills/create-product-architecture-spec` (with Ports/Adapters & seam contracts), `skills/create-quality-spec` (with test pyramid & 4 Production Readiness anchors), `skills/start-thin-slice`, `skills/close-sprint`, `skills/bootstrap-project`, and `skills/provision-project-overlay`.
+- **Validation Probes Updated** — Updated `scripts/validate-plugin.sh`, `scripts/gen-doctrine-index.sh`, `.praxis-canon.json`, `AGENTS.md`, and `GEMINI.md` to reference `docs/product.md` and `CAP.` records.
 
 ## [0.5.0] — 2026-07-25
 

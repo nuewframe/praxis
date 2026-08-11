@@ -102,7 +102,7 @@ Resilience posture committed by this decision (only if the decision sets one):
 
 ## Related Documents
 
-- **Capability record (living architecture this decision shapes):** `docs/architecture/enforcement/README.md`
+- **Capability record (living architecture this decision shapes):** [CAP.plugin-conformance-and-validation-probes](../../capabilities/CAP.plugin-conformance-and-validation-probes.md)
 - **System overview:** `docs/architecture/README.md`
 - **Supersedes / Superseded by:** none
 - **Course-correction plan that triggered this decision:** `docs/plans/praxis-course-correction-2026-07.md` <!-- praxis:allow-path reason="immutable decision record citing the plan that motivated it; that plan was removed with the pre-adoption archive" -->

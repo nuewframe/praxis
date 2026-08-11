@@ -15,7 +15,7 @@
 #   6. Every enforcement script parses and is executable.
 #   7. Inventory parity: every skill, script, and instruction on disk is
 #      referenced in the canonical self-describing docs (README.md,
-#      docs/project-context.md, and — for instructions — using-praxis), so the
+#      docs/product.md, and — for instructions — using-praxis), so the
 #      docs cannot silently drift behind the file tree.
 #   8. Every agent (`agents/*.agent.md`) has parseable frontmatter with the
 #      required keys.
@@ -238,6 +238,10 @@ LINK_RE = re.compile(r'\[[^\]]*\]\([^)]*\)')
 # should exist here — this file genuinely never exists in this repo.
 allowed_missing = {
     'scripts/verify.sh',
+    'docs/project-context.md',
+    'docs/product/README.md',
+    'docs/product/design.md',
+    'docs/architecture.md',
 }
 
 SKIP_DIRS = {'.git', 'node_modules', '.claude'}
@@ -324,10 +328,10 @@ fi
 # 7. Inventory parity: every skill, script, and instruction on disk must be
 #    referenced in the canonical self-describing docs, so the docs cannot
 #    silently drift behind the file tree.
-#      - skills/<name>/        → README.md AND docs/project-context.md
-#      - scripts/check-*.sh    → README.md AND docs/project-context.md
-#      - scripts/*.sh (others) → docs/project-context.md (README allowlist below)
-#      - instructions/*.md     → README.md, docs/project-context.md, using-praxis
+#      - skills/<name>/        → README.md AND docs/product.md
+#      - scripts/check-*.sh    → README.md AND docs/product.md
+#      - scripts/*.sh (others) → docs/product.md (README allowlist below)
+#      - instructions/*.md     → README.md, docs/product.md, using-praxis
 echo "validate-plugin: checking inventory parity..."
 INV_REPORT=$(python3 <<'PY'
 import os, sys
@@ -339,7 +343,7 @@ def read(path):
         return ''
 
 readme = read('README.md')
-context = read('docs/project-context.md')
+context = read('docs/product.md')
 bootstrap = read('skills/using-praxis/SKILL.md')
 
 problems = []
@@ -347,30 +351,30 @@ problems = []
 # README-optional scripts: release/dev tooling not wired into target projects.
 readme_optional_scripts = {'bump-version.sh'}
 
-# Skills — each must appear in README and project-context.
+# Skills — each must appear in README and docs/product.md.
 for skill in sorted(d for d in os.listdir('skills') if os.path.isdir(os.path.join('skills', d))):
     if not os.path.isfile(os.path.join('skills', skill, 'SKILL.md')):
         continue
     if skill not in readme:
         problems.append(f'skills/{skill}: not referenced in README.md')
     if skill not in context:
-        problems.append(f'skills/{skill}: not referenced in docs/project-context.md')
+        problems.append(f'skills/{skill}: not referenced in docs/product.md')
 
-# Scripts — every script must appear in project-context; check-*.sh + others
+# Scripts — every script must appear in docs/product.md; check-*.sh + others
 # (minus the release allowlist) must also appear in README.
 for script in sorted(f for f in os.listdir('scripts') if f.endswith('.sh')):
     if script not in context:
-        problems.append(f'scripts/{script}: not referenced in docs/project-context.md')
+        problems.append(f'scripts/{script}: not referenced in docs/product.md')
     if script not in readme_optional_scripts and script not in readme:
         problems.append(f'scripts/{script}: not referenced in README.md')
 
-# Instructions — each always-on guardrail must appear in README, project-context,
+# Instructions — each always-on guardrail must appear in README, docs/product.md,
 # and the bootstrap skill index, so the guardrail count never diverges.
 for instr in sorted(f for f in os.listdir('instructions') if f.endswith('.instructions.md')):
     if instr not in readme:
         problems.append(f'instructions/{instr}: not referenced in README.md')
     if instr not in context:
-        problems.append(f'instructions/{instr}: not referenced in docs/project-context.md')
+        problems.append(f'instructions/{instr}: not referenced in docs/product.md')
     if instr not in bootstrap:
         problems.append(f'instructions/{instr}: not referenced in skills/using-praxis/SKILL.md')
 
@@ -383,7 +387,7 @@ import re
 sys.path.insert(0, 'scripts')
 import citation_scan
 
-CANONICAL = ['README.md', 'docs/project-context.md', 'skills/using-praxis/SKILL.md']
+CANONICAL = ['README.md', 'docs/product.md', 'skills/using-praxis/SKILL.md']
 CLAIM_RE = re.compile(
     r'`?(skills/([a-z0-9][a-z0-9-]*)/)`?'
     r'|`?(instructions/([a-z0-9][a-z0-9-]*\.instructions\.md))`?'

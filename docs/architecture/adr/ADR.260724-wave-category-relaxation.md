@@ -146,7 +146,7 @@ Kept here because an ADR is an immutable historical record, and the wave documen
 
 ## Related Documents
 
-- **Capability record (living architecture this decision shapes):** `docs/architecture/skills/README.md`
+- **Capability record (living architecture this decision shapes):** [CAP.method-spine-and-execution](../../capabilities/CAP.method-spine-and-execution.md)
 - **System overview:** `docs/architecture/README.md`
 - **Governance clause amended:** `docs/project-context.md` § *Evolution policy* → *Removing or breaking a rule*
 - **Active sprint (TS-001):** `docs/product/sprints/SPRINT.260724-praxis-self-conformance.md` <!-- praxis:allow-path reason="cites the sprint this decision was taken in; sprint files are ephemeral by design and deleted at close, so this reference is historical and can never resolve" -->

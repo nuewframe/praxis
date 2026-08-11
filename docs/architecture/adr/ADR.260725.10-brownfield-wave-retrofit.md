@@ -145,9 +145,9 @@ Resilience posture committed by this decision: none. This is a documentation and
 
 ## Related Documents
 
-- **Capability record (living architecture this decision shapes):** `docs/architecture/skills/README.md`
+- **Capability record (living architecture this decision shapes):** [CAP.method-spine-and-execution](../../capabilities/CAP.method-spine-and-execution.md)
 - **System overview:** `docs/architecture/README.md`
-- **Product dashboard carrying the derived index:** `docs/product/README.md`
-- **Wave slice generalizing this into an adoption path:** `TS-001` of [wave-brownfield-adoption](../../product/waves/wave-brownfield-adoption/README.md)
+- **Product dashboard carrying the derived index:** `docs/product.md`
+- **Wave slice generalizing this into an adoption path:** `TS-001` of `wave-brownfield-adoption`
 - **Supersedes / Superseded by:** none
 - **Related ADRs:** `ADR.260724` (wave category relaxation) — removed the taxonomy that would have forced each derived wave into a product-org bucket, which is what made deriving by value theme possible; `ADR.260725` (declared exceptions move inline) — its Layer 1 would remove the evidence-citation workaround noted above.

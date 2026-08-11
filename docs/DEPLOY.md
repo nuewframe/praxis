@@ -22,7 +22,7 @@ Praxis follows [Semantic Versioning](https://semver.org/):
 | **minor** (x.**Y**.0) | New skills, new guardrails, additive features | `0.1.3 → 0.2.0` |
 | **major** (**X**.0.0) | Breaking changes to skill interfaces or manifest format | `0.x.x → 1.0.0` |
 
-> **While Praxis is pre-1.0, the minor position carries the major signal.** Under `0.y.z` the interfaces are not yet declared stable, so a breaking or structural change bumps `y` — a change that would be `2.0.0` after 1.0 ships as `0.4.0 → 0.5.0` today. Do not reach for `1.0.0` because a change is breaking; `1.0.0` is the deliberate declaration that the skill, instruction, and agent interfaces are stable and supported. See `docs/project-context.md` § Versioning.
+> **While Praxis is pre-1.0, the minor position carries the major signal.** Under `0.y.z` the interfaces are not yet declared stable, so a breaking or structural change bumps `y` — a change that would be `2.0.0` after 1.0 ships as `0.4.0 → 0.5.0` today. Do not reach for `1.0.0` because a change is breaking; `1.0.0` is the deliberate declaration that the skill, instruction, and agent interfaces are stable and supported. See `docs/product.md` § Evolution Policy & Governance.
 
 ---
 

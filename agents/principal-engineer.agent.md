@@ -33,7 +33,7 @@ Do **not** use this persona for:
 
 Active when running: `discovery-and-ambiguity-log`, `design-system-architecture`, `design-capability-layout`, `create-adr`.
 
-- **Inputs:** intake envelope, wave specs, current engineering snapshot, existing ADRs.
+- **Inputs:** intake envelope, initiative specs (`INIT.<name>.md`), current engineering snapshot, existing living capability records (`docs/capabilities/CAP.<name>.md`), active ADRs.
 - **Tools:** read, search, write to `docs/**` and ADR paths only. **Cannot modify source code.**
 - **Output contract — the Design Package:**
   1. Resolved Ambiguity Log.

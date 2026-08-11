@@ -1,26 +1,27 @@
 ---
-applyTo: "docs/product/**,docs/architecture/**,docs/guides/**,docs/waves/**,docs/sprints/**"
+applyTo: "docs/product/**,docs/architecture/**,docs/capabilities/**,docs/guides/**,docs/sprints/**"
 description: >
-  Always-on lean delivery guardrails: wave methodology, sprint as immutable bridge, hypothesis
-  cards, intent-not-history doc style, bidirectional sprint close. Pairs with
-  capability-driven-guardrails for the engineering side.
+  Always-on lean delivery guardrails: initiative methodology (INIT.<name>.md), living capability records (CAP.<name>.md),
+  sprint as immutable bridge, hypothesis cards, intent-not-history doc style, bidirectional sprint close.
 ---
 
 # Lean Delivery Guardrails
 
 Always-on rules for any product-planning artifact. The host project owns the final word — its own instructions override these.
 
-**Path coverage.** The `applyTo` glob names five roots. Three are where Praxis skills actually write: `docs/product/**` (waves and sprints at their default homes), `docs/architecture/**` (capability records and ADRs), and `docs/guides/**` (TEACH-phase user docs). The remaining two — `docs/waves/**` and `docs/sprints/**` — are **override-only**. No Praxis skill creates them; `provision-project-overlay` defaults `paths.waves` to `docs/product/waves` and `paths.sprints` to `docs/product/sprints`. They are listed so that a host project which remaps those keys to top-level directories still receives these guardrails, not because anything in Praxis puts files there. If you are looking for wave documents in a default install, they are under `docs/product/`.
+**Path coverage.** Applies to `docs/product/**` (initiatives, dashboard, sprints), `docs/capabilities/**` (living capability records), `docs/architecture/**` (ADRs and topology), and `docs/guides/**` (TEACH-phase user docs).
 
 ---
 
-## 1. Waves Are Intent, Not Sprints With Bigger Scope
+## 1. Initiatives (Waves) Are Intent, Single-File, and Refine Iteratively
 
-A **wave** is a coherent slice of product value tracked through thin-slices. Waves outlive sprints and survive reorganization.
+An **initiative** (wave) is a coherent slice of product value tracked through thin-slices (`TS-NNN`). Initiatives outlive sprints and survive reorganization.
 
-- Use `create-wave` to scaffold any new wave.
-- Each wave has four documents: `README.md` (intent + thin-slice tracking), `product-design.md`, `product-architecture.md`, `qa.md`.
-- The wave `README.md` is the only place that tracks thin-slice **status** and **correction notes**. Other wave docs describe **intent**.
+- Use `create-wave` or `create-initiative` to scaffold any new initiative as a single, intent-named file: `docs/product/initiatives/INIT.<initiative-name>.md`.
+- Initiatives start **lean** on Iteration 1 (high-level intent + thin-slices) and **refine progressively** across iterations ($Iteration_1 \rightarrow Iteration_N$) as data arrives.
+- **Anti-Over-Refinement Rule:** Never attempt to populate $Iteration_N$ architecture topology, seam contracts, or NFR anchors up front for early exploratory spikes or $Iteration_1$ drafts. Keep $Iteration_1$ lean; deepen specs only when thin-slices are triaged into sprints.
+- The initiative file is the only place that tracks thin-slice **status** and **correction notes**.
+- Intent-named file prefixes (`CAP.`, `INIT.`, `ADR.`, `SPRINT.`) are required — no generic `README.md` files in subdirectories.
 
 ---
 
@@ -31,82 +32,66 @@ A thin-slice describes one user outcome end-to-end. Not a backlog item. Not an i
 - Each thin-slice has a stable ID (`TS-NNN`).
 - Corrections and reopens **keep the same ID**. Never invent a replacement slice for a correction.
 - Status flows: `⚪ Not Started → 🔄 In Progress → ✅ Complete`. Add `🚫 Blocked` or `⚠️ At Risk` only when meaningful.
-- A short tracking note next to a thin-slice is allowed when it explains a correction. Wave docs are not a changelog.
+- A short tracking note next to a thin-slice is allowed when it explains a correction.
 
 ---
 
 ## 3. Sprint Is an Immutable Bridge
 
-A sprint locks **product intent** against **engineering current state** at a fixed moment in time. Two free dimensions: WHEN work starts, and the CURRENT STATE of engineering when it starts.
+A sprint locks **product intent** against **engineering current state** at a fixed moment in time.
 
-- Use `create-sprint` to author any sprint. Capture the engineering current-state snapshot — codebase, toolchain, integrations, active ADRs, known debt.
+- Use `create-sprint` to author any sprint (`docs/product/sprints/SPRINT.<YYMMDD>-<slug>.md`). Capture the engineering current-state snapshot — codebase, toolchain, integrations, active ADRs, known debt.
 - Scope is **immutable** once a sprint starts. To change scope, close the sprint and create a new one.
-- Sprint files are **ephemeral** — they live in a sprint directory, not woven into permanent docs. Mutable execution state lives in a separate `SPRINT.<ID>-*.ledger.md` that survives sessions and is deleted at close.
+- Sprint files are **ephemeral** — mutable execution state lives in `SPRINT.<ID>-*.ledger.md` that is deleted at close.
 - Every sprint includes a hypothesis card: hypothesis, validation method, continue/pivot/stop rule.
-- Standard- and Major-tier sprints carry a signed **Sprint Plan Approval** line; implementation does not start until it is signed (Trivial writes `n/a`).
+- Standard- and Major-tier sprints carry a signed **Sprint Plan Approval** line.
 
 ---
 
-## 4. Sprint Close Is Bidirectional
+## 4. Sprint Close Is Bidirectional Outflow
 
-When a sprint closes, learnings flow to **both** product artifacts AND engineering artifacts. Closing only one side loses half the learning.
+When a sprint closes, learnings flow to **both** product artifacts AND engineering artifacts.
 
-- Use `close-sprint`. Verify acceptance criteria, record outcome evidence, distill learnings into wave docs (intent only) and engineering artifacts (handbook, ADRs, capability layouts, refactor records), update the dashboard, then **delete** the sprint file.
-- Wave docs after close: clean present tense, no `SPRINT.<ID> discovered…`, no `Updated after sprint`, no sprint references, no passive history. Rewrite the section to reflect the current correct intent.
+- Use `close-sprint`. Verify acceptance criteria, record outcome evidence, distill learnings into initiative files (`INIT.<name>.md`), the product dashboard ([`docs/product.md`](../docs/product.md)), AND living capability records (`docs/capabilities/CAP.<capability-name>.md`), then **delete** the sprint file.
+- Initiative docs after close: clean present tense, no sprint references, no passive history. Rewrite sections to reflect current correct intent.
 
 ---
 
 ## 5. Quality Is Specified Before It Is Tested
 
-Each wave has a `qa.md` authored via `create-quality-spec`. It is a **planning artifact**, not test code.
+Quality criteria and NFR invariants are refined inside `INIT.<name>.md` and promoted to `docs/capabilities/CAP.<name>.md#quality-and-nfr-invariants`.
 
-- No code, imports, fixtures, file paths, or assertions in `qa.md`.
+- No code, imports, fixtures, file paths, or assertions in quality specs.
 - Every behavior maps to exactly one test layer (see `test-by-ownership`).
-- Risk tiers are honest — not everything is "critical."
-- Coverage gaps are explicit, with rationale.
+- 4 Production-Readiness anchors (Observable, Configurable, Scalable, Resilient) are explicit.
 
 ---
 
 ## 6. Code Contribution Intake Comes Before Implementation
 
-Before any user story, feature, thin-slice, behavior-changing contribution, or non-trivial refactor reaches implementation, use `intake-code-contribution`.
+Before any contribution reaches implementation, use `intake-code-contribution`.
 
-- For slice work, start at the front door with `start-thin-slice`: check dependency/status preconditions and route by tier before a sprint exists.
-- Locate the wave and thin-slice first. A chat prompt is not enough product intent.
-- Confirm `README.md`, `product-design.md`, `product-architecture.md`, and `qa.md` exist and are specific enough.
+- For slice work, start at `start-thin-slice`: check dependency/status preconditions in `INIT.<initiative>.md` and route by tier.
+- Confirm `INIT.<initiative-name>.md` exists and is specific enough.
 - Confirm or create the sprint bridge before writing code.
-- Correlate the sprint plan against the current codebase, tests, toolchain, integrations, ADRs, and known hazards.
-- Decide test posture before code: changed behavior gets red-first tests; preserved behavior gets a green baseline first.
 
 ---
 
-## 7. ADRs Capture Durable Decisions
+## 7. ADRs Capture Durable Technical Decisions
 
-Use `create-adr` whenever a sprint or wave makes a decision that binds future work — technology selection, architectural pattern, security or infrastructure approach, supersession of a prior decision.
+Use `create-adr` whenever a sprint or initiative makes a decision that binds future work.
 
-- Collision-safe date-based IDs (`ADR.<YYMMDD>[.HH…][.seq]`) per `create-adr` — **not** sequential numbering.
-- Immutable once published; supersede with a new ADR rather than editing in place.
+- Collision-safe date-based IDs (`ADR.<YYMMDD>[.HH…][.seq]`).
 - Mandatory alternatives table with at least two options.
 - Consequences cover both positive **and** negative outcomes.
 
 ---
 
-## 8. Composes With MPM and Other Runtimes
-
-If Claude MPM (or another agent orchestration runtime) is in use:
-
-- The Nuewframe Method owns **planning artifacts** (waves, sprints, ADRs, design + architecture + quality specs).
-- The orchestration runtime owns **runtime mechanics** (delegation, verification gates, ticketing, branch protection).
-- Sprint files and `qa.md` are the artifacts the orchestration runtime hands to specialist agents.
-
----
-
 ## Anti-Patterns (Always Refuse)
 
-- ❌ Editing a sprint's **locked scope** after it has started — scope, acceptance criteria, hypothesis card, and test plan are frozen (to change them, close the sprint and open a new one). The Status header, Working Notes, and the approval-line signatures are the sprint's designed **mutable** surfaces and are exempt.
-- ❌ Annotating wave docs with sprint history (rewrite intent instead)
-- ❌ Inventing replacement thin-slice IDs for corrections
-- ❌ Marking a sprint complete without recording outcome evidence
-- ❌ Closing a sprint without updating engineering artifacts
-- ❌ Embedding code in a `qa.md`
-- ❌ Treating waves as "big sprints" or sprints as "small waves"
+- ❌ Editing a sprint's **locked scope** after it has started.
+- ❌ Creating nested generic `README.md` files in subdirectories (use `CAP.`, `INIT.`, `ADR.`, `SPRINT.`).
+- ❌ Forcing 4-file folder scaffolding up front instead of single-file progressive refinement.
+- ❌ Annotating initiative docs with sprint history (rewrite intent instead).
+- ❌ Inventing replacement thin-slice IDs for corrections.
+- ❌ Closing a sprint without updating living capability records (`CAP.<name>.md`).

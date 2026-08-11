@@ -1,0 +1,19 @@
+---
+name: create-initiative
+description: Scaffold or refine a single-file growth initiative (INIT.<name>.md) in {{project.name}}. Project overlay on top of the plugin's `create-initiative` skill.
+---
+
+# Create Initiative (Project Overlay)
+
+This is a **project overlay**. The full skill — progressive single-file initiative refinement ($Iteration_1 \rightarrow Iteration_N$), Given/When/Then templates, Ports/Adapters breakdown, 4 Production Readiness anchors — is provided by the `praxis` plugin's `create-initiative` skill. Read it first, then apply the overlay below.
+
+## Project-specific paths
+
+- Initiatives directory: `docs/product/initiatives/INIT.<initiative-name>.md`
+- Product dashboard for registration: `{{paths.product_dashboard}}`
+- Living capability records referenced: `docs/capabilities/CAP.<capability-name>.md`
+
+## Project-specific rules
+
+- Initiatives start **lean** on Iteration 1 (Summary, Hypothesis, Thin-Slices).
+- **Anti-Over-Refinement Rule:** Never attempt to populate Iteration N architecture topology or NFR anchors up front for early exploratory spikes. Keep Iteration 1 lean; deepen specs only when thin-slices are triaged into active sprints.

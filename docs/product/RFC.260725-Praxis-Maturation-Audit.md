@@ -8,7 +8,7 @@
 **Related Documents:**
 - [RFC.260725-SDLC-Observation.md](RFC.260725-SDLC-Observation.md)
 - [RFC.260725-Praxis-Future-Vision.md](RFC.260725-Praxis-Future-Vision.md)
-- [../project-context.md](../project-context.md)
+- [../product.md](../product.md)
 
 ---
 

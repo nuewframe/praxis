@@ -47,9 +47,9 @@ Inventory what actually exists, and write the inventory down. You are deriving *
 
 Do not assume one tree.
 
-A product may be several generations in one repository, several packages in a monorepo, or several repositories. In each case **no single `docs/product/waves/` holds the product's intent**, and a dashboard inside any one of them is a partial truth presented as the whole.
+A product may be several generations in one repository, several packages in a monorepo, or several repositories. In each case **no single `docs/product/initiatives/` holds the product's intent**, and a dashboard inside any one of them is a partial truth presented as the whole.
 
-- **One root** → the dashboard is `docs/product/README.md` and it is complete.
+- **One root** → the dashboard is `docs/product.md` and it is complete.
 - **Several roots in one repository** → the dashboard sits **above** them and names each root; each root keeps its own waves.
 - **Several repositories** → set `paths.product_root` per [ADR.260725.17](../../docs/architecture/adr/ADR.260725.17-context-placement-beyond-one-repo.md); a repository that is a part says so and points at the whole.
 
@@ -97,7 +97,7 @@ When a candidate slice has no citable evidence, there are exactly two honest out
 
 A reader must be able to tell a derived record from a maintained one **without being told separately**. Every derived wave and dashboard opens with a banner saying so, why it carries no criteria, and what it was reconstructed from.
 
-Praxis's own derived waves are the worked example — see any wave marked `Delivered†` in [`docs/product/README.md`](../../docs/product/README.md).
+Praxis's own derived waves are the worked example — see any wave marked `Delivered†` in [`docs/product.md`](../../docs/product.md).
 
 ## Step 7 — Reconcile existing wave documents against the evidence
 

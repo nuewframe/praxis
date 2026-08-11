@@ -1,0 +1,19 @@
+---
+name: create-capability-record
+description: Scaffold or update a living capability record (CAP.<name>.md) in {{project.name}}. Project overlay on top of the plugin's `create-capability-record` skill.
+---
+
+# Create Capability Record (Project Overlay)
+
+This is a **project overlay**. The full skill — standard 6 capability sections, Bounded Contexts, User Journeys, Ports/Adapters, Seam Contracts (`<name>@vN`), NFR Invariants, and Lineage — is provided by the `praxis` plugin's `create-capability-record` skill. Read it first, then apply the overlay below.
+
+## Project-specific paths
+
+- Living capability records directory: `docs/capabilities/CAP.<capability-name>.md`
+- Product dashboard for registration: `{{paths.product_dashboard}}`
+- ADR directory referenced by capability records: `{{paths.adr}}/`
+
+## Project-specific rules
+
+- One living capability record file per business domain (`docs/capabilities/CAP.<capability-name>.md`).
+- Living capability records represent **current-state truth**, updated by `close-sprint` as validated learnings ship.
