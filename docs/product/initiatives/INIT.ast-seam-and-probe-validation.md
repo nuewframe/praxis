@@ -22,7 +22,7 @@
 | -------- | -------------------- | ------ | ----------- |
 | `TS-030` | Polyglot AST Parsing Infrastructure (`scripts/ast_parse.sh` for TS, Py, Go, Rust, C#, JVM) | ✅ Complete | [SPRINT.260811](../sprints/SPRINT.260811-ast-seam-and-probe-validation.md) |
 | `TS-031` | AST-Backed Port/Adapter Parity Probe (`check-port-adapter-parity.sh`) | ✅ Complete | [SPRINT.260811](../sprints/SPRINT.260811-ast-seam-and-probe-validation.md) |
-| `TS-032` | AST-Backed Seam Contract Generator (`check-seam-contract-parity.sh`) | ⚪ | [SPRINT.260811](../sprints/SPRINT.260811-ast-seam-and-probe-validation.md) |
+| `TS-032` | AST-Backed Seam Contract Generator (`check-seam-contract-parity.sh`) | ✅ Complete | [SPRINT.260811](../sprints/SPRINT.260811-ast-seam-and-probe-validation.md) |
 | `TS-033` | AST-Backed Seam Observability Probe (`check-observability-at-seams.sh`) | ⚪ | [SPRINT.260811](../sprints/SPRINT.260811-ast-seam-and-probe-validation.md) |
 | `TS-034` | Praxis `v0.7.0` Release & Version Bump (`scripts/bump-version.sh 0.7.0`) | ⚪ | [SPRINT.260811](../sprints/SPRINT.260811-ast-seam-and-probe-validation.md) |
 

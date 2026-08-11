@@ -8,7 +8,7 @@ _Mutable execution state. Survives session death. Deleted at `close-sprint` afte
 
 - [x] Phase 1: Polyglot AST Parsing Infrastructure (`scripts/ast_parse.sh`)
 - [x] Phase 2: AST-Backed Port/Adapter Parity Probe (`check-port-adapter-parity.sh`)
-- [ ] Phase 3: AST-Backed Seam Contract Generator (`check-seam-contract-parity.sh`)
+- [x] Phase 3: AST-Backed Seam Contract Generator (`check-seam-contract-parity.sh`)
 - [ ] Phase 4: AST-Backed Observability Probe (`check-observability-at-seams.sh`)
 - [ ] Phase 5: Praxis Version Bump `v0.7.0` (`bump-version.sh 0.7.0`, `CHANGELOG.md`, `bump-version.sh --audit`)
 
