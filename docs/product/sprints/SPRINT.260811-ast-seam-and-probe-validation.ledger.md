@@ -1,14 +1,12 @@
-<!-- praxis:allow-path reason="ephemeral ledger file" -->
 # SPRINT.260811 — Progress Ledger (Praxis `v0.7.0`)
 
 _Mutable execution state. Survives session death. Deleted at `close-sprint` after learnings are distilled._
 
 ---
 
-<!-- praxis:allow-version-literal reason="cites target milestone in ledger heading" -->
 ## Plan Phase Progress (`v0.7.0` AST Work)
 
-- [ ] Phase 1: AST Parsing Infrastructure (`scripts/ast_parse.py` <!-- praxis:allow-path reason="unreleased script planned for TS-030 in `v0.7.0`" -->)
+- [ ] Phase 1: Polyglot AST Parsing Infrastructure (`scripts/ast_parse.sh`)
 - [ ] Phase 2: AST-Backed Port/Adapter Parity Probe (`check-port-adapter-parity.sh`)
 - [ ] Phase 3: AST-Backed Seam Contract Generator (`check-seam-contract-parity.sh`)
 - [ ] Phase 4: AST-Backed Observability Probe (`check-observability-at-seams.sh`)
@@ -20,9 +18,9 @@ _Mutable execution state. Survives session death. Deleted at `close-sprint` afte
 
 | Behavior | Layer | State (🔴/🟢) | Last run |
 | -------- | ----- | ------------- | -------- |
-| Plugin Validation Probe | Composition | ⚪ | — |
-| Version Sync & Audit Probe | Integration | ⚪ | — |
-| AST Parsing Infrastructure | Unit | ⚪ | — |
+| Plugin Validation Probe | Composition | 🟢 | 2026-08-11 |
+| Version Sync & Audit Probe | Integration | 🟢 | 2026-08-11 |
+| Polyglot AST Parsing Infrastructure | Unit | ⚪ | — |
 | AST Port/Adapter Parity Probe | Integration | ⚪ | — |
 | AST Seam Contract Generator | Integration | ⚪ | — |
 | AST Observability Probe | Integration | ⚪ | — |
@@ -32,7 +30,7 @@ _Mutable execution state. Survives session death. Deleted at `close-sprint` afte
 ## Verify Attempts
 
 - Consecutive failed verifies on the current cause: 0
-- Last verify exit code + cause: —
+- Last verify exit code + cause: 0 (clean)
 - Stop-rule budget: 3 consecutive failed verifies on the same cause → HALT and escalate
 
 ---
@@ -45,7 +43,7 @@ _Mutable execution state. Survives session death. Deleted at `close-sprint` afte
 
 ## What's Left
 
-- Phase 1: Create `scripts/ast_parse.py` <!-- praxis:allow-path reason="unreleased script planned for TS-030 in `v0.7.0`" --> AST parsing utilities.
+- Phase 1: Create `scripts/ast_parse.sh` bridge and polyglot runners (`ast_parse_ts.js`, `ast_parse_py.py`, `ast_parse_go.go`, `ast_parse_rs.rs`, `ast_parse_cs.cs`, `ast_parse_kt.kt`).
 - Phase 2: Refactor `check-port-adapter-parity.sh` to use AST parsing.
 - Phase 3: Refactor `check-seam-contract-parity.sh` for AST contract extraction.
 - Phase 4: Refactor `check-observability-at-seams.sh` for AST block analysis.
