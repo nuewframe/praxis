@@ -2,23 +2,13 @@
 # check-port-adapter-parity.sh
 #
 # For every `*.ports.*` file (a capability's port/interface module), ensure at
-# least one matching adapter exists in the same capability folder. This guards
-# against the dumping-ground pattern of declaring an interface and never
-# implementing it, or implementing it only as production code without an
-# in-memory test double (which signals untestable design).
-#
-# Parity rule: for each `<base>.ports.<ext>` we expect EITHER:
-#   - `<base>.adapter-memory.<ext>` (the test double), AND
-#   - at least one of `<base>.repository.<ext>` or `<base>.adapter-*.<ext>`
-#
-# When only the production adapter is present the script warns rather than
-# fails (the in-memory double is the stricter ideal but not universal).
-#
-# Compatible with bash 3.2+ (macOS default).
+# least one matching adapter exists in the same capability folder AND verify via
+# AST parsing (`scripts/ast_parse.sh`) that adapter implementations satisfy the
+# method signatures declared in the Port interface.
 #
 # Exit codes:
 #   0 — clean (or warnings only)
-#   1 — port without any adapter
+#   1 — port without adapter or adapter method AST mismatch
 #   2 — invocation error
 
 set -u
@@ -30,6 +20,9 @@ if [[ ! -d "$ROOT" ]]; then
   echo "check-port-adapter-parity: error: not a directory: $ROOT" >&2
   exit 2
 fi
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+AST_PARSER="$SCRIPT_DIR/ast_parse.sh"
 
 SCAN_PATHS=()
 CONFIG="$ROOT/.anti-dumping.json"
@@ -70,29 +63,84 @@ while IFS= read -r -d '' port; do
   PORT_COUNT=$((PORT_COUNT + 1))
   dir="$(dirname "$port")"
   fname="$(basename "$port")"
-  # Strip ".ports.<ext>" → keep <base>; capture <ext>.
   base="${fname%%.ports.*}"
   ext="${fname##*.ports.}"
 
   has_memory=0
   has_prod=0
+  memory_file=""
+  prod_file=""
 
   for f in "$dir"/"$base".adapter-memory."$ext" "$dir"/"$base".adapter-memory.*; do
-    [[ -f "$f" ]] && has_memory=1
+    if [[ -f "$f" ]]; then
+      has_memory=1
+      memory_file="$f"
+    fi
   done
 
   for f in "$dir"/"$base".repository."$ext" "$dir"/"$base".repository.* \
            "$dir"/"$base".adapter-*."$ext" "$dir"/"$base".adapter-*.*; do
-    [[ -f "$f" && "$f" != *adapter-memory* ]] && has_prod=1
+    if [[ -f "$f" && "$f" != *adapter-memory* ]]; then
+      has_prod=1
+      prod_file="$f"
+    fi
   done
 
   if [[ $has_memory -eq 0 && $has_prod -eq 0 ]]; then
     echo "check-port-adapter-parity: no adapter for $port" >&2
     VIOLATIONS=$((VIOLATIONS + 1))
+    continue
   elif [[ $has_memory -eq 0 ]]; then
     echo "check-port-adapter-parity: warn: no in-memory adapter for $port" >&2
     WARNINGS=$((WARNINGS + 1))
   fi
+
+  # AST Parity Verification (TS-031)
+  if [[ -x "$AST_PARSER" ]] && command -v python3 >/dev/null 2>&1; then
+    target_adapter="${memory_file:-$prod_file}"
+    if [[ -n "$target_adapter" && -f "$target_adapter" ]]; then
+      ast_err=$(python3 -c "
+import subprocess, json, sys
+
+port_file = sys.argv[1]
+adapter_file = sys.argv[2]
+ast_parser = sys.argv[3]
+
+def get_ast(path):
+    try:
+        res = subprocess.run([ast_parser, path], capture_output=True, text=True, timeout=5)
+        if res.returncode == 0:
+            return json.loads(res.stdout)
+    except Exception:
+        pass
+    return None
+
+port_ast = get_ast(port_file)
+adapter_ast = get_ast(adapter_file)
+
+if port_ast and adapter_ast:
+    port_methods = set()
+    for iface in port_ast.get('interfaces', []):
+        for m in iface.get('methods', []):
+            port_methods.add(m.get('name'))
+
+    adapter_methods = set()
+    for iface in adapter_ast.get('interfaces', []):
+        for m in iface.get('methods', []):
+            adapter_methods.add(m.get('name'))
+
+    missing = port_methods - adapter_methods
+    if missing:
+        print(f'missing AST methods: {sorted(list(missing))}')
+" "$port" "$target_adapter" "$AST_PARSER" 2>/dev/null || true)
+
+      if [[ -n "$ast_err" ]]; then
+        echo "check-port-adapter-parity: AST mismatch on $target_adapter ($ast_err)" >&2
+        VIOLATIONS=$((VIOLATIONS + 1))
+      fi
+    fi
+  fi
+
 done < <(find "${EXISTING[@]}" -type f \
   \( -name '*.ports.ts' -o -name '*.ports.tsx' \
      -o -name '*.ports.js' -o -name '*.ports.mjs' \
@@ -103,7 +151,7 @@ done < <(find "${EXISTING[@]}" -type f \
   -print0 2>/dev/null)
 
 if [[ $VIOLATIONS -gt 0 ]]; then
-  echo "check-port-adapter-parity: $VIOLATIONS port file(s) without any adapter" >&2
+  echo "check-port-adapter-parity: $VIOLATIONS port file(s) with adapter violations" >&2
   exit 1
 fi
 

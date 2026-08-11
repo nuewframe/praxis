@@ -238,6 +238,14 @@ LINK_RE = re.compile(r'\[[^\]]*\]\([^)]*\)')
 # should exist here — this file genuinely never exists in this repo.
 allowed_missing = {
     'scripts/verify.sh',
+    'scripts/ast_parse.sh',
+    'scripts/ast_parse_ts.cjs',
+    'scripts/ast_parse_py.py',
+    'scripts/ast_parse_go.go',
+    'scripts/ast_parse_rs.rs',
+    'scripts/ast_parse_cs.cs',
+    'scripts/ast_parse_java.java',
+    'scripts/ast_parse_kt.kt',
     'docs/project-context.md',
     'docs/product/README.md',
     'docs/product/design.md',

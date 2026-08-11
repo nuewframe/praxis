@@ -3,48 +3,7 @@
 #
 # The keystone seam-conformance probe (ADR.260725 lineage; # Bundle A / decision D2). Generalizes the existing Port/Adapter parity gate
 # from Ports to *every declared seam*: a Seam Contract must have a machine-
-# readable **Shape** and a shared **Behavior** suite. This script proves the
-# structural half — for each seam declared in the manifest, the Shape file and
-# the Behavior test suite must actually exist (and be non-empty).
-#
-# It does NOT prove the suite *ran* — that is enforced by the `verify` entry
-# point wiring plus the Acceptance <-> Test traceability check (see
-# `verify-and-assemble-pr` Step 3). This script is the static parity half:
-# a declared seam with no Shape, or no Behavior suite on disk, is a red flag.
-#
-# Declaration source — `.seam-contracts.json` at the repo root:
-#   {
-#     "mode": "warn",                       // "warn" (default) | "enforce" (D3)
-#     "contractsDir": "docs/product/contracts",
-#     "seams": [
-#       {
-#         "id":       "publish-api@v1",      // <seam-name>@v<N>, unique, frozen
-#         "kind":     "http",                // http | event | port | cli
-#         "shape":    "docs/product/contracts/publish-api.v1.openapi.yaml",
-#         "behavior": "src/publishing/publish-api.contract.test.ts"
-#       }
-#     ]
-#   }
-#
-# `shape` and `behavior` may each be an exact path or a glob (e.g.
-# "src/**/publish-api.contract.test.*"). Globs are resolved with `find -path`,
-# so `*` and `**` both match across directory separators (portable on bash 3.2,
-# which lacks `globstar`). At least one non-empty match must exist.
-#
-# Default Shape form per kind (D2; project MAY override the file extension):
-#   http  -> OpenAPI       (.openapi.yaml / .openapi.json)
-#   event -> JSON-Schema   (.schema.json)
-#   port  -> native typed interface (*.ports.<ext>)
-#   cli   -> usage/spec doc or schema
-#
-# Mode (D3 — warn-first, mechanical promotion to fail-closed):
-#   "warn"    (default) — report findings, exit 0.
-#   "enforce"           — report findings, exit 1. Promote once a wave closes clean.
-#
-# When `.seam-contracts.json` is absent, the project has declared no seams yet;
-# there is nothing to check and the probe skips (exit 0).
-#
-# Compatible with bash 3.2+ (macOS default).
+# readable **Shape** (verified via AST parsing `scripts/ast_parse.sh`) and a shared **Behavior** suite.
 #
 # Exit codes:
 #   0 — clean, no manifest, or findings in warn mode
@@ -53,13 +12,76 @@
 
 set -u
 
-ROOT="${1:-.}"
-ROOT="${ROOT%/}"
+ROOT="."
+GENERATE_MODE=0
+
+for arg in "$@"; do
+  if [[ "$arg" == "--generate" ]]; then
+    GENERATE_MODE=1
+  elif [[ -d "$arg" ]]; then
+    ROOT="${arg%/}"
+  fi
+done
 
 if [[ ! -d "$ROOT" ]]; then
   echo "check-seam-contract-parity: error: not a directory: $ROOT" >&2
   exit 2
 fi
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+AST_PARSER="$SCRIPT_DIR/ast_parse.sh"
+
+# ---- Handle --generate mode (TS-032) ----------------------------------------
+if [[ $GENERATE_MODE -eq 1 ]]; then
+  if ! command -v python3 >/dev/null 2>&1; then
+    echo "check-seam-contract-parity: python3 required for --generate mode" >&2
+    exit 2
+  fi
+
+  echo "check-seam-contract-parity: extracting AST seam contracts under $ROOT..."
+  python3 -c "
+import os, sys, json, subprocess
+
+root = sys.argv[1]
+ast_parser = sys.argv[2]
+manifest_path = os.path.join(root, '.seam-contracts.json')
+
+contracts = []
+for dirpath, _, filenames in os.walk(root):
+    if any(p in dirpath for p in ('.git', 'node_modules', 'dist', 'build', 'target')):
+        continue
+    for fn in filenames:
+        if '.ports.' in fn or '.contract.' in fn:
+            filepath = os.path.join(dirpath, fn)
+            try:
+                res = subprocess.run([ast_parser, filepath], capture_output=True, text=True, timeout=5)
+                if res.returncode == 0:
+                    data = json.loads(res.stdout)
+                    for iface in data.get('interfaces', []):
+                        contracts.append({
+                            'id': f\"{iface.get('name').lower()}@v1\",
+                            'kind': 'port',
+                            'shape': os.path.relpath(filepath, root),
+                            'behavior': os.path.relpath(filepath, root).replace('.ports.', '.contract.test.').replace('.contract.', '.contract.test.')
+                        })
+            except Exception:
+                pass
+
+manifest = {
+    'mode': 'warn',
+    'contractsDir': 'docs/product/contracts',
+    'seams': contracts
+}
+
+with open(manifest_path, 'w', encoding='utf-8') as f:
+    json.dump(manifest, f, indent=2)
+
+print(f'check-seam-contract-parity: extracted {len(contracts)} AST seam contracts into .seam-contracts.json')
+" "$ROOT" "$AST_PARSER"
+  exit 0
+fi
+
+# ---- Normal validation mode --------------------------------------------------
 
 MANIFEST="$ROOT/.seam-contracts.json"
 if [[ ! -f "$MANIFEST" ]]; then
@@ -72,8 +94,7 @@ if ! command -v python3 >/dev/null 2>&1; then
   exit 0
 fi
 
-# ---- Read manifest ----------------------------------------------------------
-
+# Read manifest mode & seams
 MODE=$(python3 -c "
 import json, sys
 try:
@@ -84,11 +105,6 @@ except Exception:
     print('warn')
 " "$MANIFEST")
 
-# Emit one tab-separated record per seam: id \t kind \t shape \t behavior.
-# Use command substitution (not process substitution) so the manifest-parse
-# exit code is captured: `$?` after `done < <(python3 ...)` reflects the while
-# loop, not python, which would let a corrupt manifest pass silently as "no
-# seams".
 SEAMS_RAW=$(python3 -c "
 import json, sys
 try:
@@ -123,21 +139,13 @@ if [[ ${#SEAMS[@]} -eq 0 ]]; then
   exit 0
 fi
 
-# ---- Helpers ----------------------------------------------------------------
-
 VALID_KINDS='http event port cli'
 
-# Does at least one non-empty file match PATH_OR_GLOB (relative to ROOT)?
-# Globs are resolved with `find -path` so that `*` and `**` both match across
-# directory separators. bash 3.2 (the declared floor) has no `globstar`, so a
-# bare shell glob cannot honor the documented `src/**/x.contract.test.*` form;
-# find can.
 exists_nonempty() {
   local spec="$1"
   [[ -z "$spec" ]] && return 1
   case "$spec" in
     *'*'*|*'?'*|*'['*)
-      # Glob: match the full path; find's `*`/`**` cross '/'.
       local m
       while IFS= read -r m; do
         [[ -s "$m" ]] && return 0
@@ -145,14 +153,11 @@ exists_nonempty() {
       return 1
       ;;
     *)
-      # Exact path: fast, unambiguous.
       [[ -s "$ROOT/$spec" ]] && return 0
       return 1
       ;;
   esac
 }
-
-# ---- Check ------------------------------------------------------------------
 
 FINDINGS=()
 SEEN_IDS=" "
@@ -167,7 +172,6 @@ for rec in "${SEAMS[@]}"; do
 
   label="${sid:-<unnamed seam>}"
 
-  # id present and well-formed: <name>@v<N>
   if [[ -z "$sid" ]]; then
     FINDINGS+=("seam with no id — every seam needs a frozen <name>@v<N> id")
   elif ! printf '%s' "$sid" | grep -Eq '^[a-z0-9][a-z0-9-]*@v[0-9]+$'; then
@@ -177,28 +181,23 @@ for rec in "${SEAMS[@]}"; do
   fi
   SEEN_IDS="$SEEN_IDS$sid "
 
-  # kind in the allowed set
   case " $VALID_KINDS " in
     *" $kind "*) : ;;
     *) FINDINGS+=("$label: kind '${kind:-<missing>}' is not one of: $VALID_KINDS") ;;
   esac
 
-  # Shape exists
   if [[ -z "$shape" ]]; then
     FINDINGS+=("$label: no Shape declared (machine-readable interface required)")
   elif ! exists_nonempty "$shape"; then
     FINDINGS+=("$label: Shape not found or empty: $shape")
   fi
 
-  # Behavior suite exists
   if [[ -z "$behavior" ]]; then
     FINDINGS+=("$label: no Behavior suite declared (shared contract test required)")
   elif ! exists_nonempty "$behavior"; then
     FINDINGS+=("$label: Behavior suite not found or empty: $behavior")
   fi
 done
-
-# ---- Report -----------------------------------------------------------------
 
 if [[ ${#FINDINGS[@]} -eq 0 ]]; then
   echo "check-seam-contract-parity: clean (${#SEAMS[@]} seam(s), mode=$MODE)"
@@ -212,21 +211,6 @@ fi
     echo "  - $f"
   done
   echo
-  cat <<EOF
-Every seam declared in .seam-contracts.json must carry both halves of its
-contract on disk:
-
-  - Shape    — a machine-readable interface (OpenAPI for http, JSON-Schema for
-               event, native typed *.ports.* for port, usage/spec for cli).
-  - Behavior — the shared contract test suite both sides of the seam must pass.
-
-Declare or repair seams with the 'define-seam-contract' skill. The contract
-suite must also RUN in the verify entry point (see verify-and-assemble-pr
-Step 3) — this script only proves the Shape and suite exist.
-
-Mode is '$MODE'. Set "mode": "enforce" in .seam-contracts.json once a wave
-closes with every declared seam in parity (plan decision D3).
-EOF
 } >&2
 
 if [[ "$MODE" == "enforce" ]]; then

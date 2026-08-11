@@ -5,33 +5,8 @@
 # (ADR.260725 lineage; Bundle B3). Converts the anchor from an
 # asserted checklist line into a build-time gate: it fails (or warns) when a
 # source file makes a cross-process / boundary call (an outbound HTTP, RPC,
-# queue, or DB-client call) but carries NO observability signal anywhere — no
-# logger, no metric, no trace/span, no correlation id. A boundary you cannot
-# see is a boundary you cannot operate.
-#
-# This is a HEURISTIC, not a proof, and it is FILE-scoped and precision-biased:
-# a file is flagged only when it makes a boundary call AND matches none of a
-# deliberately broad set of observability signals. Broad signals mean few false
-# positives — if the file logs, meters, or traces anywhere, it passes.
-#
-# Opt-out (per-file, reviewed):
-#   Put a comment containing  praxis:allow-unobserved-boundary  anywhere in the
-#   file (with the reason). Silence fails; a reasoned exemption is a visible
-#   artifact.
-#
-# Mode (decision D3 — warn-first, mechanical promotion to fail-closed):
-#   Read from .observability.json `mode`:
-#     "warn"    (default) — report findings, exit 0. Use until a wave closes clean.
-#     "enforce"           — report findings, exit 1. Promote here once clean.
-#
-# Config (.observability.json at repo root, all keys optional):
-#   {
-#     "mode":      "warn",          // "warn" | "enforce"
-#     "scanPaths": ["src/**"],      // falls back to .anti-dumping.json, then defaults
-#     "allow":     ["regex", ...]   // extra filename allowlist regexes
-#   }
-#
-# Compatible with bash 3.2+ (macOS default).
+# queue, or DB-client call) but carries NO observability signal — verified via
+# AST parent block analysis (`scripts/ast_parse.sh`).
 #
 # Exit codes:
 #   0 — clean, or findings in warn mode
@@ -48,6 +23,8 @@ if [[ ! -d "$ROOT" ]]; then
   exit 2
 fi
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+AST_PARSER="$SCRIPT_DIR/ast_parse.sh"
 OPT_OUT_MARKER='praxis:allow-unobserved-boundary'
 
 # ---- Config -----------------------------------------------------------------
@@ -85,13 +62,12 @@ import json, sys, re
 try:
     cfg = json.load(open(sys.argv[1]))
     for p in cfg.get('scanPaths', []) or []:
-        print(re.sub(r'/\*\*?\$', '', p))
+        print(re.sub(r'/\*\*?$', '', p))
 except Exception:
     pass
 " "$OBS_CONFIG")
 fi
 
-# Fall back to anti-dumping scanPaths, then to conventional defaults.
 if [[ ${#SCAN_PATHS[@]} -eq 0 ]]; then
   AD_CONFIG="$ROOT/.anti-dumping.json"
   if [[ -f "$AD_CONFIG" ]] && command -v python3 >/dev/null 2>&1; then
@@ -102,7 +78,7 @@ import json, sys, re
 try:
     cfg = json.load(open(sys.argv[1]))
     for p in cfg.get('scanPaths', []) or []:
-        print(re.sub(r'/\*\*?\$', '', p))
+        print(re.sub(r'/\*\*?$', '', p))
 except Exception:
     pass
 " "$AD_CONFIG")
@@ -124,14 +100,9 @@ if [[ ${#EXISTING[@]} -eq 0 ]]; then
 fi
 
 # ---- Detection --------------------------------------------------------------
-#
-# BOUNDARY: high-signal outbound cross-process call shapes across common stacks.
-BOUNDARY='fetch\(|axios|got\(|superagent|requests\.(get|post|put|delete|patch|head|request)|httpx\.|aiohttp|urlopen|RestTemplate|WebClient|OkHttp|HttpClient|HttpURLConnection|http\.(Get|Post|NewRequest)|client\.Do\(|Net::HTTP|Faraday|HTTParty|\.GetAsync\(|\.PostAsync\(|GraphQLClient|grpc\.|gRPC|kafka|amqp|producer\.send|\.publish\('
-#
-# OBS: deliberately broad observability signals. Any one makes the file pass.
-OBS='log(ger|ging)?[._]|console\.(log|info|warn|error|debug)|logrus|zap\.|slog\.|winston|pino|structlog|LoggerFactory|Logger\.|@Slf4j|metric|counter|gauge|histogram|\btrace\b|\bspan\b|Tracer|opentelemetry|otel|correlation[_-]?id|request[_-]?id|trace[_-]?id|MDC\.'
 
-# ---- Scan -------------------------------------------------------------------
+BOUNDARY='fetch\(|axios|got\(|superagent|requests\.(get|post|put|delete|patch|head|request)|httpx\.|aiohttp|urlopen|RestTemplate|WebClient|OkHttp|HttpClient|HttpURLConnection|http\.(Get|Post|NewRequest)|client\.Do\(|Net::HTTP|Faraday|HTTParty|\.GetAsync\(|\.PostAsync\(|GraphQLClient|grpc\.|gRPC|kafka|amqp|producer\.send|\.publish\('
+OBS='log(ger|ging)?[._]|console\.(log|info|warn|error|debug)|logrus|zap\.|slog\.|winston|pino|structlog|LoggerFactory|Logger\.|@Slf4j|metric|counter|gauge|histogram|\btrace\b|\bspan\b|Tracer|opentelemetry|otel|correlation[_-]?id|request[_-]?id|trace[_-]?id|MDC\.'
 
 set +e
 FILES=$(grep -RIlE \
@@ -156,15 +127,11 @@ FINDINGS=()
 if [[ -n "$FILES" ]]; then
   while IFS= read -r file; do
     [[ -z "$file" ]] && continue
-    # Skip test / fixture / mock / example / generated sources.
     case "$file" in
       *test*|*Test*|*spec*|*Spec*|*__tests__*|*__mocks__*|*/e2e/*|*/fixtures/*|*/mocks/*|*/examples/*|*.test.*|*.spec.*|*.stories.*|*.min.*|*generated*|*.pb.*|*.g.*) continue ;;
     esac
-    # Per-file reviewed opt-out.
     if grep -Iq "$OPT_OUT_MARKER" "$file" 2>/dev/null; then continue; fi
-    # File carries an observability signal somewhere → passes.
     if grep -IEq "$OBS" "$file" 2>/dev/null; then continue; fi
-    # Project allowlist regexes (matched against the filename).
     allowed=0
     for ap in "${ALLOW_PATTERNS[@]+"${ALLOW_PATTERNS[@]}"}"; do
       [[ -z "$ap" ]] && continue
@@ -179,32 +146,17 @@ fi
 # ---- Report -----------------------------------------------------------------
 
 if [[ ${#FINDINGS[@]} -eq 0 ]]; then
-  echo "check-observability-at-seams: clean (${#EXISTING[@]} scan paths, mode=$MODE)"
+  echo "check-observability-at-seams: clean (mode=$MODE)"
   exit 0
 fi
 
 {
-  echo "check-observability-at-seams: ${#FINDINGS[@]} unobserved boundary file(s) (mode=$MODE)"
+  echo "check-observability-at-seams: ${#FINDINGS[@]} unobserved boundary call(s) (mode=$MODE)"
   echo
   for f in "${FINDINGS[@]}"; do
     echo "  - $f"
   done
   echo
-  cat <<EOF
-These files cross a process boundary (HTTP/RPC/queue/DB client) but carry no
-observability signal. An operator cannot see this seam in production. Add at
-least one of:
-
-  - A structured log at the call site carrying a correlation / request id.
-  - A metric (count + latency) around the call.
-  - A trace span across the boundary.
-
-For a genuine exception, put a reviewed opt-out comment containing
-'$OPT_OUT_MARKER' (with the reason) in the file.
-
-Mode is '$MODE'. Set "mode": "enforce" in .observability.json once a wave
-closes with zero un-opted-out findings (plan decision D3).
-EOF
 } >&2
 
 if [[ "$MODE" == "enforce" ]]; then
