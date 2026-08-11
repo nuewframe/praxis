@@ -25,7 +25,7 @@ Initial design proposed a monolithic Python script (`scripts/ast_parse.py` <!-- 
 
 ## Proposed Architecture & Decision
 
-We adopt **Polyglot Language-Native AST Parsers** dispatched by a thin shell bridge (`scripts/ast_parse.sh` <!-- praxis:allow-path reason="unreleased script planned for TS-030 in `v0.7.0`" -->):
+We adopt **Polyglot Language-Native AST Parsers** dispatched by a thin shell bridge (`scripts/ast_parse.sh`):
 
 ```mermaid
 flowchart TD
@@ -41,9 +41,9 @@ flowchart TD
 
 ### Polyglot Parser Modules
 
-1. **`scripts/ast_parse_ts.js`** <!-- praxis:allow-path reason="unreleased script planned for TS-030 in `v0.7.0`" -->: Executes via Node.js using official `typescript` AST API (`ts.createSourceFile`).
-2. **`scripts/ast_parse_py.py`** <!-- praxis:allow-path reason="unreleased script planned for TS-030 in `v0.7.0`" -->: Executes via Python 3 using standard `ast` module.
-3. **`scripts/ast_parse_go.go`** <!-- praxis:allow-path reason="unreleased script planned for TS-030 in `v0.7.0`" -->: Executes via Go compiler using standard `go/parser` & `go/ast`.
+1. **`scripts/ast_parse_ts.js`**: Executes via Node.js using official `typescript` AST API (`ts.createSourceFile`).
+2. **`scripts/ast_parse_py.py`**: Executes via Python 3 using standard `ast` module.
+3. **`scripts/ast_parse_go.go`**: Executes via Go compiler using standard `go/parser` & `go/ast`.
 
 ---
 

@@ -20,7 +20,7 @@
 
 | Slice ID | Outcome & User Value | Status | SPRINT Link |
 | -------- | -------------------- | ------ | ----------- |
-| `TS-030` | Multi-Language AST Parsing Infrastructure (`scripts/ast_parse.sh` <!-- praxis:allow-path reason="unreleased script planned for TS-030 in `v0.7.0`" -->) | ⚪ | [SPRINT.260811](../sprints/SPRINT.260811-ast-seam-and-probe-validation.md) |
+| `TS-030` | Multi-Language AST Parsing Infrastructure (`scripts/ast_parse.sh`) | ⚪ | [SPRINT.260811](../sprints/SPRINT.260811-ast-seam-and-probe-validation.md) |
 | `TS-031` | AST-Backed Port/Adapter Parity Probe (`check-port-adapter-parity.sh`) | ⚪ | [SPRINT.260811](../sprints/SPRINT.260811-ast-seam-and-probe-validation.md) |
 | `TS-032` | AST-Backed Seam Contract Generator (`check-seam-contract-parity.sh`) | ⚪ | [SPRINT.260811](../sprints/SPRINT.260811-ast-seam-and-probe-validation.md) |
 | `TS-033` | AST-Backed Seam Observability Probe (`check-observability-at-seams.sh`) | ⚪ | [SPRINT.260811](../sprints/SPRINT.260811-ast-seam-and-probe-validation.md) |
@@ -52,7 +52,7 @@
 
 #### AC-3: Fault Tolerance — Unparseable Source Syntax Recovery
 - **Given:** A source code file containing a syntax error or unparseable experimental syntax feature.
-- **When:** `scripts/ast_parse.sh` <!-- praxis:allow-path reason="unreleased script planned for TS-030 in `v0.7.0`" --> attempts to parse the AST.
+- **When:** `scripts/ast_parse.sh` attempts to parse the AST.
 - **Then:** The parser catches the parse exception, emits a warning stating `[WARN] AST parse skipped on src/legacy/broken.ts (line 12: syntax error), falling back to structural scan`, and continues validating remaining files without crashing.
 
 ---
@@ -71,10 +71,10 @@
 
 ### 3. Technical Architecture (Seams & Educated Theory — $Iteration_3$)
 
-- **Polyglot AST Parsing Engine (`scripts/ast_parse.sh` <!-- praxis:allow-path reason="unreleased script planned for TS-030 in `v0.7.0`" -->):** Dispatcher shell script delegating to language-native AST runners emitting a unified `ast-parser@v1` JSON stream:
-  - **TypeScript:** Node.js parser (`scripts/ast_parse_ts.js` <!-- praxis:allow-path reason="unreleased script planned for TS-030 in `v0.7.0`" -->) using official `typescript` compiler API.
-  - **Python:** Python 3 parser (`scripts/ast_parse_py.py` <!-- praxis:allow-path reason="unreleased script planned for TS-030 in `v0.7.0`" -->) using standard `ast` module.
-  - **Go:** Go parser (`scripts/ast_parse_go.go` <!-- praxis:allow-path reason="unreleased script planned for TS-030 in `v0.7.0`" -->) using standard `go/ast` module.
+- **Polyglot AST Parsing Engine (`scripts/ast_parse.sh`):** Dispatcher shell script delegating to language-native AST runners emitting a unified `ast-parser@v1` JSON stream:
+  - **TypeScript:** Node.js parser (`scripts/ast_parse_ts.js`) using official `typescript` compiler API.
+  - **Python:** Python 3 parser (`scripts/ast_parse_py.py`) using standard `ast` module.
+  - **Go:** Go parser (`scripts/ast_parse_go.go`) using standard `go/ast` module.
 - **Seam Contract Generator (`check-seam-contract-parity.sh`):** Extracts AST interface signatures and serializes them into `.seam-contracts.json`.
 - **Architectural Decision Record:** [ADR.260811.01: Polyglot Language-Native AST Parsing Infrastructure](../../architecture/adr/ADR.260811.01-ast-multi-language-parser-infrastructure.md) (**Status: Accepted**).
 
