@@ -20,14 +20,14 @@
 
 | Slice ID | Outcome & User Value | Status | SPRINT Link |
 | -------- | -------------------- | ------ | ----------- |
-| `TS-020` | Single-File Iterative Initiative Engine (`INIT.`) & `create-initiative` skill | ✅ Complete | [SPRINT.260810](../sprints/SPRINT.260810-iterative-wave-and-product-dashboard-consolidation.md) |
-| `TS-021` | Living Capability Record Architecture (`CAP.`) & `create-capability-record` skill | ✅ Complete | [SPRINT.260810](../sprints/SPRINT.260810-iterative-wave-and-product-dashboard-consolidation.md) |
-| `TS-022` | Unified Product Dashboard & Context (`docs/product.md`) | ✅ Complete | [SPRINT.260810](../sprints/SPRINT.260810-iterative-wave-and-product-dashboard-consolidation.md) |
-| `TS-023` | Agent Persona & Guardrail Instructions Revamp | ✅ Complete | [SPRINT.260810](../sprints/SPRINT.260810-iterative-wave-and-product-dashboard-consolidation.md) |
-| `TS-024` | Praxis `v0.6.0` Release & Version Bump (`scripts/bump-version.sh 0.6.0`) | ✅ Complete | [SPRINT.260810](../sprints/SPRINT.260810-iterative-wave-and-product-dashboard-consolidation.md) |
-| `TS-025` | Anti-Over-Refinement Protection & Spec Enhancement | ✅ Complete | [SPRINT.260810](../sprints/SPRINT.260810-iterative-wave-and-product-dashboard-consolidation.md) |
-| `TS-026` | Upstream Domain Event Storming (`skills/event-storming`) | ✅ Complete | [SPRINT.260810](../sprints/SPRINT.260810-iterative-wave-and-product-dashboard-consolidation.md) |
-| `TS-027` | Downstream Operational Feedback Intake (`skills/ingest-operational-feedback`) | ✅ Complete | [SPRINT.260810](../sprints/SPRINT.260810-iterative-wave-and-product-dashboard-consolidation.md) |
+| `TS-020` | Single-File Iterative Initiative Engine (`INIT.`) & `create-initiative` skill | ✅ Complete | `SPRINT.260810` (Closed) |
+| `TS-021` | Living Capability Record Architecture (`CAP.`) & `create-capability-record` skill | ✅ Complete | `SPRINT.260810` (Closed) |
+| `TS-022` | Unified Product Dashboard & Context (`docs/product.md`) | ✅ Complete | `SPRINT.260810` (Closed) |
+| `TS-023` | Agent Persona & Guardrail Instructions Revamp | ✅ Complete | `SPRINT.260810` (Closed) |
+| `TS-024` | Praxis `v0.6.0` Release & Version Bump (`scripts/bump-version.sh 0.6.0`) | ✅ Complete | `SPRINT.260810` (Closed) |
+| `TS-025` | Anti-Over-Refinement Protection & Spec Enhancement | ✅ Complete | `SPRINT.260810` (Closed) |
+| `TS-026` | Upstream Domain Event Storming (`skills/event-storming`) | ✅ Complete | `SPRINT.260810` (Closed) |
+| `TS-027` | Downstream Operational Feedback Intake (`skills/ingest-operational-feedback`) | ✅ Complete | `SPRINT.260810` (Closed) |
 
 ---
 
