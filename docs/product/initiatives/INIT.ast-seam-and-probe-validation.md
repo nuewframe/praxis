@@ -69,10 +69,14 @@
 
 ---
 
-### 3. Technical Architecture (Seams & Educated Theory)
+### 3. Technical Architecture (Seams & Educated Theory — $Iteration_3$)
 
-- **`scripts/ast_parse.py`** <!-- praxis:allow-path reason="unreleased script planned for TS-030 in `v0.7.0`" --> provides lightweight AST parsing wrappers for Python `ast`, TypeScript JSON AST parser, and Go `go/ast` CLI output.
-- **Seam Contract Generator:** Automatically serializes extracted AST interface types into `.seam-contracts.json`.
+- **AST Parsing Engine (`scripts/ast_parse.py` <!-- praxis:allow-path reason="unreleased script planned for TS-030 in `v0.7.0`" -->):** Python 3 script wrapping native language parsers into a unified `ast-parser@v1` JSON stream:
+  - **Python:** Built-in `ast` module.
+  - **TypeScript:** Node-based AST parser (`typescript` API).
+  - **Go:** Built-in `go/ast` via lightweight CLI wrapper.
+- **Seam Contract Generator (`check-seam-contract-parity.sh`):** Extracts AST interface signatures and serializes them into `.seam-contracts.json`.
+- **Architectural Decision Record:** [ADR.260811.01: Multi-Language AST Parsing Infrastructure](../../architecture/adr/ADR.260811.01-ast-multi-language-parser-infrastructure.md) (**Status: Accepted**).
 
 ---
 
