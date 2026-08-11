@@ -246,7 +246,6 @@ allowed_missing = {
     'scripts/ast_parse_cs.cs',
     'scripts/ast_parse_java.java',
     'scripts/ast_parse_kt.kt',
-    'skills/prepare-project-for-ast/SKILL.md',
     'docs/project-context.md',
     'docs/product/README.md',
     'docs/product/design.md',

@@ -140,6 +140,7 @@ docs/
 - [`implement-with-defensive-patterns`](../skills/implement-with-defensive-patterns/SKILL.md)
 - [`ingest-operational-feedback`](../skills/ingest-operational-feedback/SKILL.md)
 - [`intake-code-contribution`](../skills/intake-code-contribution/SKILL.md)
+- [`prepare-project-for-ast`](../skills/prepare-project-for-ast/SKILL.md)
 - [`provision-project-overlay`](../skills/provision-project-overlay/SKILL.md)
 - [`refactor-layered-to-capability`](../skills/refactor-layered-to-capability/SKILL.md)
 - [`start-thin-slice`](../skills/start-thin-slice/SKILL.md)

@@ -65,6 +65,7 @@ Give your agent Praxis: [Claude Code](#claude-code) · [Codex CLI](#codex-cli) �
 | `skills/verify-and-assemble-pr/`            | Phase 6 — TDD verification, integration boundary tests, PR narrative.                                                |
 | `skills/bootstrap-project/`                 | Greenfield scaffolder — generates `.github/` + `.claude/` + capability-driven `src/` skeleton.                       |
 | `skills/provision-project-overlay/`         | Generate a project-specific `.github/` overlay (skills, agents, prompts, persona instructions) on an existing repo that just installed Praxis; interview-driven, idempotent. |
+| `skills/prepare-project-for-ast/`           | Prepare a project or repository for polyglot AST seam parsing and probe validation (`ast-parser@v1`). |
 | `skills/refactor-layered-to-capability/`    | Migrate a legacy `controllers/` + `services/` + `utils/` codebase into vertical slices.                              |
 
 ### Tooling
