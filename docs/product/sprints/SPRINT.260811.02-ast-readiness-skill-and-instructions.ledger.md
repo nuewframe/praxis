@@ -9,7 +9,8 @@ _Mutable execution state. Survives session death. Deleted at `close-sprint` afte
 - [ ] Phase 1: AST Readiness Skill (`skills/prepare-project-for-ast/SKILL.md`)
 - [ ] Phase 2: Instruction Mandate (`instructions/capability-driven-guardrails.instructions.md`)
 - [ ] Phase 3: Boundary Skill Integration (`define-seam-contract`, `provision-project-overlay`)
-- [ ] Phase 4: Release & Verification (`bump-version.sh 0.7.1`, `CHANGELOG.md`, `bump-version.sh --audit`)
+- [ ] Phase 4: Anti-Meta-Commentary Guardrails (`instructions/lean-delivery-guardrails.instructions.md`, `validate-plugin.sh`)
+- [ ] Phase 5: Release & Verification (`bump-version.sh 0.7.1`, `CHANGELOG.md`, `bump-version.sh --audit`)
 
 ---
 
@@ -21,6 +22,7 @@ _Mutable execution state. Survives session death. Deleted at `close-sprint` afte
 | Version Sync & Audit Probe | Integration | 🟢 | 2026-08-11 |
 | AST Readiness Skill | Skill | ⚪ | — |
 | AST Guardrails Mandate | Instruction | ⚪ | — |
+| Anti-Meta-Commentary Probe | Unit | ⚪ | — |
 
 ---
 
@@ -43,4 +45,5 @@ _Mutable execution state. Survives session death. Deleted at `close-sprint` afte
 - Phase 1: Create `skills/prepare-project-for-ast/SKILL.md`.
 - Phase 2: Update `instructions/capability-driven-guardrails.instructions.md`.
 - Phase 3: Update `skills/define-seam-contract/SKILL.md` and `skills/provision-project-overlay/SKILL.md`.
-- Phase 4: Bump version to `0.7.1`, update `CHANGELOG.md`, and verify audit.
+- Phase 4: Update `instructions/lean-delivery-guardrails.instructions.md` and `validate-plugin.sh` for anti-meta-commentary.
+- Phase 5: Bump version to `0.7.1`, update `CHANGELOG.md`, and verify audit.
