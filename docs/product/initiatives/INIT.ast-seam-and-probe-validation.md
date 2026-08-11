@@ -8,8 +8,8 @@
 
 ## Executive Summary & Hypothesis ($Iteration_1$)
 
-- **Business Intent & ROI:** Replace regex text heuristics in seam parity and port-adapter probes (`check-port-adapter-parity.sh`, `check-seam-contract-parity.sh`, `check-observability-at-seams.sh`) with AST-backed static analysis for TypeScript, Go, and Python. Establish automated seam contract extraction directly from AST interfaces into `.seam-contracts.json`.
-- **Hypothesis:** We believe upgrading Praxis validation probes to AST-backed parsing (via lightweight AST syntax trees for TS, Go, and Python) will eliminate false positives/negatives in complex codebases, enable automated seam contract generation directly from code interfaces, and provide robust cross-language seam enforcement for `v0.7.0`.
+- **Business Intent & ROI:** Replace regex text heuristics in seam parity and port-adapter probes (`check-port-adapter-parity.sh`, `check-seam-contract-parity.sh`, `check-observability-at-seams.sh`) with AST-backed static analysis across all 6 main enterprise stacks (**TypeScript**, **Python**, **Go**, **Rust**, **C#**, **Java/Kotlin**). Establish automated seam contract extraction directly from AST interfaces into `.seam-contracts.json`.
+- **Hypothesis:** We believe upgrading Praxis validation probes to AST-backed parsing (via language-native AST runners for TS, Py, Go, Rust, C#, and JVM) will eliminate false positives/negatives in complex codebases, enable automated seam contract generation directly from code interfaces, and provide robust cross-language seam enforcement for `v0.7.0`.
 - **Validation Method:** `check-port-adapter-parity.sh` and `check-seam-contract-parity.sh` executed against multi-language test fixtures in `scripts/__fixtures__/` returning clean AST parsing verdicts in $< 500\text{ms}$.
 
 ---
@@ -20,7 +20,7 @@
 
 | Slice ID | Outcome & User Value | Status | SPRINT Link |
 | -------- | -------------------- | ------ | ----------- |
-| `TS-030` | Multi-Language AST Parsing Infrastructure (`scripts/ast_parse.sh`) | ⚪ | [SPRINT.260811](../sprints/SPRINT.260811-ast-seam-and-probe-validation.md) |
+| `TS-030` | Polyglot AST Parsing Infrastructure (`scripts/ast_parse.sh` for TS, Py, Go, Rust, C#, JVM) | ⚪ | [SPRINT.260811](../sprints/SPRINT.260811-ast-seam-and-probe-validation.md) |
 | `TS-031` | AST-Backed Port/Adapter Parity Probe (`check-port-adapter-parity.sh`) | ⚪ | [SPRINT.260811](../sprints/SPRINT.260811-ast-seam-and-probe-validation.md) |
 | `TS-032` | AST-Backed Seam Contract Generator (`check-seam-contract-parity.sh`) | ⚪ | [SPRINT.260811](../sprints/SPRINT.260811-ast-seam-and-probe-validation.md) |
 | `TS-033` | AST-Backed Seam Observability Probe (`check-observability-at-seams.sh`) | ⚪ | [SPRINT.260811](../sprints/SPRINT.260811-ast-seam-and-probe-validation.md) |
@@ -32,8 +32,8 @@
 
 ### 1. User Experience & Acceptance Criteria (Given/When/Then)
 
-#### AC-1: Happy Path — Valid AST Interface Parity
-- **Given:** A repository containing TypeScript interfaces, Go structs, or Python protocols implementing declared seam contracts (`<name>@vN`).
+#### AC-1: Happy Path — Valid AST Interface Parity Across Stacks
+- **Given:** A repository containing TypeScript interfaces, Go structs, Python protocols, Rust traits, C# interfaces, or Java/Kotlin interfaces implementing declared seam contracts (`<name>@vN`).
 - **When:** `check-seam-contract-parity.sh` or `check-port-adapter-parity.sh` is executed.
 - **Then:** The AST parser extracts exact method signatures and field types, confirms matching shapes in `.seam-contracts.json`, and outputs `ok` in $< 500\text{ms}$ with exit code 0.
 
@@ -71,10 +71,13 @@
 
 ### 3. Technical Architecture (Seams & Educated Theory — $Iteration_3$)
 
-- **Polyglot AST Parsing Engine (`scripts/ast_parse.sh`):** Dispatcher shell script delegating to language-native AST runners emitting a unified `ast-parser@v1` JSON stream:
-  - **TypeScript:** Node.js parser (`scripts/ast_parse_ts.js`) using official `typescript` compiler API.
-  - **Python:** Python 3 parser (`scripts/ast_parse_py.py`) using standard `ast` module.
-  - **Go:** Go parser (`scripts/ast_parse_go.go`) using standard `go/ast` module.
+- **Polyglot AST Parsing Engine (`scripts/ast_parse.sh`):** Dispatcher shell script delegating to language-native AST runners emitting a unified `ast-parser@v1` JSON stream across 6 main stacks:
+  - **TypeScript / JS:** `scripts/ast_parse_ts.js` (Node.js compiler API)
+  - **Python:** `scripts/ast_parse_py.py` (Python 3 stdlib `ast`)
+  - **Go:** `scripts/ast_parse_go.go` (Go `go/ast`)
+  - **Rust:** `scripts/ast_parse_rs.rs` (`rustc` / `syn` parser)
+  - **C#:** `scripts/ast_parse_cs.cs` (.NET Roslyn API)
+  - **Java / Kotlin:** `scripts/ast_parse_java.java` & `scripts/ast_parse_kt.kt` (JVM compiler parser)
 - **Seam Contract Generator (`check-seam-contract-parity.sh`):** Extracts AST interface signatures and serializes them into `.seam-contracts.json`.
 - **Architectural Decision Record:** [ADR.260811.01: Polyglot Language-Native AST Parsing Infrastructure](../../architecture/adr/ADR.260811.01-ast-multi-language-parser-infrastructure.md) (**Status: Accepted**).
 
