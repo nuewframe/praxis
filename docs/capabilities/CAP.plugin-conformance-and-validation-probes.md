@@ -25,7 +25,7 @@
 
 ## 3. Technical Architecture & System Topology
 
-- **Architecture Layout:** `scripts/validate-plugin.sh`, `scripts/check-*.sh`, `scripts/citation_scan.py`, `scripts/test-probes.sh`, `scripts/test-citation-scan.sh`
+- **Architecture Layout:** `scripts/ast_parse.sh` (dispatcher bridge for TS, Py, Go, Rust, C#, JVM AST runners), `scripts/validate-plugin.sh`, `scripts/check-*.sh`, `scripts/citation_scan.py`, `scripts/test-probes.sh`, `scripts/test-citation-scan.sh`
 - **15 Automated Validation Checks:**
   1. `SKILL.md` frontmatter validity & single-line `tools:` key check.
   2. JSON syntax & schema validation.

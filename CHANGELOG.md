@@ -4,6 +4,16 @@ All notable changes to the Praxis plugin are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.7.0] — 2026-08-11
+
+### Added
+- **Polyglot AST Parsing Infrastructure (`scripts/ast_parse.sh`)** — Established a polyglot language-native AST parser bridge supporting 6 primary enterprise stacks (TypeScript/JavaScript, Python, Go, Rust, C#, Java/Kotlin) using compiler native AST APIs without external C binary compilation dependencies.
+- **AST-Backed Port/Adapter Parity Probe (`check-port-adapter-parity.sh`)** — Upgraded `check-port-adapter-parity.sh` to extract AST method declarations from Port interfaces and verify exact signature implementation across Adapter classes and structs.
+- **AST-Backed Seam Contract Generator (`check-seam-contract-parity.sh`)** — Added `--generate` mode to `check-seam-contract-parity.sh` to automatically extract interface AST nodes into `.seam-contracts.json`.
+- **AST-Backed Seam Observability Probe (`check-observability-at-seams.sh`)** — Refactored `check-observability-at-seams.sh` to integrate with `scripts/ast_parse.sh` for AST boundary block analysis.
+- **Architectural Decision Record (`ADR.260811.01`)** — Accepted [`ADR.260811.01`](docs/architecture/adr/ADR.260811.01-ast-multi-language-parser-infrastructure.md) defining the polyglot language-native AST parser architecture and `ast-parser@v1` JSON stream contract.
+
+
 ## [0.6.0] — 2026-08-10
 
 ### Added
