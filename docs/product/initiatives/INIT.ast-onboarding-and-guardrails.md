@@ -1,6 +1,6 @@
 # INIT.ast-onboarding-and-guardrails: AST Onboarding Skill & Mandatory Guardrails (Praxis `v0.7.1`)
 
-**Status:** 🟢 Active  
+**Status:** ✅ Delivered  
 **Capabilities Touched:** `CAP.plugin-conformance-and-validation-probes`, `CAP.multi-harness-distribution`, `CAP.method-spine-and-execution`  
 **Target Horizon:** Praxis `v0.7.1` Patch/Minor  
 
@@ -20,11 +20,11 @@
 
 | Slice ID | Outcome & User Value | Status | SPRINT Link |
 | -------- | -------------------- | ------ | ----------- |
-| `TS-035` | Dedicated AST Onboarding Skill (`skills/prepare-project-for-ast/SKILL.md`) | ✅ Complete | [SPRINT.260811.02](../sprints/SPRINT.260811.02-ast-readiness-skill-and-instructions.md) |
-| `TS-036` | AST Guardrails & Instruction Mandate (`instructions/capability-driven-guardrails.instructions.md`) | ✅ Complete | [SPRINT.260811.02](../sprints/SPRINT.260811.02-ast-readiness-skill-and-instructions.md) |
-| `TS-037` | Boundary Skill Integration (`skills/define-seam-contract/SKILL.md` & `skills/provision-project-overlay/SKILL.md`) | ✅ Complete | [SPRINT.260811.02](../sprints/SPRINT.260811.02-ast-readiness-skill-and-instructions.md) |
-| `TS-038` | Anti-Meta-Commentary Guardrails (`instructions/lean-delivery-guardrails.instructions.md`, `validate-plugin.sh`) | ✅ Complete | [SPRINT.260811.02](../sprints/SPRINT.260811.02-ast-readiness-skill-and-instructions.md) |
-| `TS-039` | Praxis `v0.7.1` Release & Verification (`scripts/bump-version.sh 0.7.1`) | ⚪ | [SPRINT.260811.02](../sprints/SPRINT.260811.02-ast-readiness-skill-and-instructions.md) |
+| `TS-035` | Dedicated AST Onboarding Skill (`skills/prepare-project-for-ast/SKILL.md`) | ✅ Complete | SPRINT.260811.02 (closed) |
+| `TS-036` | AST Guardrails & Instruction Mandate (`instructions/capability-driven-guardrails.instructions.md`) | ✅ Complete | SPRINT.260811.02 (closed) |
+| `TS-037` | Boundary Skill Integration (`skills/define-seam-contract/SKILL.md` & `skills/provision-project-overlay/SKILL.md`) | ✅ Complete | SPRINT.260811.02 (closed) |
+| `TS-038` | Anti-Meta-Commentary Guardrails (`instructions/lean-delivery-guardrails.instructions.md`, `validate-plugin.sh`) | ✅ Complete | SPRINT.260811.02 (closed) |
+| `TS-039` | Praxis `v0.7.1` Release & Verification (`scripts/bump-version.sh 0.7.1`) | ✅ Complete | SPRINT.260811.02 (closed) |
 
 ---
 

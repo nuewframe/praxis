@@ -4,6 +4,15 @@ All notable changes to the Praxis plugin are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.7.1] — 2026-08-11
+
+### Added
+- **AST Onboarding Skill (`skills/prepare-project-for-ast`)** — Created a dedicated project onboarding skill for polyglot AST toolchain diagnostics, interface discovery (`*.ports.*`, `@seam`), and `.seam-contracts.json` generation.
+- **Polyglot AST Seam Conformance Guardrails (`instructions/capability-driven-guardrails.instructions.md`)** — Added Section 15 mandating `scripts/ast_parse.sh` (`ast-parser@v1`) dispatch for interface and seam contract validation across 6 enterprise stacks.
+- **Anti-Meta-Commentary & Bare Assertion Discipline (`instructions/lean-delivery-guardrails.instructions.md`)** — Added Section 8 establishing the 3-part test, bare assertion conversion rule, and 3 tells (`so`/`because`/`since`, `by design, not by oversight`, `today`/`already`/`in production`).
+- **Forbidden Terminology Enforcement (`.praxis-canon.json`)** — Registered defensive phrase `by design, not by oversight` in `.praxis-canon.json` forbiddenTerms scanned by `scripts/validate-plugin.sh`.
+
+
 ## [0.7.0] — 2026-08-11
 
 ### Added
