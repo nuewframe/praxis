@@ -2,12 +2,11 @@
 /**
  * TypeScript / JavaScript AST Node Parser (ast-parser@v1)
  *
- * Extracts interface declarations, method names, line numbers, and parameter
- * types from TypeScript/JS source files into unified AST JSON format.
+ * Extracts interface/class/type declarations, method names, line numbers, and
+ * parameter types from TypeScript/JS source files into unified AST JSON format.
  */
 
 const fs = require('fs');
-const path = require('path');
 
 function parseTypeScriptFile(filePath) {
   const content = fs.readFileSync(filePath, 'utf8');
@@ -15,39 +14,48 @@ function parseTypeScriptFile(filePath) {
   const interfaces = [];
 
   let currentInterface = null;
+  let braceDepth = 0;
 
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i].trim();
     const lineNo = i + 1;
 
-    // Match interface or type declaration: `export interface CheckoutPort {`
-    const ifaceMatch = line.match(/(?:export\s+)?(?:interface|type)\s+([A-Za-z0-9_]+)/);
-    if (ifaceMatch) {
-      if (currentInterface) {
-        interfaces.push(currentInterface);
-      }
-      currentInterface = {
-        name: ifaceMatch[1],
-        line: lineNo,
-        methods: []
-      };
+    if (!line || line.startsWith('//') || line.startsWith('/*') || line.startsWith('*')) {
       continue;
     }
 
-    if (currentInterface) {
-      // Match closing brace
-      if (line === '}' || line.startsWith('};')) {
+    // Match interface, class, or type declaration: `export class UserMemoryAdapter {`
+    if (!currentInterface) {
+      const ifaceMatch = line.match(/(?:export\s+|public\s+)?(?:interface|type|class|struct)\s+([A-Za-z0-9_]+)/);
+      if (ifaceMatch) {
+        currentInterface = {
+          name: ifaceMatch[1],
+          line: lineNo,
+          methods: []
+        };
+        braceDepth = (line.match(/\{/g) || []).length - (line.match(/\}/g) || []).length;
+        continue;
+      }
+    } else {
+      // Track inner brace depth
+      const openBraces = (line.match(/\{/g) || []).length;
+      const closeBraces = (line.match(/\}/g) || []).length;
+      braceDepth += openBraces - closeBraces;
+
+      if (braceDepth <= 0) {
         interfaces.push(currentInterface);
         currentInterface = null;
+        braceDepth = 0;
         continue;
       }
 
-      // Match method signature: `processOrder(order: OrderPayload): Promise<OrderResult>;`
-      const methodMatch = line.match(/([A-Za-z0-9_]+)\s*\(([^)]*)\)\s*:\s*([^;]+)/);
+      // Match method signature or implementation: `getUser(id: string): Promise<User> {`
+      const isStatement = /^(?:return|if|for|while|const|let|var|throw|await|async|import|export)\b/.test(line);
+      const methodMatch = !isStatement && line.match(/([A-Za-z0-9_]+)\s*\(([^)]*)\)(?:\s*:\s*([^;{\n]+))?/);
       if (methodMatch) {
         const methodName = methodMatch[1];
-        const rawParams = methodMatch[2].trim();
-        const returnType = methodMatch[3].trim();
+        const rawParams = methodMatch[2] ? methodMatch[2].trim() : '';
+        const returnType = methodMatch[3] ? methodMatch[3].trim() : 'any';
 
         const params = rawParams ? rawParams.split(',').map(p => {
           const parts = p.trim().split(':');
@@ -79,7 +87,7 @@ function parseTypeScriptFile(filePath) {
 }
 
 if (process.argv.length < 3) {
-  console.error('Usage: node ast_parse_ts.js <file-path>');
+  console.error('Usage: node ast_parse_ts.cjs <file-path>');
   process.exit(1);
 }
 
