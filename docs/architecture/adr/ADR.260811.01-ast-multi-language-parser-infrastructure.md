@@ -46,7 +46,7 @@ flowchart TD
 
 ### Polyglot Parser Modules (The 6 Main Stacks)
 
-1. **TypeScript / JavaScript (`scripts/ast_parse_ts.js`):** Executes via Node.js using official `typescript` compiler AST API (`ts.createSourceFile`).
+1. **TypeScript / JavaScript (`scripts/ast_parse_ts.cjs`):** Executes via Node.js using official `typescript` AST API (`ts.createSourceFile`).
 2. **Python (`scripts/ast_parse_py.py`):** Executes via Python 3 using standard `ast` module.
 3. **Go (`scripts/ast_parse_go.go`):** Executes via Go using standard `go/parser` & `go/ast`.
 4. **Rust (`scripts/ast_parse_rs.rs`):** Executes via `rustc` / `syn` AST parser.

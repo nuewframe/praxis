@@ -20,7 +20,7 @@
 
 | Slice ID | Outcome & User Value | Status | SPRINT Link |
 | -------- | -------------------- | ------ | ----------- |
-| `TS-030` | Polyglot AST Parsing Infrastructure (`scripts/ast_parse.sh` for TS, Py, Go, Rust, C#, JVM) | ⚪ | [SPRINT.260811](../sprints/SPRINT.260811-ast-seam-and-probe-validation.md) |
+| `TS-030` | Polyglot AST Parsing Infrastructure (`scripts/ast_parse.sh` for TS, Py, Go, Rust, C#, JVM) | ✅ Complete | [SPRINT.260811](../sprints/SPRINT.260811-ast-seam-and-probe-validation.md) |
 | `TS-031` | AST-Backed Port/Adapter Parity Probe (`check-port-adapter-parity.sh`) | ⚪ | [SPRINT.260811](../sprints/SPRINT.260811-ast-seam-and-probe-validation.md) |
 | `TS-032` | AST-Backed Seam Contract Generator (`check-seam-contract-parity.sh`) | ⚪ | [SPRINT.260811](../sprints/SPRINT.260811-ast-seam-and-probe-validation.md) |
 | `TS-033` | AST-Backed Seam Observability Probe (`check-observability-at-seams.sh`) | ⚪ | [SPRINT.260811](../sprints/SPRINT.260811-ast-seam-and-probe-validation.md) |
@@ -72,7 +72,7 @@
 ### 3. Technical Architecture (Seams & Educated Theory — $Iteration_3$)
 
 - **Polyglot AST Parsing Engine (`scripts/ast_parse.sh`):** Dispatcher shell script delegating to language-native AST runners emitting a unified `ast-parser@v1` JSON stream across 6 main stacks:
-  - **TypeScript / JS:** `scripts/ast_parse_ts.js` (Node.js compiler API)
+  - **TypeScript / JS:** `scripts/ast_parse_ts.cjs` (Node.js compiler API)
   - **Python:** `scripts/ast_parse_py.py` (Python 3 stdlib `ast`)
   - **Go:** `scripts/ast_parse_go.go` (Go `go/ast`)
   - **Rust:** `scripts/ast_parse_rs.rs` (`rustc` / `syn` parser)

@@ -148,6 +148,7 @@ docs/
 
 ### Scripts & Probes (`scripts/`)
 
+- [`ast_parse.sh`](../scripts/ast_parse.sh)
 - [`bump-version.sh`](../scripts/bump-version.sh)
 - [`check-anti-dumping.sh`](../scripts/check-anti-dumping.sh)
 - [`check-config-externalized.sh`](../scripts/check-config-externalized.sh)

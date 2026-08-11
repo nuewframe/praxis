@@ -73,6 +73,7 @@ These scripts check **shape and presence** — a file exists, a pattern matches,
 
 | Script                                 | Purpose                                                                                                                                   |
 | -------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| `scripts/ast_parse.sh`                 | Polyglot AST parsing dispatcher bridge: dispatches source files to language-native AST runners emitting standard `ast-parser@v1` JSON. |
 | `scripts/check-anti-dumping.sh`        | Linter that fails on catch-all names (`utils/`, `helpers/`, `common/`, `shared/`, `misc.*`, `lib.*`) inside capability roots. Configurable via `.anti-dumping.json`. |
 | `scripts/check-no-skipped-tests.sh`    | Fails on committed `.skip(` / `xit(` / `@Disabled` / `@pytest.mark.skip` markers — quarantined tests should never reach `main`.           |
 | `scripts/check-no-sleep-waits.sh`      | Fails on `Thread.sleep`, `time.sleep`, `waitForTimeout` — hard-wait sleeps hide race conditions and slow suites.                          |

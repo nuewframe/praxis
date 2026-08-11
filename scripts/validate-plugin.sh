@@ -239,7 +239,7 @@ LINK_RE = re.compile(r'\[[^\]]*\]\([^)]*\)')
 allowed_missing = {
     'scripts/verify.sh',
     'scripts/ast_parse.sh',
-    'scripts/ast_parse_ts.js',
+    'scripts/ast_parse_ts.cjs',
     'scripts/ast_parse_py.py',
     'scripts/ast_parse_go.go',
     'scripts/ast_parse_rs.rs',
