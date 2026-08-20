@@ -34,6 +34,7 @@ Initiatives (waves) represent growth vectors delivered as transient, single-file
 | [`INIT.iterative-wave-and-dashboard-consolidation`](product/initiatives/INIT.iterative-wave-and-dashboard-consolidation.md) | Single-file INIT. initiatives, CAP. living records, and `docs/product.md` hub (`v0.6.0`). | ✅ Delivered | 8 — 8 ✅ |
 | [`INIT.ast-seam-and-probe-validation`](product/initiatives/INIT.ast-seam-and-probe-validation.md) | AST-backed static analysis for port/adapter, seam contract, and probe validation (`v0.7.0`). | ✅ Delivered | 5 — 5 ✅ |
 | [`INIT.ast-onboarding-and-guardrails`](product/initiatives/INIT.ast-onboarding-and-guardrails.md) | Dedicated AST onboarding skill, mandatory agent instructions, and anti-meta-commentary guardrails (`v0.7.1`). | ✅ Delivered | 5 — 5 ✅ |
+| [`INIT.kdl-state-and-rust-cli-consolidation`](product/initiatives/INIT.kdl-state-and-rust-cli-consolidation.md) | Unified KDL state, compiled Rust CLI engine (`praxis`), and deterministic Markdown projections (`v0.8.0`). | ⚪ Proposed | 0 — 6 ⚪ |
 
 *† Derived records reconstructed from release history and capability records after initial delivery.*
 
