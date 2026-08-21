@@ -13,7 +13,7 @@ use praxis_core::{
     Ask, Binding, Closing, Conditions, Corpus, Known, Pickup, Schema, Severity, Violation,
     Cut, Promotion, Publication, Published, Verified, assess, bind, check_corpus,
     check_document, close_iteration, cut, index_all, parse, pick_up, project, promote, publish,
-    unbind, verify, what_is_currently_true,
+    review, unbind, verify, what_is_currently_true,
 };
 
 mod render;
@@ -117,6 +117,17 @@ enum Command {
         /// The state root to read.
         #[arg(default_value = "praxis")]
         root: PathBuf,
+    },
+    /// Preview what an iteration has promised and shown. Writes nothing.
+    Review {
+        /// The iteration to preview.
+        iteration: String,
+        /// The state root to read.
+        #[arg(default_value = "praxis")]
+        root: PathBuf,
+        /// Render as Markdown into the working projection path, which is gitignored.
+        #[arg(long)]
+        markdown: bool,
     },
     /// Show which slices could be started right now, and what would refuse each of the rest.
     ///
@@ -267,6 +278,15 @@ fn main() -> ExitCode {
                 ExitCode::FAILURE
             }
         },
+        Command::Review { iteration, root, markdown } => {
+            match reviewing(&iteration, &root, markdown) {
+                Ok(()) => ExitCode::SUCCESS,
+                Err(report) => {
+                    eprintln!("{report:?}");
+                    ExitCode::FAILURE
+                }
+            }
+        }
         Command::Ready { root } => match ready(&root) {
             Ok(()) => ExitCode::SUCCESS,
             Err(report) => {
@@ -997,6 +1017,51 @@ fn truth(root: &Path) -> miette::Result<()> {
         miette::bail!("the answer does not satisfy read-model@v1");
     }
     print!("{}", render::render(&model));
+    Ok(())
+}
+
+/// `TS.260820.08`. A reviewer sees what an iteration promised and what it has shown, in
+/// one answer, and reviewing leaves no residue.
+///
+/// There is no path under the archival root anywhere in this function. That is what makes
+/// C2 structural: composing a preview cannot touch the published tree, because it has
+/// nowhere to write to it.
+fn reviewing(iteration: &str, root: &Path, markdown: bool) -> miette::Result<()> {
+    let sources = load(root)?;
+    let docs: Vec<_> = sources.iter().map(|(_, _, d)| d.clone()).collect();
+    let mut schema = Schema::default();
+    for doc in &docs {
+        let found = Schema::from_document(doc);
+        if !found.is_empty() {
+            schema = found;
+        }
+    }
+    let corpus = Corpus::from_documents(&docs, &schema);
+    let model = review(iteration, &corpus, &now())
+        .ok_or_else(|| miette::miette!("{iteration} is no iteration the record holds"))?;
+
+    let flaws = model.flaws();
+    if !flaws.is_empty() {
+        for flaw in &flaws {
+            eprintln!("praxis: read-model@v1 violated — {flaw}");
+        }
+        miette::bail!("the preview does not satisfy read-model@v1");
+    }
+
+    if !markdown {
+        print!("{}", render::render(&model));
+        return Ok(());
+    }
+
+    // The working projection path, which config.kdl declares and .gitignore excludes. A
+    // preview cannot be committed by accident because the only place it lands is ignored.
+    let path = root.join(".render").join(format!("{iteration}.preview.md"));
+    if let Some(dir) = path.parent() {
+        fs::create_dir_all(dir).map_err(|e| miette::miette!("{}: {e}", dir.display()))?;
+    }
+    fs::write(&path, render::render_markdown(&model, iteration))
+        .map_err(|e| miette::miette!("{}: {e}", path.display()))?;
+    println!("praxis: preview at {} — gitignored, and safe to delete", path.display());
     Ok(())
 }
 

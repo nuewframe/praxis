@@ -15,12 +15,23 @@ pub fn render_markdown(model: &ReadModel, stamp: &str) -> String {
     let mut out = String::new();
     out.push_str(&format!("# {}\n\n", title_case(&model.view)));
     out.push_str(&format!("{}\n\n", model.answers));
+    // A preview is never mistakable for a record. The header says which it is, and it says
+    // it before anything a reader might quote (TS.260820.08/C1).
+    if !model.publishable {
+        out.push_str("> **PREVIEW — not a record.** Composed on demand from the record as it\n");
+        out.push_str("> stands, for a version that does not exist yet. Nothing was written to\n");
+        out.push_str("> produce it, and nothing should be written from it.\n\n");
+    }
     // An archival result names the VERSION it depicts, and deliberately not the moment it
     // was generated. A wall-clock stamp would make every re-render differ from the last,
     // and verification of a published tree is a comparison (TS.260820.11). The working
     // renderer stamps the moment for the opposite reason: `right now` is its whole point.
-    out.push_str(&format!("> Depicts **{stamp}**, and nothing else. Regenerated whole from the\n"));
-    out.push_str("> record; never edited in place.\n\n");
+    if model.publishable {
+        out.push_str(&format!("> Depicts **{stamp}**, and nothing else. Regenerated whole from\n"));
+        out.push_str("> the record; never edited in place.\n\n");
+    } else {
+        out.push_str(&format!("> As of {}. Ask again for a different answer.\n\n", model.as_of));
+    }
 
     for section in &model.sections {
         out.push_str(&format!("## {}\n\n", section.name));

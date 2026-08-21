@@ -155,6 +155,10 @@ pub struct Attempt {
     pub state: String,
     pub claims: Vec<Settled>,
     pub findings: Vec<Carried>,
+    /// Layers this iteration says it reached: name, state, and the evidence named.
+    pub layers: Vec<(String, String, String)>,
+    /// Phases: kind, state, and what each produced.
+    pub phases: Vec<(String, String, String)>,
     /// Which of the configured bump rules this iteration's work matches. Declared by the
     /// iteration, because only whoever did the work knows what kind of change it was.
     pub contributes: Vec<String>,
@@ -347,6 +351,28 @@ fn attempt_from(node: &KdlNode) -> Attempt {
             })
             .collect(),
         contributes: child_args(node, "contributes"),
+        layers: node
+            .iter_children()
+            .filter(|c| c.name().value() == "layer")
+            .map(|c| {
+                (
+                    string_arg(c).unwrap_or_default(),
+                    prop(c, "state").unwrap_or_default(),
+                    prop(c, "evidence").unwrap_or_default(),
+                )
+            })
+            .collect(),
+        phases: node
+            .iter_children()
+            .filter(|c| c.name().value() == "phase")
+            .map(|c| {
+                (
+                    string_arg(c).unwrap_or_default(),
+                    prop(c, "state").unwrap_or_default(),
+                    prop(c, "produced").or_else(|| prop(c, "because")).unwrap_or_default(),
+                )
+            })
+            .collect(),
         findings: node
             .iter_children()
             .filter(|c| c.name().value() == "finding")

@@ -144,3 +144,44 @@ fn c4_a_commit_that_cannot_be_read_fails_rather_than_skipping() {
     assert!(stderr.contains("shallow clone"), "and it says what would cause that: {stderr}");
     let _ = fs::remove_dir_all(&dir);
 }
+
+/// `TS.260820.08`/C2 — composing a preview writes nothing to the published tree.
+#[test]
+fn reviewing_leaves_the_published_tree_byte_unchanged() {
+    let dir = published_repo("preview");
+    let published = dir.join("docs/releases/0.1.0/what-shipped.md");
+    let before = fs::read(&published).expect("read");
+
+    fs::write(
+        dir.join("praxis/iteration.kdl"),
+        r##"
+thin-slice "TS.a" {
+    slug "a-thing"
+}
+iteration "ITER.1" {
+    on-slice "TS.a"
+    state "working"
+}
+"##,
+    )
+    .expect("write");
+
+    let out = Command::new(env!("CARGO_BIN_EXE_praxis"))
+        .args(["review", "ITER.1", "praxis", "--markdown"])
+        .current_dir(&dir)
+        .output()
+        .expect("praxis runs");
+    assert!(out.status.success(), "{}", String::from_utf8_lossy(&out.stderr));
+
+    let after = fs::read(&published).expect("read");
+    assert_eq!(before, after, "reviewing leaves no residue in the published tree");
+
+    // And the preview landed in the working projection path, which is gitignored.
+    let preview = dir.join("praxis/.render/ITER.1.preview.md");
+    let text = fs::read_to_string(&preview).expect("the preview exists");
+    assert!(
+        text.contains("**PREVIEW — not a record.**"),
+        "C1: a preview is never mistakable for a record: {text}"
+    );
+    let _ = fs::remove_dir_all(&dir);
+}

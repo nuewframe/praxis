@@ -2,8 +2,8 @@
 
 what shipped at 0.8.0, which symptoms it resolved, and what it left owed
 
-> Depicts **0.8.0**, and nothing else. Regenerated whole from the
-> record; never edited in place.
+> Depicts **0.8.0**, and nothing else. Regenerated whole from
+> the record; never edited in place.
 
 ## what shipped
 
@@ -22,6 +22,7 @@ what shipped at 0.8.0, which symptoms it resolved, and what it left owed
 | ITER.260821.10 | TS.260820.11 — verify-the-published-tree | slice-outcome-added |
 | ITER.260821.11 | TS.260820.17 — promote-what-shipped | slice-outcome-added |
 | ITER.260821.12 | TS.260820.03 — what-is-currently-true | slice-outcome-added |
+| ITER.260821.13 | TS.260820.08 — review-an-iteration-in-flight | slice-outcome-added |
 
 ## symptoms it resolved
 
@@ -101,4 +102,7 @@ _Nothing here — no symptom names this version as what resolved it._
 | ITER.260821.11 | AA4 | — |
 | ITER.260821.12 | AB1 | — |
 | ITER.260821.12 | AB2 | — |
+| ITER.260821.13 | AC1 | — |
+| ITER.260821.13 | AC2 | — |
+| ITER.260821.13 | AC3 | — |
 

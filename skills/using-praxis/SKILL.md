@@ -118,6 +118,7 @@ Load the `SKILL.md` of any skill you intend to follow.
 | | `pick-up-a-slice` | Take a slice through the one gate — selection is the commitment, refusals are recorded as facts, and the override is recorded beside the refusal it overrides |
 | | `attach-evidence` | Back a declared layer with an artifact at the moment it is reached — evidence outside the slice's declared set is refused, and a layer you did not reach stays visible as unevidenced |
 | | `close-an-iteration` | Close without dropping scope in silence — a shortfall is carried by a finding that names the claim, and deleting a claim to make the close succeed is itself refused |
+| | `review-in-flight` | Preview what an iteration promised against what it has shown, at any moment and writing nothing — the layers it has NOT reached are listed, not omitted |
 | | `bind-work-to-a-version` | Attach closed iterations to a version so its content is derived rather than hand-kept — only closed work binds, once, and the bump is proposed from configured rules |
 | | `cut-the-version` | Cut a planned version and write its index node in one operation — the index points at a commit rather than copying it, and the seal makes a later edit visible |
 | | `publish-the-release-set` | Regenerate every published document whole for one version, before the cut — no splice path, no wall-clock stamp, and no renderer branch on what a view means |

@@ -2,8 +2,8 @@
 
 what must the system be able to do, and which events does each keep consistent?
 
-> Depicts **0.8.0**, and nothing else. Regenerated whole from the
-> record; never edited in place.
+> Depicts **0.8.0**, and nothing else. Regenerated whole from
+> the record; never edited in place.
 
 ## capabilities
 
