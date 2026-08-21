@@ -121,6 +121,7 @@ Load the `SKILL.md` of any skill you intend to follow.
 | | `review-in-flight` | Preview what an iteration promised against what it has shown, at any moment and writing nothing — the layers it has NOT reached are listed, not omitted |
 | | `bind-work-to-a-version` | Attach closed iterations to a version so its content is derived rather than hand-kept — only closed work binds, once, and the bump is proposed from configured rules |
 | | `cut-the-version` | Cut a planned version and write its index node in one operation — the index points at a commit rather than copying it, and the seal makes a later edit visible |
+| | `declare-a-lifetime` | Decide whether a read model survives being frozen and record why — the publication test, refused in both directions without a reason |
 | | `publish-the-release-set` | Regenerate every published document whole for one version, before the cut — no splice path, no wall-clock stamp, and no renderer branch on what a view means |
 | | `verify-the-published-tree` | Prove no published document was hand-edited — compared against the commit its release names, never against the record it is meant to outlive |
 | | `promote-what-shipped` | Fold a cut release into what each capability says it is — derived from bound work, recomputed by a rule, and refused if hand-edited in either direction |

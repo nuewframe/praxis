@@ -29,11 +29,26 @@ notional-architecture "NA.test" {
             field "from-cluster" each="0..1"
             field "owns-event"   each="0..n"
         }
+        entity "event-storm" {
+            field "read-model" each="0..n" holds="read-model"
+        }
+        entity "read-model" {
+            field "answers" each="0..1"
+        }
     }
 }
 "##;
 
 const RECORD: &str = r##"
+// Membership of the published set is derived from these declarations and nothing else.
+event-storm "ES.1" {
+    read-model "the-published-set-for-a-release" publishable=#true \
+        because="a release note is useful only frozen" \
+        publishes-to="docs/releases/<version>/release-notes.md"
+    read-model "capabilities-and-what-they-own" publishable=#true \
+        because="what the system could do at N is what a reader pinned to N needs" \
+        publishes-to="docs/releases/<version>/capabilities.md"
+}
 thin-slice "TS.a" {
     slug "a-thing"
 }
@@ -77,7 +92,10 @@ fn c1_publishing_twice_produces_the_same_documents() {
     let first = ready(RECORD, "0.9.0");
     let second = ready(RECORD, "0.9.0");
     assert_eq!(first, second, "a publish an hour later is the same publish");
-    assert_eq!(first[0].model.as_of, "0.9.0", "the `moment` of an archival result IS its version");
+    assert!(
+        first.iter().all(|d| d.model.as_of == "0.9.0"),
+        "the `moment` of an archival result IS its version"
+    );
 }
 
 #[test]
@@ -181,7 +199,11 @@ fn a_version_binding_nothing_has_no_shipped_work_to_describe() {
 #[test]
 fn what_shipped_carries_the_findings_the_bound_work_left_owed() {
     let documents = ready(RECORD, "0.9.0");
-    let shipped = &documents[0].model;
+    let shipped = documents
+        .iter()
+        .find(|d| d.model.view == "the-published-set-for-a-release")
+        .map(|d| &d.model)
+        .expect("the release notes");
     let owed = shipped
         .sections
         .iter()
@@ -194,7 +216,10 @@ fn what_shipped_carries_the_findings_the_bound_work_left_owed() {
 #[test]
 fn an_empty_section_in_a_published_document_still_says_why() {
     let documents = ready(RECORD, "0.9.0");
-    let resolved = documents[0]
+    let resolved = documents
+        .iter()
+        .find(|d| d.model.view == "the-published-set-for-a-release")
+        .expect("the release notes")
         .model
         .sections
         .iter()

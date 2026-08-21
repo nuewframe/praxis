@@ -23,7 +23,7 @@ pub use check::{
     Known, Refusal, Severity, Violation, check_corpus, check_document, check_node, index_all,
     refused,
 };
-pub use admission::{Assessment, Capability, Carried, Config, Release, Condition, Conditions, Corpus, Settled, Verdict, assess, project};
+pub use admission::{Assessment, Capability, Carried, Config, Release, View, Condition, Conditions, Corpus, Settled, Verdict, assess, project};
 pub use binding::{Binding, Proposal, Rejected, bind, propose, unbind};
 pub use cut::{Blocked, Cut, cut, seal};
 pub use close::{Closing, Unaccounted, close_iteration};

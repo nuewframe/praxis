@@ -49,6 +49,10 @@ pub enum Refusal {
     BrokenSeal { release: String, expected: String, found: String },
     /// A cut release with no seal at all, so nothing about it can be checked.
     UnsealedRelease { release: String },
+    /// A read model nobody has said whether to publish.
+    UndeclaredLifetime { view: String },
+    /// A publishable view with no reason, or nowhere to land.
+    UnjustifiedLifetime { view: String, missing: &'static str },
     /// A capability whose promoted truth is not what the record derives from cut releases.
     HandPromoted { capability: String, found: usize, derived: usize },
     /// A layer the slice declared that the iteration has not evidenced. Reported: it must
@@ -71,6 +75,8 @@ impl Refusal {
             Self::SilentDrop { claim, .. } | Self::DroppedClaim { claim, .. } => claim,
             Self::BrokenSeal { .. } | Self::UnsealedRelease { .. } => "seal",
             Self::HandPromoted { .. } => "shipped",
+            Self::UndeclaredLifetime { .. } => "publishable",
+            Self::UnjustifiedLifetime { missing, .. } => missing,
         }
     }
 
@@ -125,6 +131,16 @@ impl Refusal {
                  slice sets the granularity, and evidence outside it is evidence for something \
                  nobody asked about",
                 if declared.is_empty() { "none".to_owned() } else { declared.join(" · ") }
+            ),
+            Self::UndeclaredLifetime { view } => format!(
+                "{view} does not say whether it survives being frozen. There is no repository-wide \
+                 default, because perishability is a property of the question and not of the file \
+                 type — declare `publishable`, either way"
+            ),
+            Self::UnjustifiedLifetime { view, missing } => format!(
+                "{view} is publishable and declares no `{missing}`. The whole decision is a \
+                 judgement about perishability, and an unjustified judgement is indistinguishable \
+                 from an oversight"
             ),
             Self::HandPromoted { capability, found, derived } => format!(
                 "{capability} declares {found} shipped entr{} and the record derives {derived} from \
@@ -435,6 +451,56 @@ pub fn check_corpus(docs: &[KdlDocument], schema: &Schema) -> Vec<Violation> {
             schema.declares_rule("no-silent-drop"),
             schema.declares_rule("claim-dropped-from-the-slice"),
         ));
+    }
+
+    // `publish-only-what-survives-freezing`, if the record declares it. Membership of the
+    // published set comes from these declarations and from nothing else.
+    if schema.declares_rule("publish-only-what-survives-freezing") {
+        for doc in docs {
+            for storm in doc.nodes().iter().filter(|n| n.name().value() == "event-storm") {
+                for view in children_named(storm, "read-model") {
+                    let Some(name) = string_arg(view) else { continue };
+                    match view.get("publishable").and_then(|v| v.as_bool()) {
+                        None => out.push(Violation {
+                            entity_kind: "read-model".to_owned(),
+                            entity_id: Some(name.clone()),
+                            refusal: Refusal::UndeclaredLifetime { view: name },
+                            span: view.span(),
+                        }),
+                        Some(true) => {
+                            for (field, missing) in
+                                [("because", "because"), ("publishes-to", "publishes-to")]
+                            {
+                                if prop(view, field).is_none() {
+                                    out.push(Violation {
+                                        entity_kind: "read-model".to_owned(),
+                                        entity_id: Some(name.clone()),
+                                        refusal: Refusal::UnjustifiedLifetime {
+                                            view: name.clone(),
+                                            missing,
+                                        },
+                                        span: view.span(),
+                                    });
+                                }
+                            }
+                        }
+                        Some(false) => {
+                            if prop(view, "because").is_none() {
+                                out.push(Violation {
+                                    entity_kind: "read-model".to_owned(),
+                                    entity_id: Some(name.clone()),
+                                    refusal: Refusal::UnjustifiedLifetime {
+                                        view: name.clone(),
+                                        missing: "because",
+                                    },
+                                    span: view.span(),
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     // `promoted-truth-is-derived`, if the record declares it. This is the rule that makes

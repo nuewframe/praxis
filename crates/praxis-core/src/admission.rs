@@ -164,6 +164,20 @@ pub struct Attempt {
     pub contributes: Vec<String>,
 }
 
+/// A read model, and what the record declares about its lifetime. Membership of the
+/// published set is derived from these and from nothing else (`TS.260820.12`).
+#[derive(Debug, Clone)]
+pub struct View {
+    pub name: String,
+    pub answers: String,
+    /// `None` when nobody has said whether it survives being frozen. Not a default —
+    /// perishability is a property of the question, not of the file type.
+    pub publishable: Option<bool>,
+    pub because: Option<String>,
+    /// Where under the release directory it lands. Required of a publishable view.
+    pub publishes_to: Option<String>,
+}
+
 /// A permanent doing the system must have, and the cluster it was derived from.
 #[derive(Debug, Clone)]
 pub struct Capability {
@@ -218,6 +232,7 @@ pub struct Corpus {
     /// Symptom id, and the version it names as having resolved it.
     pub symptoms: Vec<(String, String)>,
     pub capabilities: Vec<Capability>,
+    pub views: Vec<View>,
     pub config: Config,
     /// Ids the shape check refuses. A slice the checker refuses is not work waiting.
     pub refused: Vec<String>,
@@ -267,6 +282,23 @@ impl Corpus {
                             })
                             .collect(),
                     }),
+                    "event-storm" => {
+                        for child in node.iter_children() {
+                            if child.name().value() == "read-model"
+                                && let Some(name) = string_arg(child)
+                            {
+                                corpus.views.push(View {
+                                    name,
+                                    answers: prop(child, "answers").unwrap_or_default(),
+                                    publishable: child
+                                        .get("publishable")
+                                        .and_then(|v| v.as_bool()),
+                                    because: prop(child, "because"),
+                                    publishes_to: prop(child, "publishes-to"),
+                                });
+                            }
+                        }
+                    }
                     "symptom" => {
                         if let (Some(id), Some(by)) =
                             (string_arg(node), child_arg(node, "resolved-by"))

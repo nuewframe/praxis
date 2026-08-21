@@ -59,17 +59,53 @@ pub fn publish(version: &str, corpus: &Corpus) -> Publication {
         )]);
     }
 
-    let documents = vec![
-        Document {
-            file: format!("docs/releases/{version}/what-shipped.md"),
-            model: published_set(version, corpus),
-        },
-        Document {
-            file: format!("docs/releases/{version}/capabilities.md"),
-            model: capabilities(version, corpus),
-        },
-    ];
+    // Membership is DERIVED from the lifetime declarations and from nothing else. An
+    // engine that composes its own list has taken the decision back from the record
+    // (TS.260820.12).
+    let mut documents = Vec::new();
+    let mut uncomposable = Vec::new();
+    for view in corpus.views.iter().filter(|v| v.publishable == Some(true)) {
+        let Some(lands_at) = &view.publishes_to else {
+            uncomposable.push(format!(
+                "{} is publishable and declares no `publishes-to`, so there is nowhere to put it",
+                view.name
+            ));
+            continue;
+        };
+        let model = match view.name.as_str() {
+            "the-published-set-for-a-release" => published_set(version, corpus),
+            "capabilities-and-what-they-own" => capabilities(version, corpus),
+            other => {
+                uncomposable.push(format!(
+                    "{other} is declared publishable and the engine has no composer for it. The \
+                     published set must equal the publishable declarations exactly, so this is a \
+                     refusal rather than a shorter set"
+                ));
+                continue;
+            }
+        };
+        documents.push(Document { file: landing(lands_at, version, &view.name), model });
+    }
+
+    if !uncomposable.is_empty() {
+        return Publication::Refused(uncomposable);
+    }
+    if documents.is_empty() {
+        return Publication::Refused(vec![format!(
+            "the record declares no publishable view, so {version} would publish nothing. That is \
+             a gap in the declarations rather than an empty release"
+        )]);
+    }
+
     Publication::Ready { version: version.to_owned(), documents }
+}
+
+/// Where a view lands, from its own `publishes-to`. A path ending in `/` is a directory,
+/// and the document inside it is named for the view — so the record decides the location
+/// and the engine only fills in the version.
+fn landing(declared: &str, version: &str, view: &str) -> String {
+    let path = declared.replace("<version>", version);
+    if path.ends_with('/') { format!("{path}{view}.md") } else { path }
 }
 
 /// `the-published-set-for-a-release` — what shipped at version N, which symptoms it
