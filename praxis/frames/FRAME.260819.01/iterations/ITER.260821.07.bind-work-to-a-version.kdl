@@ -138,6 +138,18 @@ iteration "ITER.260821.07" {
             Every previous gap was a kind or a field that was simply never declared. This one is a \
             gap in the SCHEMA LANGUAGE, which is a different kind of owed work"
 
+    finding "W7" state="open" size="frame-sized" \
+        text="the release record is derived at WRITE time, not at read time — which makes it a \
+            cache. ITER.260821.07 was bound before it declared `contributes`, so the release said \
+            `proposal-incomplete-for` and kept saying it until an unbind and a rebind recomputed \
+            the file. Nothing detected the staleness in between" \
+        obliges="either the release is projected on demand like what-is-ready-to-pick-up, or a \
+            check compares the written record against what it would compute" \
+        note="found by doing exactly what the frame is about — a second copy whose fidelity is \
+            unverifiable-without-checking-the-first — in the record built to argue against it. \
+            `praxis ready` is computed on demand for precisely this reason and is never written; \
+            the release is written because a release is archival. Both cannot be right the same way"
+
     finding "W6" state="open" size="owed-work" \
         text="this iteration carried every claim TWICE — once as the gate pinned it at open, once \
             as the working agent wrote it settled — and nothing refused that. The close read the \
@@ -168,7 +180,15 @@ iteration "ITER.260821.07" {
         note "the accounting above was computed at close, not asserted. It says every claim is either met or carried by a finding that names it, and nothing about whether the work is any good"
     }
 
+    contributes "slice-outcome-added" \
+        because="bind-work-to-a-version, and the release index derived rather than kept" \
+        note="added AFTER this iteration was bound, which is how W7 was found"
+
     trail {
+        entry at="2026-08-21T14:30:00Z" by="agent:principal-engineer" action="amended" \
+            note="contributes declared, and W7 recorded — the release was bound before this \
+                iteration said what kind of change it was, and the file kept the stale answer \
+                until a rebind"
         entry at="2026-08-21T14:24:16Z" by="agent:praxis" action="state-changed" from="open" to="closed" note="closed by `praxis close`. The accounting was computed; the conclusion is not the machine's to draw"
 
         entry at="2026-08-21T14:18:09Z" by="agent:praxis" action="created" \
