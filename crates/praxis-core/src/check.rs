@@ -513,8 +513,12 @@ pub fn check_corpus(docs: &[KdlDocument], schema: &Schema) -> Vec<Violation> {
                     .attempts
                     .iter()
                     .find(|a| &a.id == iteration)
-                    .and_then(|a| corpus.slice(&a.on_slice))
-                    .is_some_and(|slice| slice.attacks.contains(&symptom.id))
+                    .is_some_and(|a| {
+                        a.on_slices
+                            .iter()
+                            .filter_map(|id| corpus.slice(id))
+                            .any(|slice| slice.attacks.contains(&symptom.id))
+                    })
             });
             if !attacked {
                 out.push(Violation {
@@ -810,10 +814,8 @@ fn check_claims(docs: &[KdlDocument], silent_drop: bool, dropped: bool) -> Vec<V
     for doc in docs {
         for node in doc.nodes().iter().filter(|n| n.name().value() == "iteration") {
             let id = string_arg(node);
-            let on_slice = children_named(node, "on-slice")
-                .first()
-                .and_then(|n| string_arg(n))
-                .unwrap_or_default();
+            let on_slices: Vec<String> =
+                children_named(node, "on-slice").iter().filter_map(|n| string_arg(n)).collect();
             let closed = children_named(node, "state")
                 .first()
                 .and_then(|n| string_arg(n))
@@ -827,8 +829,8 @@ fn check_claims(docs: &[KdlDocument], silent_drop: bool, dropped: bool) -> Vec<V
                 let state = prop(claim, "state").unwrap_or_default();
 
                 if dropped
-                    && from == on_slice
-                    && let Some((_, claims)) = declared.iter().find(|(s, _)| s == &on_slice)
+                    && on_slices.contains(&from)
+                    && let Some((_, claims)) = declared.iter().find(|(s, _)| s == &from)
                     && !claims.is_empty()
                     && !claims.contains(&claim_id)
                 {
@@ -837,7 +839,7 @@ fn check_claims(docs: &[KdlDocument], silent_drop: bool, dropped: bool) -> Vec<V
                         entity_id: id.clone(),
                         refusal: Refusal::DroppedClaim {
                             claim: claim_id.clone(),
-                            slice: on_slice.clone(),
+                            slice: from.clone(),
                         },
                         span: claim.span(),
                     });
@@ -881,13 +883,29 @@ fn check_layers(docs: &[KdlDocument]) -> Vec<Violation> {
     let mut out = Vec::new();
     for doc in docs {
         for node in doc.nodes().iter().filter(|n| n.name().value() == "iteration") {
-            let Some(on_slice) = children_named(node, "on-slice").first().and_then(|n| string_arg(n))
-            else {
+            let on_slices: Vec<String> =
+                children_named(node, "on-slice").iter().filter_map(|n| string_arg(n)).collect();
+            if on_slices.is_empty() {
                 continue;
-            };
-            let Some((_, allowed)) = declared.iter().find(|(id, _)| id == &on_slice) else {
+            }
+            // The union across the committed slices. A commitment may reach any layer any
+            // of its slices declared, and owes every layer all of them declared.
+            let mut allowed: Vec<String> = Vec::new();
+            let mut known = false;
+            for id in &on_slices {
+                if let Some((_, layers)) = declared.iter().find(|(s, _)| s == id) {
+                    known = true;
+                    for layer in layers {
+                        if !allowed.contains(layer) {
+                            allowed.push(layer.clone());
+                        }
+                    }
+                }
+            }
+            if !known {
                 continue;
-            };
+            }
+            let on_slice = on_slices.join(" · ");
             let id = string_arg(node);
 
             let mut evidenced: Vec<String> = Vec::new();

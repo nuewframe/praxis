@@ -376,9 +376,15 @@ notional-architecture "NA.260820.01" {
         note="W13 corrected the argument and left the verdict standing. Six slices remain unwalked, \
             and TS.260820.18 is the only one on this boundary that has been exercised"
 
-    open "what an iteration IS, as an entity" \
-        note="work-admission owns it, three capabilities write facts about it, and no record defines \
-            it. It has surfaced as an entity in every walk and been modelled in none"
+    answered "what an iteration IS, as an entity" \
+        is="the COMMITMENT. Not an attempt at a slice — the set of slices one ask committed to, \
+            worked together and accounted for together" \
+        by="ITER.260821.19" \
+        note="it was declared with fields by ITER.260821.01 and still carried `on-slice each=1`, \
+            which quietly answered the question wrongly: it made the iteration a property of a \
+            slice rather than a commitment over slices. Eighteen iterations never caught it because \
+            every ask happened to name one slice — the model was never asked the question it was \
+            answering"
 
     open "whether document-projection consuming from all four is a hub or a correct sink" \
         falsifier="if projection ever needs to emit anything back into the record beyond its own publication facts, it is a hub and the topology is wrong"
@@ -500,6 +506,9 @@ notional-architecture "NA.260820.01" {
             field "invariant"       each="0..n"
             field "owes"            each="0..n"
             field "open"            each="0..n"
+            field "answered"        each="0..n" \
+                because="an open question that got an answer is not deleted. What it WAS is how a \
+                    reader knows the answer was reached rather than assumed"
         }
         entity "capability" is="a permanent doing the system must have" \
             states="sought active retired" \
@@ -581,7 +590,7 @@ notional-architecture "NA.260820.01" {
             field "resolves"     each="0..n" references="symptom"
             field "trail"        each="1"
         }
-        entity "iteration" is="one attempt at a slice — what ITERATE produces" \
+        entity "iteration" is="one COMMITMENT — the slices an ask committed to, worked together" \
             states="open working closed abandoned" \
             owned-by="work-admission" \
             never-deleted=#true because="a closed iteration is history, and history is what makes a slice's maturity legible" \
@@ -590,7 +599,10 @@ notional-architecture "NA.260820.01" {
                 be distinguished from a field at all. A container with no shape cannot refuse what \
                 it holds, which is what let `phase` go missing" {
             field "slug"      each="1"
-            field "on-slice"  each="1" references="thin-slice"
+            field "on-slice"  each="1..n" references="thin-slice" \
+                because="the commitment may span several slices. Its claims are the union of theirs, \
+                    its layers are bounded by their union, and it closes when all of them are \
+                    accounted for"
             field "state"     each="1" one-of="open" "working" "closed" "abandoned"
             field "opened-at" each="1"
             field "opened-by" each="1"
@@ -709,8 +721,17 @@ notional-architecture "NA.260820.01" {
             note="actor-facing. See the reading rules above — this is never a capability seam"
         relates "feeds-read-model" from="thin-slice" to="read-model" each="0..n" \
             note="points BACKWARDS as a dependency. See the reading rules above"
-        relates "on-slice"      from="iteration" to="thin-slice" each="1" write-once=#true \
-            because="an iteration is an attempt at ONE slice. Which attempt it is, is derived by ordering the iterations on that slice — never stored"
+        relates "on-slice"      from="iteration" to="thin-slice" each="1..n" write-once=#true \
+            because="the ITERATION is the commitment; a slice is a unit of work that adds value. \
+                One ask to start can commit to several slices, and they are worked together or the \
+                commitment was never one thing" \
+            was="each=1 — `an iteration is an attempt at ONE slice`" \
+            corrected-by="ITER.260821.19. That reading confused the unit of WORK with the unit of \
+                COMMITMENT. It survived eighteen iterations because every ask happened to name one \
+                slice, so the model was never tested against what it actually claimed" \
+            note="which attempt a slice is on is still derived, by ordering the iterations that \
+                name it — never stored. And a slice may still be in only one OPEN iteration at a \
+                time, which is the constraint that mattered and is unchanged"
         relates "depends-on"    from="thin-slice" to="seam" each="0..n" \
             constraint="never slice → slice. Dependency is only ever on a frozen contract, which is what makes disjointness a query" \
             violated-by="seventeen of eighteen slices today. Carried as open"

@@ -16,7 +16,19 @@ use crate::view::{ReadModel, Section};
 /// Compose the preview for one iteration. `None` when the record holds no such iteration.
 pub fn review(iteration_id: &str, corpus: &Corpus, as_of: &str) -> Option<ReadModel> {
     let attempt = corpus.attempts.iter().find(|a| a.id == iteration_id)?;
-    let slice = corpus.slice(&attempt.on_slice);
+    // Layers come from the SLICES, so a layer none of them declared is visible as
+    // undeclared and one none of them reached is visible as unevidenced.
+    let declared: Vec<String> = attempt
+        .on_slices
+        .iter()
+        .filter_map(|id| corpus.slice(id))
+        .flat_map(|s| s.layers.clone())
+        .fold(Vec::new(), |mut acc, layer| {
+            if !acc.contains(&layer) {
+                acc.push(layer);
+            }
+            acc
+        });
 
     // What it promised against what it has shown, in one place. A claim with no evidence
     // is listed with the gap stated rather than left out of the table.
@@ -42,7 +54,6 @@ pub fn review(iteration_id: &str, corpus: &Corpus, as_of: &str) -> Option<ReadMo
     // from the review was never reached AND never refused.
     let mut layers = Section::new("what it has reached", &["layer", "state", "evidence"])
         .empty_because("nothing recorded — the slice declares no layer");
-    let declared = slice.map(|s| s.layers.clone()).unwrap_or_default();
     for layer in &declared {
         match attempt.layers.iter().find(|(name, _, _)| name == layer) {
             Some((_, state, evidence)) => layers.push(vec![
@@ -63,7 +74,7 @@ pub fn review(iteration_id: &str, corpus: &Corpus, as_of: &str) -> Option<ReadMo
         if !declared.contains(name) {
             layers.push(vec![
                 name.clone(),
-                format!("{state} — NOT DECLARED by {}", attempt.on_slice),
+                format!("{state} — NOT DECLARED by {}", attempt.slices()),
                 evidence.clone(),
             ]);
         }
@@ -100,7 +111,7 @@ pub fn review(iteration_id: &str, corpus: &Corpus, as_of: &str) -> Option<ReadMo
         format!(
             "PREVIEW of {iteration_id} on {} — what did it promise, what has it evidenced, and \
              what is still open?",
-            attempt.on_slice
+            attempt.slices()
         ),
         as_of,
     );

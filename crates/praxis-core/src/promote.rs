@@ -56,16 +56,17 @@ pub fn derive(corpus: &Corpus) -> BTreeMap<String, Vec<Shipped>> {
             let Some(attempt) = corpus.attempts.iter().find(|a| &a.id == iteration) else {
                 continue;
             };
-            let Some(slice) = corpus.slice(&attempt.on_slice) else { continue };
-            if slice.realizes.is_empty() {
-                continue;
+            for slice in attempt.on_slices.iter().filter_map(|id| corpus.slice(id)) {
+                if slice.realizes.is_empty() {
+                    continue;
+                }
+                let capability = slice.realizes.trim_start_matches("CAP.").to_owned();
+                out.entry(capability).or_default().push(Shipped {
+                    version: release.version.clone(),
+                    iteration: attempt.id.clone(),
+                    slice: slice.id.clone(),
+                });
             }
-            let capability = slice.realizes.trim_start_matches("CAP.").to_owned();
-            out.entry(capability).or_default().push(Shipped {
-                version: release.version.clone(),
-                iteration: attempt.id.clone(),
-                slice: attempt.on_slice.clone(),
-            });
         }
     }
     for shipped in out.values_mut() {

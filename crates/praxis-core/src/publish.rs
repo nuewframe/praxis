@@ -179,9 +179,12 @@ pub(crate) fn published_set(version: &str, corpus: &Corpus) -> ReadModel {
         let Some(attempt) = corpus.attempts.iter().find(|a| &a.id == id) else {
             continue;
         };
-        let slug = corpus
-            .slice(&attempt.on_slice)
-            .map_or_else(|| attempt.on_slice.clone(), |s| format!("{} — {}", attempt.on_slice, s.slug));
+        let slug = attempt
+            .on_slices
+            .iter()
+            .map(|id| corpus.slice(id).map_or_else(|| id.clone(), |s| format!("{id} — {}", s.slug)))
+            .collect::<Vec<_>>()
+            .join(" · ");
         shipped.push(vec![
             attempt.id.clone(),
             slug,

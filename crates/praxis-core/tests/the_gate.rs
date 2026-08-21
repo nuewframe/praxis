@@ -50,7 +50,7 @@ fn gate(record: &str, slice: &str) -> Pickup {
     let docs = vec![schema_doc, record_doc];
     let corpus = Corpus::from_documents(&docs, &schema);
     let assessment = assess(&corpus, &conditions, &ask().at);
-    pick_up(slice, &corpus, &assessment, &ask(), &[])
+    pick_up(&[slice.to_owned()], &corpus, &assessment, &ask(), &[])
 }
 
 fn refusal(pickup: &Pickup) -> &praxis_core::Record {
@@ -238,7 +238,7 @@ fn two_pickups_on_one_day_do_not_contend() {
     let docs = vec![schema_doc, record_doc];
     let corpus = Corpus::from_documents(&docs, &schema);
     let assessment = assess(&corpus, &conditions, &ask().at);
-    let second = pick_up("TS.ready", &corpus, &assessment, &ask(), &[a.id.clone()]);
+    let second = pick_up(&["TS.ready".to_owned()], &corpus, &assessment, &ask(), &[a.id.clone()]);
     let Pickup::Opened(b) = &second else { panic!("expected an admission") };
 
     assert_ne!(a.id, b.id, "two agents on one day get distinct files and never contend");
@@ -312,15 +312,133 @@ iteration "ITER.2" {
     // Every slice the VIEW calls ready is admitted by the GATE.
     for id in &ready {
         assert!(
-            matches!(pick_up(id, &corpus, &assessment, &ask(), &[]), Pickup::Opened(_)),
+            matches!(pick_up(&[id.to_owned()], &corpus, &assessment, &ask(), &[]), Pickup::Opened(_)),
             "{id} is listed ready and the gate refused it"
         );
     }
     // And every slice it excludes is refused — whether excluded as blocked or as done.
     for id in blocked.iter().chain(delivered.iter()) {
         assert!(
-            matches!(pick_up(id, &corpus, &assessment, &ask(), &[]), Pickup::Refused(_)),
+            matches!(pick_up(&[id.to_owned()], &corpus, &assessment, &ask(), &[]), Pickup::Refused(_)),
             "{id} is excluded by the view and the gate admitted it"
         );
     }
+}
+
+/// The ITERATION is the commitment; a slice is a unit of work. One ask can commit to
+/// several, and they are worked together (ITER.260821.19).
+const TWO_READY: &str = r##"
+thin-slice "TS.one" {
+    slug "one"
+    kind "command"
+    realizes "CAP.x"
+    claim "C1"
+}
+thin-slice "TS.two" {
+    slug "two"
+    kind "command"
+    realizes "CAP.x"
+    claim "C1"
+    claim "C2"
+}
+"##;
+
+fn gate_many(record: &str, slices: &[&str]) -> Pickup {
+    let schema_doc = parse(SCHEMA).expect("schema parses");
+    let record_doc = parse(record).expect("record parses");
+    let schema = Schema::from_document(&schema_doc);
+    let conditions = Conditions::from_document(&schema_doc);
+    let docs = vec![schema_doc, record_doc];
+    let corpus = Corpus::from_documents(&docs, &schema);
+    let assessment = assess(&corpus, &conditions, &ask().at);
+    let ids: Vec<String> = slices.iter().map(|s| (*s).to_owned()).collect();
+    pick_up(&ids, &corpus, &assessment, &ask(), &[])
+}
+
+#[test]
+fn one_ask_over_several_slices_opens_one_commitment() {
+    let Pickup::Opened(record) = gate_many(TWO_READY, &["TS.one", "TS.two"]) else {
+        panic!("both are admissible")
+    };
+    let doc = parse(&record.kdl).expect("valid KDL");
+    let node = doc.nodes().iter().find(|n| n.name().value() == "iteration").expect("an iteration");
+
+    let on: Vec<&str> = node
+        .iter_children()
+        .filter(|c| c.name().value() == "on-slice")
+        .filter_map(|c| c.entries().first().and_then(|e| e.value().as_string()))
+        .collect();
+    assert_eq!(on, vec!["TS.one", "TS.two"], "one record, both slices");
+    assert_eq!(
+        doc.nodes().iter().filter(|n| n.name().value() == "iteration").count(),
+        1,
+        "one commitment, not one iteration each"
+    );
+}
+
+#[test]
+fn the_commitment_pins_every_claim_of_every_slice_it_covers() {
+    let Pickup::Opened(record) = gate_many(TWO_READY, &["TS.one", "TS.two"]) else {
+        panic!("expected an admission")
+    };
+    // Three claims across two slices, each carrying the slice that declared it — which is
+    // what lets the close check C3 against the right one.
+    assert_eq!(record.kdl.matches("    claim ").count(), 3);
+    assert!(record.kdl.contains(r#"claim "C1" from-slice="TS.one""#));
+    assert!(record.kdl.contains(r#"claim "C1" from-slice="TS.two""#));
+    assert!(record.kdl.contains(r#"claim "C2" from-slice="TS.two""#));
+}
+
+#[test]
+fn each_slice_is_vetted_separately_and_the_verdicts_are_kept_apart() {
+    let Pickup::Opened(record) = gate_many(TWO_READY, &["TS.one", "TS.two"]) else {
+        panic!("expected an admission")
+    };
+    assert_eq!(record.kdl.matches(r#"vet "create""#).count(), 2, "one vet per slice");
+    assert!(record.kdl.contains(r#"on-slice="TS.one""#));
+    assert!(record.kdl.contains(r#"on-slice="TS.two""#));
+}
+
+#[test]
+fn a_commitment_is_refused_whole_when_any_slice_is_refused() {
+    // A commitment that admits its easy half is not one thing, and the ask was for one
+    // thing.
+    let record = format!(
+        "{TWO_READY}\niteration \"ITER.1\" {{\n    on-slice \"TS.two\"\n    state \"working\"\n}}\n"
+    );
+    let Pickup::Refused(refusal) = gate_many(&record, &["TS.one", "TS.two"]) else {
+        panic!("TS.two is held by an open iteration, so the commitment cannot be admitted")
+    };
+    assert!(
+        refusal.failed.iter().any(|(c, _)| c.contains("no-iteration-in-flight") && c.contains("TS.two")),
+        "and the refusal says WHICH slice failed: {:?}",
+        refusal.failed
+    );
+    assert!(
+        !refusal.failed.iter().any(|(c, _)| c.contains("TS.one")),
+        "the admissible one is not accused"
+    );
+}
+
+#[test]
+fn a_single_slice_ask_is_unchanged_by_any_of_this() {
+    // The suffix that names which slice failed is noise when there is only one, and
+    // eighteen iterations of records were written without it.
+    let record = r##"
+thin-slice "TS.a" {
+    slug "a"
+    kind "command"
+    realizes "CAP.x"
+    claim "C1"
+}
+thin-slice "TS.b" {
+    slug "b"
+    kind "command"
+    realizes "CAP.x"
+    claim "C1"
+    depends-on "TS.a — first"
+}
+"##;
+    let Pickup::Refused(refusal) = gate_many(record, &["TS.b"]) else { panic!("expected refusal") };
+    assert_eq!(refusal.failed[0].0, "dependencies-delivered", "no slice suffix");
 }

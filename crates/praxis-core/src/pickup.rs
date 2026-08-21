@@ -47,48 +47,82 @@ pub struct Ask {
 ///
 /// `taken` is every id already in use, so a new one does not collide. The gate never
 /// reads the disk: which ids exist is a fact handed to it, like every other.
-pub fn pick_up(slice_id: &str, corpus: &Corpus, assessment: &Assessment, ask: &Ask, taken: &[String]) -> Pickup {
-    let Some(slice) = corpus.slice(slice_id) else {
-        return Pickup::NoSuchSlice(format!(
-            "{slice_id} is no slice the record holds, so there is nothing to admit or refuse"
-        ));
-    };
-    let Some(verdicts) = assessment.verdicts.get(slice_id) else {
-        return Pickup::NoSuchSlice(format!("{slice_id} was never assessed"));
-    };
+/// Take one or more slices through the gate, as ONE commitment.
+///
+/// Every slice is vetted separately and the commitment is admitted only if all of them
+/// are: a commitment that admits its easy half is not one thing, and the ask was for one
+/// thing. A refusal names which slice failed which condition.
+pub fn pick_up(
+    slice_ids: &[String],
+    corpus: &Corpus,
+    assessment: &Assessment,
+    ask: &Ask,
+    taken: &[String],
+) -> Pickup {
+    if slice_ids.is_empty() {
+        return Pickup::NoSuchSlice("no slice was named, so there is nothing to admit".to_owned());
+    }
 
-    let failed: Vec<(String, String)> = verdicts
-        .iter()
-        .filter(|(_, v)| v.blocks())
-        .map(|(c, v)| (c.clone(), v.detail().to_owned()))
-        .collect();
+    let mut slices = Vec::new();
+    for id in slice_ids {
+        let Some(slice) = corpus.slice(id) else {
+            return Pickup::NoSuchSlice(format!(
+                "{id} is no slice the record holds, so there is nothing to admit or refuse"
+            ));
+        };
+        if assessment.verdicts.get(id).is_none() {
+            return Pickup::NoSuchSlice(format!("{id} was never assessed"));
+        }
+        slices.push(slice);
+    }
 
-    // Declared, undecided, and carried into the record either way. An admission that does
-    // not say what it left undecided is an admission of less than it appears to be.
-    let undecided: Vec<(String, String)> = verdicts
-        .iter()
-        .filter(|(_, v)| matches!(v, Verdict::Uncomputed(_) | Verdict::Judgement))
-        .map(|(c, v)| (c.clone(), v.detail().to_owned()))
-        .collect();
+    let mut failed = Vec::new();
+    let mut undecided = Vec::new();
+    let mut per_slice = Vec::new();
+    let committed = slices.len();
+    for slice in &slices {
+        let verdicts = &assessment.verdicts[&slice.id];
+        for (condition, verdict) in verdicts {
+            if verdict.blocks() {
+                // Named per slice only when there are several: with one, the suffix is
+                // noise; with four, `dependencies-delivered` alone does not say which of
+                // them is waiting.
+                let named = if committed == 1 {
+                    condition.clone()
+                } else {
+                    format!("{condition} ({})", slice.id)
+                };
+                failed.push((named, verdict.detail().to_owned()));
+            }
+            if matches!(verdict, Verdict::Uncomputed(_) | Verdict::Judgement)
+                && !undecided.iter().any(|(c, _): &(String, String)| c == condition)
+            {
+                undecided.push((condition.clone(), verdict.detail().to_owned()));
+            }
+        }
+        per_slice.push((slice.id.clone(), verdicts.clone()));
+    }
+
+    // The file is named for the commitment, which is the first slice's slug when there is
+    // one and the count when there are several — a filename cannot carry four slugs.
+    let name = if slices.len() == 1 {
+        slices[0].slug.clone()
+    } else {
+        format!("{}-and-{}-more", slices[0].slug, slices.len() - 1)
+    };
 
     if failed.is_empty() {
         let id = next_id("ITER", &ask.at, taken);
-        let kdl = iteration_kdl(&id, slice_id, &slice.slug, &slice.claims, ask, verdicts, &undecided);
-        Pickup::Opened(Record {
-            file: format!("iterations/{id}.{}.kdl", slice.slug),
-            id,
-            kdl,
-            failed,
-        })
+        let claims: Vec<(String, String)> = slices
+            .iter()
+            .flat_map(|s| s.claims.iter().map(|c| (s.id.clone(), c.clone())))
+            .collect();
+        let kdl = iteration_kdl(&id, &name, &claims, ask, &per_slice, &undecided);
+        Pickup::Opened(Record { file: format!("iterations/{id}.{name}.kdl"), id, kdl, failed })
     } else {
         let id = next_id("REF", &ask.at, taken);
-        let kdl = refusal_kdl(&id, slice_id, ask, &failed, &undecided);
-        Pickup::Refused(Record {
-            file: format!("iterations/{id}.{}.kdl", slice.slug),
-            id,
-            kdl,
-            failed,
-        })
+        let kdl = refusal_kdl(&id, &slice_ids.join(" "), ask, &failed, &undecided);
+        Pickup::Refused(Record { file: format!("iterations/{id}.{name}.kdl"), id, kdl, failed })
     }
 }
 
@@ -106,24 +140,33 @@ pub(crate) fn next_id(prefix: &str, at: &str, taken: &[String]) -> String {
 
 fn iteration_kdl(
     id: &str,
-    slice_id: &str,
-    slug: &str,
-    claims: &[String],
+    name: &str,
+    claims: &[(String, String)],
     ask: &Ask,
-    verdicts: &[(String, Verdict)],
+    per_slice: &[(String, Vec<(String, Verdict)>)],
     undecided: &[(String, String)],
 ) -> String {
     let mut out = String::new();
     out.push_str("// Opened by `praxis pick-up`. Every condition below was evaluated against the\n");
     out.push_str(&format!("// tree as it stood at {}, and the verdicts are recorded\n", ask.at));
     out.push_str("// rather than summarised: a gate whose reasoning is not on the record is a gate\n");
-    out.push_str("// you have to trust.\n\n");
+    out.push_str("// you have to trust.\n");
+    if per_slice.len() > 1 {
+        out.push_str("//\n");
+        out.push_str(&format!(
+            "// One commitment over {} slices. They were vetted separately and admitted\n",
+            per_slice.len()
+        ));
+        out.push_str("// together — a commitment that admits its easy half is not one thing.\n");
+    }
+    out.push('\n');
     out.push_str(&format!("iteration {id:?} {{\n"));
-    // The slug names the ATTEMPT, and the gate cannot know what this attempt will be
-    // about — only which slice it is on. So it seeds from the slice and expects a human
-    // to rename it once there is something to name.
-    out.push_str(&format!("    slug {slug:?}\n"));
-    out.push_str(&format!("    on-slice {slice_id:?}\n"));
+    // The slug names the COMMITMENT, and the gate cannot know what it will be about —
+    // only which slices it covers. It seeds from them and expects a human to rename it.
+    out.push_str(&format!("    slug {name:?}\n"));
+    for (slice, _) in per_slice {
+        out.push_str(&format!("    on-slice {slice:?}\n"));
+    }
     out.push_str("    state \"open\"\n");
     out.push_str(&format!("    opened-at {:?}\n", ask.at));
     out.push_str(&format!("    opened-by {:?}\n", ask.by));
@@ -131,26 +174,33 @@ fn iteration_kdl(
     out.push_str("        status \"signed\"\n");
     out.push_str(&format!("        signer {:?}\n", ask.signer));
     out.push_str(&format!("        at {:?}\n", ask.at));
-    out.push_str("        signed-by \"the ask to pick up this slice\"\n");
-    out.push_str("    }\n");
     out.push_str(&format!(
-        "\n    vet \"create\" state=\"done\" at={:?} {{\n",
-        ask.at
+        "        signed-by \"the ask to pick up {}\"\n",
+        if per_slice.len() == 1 { "this slice" } else { "these slices, as one commitment" }
     ));
-    for (condition, verdict) in verdicts {
-        let (word, detail) = match verdict {
-            Verdict::Admits => ("passed", String::new()),
-            Verdict::Blocks(why) => ("failed", why.clone()),
-            Verdict::Uncomputed(why) => ("not-computed", why.clone()),
-            Verdict::Judgement => ("left-to-the-maintainer", String::new()),
-        };
-        out.push_str(&format!("        condition {condition:?} verdict={word:?}"));
-        if !detail.is_empty() {
-            out.push_str(&format!(" \\\n            found={:?}", squash(&detail)));
-        }
-        out.push('\n');
-    }
     out.push_str("    }\n");
+
+    for (slice, verdicts) in per_slice {
+        out.push_str(&format!(
+            "\n    vet \"create\" state=\"done\" at={:?} on-slice={slice:?} {{\n",
+            ask.at
+        ));
+        for (condition, verdict) in verdicts {
+            let (word, detail) = match verdict {
+                Verdict::Admits => ("passed", String::new()),
+                Verdict::Blocks(why) => ("failed", why.clone()),
+                Verdict::Uncomputed(why) => ("not-computed", why.clone()),
+                Verdict::Judgement => ("left-to-the-maintainer", String::new()),
+            };
+            out.push_str(&format!("        condition {condition:?} verdict={word:?}"));
+            if !detail.is_empty() {
+                out.push_str(&format!(" \\\n            found={:?}", squash(&detail)));
+            }
+            out.push('\n');
+        }
+        out.push_str("    }\n");
+    }
+
     if !undecided.is_empty() {
         out.push_str(&format!(
             "\n    // {} of the declared conditions were not decided by the gate. They are\n",
@@ -159,17 +209,17 @@ fn iteration_kdl(
         out.push_str("    // recorded above rather than omitted: an admission that does not say what\n");
         out.push_str("    // it left undecided claims more than it checked.\n");
     }
-    // The claims, pinned at open. Not a convenience: a claim list that can be edited
-    // mid-iteration is a close you can always make succeed by dropping what you did not
-    // reach, which is exactly how scope goes quietly in a Markdown checklist
-    // (TS.260820.07/C3).
+
+    // The claims, pinned at open, each carrying the slice that declared it. A claim list
+    // that can be edited mid-iteration is a close you can always make succeed by dropping
+    // what you did not reach (TS.260820.07/C3).
     if !claims.is_empty() {
-        out.push_str("\n    // Frozen at open, from the slice. Removing one from the slice now\n");
+        out.push_str("\n    // Frozen at open, from the slices. Removing one from a slice now\n");
         out.push_str("    // does not remove it from here — it makes the two disagree, and that is\n");
         out.push_str("    // refused.\n");
-        for claim in claims {
+        for (slice, claim) in claims {
             out.push_str(&format!(
-                "    claim {claim:?} from-slice={slice_id:?} state=\"pending\"\n"
+                "    claim {claim:?} from-slice={slice:?} state=\"pending\"\n"
             ));
         }
     }

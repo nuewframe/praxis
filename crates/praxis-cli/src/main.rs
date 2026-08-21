@@ -37,8 +37,9 @@ enum Command {
     ///
     /// Selection is the commitment: choosing this is choosing not to work something else.
     PickUp {
-        /// The slice to take.
-        slice: String,
+        /// The slices to take, as ONE commitment. Vetted separately, admitted together.
+        #[arg(required = true, num_args = 1..)]
+        slices: Vec<String>,
         /// The state root to read and write.
         #[arg(default_value = "praxis")]
         root: PathBuf,
@@ -193,7 +194,7 @@ fn main() -> ExitCode {
                 ExitCode::FAILURE
             }
         },
-        Command::PickUp { slice, root, dry_run } => match pickup(&slice, &root, dry_run) {
+        Command::PickUp { slices, root, dry_run } => match pickup(&slices, &root, dry_run) {
             Ok(admitted) => {
                 if admitted {
                     ExitCode::SUCCESS
@@ -331,7 +332,7 @@ fn main() -> ExitCode {
 
 /// `TS.260820.05` — the one gate. Either an iteration is open, or a refusal is on the
 /// record naming the condition that failed. Never both, and never neither.
-fn pickup(slice: &str, root: &Path, dry_run: bool) -> miette::Result<bool> {
+fn pickup(slices: &[String], root: &Path, dry_run: bool) -> miette::Result<bool> {
     let sources = load(root)?;
     let docs: Vec<_> = sources.iter().map(|(_, _, d)| d.clone()).collect();
 
@@ -368,11 +369,27 @@ fn pickup(slice: &str, root: &Path, dry_run: bool) -> miette::Result<bool> {
     // Where the record goes is a layout question, so the shell answers it — and it
     // answers it from where the SLICE lives, not from the state root. A record belongs to
     // the frame that raised the work, and only the tree knows which frame that is.
-    let home = frame_of(slice, &sources).ok_or_else(|| {
-        miette::miette!("cannot tell which frame {slice} belongs to, so there is nowhere to put the record")
-    })?;
+    // Every slice in one commitment must belong to one frame — the record has nowhere to
+    // put a commitment that spans two.
+    let mut homes: Vec<PathBuf> = Vec::new();
+    for slice in slices {
+        let home = frame_of(slice, &sources).ok_or_else(|| {
+            miette::miette!("cannot tell which frame {slice} belongs to, so there is nowhere to put the record")
+        })?;
+        if !homes.contains(&home) {
+            homes.push(home);
+        }
+    }
+    if homes.len() > 1 {
+        miette::bail!(
+            "these slices belong to {} different frames. A commitment is one ask against one \
+             problem, and the record has nowhere to put one that spans two",
+            homes.len()
+        );
+    }
+    let home = homes.remove(0);
 
-    match pick_up(slice, &corpus, &assessment, &ask, &taken) {
+    match pick_up(slices, &corpus, &assessment, &ask, &taken) {
         Pickup::NoSuchSlice(why) => miette::bail!("{why}"),
         Pickup::Opened(record) => {
             let path = home.join(&record.file);
@@ -380,7 +397,7 @@ fn pickup(slice: &str, root: &Path, dry_run: bool) -> miette::Result<bool> {
                 println!("would open {} at {}\n\n{}", record.id, path.display(), record.kdl);
             } else {
                 write_once(&path, &record.kdl)?;
-                println!("praxis: {} opened on {slice} — {}", record.id, path.display());
+                println!("praxis: {} opened on {} — {}", record.id, slices.join(" · "), path.display());
             }
             Ok(true)
         }

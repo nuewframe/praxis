@@ -173,7 +173,9 @@ pub struct Carried {
 #[derive(Debug, Clone)]
 pub struct Attempt {
     pub id: String,
-    pub on_slice: String,
+    /// The slices this commitment covers. The ITERATION is the commitment; a slice is a
+    /// unit of work. One ask can commit to several, and they are worked together.
+    pub on_slices: Vec<String>,
     pub state: String,
     pub claims: Vec<Settled>,
     pub findings: Vec<Carried>,
@@ -269,6 +271,16 @@ pub struct Config {
 }
 
 impl Attempt {
+    /// Whether this commitment covers a given slice.
+    pub fn covers(&self, slice: &str) -> bool {
+        self.on_slices.iter().any(|s| s == slice)
+    }
+
+    /// What to show a reader who wants one name for the commitment.
+    pub fn slices(&self) -> String {
+        self.on_slices.join(" · ")
+    }
+
     pub fn in_flight(&self) -> bool {
         matches!(self.state.as_str(), "open" | "working")
     }
@@ -464,7 +476,7 @@ fn slice_from(node: &KdlNode) -> Slice {
 fn attempt_from(node: &KdlNode) -> Attempt {
     Attempt {
         id: string_arg(node).unwrap_or_default(),
-        on_slice: child_arg(node, "on-slice").unwrap_or_default(),
+        on_slices: child_args(node, "on-slice"),
         state: child_arg(node, "state").unwrap_or_default(),
         claims: node
             .iter_children()
@@ -690,7 +702,7 @@ fn decide(condition: &Condition, slice: &Slice, corpus: &Corpus) -> Verdict {
         "no-iteration-in-flight" => match corpus
             .attempts
             .iter()
-            .find(|a| a.on_slice == slice.id && a.in_flight())
+            .find(|a| a.on_slices.contains(&slice.id) && a.in_flight())
         {
             Some(a) => Verdict::Blocks(format!("{} is {} on this slice", a.id, a.state)),
             None => Verdict::Admits,

@@ -87,19 +87,28 @@ pub fn close_iteration(iteration_id: &str, corpus: &Corpus, ask: &Ask, taken: &[
         ));
     }
 
-    let declared: Vec<String> = corpus
-        .slice(&attempt.on_slice)
-        .map(|s| s.claims.clone())
-        .unwrap_or_default();
+    // The union across every slice the commitment covers. A claim belongs to the
+    // commitment if any of its slices declares it.
+    let declared: Vec<(String, String)> = attempt
+        .on_slices
+        .iter()
+        .filter_map(|id| corpus.slice(id))
+        .flat_map(|slice| slice.claims.iter().map(|c| (slice.id.clone(), c.clone())))
+        .collect();
 
     let mut unaccounted = Vec::new();
     let mut accounting = Vec::new();
     for claim in &attempt.claims {
         // C3 first: a claim frozen here that the slice has since stopped declaring.
-        if claim.from == attempt.on_slice && !declared.is_empty() && !declared.contains(&claim.id) {
+        // C3: a claim frozen here whose own slice has since stopped declaring it. Checked
+        // against THAT slice, not against the commitment as a whole.
+        if attempt.covers(&claim.from)
+            && declared.iter().any(|(slice, _)| slice == &claim.from)
+            && !declared.iter().any(|(slice, id)| slice == &claim.from && id == &claim.id)
+        {
             unaccounted.push(Unaccounted::DroppedFromTheSlice {
                 claim: claim.id.clone(),
-                slice: attempt.on_slice.clone(),
+                slice: claim.from.clone(),
             });
             continue;
         }
@@ -137,7 +146,7 @@ pub fn close_iteration(iteration_id: &str, corpus: &Corpus, ask: &Ask, taken: &[
     }
 
     let id = crate::pickup::next_id("REF", &ask.at, taken);
-    let kdl = refusal_kdl(&id, iteration_id, &attempt.on_slice, ask, &unaccounted);
+    let kdl = refusal_kdl(&id, iteration_id, &attempt.slices(), ask, &unaccounted);
     Closing::Refused(Record {
         file: format!("iterations/{id}.close-refused.kdl"),
         id,

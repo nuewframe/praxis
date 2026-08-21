@@ -4,8 +4,9 @@
 // you have to trust.
 
 iteration "ITER.260821.19" {
-    slug "prove-every-rule-can-refuse"
+    slug "prove-every-rule-can-refuse-and-seal-what-cannot-change"
     on-slice "TS.260821.02"
+    on-slice "TS.260820.18"
     state "open"
     opened-at "2026-08-21T22:13:45Z"
     opened-by "agent:praxis"
@@ -49,6 +50,16 @@ iteration "ITER.260821.19" {
     //   phase      — an existing slice needs a phase re-run. Named per slice below.
     //   this iteration — work that has no other home, or that proves the rest.
     // ================================================================
+
+    finding "AI2" state="open" size="frame-sized" \
+        text="the model said `an iteration is an attempt at ONE slice` and that was wrong. The \
+            ITERATION is the COMMITMENT; a slice is a unit of work that adds value. One ask can \
+            commit to several, and they are worked together or the commitment was never one thing" \
+        note="it survived eighteen iterations because every ask happened to name one slice, so the \
+            model was never asked the question it was answering. NA.260820.01 has carried \
+            `open: what an iteration IS, as an entity` since it was seeded — and ITER.260821.01 \
+            declared the entity with `on-slice each=1`, which answered it quietly and wrongly. A \
+            question marked open and answered by a default is worse than one left alone"
 
     finding "AI1" state="open" size="observation" \
         text="W6 happened again, in this iteration, within an hour of the rule against it being \
@@ -126,12 +137,20 @@ iteration "ITER.260821.19" {
             why="the release chain has never run end to end. Not a slice's work — a release's"
     }
 
+    claim "C1" from-slice="TS.260820.18" state="met" \
+        text="resolving against a release that does not exist is refused" \
+        settled-by="settled by ITER.260821.17 and carried into this commitment unchanged" \
+        evidence="tests/symptoms.rs::c1_resolving_against_a_release_that_does_not_exist_is_refused"
+    claim "C2" from-slice="TS.260820.18" state="met" \
+        text="resolving against a release that bound no slice attacking this symptom is refused" \
+        settled-by="settled by ITER.260821.17 and carried into this commitment unchanged" \
+        evidence="tests/symptoms.rs::c2_a_release_that_bound_no_attacking_slice_is_refused"
     claim "C3" from-slice="TS.260820.18" state="pending" \
         text="a resolved symptom cannot silently return to present" \
-        note="the residue AG3 carried from ITER.260821.17. It is settled here because sealing a \
-            resolved symptom is the concrete WITNESS that an-immutable-record-carries-a-seal can \
-            refuse — the rule needs the seal and the seal needs the rule, and one iteration is \
-            where they meet"
+        note="the residue AG3 carried from ITER.260821.17, and the reason TS.260820.18 joins this \
+            commitment rather than getting its own iteration: sealing a resolved symptom is the \
+            concrete WITNESS that an-immutable-record-carries-a-seal can refuse. The rule needs the \
+            seal and the seal needs the rule, and a commitment is where they meet"
 
     vet "start" state="done" at="2026-08-21T20:32:00Z" {
         condition "the tree is clean and current" verdict="passed" found="HEAD 96bda0c plus the discovery maturation above"
