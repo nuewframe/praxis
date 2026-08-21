@@ -21,8 +21,10 @@ notional-architecture "NA.test" {
             field "index"    each="0..1"
             field "seal"     each="0..1"
         }
+        entity "frame" {
+            field "symptom" each="0..n" holds="symptom"
+        }
         entity "symptom" {
-            field "resolved-by" each="0..1"
         }
     }
 }
@@ -220,11 +222,9 @@ iteration "ITER.1" {
     on-slice "TS.a"
     state "closed"
 }
-symptom "S3" {
-    resolved-by "0.9.0"
-}
-symptom "S4" {
-    resolved-by "0.9.1"
+frame "F.1" {
+    symptom "S3" state="resolved" resolved-by="0.9.0"
+    symptom "S4" state="resolved" resolved-by="0.9.1"
 }
 release "REL.0.9.0" {
     version "0.9.0"

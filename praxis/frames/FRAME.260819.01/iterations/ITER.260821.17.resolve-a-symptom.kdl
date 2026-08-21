@@ -1,0 +1,161 @@
+// Opened by `praxis pick-up`. Every condition below was evaluated against the
+// tree as it stood at 2026-08-21T20:07:10Z, and the verdicts are recorded
+// rather than summarised: a gate whose reasoning is not on the record is a gate
+// you have to trust.
+
+iteration "ITER.260821.17" {
+    slug "resolve-a-symptom"
+    on-slice "TS.260820.18"
+    state "closed"
+    opened-at "2026-08-21T20:07:10Z"
+    opened-by "agent:praxis"
+
+    approval "admission" {
+        status "signed"
+        signer "human:wael"
+        at "2026-08-21T20:07:10Z"
+        signed-by "the ask to pick up this slice"
+    }
+
+    vet "create" state="done" at="2026-08-21T20:07:10Z" {
+        condition "slice-is-shaped" verdict="passed"
+        condition "dependencies-delivered" verdict="passed"
+        condition "no-iteration-in-flight" verdict="passed"
+        condition "nothing-left-to-admit" verdict="passed"
+        condition "work-is-disjoint" verdict="not-computed" \
+            found="no seam manifest exists, so what two iterations would touch cannot be compared. Disjointness is half of what this capability says it judges, and half of what it judges is currently not computed at all"
+        condition "the-slice-is-the-best-available" verdict="left-to-the-maintainer"
+    }
+
+    // 2 of the declared conditions were not decided by the gate. They are
+    // recorded above rather than omitted: an admission that does not say what
+    // it left undecided claims more than it checked.
+
+    // Frozen at open, from the slice. Removing one from the slice now
+    // does not remove it from here — it makes the two disagree, and that is
+    // refused.
+
+    claim "C1" from-slice="TS.260820.18" state="met" \
+        text="resolving against a release that does not exist is refused" \
+        settled-by="a negative test with a dangling resolved-by" \
+        evidence="tests/symptoms.rs::c1_resolving_against_a_release_that_does_not_exist_is_refused, \
+            and ::c1_a_release_that_is_only_planned_does_not_resolve_anything — binding work to a \
+            version is not shipping it, so the frame shrinks at the cut and not at the intent. \
+            Verified against the real record: it refused this repository's own S1"
+    claim "C2" from-slice="TS.260820.18" state="met" \
+        text="resolving against a release that bound no slice attacking this symptom is refused" \
+        settled-by="a negative test with a real release and no attacking slice" \
+        evidence="tests/symptoms.rs::c2_a_release_that_bound_no_attacking_slice_is_refused, and \
+            ::c2_an_attacking_slice_in_a_different_release_does_not_count — the attack has to be in \
+            THIS release, because a slice that attacks S1 and shipped elsewhere says nothing about \
+            what this version did"
+    claim "C3" from-slice="TS.260820.18" state="met-in-part" \
+        text="a resolved symptom cannot silently return to present" \
+        settled-by="a negative test reverting a resolution without a new frame or an amendment" \
+        evidence="tests/symptoms.rs::a_withdrawn_claim_leaves_the_symptom_present_and_the_record_clean \
+            — a withdrawal that records `previously-claimed` and `withdrawn-because` passes, and the \
+            withdrawal this repository performed on its own S1 is the worked example" \
+        residue="nothing REFUSES a silent revert. A symptom edited from resolved back to present \
+            with no `previously-claimed` is accepted, because the check has no memory of what the \
+            record said before. Recorded as AG3" \
+        note="the honest position: this settles that a withdrawal CAN be recorded, not that an \
+            unrecorded one is caught"
+
+    decision "the unverifiable claim is withdrawn, not grandfathered" \
+        chose="move S1 to `present` and record previously-claimed and withdrawn-because" \
+        over="a grandfather clause exempting claims made before the delivery graph existed" \
+        because="the narrowing may well have happened. The problem is that nobody can check, and \
+            this frame's whole argument is that an assertion nobody can check is not evidence. A \
+            method that exempts its own progress reports from the standard it sets is the root cause \
+            with a nicer surface" \
+        falsified-by="a frame where withdrawing pre-record claims loses so much true history that \
+            readers start keeping it somewhere else — at which point the record has made itself less \
+            useful than the prose it replaced" \
+        state="accepted"
+
+    vet "start" state="done" at="2026-08-21T20:05:00Z" {
+        condition "the tree is clean and current" verdict="passed" found="HEAD e42a096"
+        condition "the slice's scope is unchanged" verdict="passed" found="three claims, read line by line"
+        condition "what this will refuse is known before it is turned on" verdict="known-and-recorded" \
+            found="S1 claims partially-resolved by 0.5.0, and no release record exists at that \
+                version. The rule will refuse this repository's own frame" \
+            resolved-by="expected, and the right answer. What was NOT expected is that the refusal \
+                would be computed and then dropped — see AG1"
+    }
+
+    frozen {
+        pins "the entity-and-field schema" at="NA.260820.01/schema" at-commit="e42a096"
+        rule "a schema change while this iteration is open is a FINDING, not an edit" \
+            exception="declaring resolution-names-a-release is the mechanism this slice depends on"
+    }
+
+    contributes "slice-outcome-added" \
+        because="resolve-a-symptom, and a frame that can only shrink by something that shipped"
+
+    layer "doctrine"    state="evidenced" evidence="skills/resolve-a-symptom/SKILL.md, registered in the router" reaches="the skill teaches that a frame shrinks only by a release, never by an opinion"
+    layer "enforcement" state="evidenced" evidence="158 tests pass; a dangling release, a planned one, and one that bound no attacking slice are each refused" reaches="resolution-names-a-release, extended to require an attacking slice in that release"
+    layer "docs"        state="evidenced" evidence="a cut release derives `resolves` from the symptoms that name it, and the release notes carry them" reaches="the release notes carry which symptoms it closed"
+    layer-set sealed=#true at="2026-08-21T20:05:00Z"
+
+    phase "design-ux" state="complete" required-by="doctrine" \
+        produced="what to do when the check refuses something you BELIEVE — three questions in order, \
+            and a worked example of the third. The skill says plainly that an old claim is not false, \
+            it is uncomputable, and that those need different answers"
+    phase "design-system" state="complete" required-by="enforcement" \
+        produced="the attack must be in THIS release. A slice attacking S1 that shipped in some \
+            other version says nothing about what this one did — so the check walks release → bound \
+            iterations → their slices → attacks, and a shortcut through `any slice anywhere` would \
+            have passed every test that mattered"
+    phase "implement" state="complete" required-by="enforcement · docs" \
+        produced="the Symptom corpus reader, slice `attacks`, resolution-names-a-release, eight \
+            tests, and the fix for AG1"
+    phase "learn" state="complete" required-by="always" produced="three findings, one of them a bug that hid every nested refusal" \
+        note="never skippable — it is the phase that judges the others"
+    phase "teach" state="complete" required-by="doctrine" produced="skills/resolve-a-symptom/SKILL.md"
+
+    finding "AG1" state="open" size="frame-sized" \
+        text="the first run of this rule reported NOTHING, and the rule was correct. Corpus \
+            violations were attributed to a file by searching its ROOT nodes for the entity id — and \
+            a symptom lives inside its frame, a decision inside its iteration. The refusal was \
+            computed and then silently dropped" \
+        note="this is S3 one layer down, inside the engine built to attack S3: a refusal that was \
+            computed and a refusal that never ran looked identical from outside. It was found only \
+            because the answer was PREDICTED — S1 was known to be unverifiable before the rule was \
+            turned on, so `no refusals` was visibly wrong. Every earlier rule was turned on without \
+            knowing what it would say, and any of them could have been dropping refusals the same way"
+
+    finding "AG2" state="open" size="observation" \
+        text="fixing AG1 by matching the id at any depth over-attributed instead: `attacks \"S1\"` \
+            has S1 as its first argument, so every slice attacking S1 claimed the violation. It now \
+            matches on KIND and id together" \
+        note="the third attribution bug in this engine — S7 matched kind OR id, this matched id at \
+            any depth, and the correct answer is both together. Each was found by a different rule \
+            firing, never by a test, and there is still no test that would catch the fourth"
+
+    finding "AG3" state="open" size="owed-work" carries="C3" \
+        text="nothing refuses a SILENT revert. A symptom edited from resolved back to present with \
+            no `previously-claimed` passes, because the check has no memory of what the record said \
+            before" \
+        obliges="either a seal on a resolved symptom, as decisions and cut releases carry, or a \
+            rule requiring `previously-claimed` on any symptom that a released version names" \
+        note="C3 is settled in part: a withdrawal CAN be recorded, and this repository recorded one. \
+            That an unrecorded one is caught is not shown, and saying so is cheaper than discovering \
+            it later"
+    closed-at "2026-08-21T20:12:06Z"
+    outcome "continue"
+
+    close {
+        claims-settled "C1" how="met"
+        claims-settled "C2" how="met"
+        claims-settled "C3" how="carried by AG3"
+        all-met #false
+        note "the accounting above was computed at close, not asserted. It says every claim is either met or carried by a finding that names it, and nothing about whether the work is any good"
+    }
+
+    trail {
+        entry at="2026-08-21T20:12:06Z" by="agent:praxis" action="state-changed" from="open" to="closed" note="closed by `praxis close`. The accounting was computed; the conclusion is not the machine's to draw"
+
+        entry at="2026-08-21T20:07:10Z" by="agent:praxis" action="created" \
+            note="opened by the gate, on the ask of human:wael"
+    }
+}

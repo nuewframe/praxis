@@ -725,6 +725,13 @@ notional-architecture "NA.260820.01" {
         rule "iteration-without-signed-admission" refuses="work beginning on an iteration whose admission is unsigned"
         rule "iteration-worked-without-start-vet"  refuses="work beginning on a create-vet alone"
         rule "complete-phase-without-evidence"     refuses="a phase marked complete that produced nothing"
+        rule "resolution-names-a-release"          refuses="a symptom resolved by a release the record does not hold, or by one that bound no slice attacking it" \
+            because="a frame shrinks by a RELEASE, never by an opinion. Resolution computed from \
+                what shipped is the frame's own principle applied to the frame's own bookkeeping — \
+                and a method that exempts its own progress reports from the standard it sets is the \
+                root cause with a nicer surface" \
+            note="the sharpest check in the set. It is also the one most likely to refuse something \
+                the maintainer believes, which is the point"
         rule "a-decision-names-what-it-rejected"   refuses="a decision that names no alternative it rejected" \
             because="a decision with no alternatives is a preference, and a preference recorded as a \
                 decision is the hardest kind to argue with later — there is nothing to argue against"

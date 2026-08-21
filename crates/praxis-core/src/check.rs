@@ -49,6 +49,10 @@ pub enum Refusal {
     BrokenSeal { release: String, expected: String, found: String },
     /// A cut release with no seal at all, so nothing about it can be checked.
     UnsealedRelease { release: String },
+    /// A symptom resolved by a release the record does not hold.
+    ResolvedByNothing { symptom: String, version: String },
+    /// A symptom resolved by a release that bound no slice attacking it.
+    ResolvedWithoutAttack { symptom: String, version: String },
     /// A decision with no alternatives, or none that would show it wrong.
     PreferenceNotDecision { decision: String, missing: &'static str },
     /// A decision that belongs to no iteration.
@@ -84,6 +88,7 @@ impl Refusal {
             Self::UndeclaredLifetime { .. } => "publishable",
             Self::PreferenceNotDecision { missing, .. } => missing,
             Self::UnboundDecision { .. } | Self::RewrittenDecision { .. } => "decision",
+            Self::ResolvedByNothing { .. } | Self::ResolvedWithoutAttack { .. } => "resolved-by",
             Self::UnjustifiedLifetime { missing, .. } => missing,
         }
     }
@@ -139,6 +144,15 @@ impl Refusal {
                  slice sets the granularity, and evidence outside it is evidence for something \
                  nobody asked about",
                 if declared.is_empty() { "none".to_owned() } else { declared.join(" · ") }
+            ),
+            Self::ResolvedByNothing { symptom, version } => format!(
+                "{symptom} names {version:?} as what resolved it, and the record holds no cut \
+                 release at that version. A frame shrinks by a release, never by an opinion"
+            ),
+            Self::ResolvedWithoutAttack { symptom, version } => format!(
+                "{symptom} names {version} as what resolved it, and {version} bound no slice whose \
+                 `attacks` names {symptom}. Resolution is COMPUTED from what shipped rather than \
+                 asserted by whoever is closing it"
             ),
             Self::PreferenceNotDecision { decision, missing } => format!(
                 "{decision:?} declares no `{missing}`. A decision with no alternatives it rejected, \
@@ -473,6 +487,47 @@ pub fn check_corpus(docs: &[KdlDocument], schema: &Schema) -> Vec<Violation> {
             schema.declares_rule("no-silent-drop"),
             schema.declares_rule("claim-dropped-from-the-slice"),
         ));
+    }
+
+    // `resolution-names-a-release`, if the record declares it. The sharpest check here:
+    // it makes progress against a problem computable from the record rather than declared
+    // by whoever wants to close it.
+    if schema.declares_rule("resolution-names-a-release") {
+        let corpus = crate::admission::Corpus::from_documents(docs, schema);
+        for symptom in corpus.symptoms.iter().filter(|s| s.resolved()) {
+            let Some(version) = &symptom.resolved_by else { continue };
+            let Some(release) = corpus.release(version).filter(|r| r.cut()) else {
+                out.push(Violation {
+                    entity_kind: "symptom".to_owned(),
+                    entity_id: Some(symptom.id.clone()),
+                    refusal: Refusal::ResolvedByNothing {
+                        symptom: symptom.id.clone(),
+                        version: version.clone(),
+                    },
+                    span: SourceSpan::from(0),
+                });
+                continue;
+            };
+            let attacked = release.binds.iter().any(|iteration| {
+                corpus
+                    .attempts
+                    .iter()
+                    .find(|a| &a.id == iteration)
+                    .and_then(|a| corpus.slice(&a.on_slice))
+                    .is_some_and(|slice| slice.attacks.contains(&symptom.id))
+            });
+            if !attacked {
+                out.push(Violation {
+                    entity_kind: "symptom".to_owned(),
+                    entity_id: Some(symptom.id.clone()),
+                    refusal: Refusal::ResolvedWithoutAttack {
+                        symptom: symptom.id.clone(),
+                        version: version.clone(),
+                    },
+                    span: SourceSpan::from(0),
+                });
+            }
+        }
     }
 
     // The decision rules, if the record declares them. A decision is bound to the

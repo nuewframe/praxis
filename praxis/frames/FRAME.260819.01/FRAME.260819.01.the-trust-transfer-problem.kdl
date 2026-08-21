@@ -10,8 +10,17 @@ frame "FRAME.260819.01" {
     title "Trust in an agent's artifact is unearned, because fidelity is invisible"
 
     // ---- Symptoms. Each resolves on its own schedule, by naming a release. ----
-    symptom "S1" state="partially-resolved" resolved-by="0.5.0" \
-        text="agents improvise structure instead of following a method — narrowed by guardrails and skills, not closed"
+    symptom "S1" state="present" \
+        text="agents improvise structure instead of following a method — narrowed by guardrails and skills, not closed" \
+        previously-claimed="partially-resolved by 0.5.0" \
+        withdrawn-because="resolution-names-a-release refused it, correctly. 0.5.0 predates the \
+            delivery graph: the record holds no cut release at that version and therefore no slice \
+            whose `attacks` names S1. The narrowing may well have happened — it is not that the \
+            claim is false, it is that it is UNCOMPUTABLE, and this frame's whole argument is that \
+            an assertion nobody can check is not evidence" \
+        note="withdrawn rather than grandfathered. A method that exempts its own progress reports \
+            from the standard it sets is the root cause with a nicer surface, and the first thing \
+            self-application cost this frame was a claimed win"
     symptom "S2" state="present" \
         text="an artifact looks identical whether the agent reasoned hard or pattern-matched a template"
     symptom "S3" state="present" \

@@ -26,6 +26,7 @@ what shipped at 0.8.0, which symptoms it resolved, and what it left owed
 | ITER.260821.14 | TS.260820.12 — declare-what-gets-published | slice-outcome-added |
 | ITER.260821.15 | TS.260820.14 — record-a-decision | slice-outcome-added |
 | ITER.260821.16 | TS.260820.15 — document-how-a-capability-is-used | slice-outcome-added |
+| ITER.260821.17 | TS.260820.18 — resolve-a-symptom | slice-outcome-added |
 
 ## symptoms it resolved
 
@@ -117,4 +118,7 @@ _Nothing here — no symptom names this version as what resolved it._
 | ITER.260821.16 | AF1 | — |
 | ITER.260821.16 | AF2 | — |
 | ITER.260821.16 | AF3 | — |
+| ITER.260821.17 | AG1 | — |
+| ITER.260821.17 | AG2 | — |
+| ITER.260821.17 | AG3 | C3 |
 

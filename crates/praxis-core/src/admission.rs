@@ -124,6 +124,8 @@ pub struct Slice {
     /// The claim ids the slice declares. Delivery is measured against these, never
     /// against one iteration's own accounting of what it took on.
     pub claims: Vec<String>,
+    /// The symptoms this slice was cut to attack.
+    pub attacks: Vec<String>,
     /// What the record SAYS its state is — which may disagree with what the iterations show.
     pub declared_state: Option<String>,
 }
@@ -182,6 +184,23 @@ pub struct Attempt {
     /// Which of the configured bump rules this iteration's work matches. Declared by the
     /// iteration, because only whoever did the work knows what kind of change it was.
     pub contributes: Vec<String>,
+}
+
+/// One observable thing that is wrong, resolving on its own schedule by naming a release.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Symptom {
+    pub id: String,
+    pub state: String,
+    /// The version claimed to have resolved it. Checkable: that release must exist AND
+    /// must have bound a slice that attacks this symptom.
+    pub resolved_by: Option<String>,
+    pub seal: Option<String>,
+}
+
+impl Symptom {
+    pub fn resolved(&self) -> bool {
+        matches!(self.state.as_str(), "resolved" | "partially-resolved")
+    }
 }
 
 /// A read model, and what the record declares about its lifetime. Membership of the
@@ -261,8 +280,7 @@ pub struct Corpus {
     pub slices: Vec<Slice>,
     pub attempts: Vec<Attempt>,
     pub releases: Vec<Release>,
-    /// Symptom id, and the version it names as having resolved it.
-    pub symptoms: Vec<(String, String)>,
+    pub symptoms: Vec<Symptom>,
     pub capabilities: Vec<Capability>,
     pub views: Vec<View>,
     pub decisions: Vec<Decision>,
@@ -363,11 +381,17 @@ impl Corpus {
                             }
                         }
                     }
-                    "symptom" => {
-                        if let (Some(id), Some(by)) =
-                            (string_arg(node), child_arg(node, "resolved-by"))
+                    "frame" => {
+                        for child in node.iter_children().filter(|c| c.name().value() == "symptom")
                         {
-                            corpus.symptoms.push((id, by));
+                            if let Some(id) = string_arg(child) {
+                                corpus.symptoms.push(Symptom {
+                                    id,
+                                    state: prop(child, "state").unwrap_or_default(),
+                                    resolved_by: prop(child, "resolved-by"),
+                                    seal: prop(child, "seal"),
+                                });
+                            }
                         }
                     }
                     "config" => corpus.config = config_from(node),
@@ -428,6 +452,11 @@ fn slice_from(node: &KdlNode) -> Slice {
         layers: child_args(node, "layer"),
         depends_on: child_args(node, "depends-on"),
         claims: child_args(node, "claim"),
+        attacks: node
+            .iter_children()
+            .filter(|c| c.name().value() == "attacks")
+            .flat_map(string_args)
+            .collect(),
         declared_state: child_arg(node, "state"),
     }
 }
@@ -517,8 +546,8 @@ impl Corpus {
     pub fn resolved_by(&self, version: &str) -> Vec<&str> {
         self.symptoms
             .iter()
-            .filter(|(_, by)| by == version)
-            .map(|(id, _)| id.as_str())
+            .filter(|s| s.resolved_by.as_deref() == Some(version))
+            .map(|s| s.id.as_str())
             .collect()
     }
 

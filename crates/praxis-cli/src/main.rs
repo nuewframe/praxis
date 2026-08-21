@@ -1320,11 +1320,24 @@ fn check(root: &Path) -> miette::Result<usize> {
 /// (ITER.260821.03/S7).
 fn belongs(violation: &Violation, doc: &kdl::KdlDocument) -> bool {
     match &violation.entity_id {
-        Some(id) => doc.nodes().iter().any(|n| root_id(n).as_deref() == Some(id.as_str())),
+        // Nested too. A symptom lives inside its frame and a decision inside its
+        // iteration, so a search of root nodes alone COMPUTES the refusal and then drops
+        // it — which is the shape S3 warns about, one layer down (ITER.260821.17/AG1).
+        Some(id) => holds(doc.nodes(), &violation.entity_kind, id),
         // An anonymous violation can only be placed by kind, which is imprecise — so a
         // corpus rule that cannot name the entity it is about is a rule to reconsider.
         None => doc.nodes().iter().any(|n| n.name().value() == violation.entity_kind),
     }
+}
+
+/// Whether these nodes, at any depth, hold an entity of this KIND with this id. Both
+/// halves are needed: an id alone matches `attacks "S1"` as readily as `symptom "S1"`, and
+/// a kind alone matches every record of that kind in the tree.
+fn holds(nodes: &[kdl::KdlNode], kind: &str, id: &str) -> bool {
+    nodes.iter().any(|n| {
+        (n.name().value() == kind && root_id(n).as_deref() == Some(id))
+            || n.children().is_some_and(|kids| holds(kids.nodes(), kind, id))
+    })
 }
 
 fn root_id(node: &kdl::KdlNode) -> Option<String> {
