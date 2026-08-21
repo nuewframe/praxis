@@ -9,7 +9,8 @@ capability "work-admission" {
         exclusions — this one judges readiness at open, that one judges completeness at close — \
         and each ships and is useful with the other absent"
 
-    owns-event "SliceVetted" "PickupRefused" "DependencyFrozen" "IterationClosed" "CloseRefused"
+    owns-event "SliceVetted" "PickupRefused" "DependencyFrozen" "IterationClosed" "CloseRefused" \
+        "IterationStarted" "StartRefused"
 
     owns-read-model "what-is-ready-to-pick-up" \
         answers="which slices could be started right now, and what would refuse each of them?" \

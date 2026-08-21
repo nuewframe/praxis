@@ -113,9 +113,26 @@ event-storm "ES.260819.01" {
     event "PickupRefused" from="pick-up" phase="ITERATE" \
         means="the gate refused, and said which condition failed. A refusal that is not recorded is indistinguishable from never having been asked"
 
+    command "start-iteration" by="working-agent" asks="begin work on an admitted iteration, against the tree as it stands NOW"
+    event "IterationStarted" from="start-iteration" phase="ITERATE" pivotal=#true \
+        means="the second vet ran, against a tree that has moved since the first. This is the ask the \
+            record has always required and no command performed" \
+        found-by="ITER.260821.04/T3 — `pick-up` writes state `open` because one command cannot \
+            reproduce two moments, and the storm named only one command"
+    event "StartRefused" from="start-iteration" phase="ITERATE" \
+        means="the tree moved in a way the create vet did not anticipate, and the iteration stays open"
+
     command "freeze-dependency" by="working-agent" asks="pin what this iteration builds on so it cannot move underneath it"
     event "DependencyFrozen" from="freeze-dependency" phase="ITERATE" \
         means="what the iteration stands on is fixed for its duration"
+
+    command "accept-decision" by="working-agent" asks="seal this decision, so it can only be corrected by appending"
+    event "DecisionAccepted" from="accept-decision" phase="ITERATE" \
+        means="a decision stopped being editable. Acceptance is an ACT — the storm treated it as a \
+            state a decision drifts into, and a state nobody performs is a state nobody seals" \
+        found-by="ITER.260821.15/AE3 — append-only was implemented and unused, because nothing sealed"
+    event "AcceptanceRefused" from="accept-decision" phase="ITERATE" \
+        means="the decision names no alternative or no falsifier, so there is nothing to seal"
 
     command "record-decision" by="working-agent" asks="record a choice this iteration had to make, with its alternatives"
     event "DecisionRecorded" from="record-decision" phase="ITERATE" \
@@ -184,6 +201,22 @@ event-storm "ES.260819.01" {
     command "resolve-symptom" by="maintainer" asks="mark this symptom resolved, by naming the release that did it"
     event "SymptomResolved" from="resolve-symptom" phase="LEARN" pivotal=#true \
         means="a frame gave up one of its symptoms to a specific version. This is the only way a frame ever shrinks"
+
+    command "withdraw-a-claim" by="maintainer" asks="take back an assertion the record cannot compute, and say why"
+    event "ClaimWithdrawn" from="withdraw-a-claim" phase="LEARN" \
+        means="something the record asserted has been retracted BECAUSE it is uncheckable, not because \
+            it is false. The original claim stays readable" \
+        found-by="ITER.260821.17 — S1 claimed resolution by a release that predates the graph, and \
+            the only honest moves were withdraw or grandfather. The storm had neither" \
+        note="the counterpart to resolve-symptom, and the reason a frame can shrink AND grow back \
+            without anyone editing history"
+
+    command "amend-a-record" by="maintainer" asks="correct a record by appending what changed and why, never by rewriting"
+    event "RecordAmended" from="amend-a-record" phase="LEARN" \
+        means="a slice's scope, a finding's accounting or a decision's reach changed, with the \
+            original still readable" \
+        found-by="six amendments performed across ITER.260821.03 to .17, none of them a command the \
+            storm named. `amended-by` existed as a FIELD from the first day and as an ACT never"
 
     command "reopen-frame" by="maintainer" asks="re-open, because the remaining symptoms need a different attempt"
     event "FrameReopened" from="reopen-frame" phase="LEARN" \
@@ -256,6 +289,27 @@ event-storm "ES.260819.01" {
         then="issue verify-published against every document in the published tree" \
         attacks="S6" \
         note="the only command in this storm with no human behind it. Trust that depends on someone remembering to check is not trust"
+
+    policy "ordering-between-commands-is-declared" \
+        whenever="one command's outcome depends on another having already run" \
+        then="the ordering is declared on the record, not implied by the order the slices were written in" \
+        attacks="S4" \
+        found-by="ITER.260821.09/Y1 — TS.260820.09 and TS.260820.10 contradicted each other and both \
+            were cut from this storm on the same day. Each is internally coherent; the contradiction \
+            lives in the SPACE BETWEEN two records" \
+        note="a checker that validates records one at a time cannot see this, which is why it has to \
+            be declared rather than inferred"
+
+    policy "a-rule-with-no-witness-is-not-a-rule" \
+        whenever="a rule is declared and no record demonstrates it refusing" \
+        then="report it. A rule that has never been shown to refuse is indistinguishable from one that cannot" \
+        attacks="S3" \
+        found-by="ITER.260821.17/AG1 — a correct rule reported nothing because its refusals were \
+            computed and silently dropped, and nobody could tell. Caught only because the answer had \
+            been predicted" \
+        note="this is S3 turned on the enforcement layer itself: a gate that was never invoked and a \
+            gate that refused look identical, and so do a rule that cannot fire and one that has \
+            nothing to fire at"
 
     policy "resolution-names-a-release" \
         whenever="a symptom is marked resolved" \
@@ -352,7 +406,8 @@ event-storm "ES.260819.01" {
     }
 
     cluster "iteration-control" {
-        owns "SliceVetted" "PickupRefused" "DependencyFrozen" "IterationClosed" "CloseRefused"
+        owns "SliceVetted" "PickupRefused" "DependencyFrozen" "IterationClosed" "CloseRefused" \
+            "IterationStarted" "StartRefused"
         doing "admit work, refuse work, and record both — the one gate and its consequences"
         not "it does not judge quality. It judges readiness and disjointness only"
     }

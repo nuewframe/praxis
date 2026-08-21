@@ -6,7 +6,8 @@ capability "claim-settlement" {
     derived-from "ES.260819.01"
     from-cluster "evidence-and-settlement"
 
-    owns-event "EvidenceAttached" "ClaimSettled" "FindingRaised" "FindingTriaged" "DecisionRecorded"
+    owns-event "EvidenceAttached" "ClaimSettled" "FindingRaised" "FindingTriaged" "DecisionRecorded" \
+        "DecisionAccepted" "AcceptanceRefused"
 
     owns-read-model "what-this-iteration-claims-and-has-shown" \
         answers="what did it promise, what has it evidenced, and what is still open?" \

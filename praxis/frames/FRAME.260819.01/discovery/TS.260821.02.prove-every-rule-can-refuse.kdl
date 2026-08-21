@@ -1,0 +1,75 @@
+// The first slice in this frame cut from a FINDING rather than from the storm.
+//
+// Eighteen slices came out of ES.260819.01 in one sitting. This one comes out of
+// ITER.260821.17/AG1, which found a correct rule reporting nothing because its refusals
+// were computed and silently dropped — caught only because the answer had been predicted.
+// Three attribution bugs, each found by a rule firing and never by a test.
+
+thin-slice "TS.260821.02" {
+    slug "prove-every-rule-can-refuse"
+    title "Report any declared rule that nothing in the record demonstrates refusing"
+    kind "command"
+    realizes "CAP.delivery-record"
+    from-storm "ES.260819.01"
+
+    command "prove-rules"
+    actor "automation"
+    produces-event "RuleWitnessed" "RuleUnwitnessed"
+    needs-read-model "what-is-currently-true"
+
+    trigger "the record declares a rule, and nobody knows whether it can fire"
+    outcome "every declared rule is either witnessed by a refusal the engine actually computed, or named as unwitnessed"
+
+    scenario #"""
+        Given a record declaring rules, some enforced and some only written down
+        When the rules are proved
+        Then each is exercised against a record built to violate it, and any rule that refuses
+             nothing is REPORTED by name — because a rule that has never been shown to refuse
+             is indistinguishable from one that cannot, and that is S3 turned on the
+             enforcement layer itself.
+        """#
+
+    step "1" does="read every rule the record declares. The set comes from the record, never from the engine"
+    step "2" does="exercise each against a witness — a record built to violate exactly that rule"
+    step "3" does="a rule whose witness produces no refusal is reported, naming the rule"
+    step "4" does="a rule the engine carries no witness for is reported too, and differently — unwitnessed is not the same as unenforceable"
+
+    excludes "judging whether a rule is a GOOD rule. It proves the rule can fire, never that it should exist"
+    excludes "generating witnesses. A witness is written by whoever declares the rule, which is what \
+        makes it evidence rather than a second implementation of the same check"
+    excludes "refusing on an unwitnessed rule. A rule declared today for a shape the record does not \
+        hold yet is legitimate — what is not legitimate is nobody knowing which"
+
+    layer "doctrine"    reaches="the skill teaches that declaring a rule includes writing the record that violates it"
+    layer "enforcement" reaches="a-rule-has-a-witness, reported over the whole declared rule set"
+    layer "docs"        reaches="the unwitnessed set is readable, so `which of our gates has never fired` stops being unanswerable"
+
+    claim "C1" text="a declared rule that no witness makes refuse is reported, naming the rule" \
+        settled-by="a test declaring a rule with a witness that does not violate it, asserting the rule is named"
+    claim "C2" text="a witness proves the rule by producing a refusal the engine computed, never by asserting one exists" \
+        settled-by="a test asserting the report is derived from running the checker over the witness, and that a witness claiming a refusal it does not produce is itself reported"
+    claim "C3" text="a rule whose refusals are computed and then dropped has no witness" \
+        settled-by="a test reintroducing AG1 — a refusal about a nested entity — and asserting the rule loses its witness"
+    claim "C4" text="an-immutable-record-carries-a-seal gains a witness, and sealing this record settles what it refuses" \
+        settled-by="a witness for the seal rule, plus the accepted decisions and resolved symptoms of this record sealed"
+
+    depends-on "TS.260821.01 — a rule is declared on the schema before it can be witnessed"
+
+    useful-alone "`which of our gates has never fired` becomes answerable. Worth having with nothing \
+        else changed, because the answer today is that nobody knows"
+
+    attacks "S3"
+
+    cut-from "ITER.260821.17/AG1" \
+        note="cut from a finding rather than from the storm. Whether this reaches a release is what \
+            decides the fitness function a-finding-travelled-the-whole-loop, which has never fired"
+
+    principle-note "a rule that cannot be shown to refuse is an assertion about enforcement, and \
+        this frame exists because assertions about fidelity are what nobody can check. Building an \
+        engine that computes refusals does not escape it — it moves it one level down, to whether \
+        the computation runs at all"
+
+    proves "every declared rule either refuses something or is named as having refused nothing"
+    does-not-prove "that the rule refuses the RIGHT things. A witness shows a rule can fire; \
+        whether it fires on what it should is what its own tests are for"
+}

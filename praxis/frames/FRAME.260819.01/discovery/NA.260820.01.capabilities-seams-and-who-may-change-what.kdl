@@ -335,6 +335,26 @@ notional-architecture "NA.260820.01" {
     // silently rewrote the capabilities it was derived from would be asserting, not deriving.
     // ================================================================
 
+    owes "declare `depends-on` against a frozen seam and retire the slice-to-slice form" from="P2" "S2" \
+        because="seventeen of eighteen slices name a slice, which is what made the backlog a chain \
+            eight deep rather than a fan. The shape of the edge is what makes the work serial"
+    owes "retire thin-slice.state — delivery is derived and a stored copy can only disagree" from="S4"
+    owes "reconcile the harness layer: config.kdl says the six install manifests, TS.260820.11 says the CI path" from="Z3"
+    owes "read the archival root from config rather than composing it in the engine" from="Y5" \
+        because="the same class as the bump rules before W3, and as AD1 — a binding the record \
+            declares and the engine does not consult"
+    owes "one fact, one reader. `owns-event` was read correctly by the checker and wrongly by the \
+        corpus, and nothing compared them" from="AB1" \
+        because="a checker that validates the record cannot catch a reader that misreads it, and \
+            this frame has been building both"
+    owes "a `start` command, so the second vet is an act rather than a line claiming one" from="T3"
+    owes "a way for the gate to admit `this slice settles that slice's residue`" from="Y3" \
+        because="two iterations were admitted over a machine refusal for the same cause. A gate a \
+            human must overrule at every dependency inversion is a gate that gets switched off"
+    owes "run the release chain end to end on this repository's own release" from="AA4" "AF2" \
+        because="bind, publish, cut, verify and promote are all built and none has run together. \
+            Every finding in this frame came from USING rather than testing"
+
     owes "re-file TS.260820.07 under CAP.work-admission" from="W8" \
         because="the iteration is one entity and work-admission owns it. The slice's content is right; the capability on it is wrong"
     owes "move no-silent-drop from CAP.claim-settlement to CAP.work-admission" from="W9"
@@ -591,6 +611,13 @@ notional-architecture "NA.260820.01" {
             field "decision"  each="0..n" holds="decision" \
                 because="a decision is bound to the iteration that FORCED it, by nesting inside it"
             field "finding"   each="0..n"
+            field "triage"    each="0..n" \
+                because="what LEARN concluded about findings that are not this iteration's own — \
+                    where each one lands, and which phase of which slice owes it" \
+                note="`triage-finding` has been a command in the storm since the day it was held, \
+                    and the iteration entity had nowhere to put its result. Declared by \
+                    ITER.260821.19, which is the first iteration to triage a whole frame's findings \
+                    at once — and it was refused the moment it tried"
             field "close"     each="0..1"
             field "trail"     each="1"
         }
@@ -725,6 +752,51 @@ notional-architecture "NA.260820.01" {
         rule "iteration-without-signed-admission" refuses="work beginning on an iteration whose admission is unsigned"
         rule "iteration-worked-without-start-vet"  refuses="work beginning on a create-vet alone"
         rule "complete-phase-without-evidence"     refuses="a phase marked complete that produced nothing"
+        // Cross-field constraint. Declared as vocabulary rather than as a rule, because it
+        // is a shape an ENTITY carries — `exactly one of these fields is present`. W4 found
+        // it: a refusal is about a slice, an iteration or a version, and cardinality per
+        // field cannot say that, so a refusal naming nothing at all was accepted.
+        vocabulary "one-of-fields" \
+            means="exactly one of the named fields is present on a record of this kind" \
+            found-by="ITER.260821.07/W4 — the first thing the record needed to say that its own \
+                vocabulary could not express. Every gap before it was a kind or a field nobody had \
+                declared; this one is a gap in the schema LANGUAGE" \
+            applies-to="refusal — on-slice · on-iteration · on-version"
+
+        rule "an-immutable-record-carries-a-seal"  refuses="a record whose kind declares immutability and that carries no seal" \
+            because="cut-release-is-immutable and an-accepted-decision-is-append-only both check the \
+                seal ONLY WHEN PRESENT, so a record with no seal is protected by nothing. \
+                Append-only that nothing seals is append-only nobody has" \
+            found-by="ITER.260821.15/AE3 and ITER.260821.17/AG3" \
+            note="the rule that makes the other two mean anything. It refuses the current record \
+                until every accepted decision and every resolved symptom is sealed"
+        rule "a-claim-id-is-unique-in-its-iteration" refuses="an iteration carrying two claims with one id" \
+            because="the gate pins claims at open and the working agent settles them. Writing the \
+                settled claim BESIDE the pinned one rather than onto it leaves both, and the close \
+                reads whichever comes first" \
+            found-by="ITER.260821.07/W6 — the first time a rule caught the agent who wrote it, on \
+                the real tree rather than in a fixture"
+        rule "a-record-is-filed-in-its-container"  refuses="a record whose kind belongs to a container it is not in" \
+            because="shape is checked and PLACEMENT is not. praxis check passed on a valid record in \
+                the wrong directory, and only looking caught it" \
+            found-by="ITER.260821.04/T1"
+        rule "a-derived-field-is-recomputed"       refuses="a written field the record derives and no rule recomputes" \
+            because="a derived field written once and never rechecked is a cache — a second copy \
+                whose fidelity is unverifiable without checking the first, which is the whole of \
+                this frame. One recomputed by a rule is a projection with a proof attached" \
+            found-by="ITER.260821.07/W7, answered in part by ITER.260821.11/AA1" \
+            still-owed="release.proposed-bump and release.proposal-incomplete-for are still \
+                write-time only"
+        rule "a-rule-has-a-witness"                reports="a declared rule that no record in the corpus demonstrates refusing" \
+            because="a rule that has never been shown to refuse is indistinguishable from one that \
+                CANNOT. AG1 proved it: a correct rule reported nothing because its refusals were \
+                computed and silently dropped, and it was caught only because the answer had been \
+                predicted" \
+            found-by="ITER.260821.17/AG1, and the three attribution bugs S7, AG1, AG2 — each found \
+                by a rule firing, never by a test" \
+            note="reported rather than refused: a rule declared today for a shape the record does \
+                not hold yet is legitimate. What is not legitimate is nobody knowing which"
+
         rule "resolution-names-a-release"          refuses="a symptom resolved by a release the record does not hold, or by one that bound no slice attacking it" \
             because="a frame shrinks by a RELEASE, never by an opinion. Resolution computed from \
                 what shipped is the frame's own principle applied to the frame's own bookkeeping — \
@@ -810,10 +882,23 @@ notional-architecture "NA.260820.01" {
         fitness "no-drift-between-view-and-record" \
             text="a rendered view and the state it depicts cannot disagree"
         fitness "a-slice-took-more-than-one-iteration" falsifies=#true \
-            because="if every slice completes in a single iteration, the iteration is ceremony and should be cut"
+            because="if every slice completes in a single iteration, the iteration is ceremony and should be cut" \
+            fired=#true at="ITER.260821.03" \
+            what-happened="TS.260820.04 closed with C1 met-in-part and was NOT delivered, so the \
+                tool put it back in `ready` and blocked the gate behind it. Resolved not by \
+                re-opening the slice but by a later iteration settling the residue — which is a \
+                mechanism nothing had implemented until T2 corrected how delivery is derived"
         fitness "a-finding-travelled-the-whole-loop" falsifies=#true \
             because="opened by learning, triaged, addressed by a slice, closed by a release that \
-                shipped. If none ever completes the circuit, the loop is drawn but not running"
+                shipped. If none ever completes the circuit, the loop is drawn but not running" \
+            fired=#false as-of="ITER.260821.18" \
+            what-happened="eighteen slices delivered and eighty-eight findings raised, and not one \
+                had completed the circuit. Findings were raised, carried and settled — S1, X1, U3, \
+                AG3 — but none had been triaged back into DISCOVERY and addressed by a slice cut \
+                for it. The loop was drawn and had never run" \
+            note="this is the falsifier doing exactly what it was written to do: it noticed. \
+                TS.260821.02 is the first slice cut FROM a finding rather than from the storm, and \
+                whether this fitness function fires depends on that slice reaching a release"
     }
 
     trail {
