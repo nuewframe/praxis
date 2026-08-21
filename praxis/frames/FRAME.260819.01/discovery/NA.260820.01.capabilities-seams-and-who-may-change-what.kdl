@@ -487,6 +487,9 @@ notional-architecture "NA.260820.01" {
             field "doing"            each="1" because="a capability that names no doing is a noun someone liked"
             field "not"              each="1" because="an exclusion something else covers, never scope restated"
             field "state"            each="1" one-of="sought" "active" "retired"
+            field "shipped"          each="0..n" \
+                because="what shipped for this capability, and in which release. Written by \
+                    promotion and recomputed by promoted-truth-is-derived — never hand-written"
             field "derived-from"     each="1" references="event-storm" \
                 because="capability-must-trace — a capability owns a cluster of events from a storm, or it is an assertion"
             field "from-cluster"     each="1" references="cluster" \
@@ -707,6 +710,12 @@ notional-architecture "NA.260820.01" {
         rule "iteration-without-signed-admission" refuses="work beginning on an iteration whose admission is unsigned"
         rule "iteration-worked-without-start-vet"  refuses="work beginning on a create-vet alone"
         rule "complete-phase-without-evidence"     refuses="a phase marked complete that produced nothing"
+        rule "promoted-truth-is-derived"           refuses="a capability whose promoted truth is not what the record derives from what cut releases bound" \
+            because="if it did not come from bound work it is not promotion, it is an assertion \
+                about the past — which is the root cause with a version number attached" \
+            note="the answer to W7's class. A derived field written once and never rechecked is a \
+                cache; one RECOMPUTED by a rule is a projection with a proof attached. The command \
+                and the check call the same derivation, so they cannot disagree about what truth is"
         rule "cut-release-is-immutable"            refuses="a cut release whose content no longer matches the seal written when it was cut" \
             because="a release is a POINT on the version line, and a point that moved is not one. \
                 Everything downstream — publication, verification, symptom resolution — pins to it" \

@@ -121,6 +121,7 @@ Load the `SKILL.md` of any skill you intend to follow.
 | | `cut-the-version` | Cut a planned version and write its index node in one operation — the index points at a commit rather than copying it, and the seal makes a later edit visible |
 | | `publish-the-release-set` | Regenerate every published document whole for one version, before the cut — no splice path, no wall-clock stamp, and no renderer branch on what a view means |
 | | `verify-the-published-tree` | Prove no published document was hand-edited — compared against the commit its release names, never against the record it is meant to outlive |
+| | `promote-what-shipped` | Fold a cut release into what each capability says it is — derived from bound work, recomputed by a rule, and refused if hand-edited in either direction |
 | | `create-initiative` | Scaffold or refine a single-file growth initiative (`INIT.<initiative-name>.md`) |
 | | `create-capability-record` | Scaffold or update a living capability record (`CAP.<capability-name>.md`) |
 | | `create-wave` | Alias for `create-initiative` — single-file growth initiative on `docs/product.md` |

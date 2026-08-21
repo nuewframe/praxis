@@ -164,9 +164,12 @@ pub struct Attempt {
 #[derive(Debug, Clone)]
 pub struct Capability {
     pub id: String,
-    pub does: String,
+    pub state: String,
     pub from_cluster: String,
     pub owns: Vec<String>,
+    /// Promoted truth: what shipped for this capability, and where. Derived, never
+    /// hand-written — `promoted-truth-is-derived` recomputes it.
+    pub shipped: Vec<crate::promote::Shipped>,
 }
 
 /// A version, and the work bound to it. Machine-owned: every field here is derived from
@@ -240,9 +243,18 @@ impl Corpus {
                     "release" => corpus.releases.push(release_from(node)),
                     "capability" => corpus.capabilities.push(Capability {
                         id: string_arg(node).unwrap_or_default(),
-                        does: child_arg(node, "does").unwrap_or_default(),
+                        state: child_arg(node, "state").unwrap_or_default(),
                         from_cluster: child_arg(node, "from-cluster").unwrap_or_default(),
                         owns: child_args(node, "owns-event"),
+                        shipped: node
+                            .iter_children()
+                            .filter(|c| c.name().value() == "shipped")
+                            .map(|c| crate::promote::Shipped {
+                                version: string_arg(c).unwrap_or_default(),
+                                iteration: prop(c, "by").unwrap_or_default(),
+                                slice: prop(c, "slice").unwrap_or_default(),
+                            })
+                            .collect(),
                     }),
                     "symptom" => {
                         if let (Some(id), Some(by)) =

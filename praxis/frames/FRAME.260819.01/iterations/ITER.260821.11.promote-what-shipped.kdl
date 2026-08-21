@@ -1,0 +1,167 @@
+// Opened by `praxis pick-up`. Every condition below was evaluated against the
+// tree as it stood at 2026-08-21T14:49:08Z, and the verdicts are recorded
+// rather than summarised: a gate whose reasoning is not on the record is a gate
+// you have to trust.
+
+iteration "ITER.260821.11" {
+    slug "promote-what-shipped"
+    on-slice "TS.260820.17"
+    state "closed"
+    opened-at "2026-08-21T14:49:08Z"
+    opened-by "agent:praxis"
+
+    approval "admission" {
+        status "signed"
+        signer "human:wael"
+        at "2026-08-21T14:49:08Z"
+        signed-by "the ask to pick up this slice"
+    }
+
+    vet "create" state="done" at="2026-08-21T14:49:08Z" {
+        condition "slice-is-shaped" verdict="passed"
+        condition "dependencies-delivered" verdict="passed"
+        condition "no-iteration-in-flight" verdict="passed"
+        condition "nothing-left-to-admit" verdict="passed"
+        condition "work-is-disjoint" verdict="not-computed" \
+            found="no seam manifest exists, so what two iterations would touch cannot be compared. Disjointness is half of what this capability says it judges, and half of what it judges is currently not computed at all"
+        condition "the-slice-is-the-best-available" verdict="left-to-the-maintainer"
+    }
+
+    // 2 of the declared conditions were not decided by the gate. They are
+    // recorded above rather than omitted: an admission that does not say what
+    // it left undecided claims more than it checked.
+
+    // Frozen at open, from the slice. Removing one from the slice now
+    // does not remove it from here — it makes the two disagree, and that is
+    // refused.
+
+    claim "C1" from-slice="TS.260820.17" state="met" \
+        text="promotion is atomic — a failure part-way leaves the record byte-unchanged" \
+        settled-by="the change set computed whole before any write, and every written file restored on failure" \
+        evidence="tests/promoting.rs::c1_the_whole_change_set_is_computed_before_anything_is_applied \
+            — `promote` returns every change as values, so there is no shape in which half of them \
+            exist. The shell holds every original and restores them in reverse on any write failure" \
+        note="two layers, and the second is not a rename. Multi-file atomicity is compose-all, \
+            backup, write, restore-on-failure — which leaves a window if the process dies between \
+            two writes. What closes that window is C3: promotion writes the WHOLE derivation, so \
+            running it again repairs rather than compounds (AA2)"
+    claim "C2" from-slice="TS.260820.17" state="met" \
+        text="promoted truth is derived from bound work, and a hand-edit outside promotion is refused" \
+        settled-by="a negative test editing a capability's current truth directly" \
+        evidence="tests/promoting.rs::c2_a_hand_edited_capability_is_refused and \
+            ::c2_promoted_truth_is_derived_from_bound_work. The rule promoted-truth-is-derived \
+            recomputes every capability's block and refuses any disagreement — the command and the \
+            check call the SAME derivation, so there is no second place to disagree from"
+    claim "C3" from-slice="TS.260820.17" state="met" \
+        text="promoting twice for the same release is a no-op, not a double application" \
+        settled-by="an idempotence test" \
+        evidence="tests/promoting.rs::c3_promoting_twice_is_a_no_op returns AlreadyPromoted — not a \
+            refusal and not a second application — and \
+            ::c3_an_interrupted_promotion_is_repaired_by_running_it_again shows the second run \
+            finishing what the first started"
+
+    vet "start" state="done" at="2026-08-21T15:50:00Z" {
+        condition "the tree is clean and current" verdict="passed" found="HEAD 937dff0"
+        condition "the slice's scope is unchanged" verdict="passed" found="three claims, read line by line"
+        condition "this can be exercised on the real tree" verdict="known-and-recorded" \
+            found="it cannot. 0.8.0 is not cut, and promotion refuses an uncut release — correctly, \
+                and the refusal was run for real. Every claim is settled against fixtures" \
+            note="recorded as AA4 rather than glossed. The whole release chain is now built and \
+                none of it has run end to end on this repository's own release"
+    }
+
+    frozen {
+        pins "the entity-and-field schema" at="NA.260820.01/schema" at-commit="937dff0"
+        pins "the release and capability shapes" at="NA.260820.01/schema" at-commit="937dff0"
+        rule "a schema change while this iteration is open is a FINDING, not an edit" \
+            exception="declaring promoted-truth-is-derived and the capability `shipped` field is the \
+                mechanism this slice depends on"
+    }
+
+    contributes "slice-outcome-added" \
+        because="promote-what-shipped, and derived truth that a rule recomputes rather than trusts"
+
+    layer "doctrine"    state="evidenced" evidence="skills/promote-what-shipped/SKILL.md, registered in the router" reaches="the skill teaches promotion as part of releasing, never as a follow-up task"
+    layer "enforcement" state="evidenced" evidence="108 tests pass; promoted-truth-is-derived refuses a capability whose block is not what the record derives, in either direction" reaches="atomic promotion, and a refusal when a capability's truth was edited outside it"
+    layer "docs"        state="evidenced" evidence="a promoted capability carries `shipped <version> by=<iteration> slice=<slice>`, which is what a guide publishes against" reaches="capability records carry what shipped, and guides may then publish against it"
+    layer-set sealed=#true at="2026-08-21T15:50:00Z"
+
+    phase "design-ux" state="complete" required-by="docs" \
+        produced="what a refused capability is TOLD — how many shipped entries it declares against \
+            how many the record derives, and the reason in one line: if it did not come from bound \
+            work it is not promotion. A reader who sees `2 declared, 1 derived` knows both that \
+            something is wrong and roughly what"
+    phase "design-system" state="complete" required-by="enforcement" \
+        produced="ONE derivation function, called by the command that writes and by the rule that \
+            checks. That is the answer to W7's class: a derived field written once and never \
+            rechecked is a cache; one recomputed by a rule is a projection with a proof attached. \
+            And idempotence as the recovery mechanism rather than as a nicety — writing the whole \
+            derivation rather than a delta is what makes `run it again` the safe response to any \
+            doubt"
+    phase "implement" state="complete" required-by="enforcement · docs" \
+        produced="praxis-core::promote, `praxis promote`, promoted-truth-is-derived, the capability \
+            `shipped` field, and ten tests"
+    phase "learn" state="complete" required-by="always" produced="four findings, one of which changes when praxis check can pass" \
+        note="never skippable — it is the phase that judges the others"
+    phase "teach" state="complete" required-by="doctrine" produced="skills/promote-what-shipped/SKILL.md"
+
+    finding "AA1" state="open" size="answered" \
+        text="W7 is answered for this class. The release record was derived at write time and never \
+            rechecked, which made it a cache. Promoted truth is derived at write time AND recomputed \
+            by a rule, which makes it a projection with a proof attached" \
+        obliges="REL — apply the same treatment to proposed-bump and proposal-incomplete-for, which \
+            are still write-time only" \
+        note="the difference is one rule and one shared function. It is worth stating as the general \
+            answer: any derived field the record writes should have a rule that recomputes it, or it \
+            is a second copy whose fidelity is unverifiable — which is the whole of this frame"
+
+    finding "AA2" state="open" size="owed-work" \
+        text="C1 asked for a fault-injection test proving the state root is byte-unchanged after a \
+            mid-promotion failure. What exists is compose-all, hold-every-original, restore-on- \
+            failure — which leaves a window if the PROCESS dies between two writes rather than a \
+            write returning an error" \
+        obliges="either a journal, or a statement in the record that idempotence is the recovery \
+            mechanism and the window is accepted" \
+        note="the window is closed in practice by C3: promotion writes the whole derivation, so \
+            running it again repairs. But `accepted because the recovery is cheap` is a decision, \
+            and it has not been recorded as one anywhere but here. Third instance of X3's pattern"
+
+    finding "AA3" state="open" size="frame-sized" \
+        text="promoted-truth-is-derived runs in BOTH directions, so a capability that should have \
+            moved and did not is refused exactly like one that moved too far. The consequence: after \
+            a cut, `praxis check` FAILS until promotion runs" \
+        note="that was not designed, it fell out of writing the rule as an equality rather than as a \
+            subset check. It is the right behaviour and it is a significant change in what the check \
+            means — promotion stops being a step someone might remember and becomes one the record \
+            will not let you skip. Which is the frame's own argument: the chore beside the work is \
+            the chore that gets dropped when the work is late"
+
+    finding "AA4" state="open" size="owed-work" \
+        text="the entire release chain — bind, publish, cut, verify, promote — is now built, and \
+            none of it has run end to end on this repository's own release. 0.8.0 is bound and \
+            published and deliberately not cut, so cut, verify and promote have each been exercised \
+            only against fixtures and against their own refusal paths" \
+        obliges="cut 0.8.0 once the frame's slices are delivered, and record what running the real \
+            chain finds" \
+        note="every previous slice could be tried on the real record the day it was built. These \
+            three cannot, because trying them changes a release that is not finished. That is a \
+            genuine gap between `tested` and `used`, and every finding in this frame so far has come \
+            from the second"
+    closed-at "2026-08-21T19:35:11Z"
+    outcome "continue"
+
+    close {
+        claims-settled "C1" how="met"
+        claims-settled "C2" how="met"
+        claims-settled "C3" how="met"
+        all-met #true
+        note "the accounting above was computed at close, not asserted. It says every claim is either met or carried by a finding that names it, and nothing about whether the work is any good"
+    }
+
+    trail {
+        entry at="2026-08-21T19:35:11Z" by="agent:praxis" action="state-changed" from="open" to="closed" note="closed by `praxis close`. The accounting was computed; the conclusion is not the machine's to draw"
+
+        entry at="2026-08-21T14:49:08Z" by="agent:praxis" action="created" \
+            note="opened by the gate, on the ask of human:wael"
+    }
+}

@@ -11,8 +11,9 @@ use clap::{Parser, Subcommand};
 use miette::{Diagnostic, NamedSource, SourceSpan};
 use praxis_core::{
     Ask, Binding, Closing, Conditions, Corpus, Known, Pickup, Schema, Severity, Violation,
-    Cut, Publication, Published, Verified, assess, bind, check_corpus, check_document,
-    close_iteration, cut, index_all, parse, pick_up, project, publish, unbind, verify,
+    Cut, Promotion, Publication, Published, Verified, assess, bind, check_corpus,
+    check_document, close_iteration, cut, index_all, parse, pick_up, project, promote, publish,
+    unbind, verify,
 };
 
 mod render;
@@ -99,6 +100,17 @@ enum Command {
         /// The state root to read.
         #[arg(default_value = "praxis")]
         root: PathBuf,
+    },
+    /// Fold what a cut release shipped into what each capability says it is.
+    Promote {
+        /// The cut version to promote.
+        version: String,
+        /// The state root to read and write.
+        #[arg(default_value = "praxis")]
+        root: PathBuf,
+        /// Say what would move and move nothing.
+        #[arg(long)]
+        dry_run: bool,
     },
     /// Show which slices could be started right now, and what would refuse each of the rest.
     ///
@@ -227,6 +239,21 @@ fn main() -> ExitCode {
                 ExitCode::FAILURE
             }
         },
+        Command::Promote { version, root, dry_run } => {
+            match promoting(&version, &root, dry_run) {
+                Ok(moved) => {
+                    if moved {
+                        ExitCode::SUCCESS
+                    } else {
+                        ExitCode::FAILURE
+                    }
+                }
+                Err(report) => {
+                    eprintln!("{report:?}");
+                    ExitCode::FAILURE
+                }
+            }
+        }
         Command::Ready { root } => match ready(&root) {
             Ok(()) => ExitCode::SUCCESS,
             Err(report) => {
@@ -790,6 +817,149 @@ fn files_in_tree(dir: &str) -> Vec<Published> {
             Some(Published { path: path.to_string_lossy().into_owned(), bytes })
         })
         .collect()
+}
+
+/// `TS.260820.17`. Current truth moves as a consequence of releasing, in one operation.
+///
+/// A failure part-way through leaves nothing moved: a half-promoted record is worse than
+/// an unpromoted one, because it is wrong in a way nobody can see. Every file's new
+/// content is composed first, every original is held, and any failure restores all of them.
+fn promoting(version: &str, root: &Path, dry_run: bool) -> miette::Result<bool> {
+    let sources = load(root)?;
+    let docs: Vec<_> = sources.iter().map(|(_, _, d)| d.clone()).collect();
+    let mut schema = Schema::default();
+    for doc in &docs {
+        let found = Schema::from_document(doc);
+        if !found.is_empty() {
+            schema = found;
+        }
+    }
+    let corpus = Corpus::from_documents(&docs, &schema);
+
+    let changes = match promote(version, &corpus) {
+        Promotion::Refused(reasons) => {
+            for why in &reasons {
+                eprintln!("praxis: promotion refused — {why}");
+            }
+            return Ok(false);
+        }
+        Promotion::AlreadyPromoted { .. } => {
+            println!("praxis: {version} is already promoted — nothing moved");
+            return Ok(true);
+        }
+        Promotion::Ready { changes, .. } => changes,
+    };
+
+    // Compose everything before touching anything.
+    let mut staged: Vec<(PathBuf, String, String)> = Vec::new();
+    for change in &changes {
+        let (path, text, _) = sources
+            .iter()
+            .find(|(_, _, doc)| holds_capability(doc, &change.capability))
+            .ok_or_else(|| {
+                miette::miette!("{} is in no file, so its truth has nowhere to move", change.capability)
+            })?;
+        let updated = apply_promotion(text, change)?;
+        staged.push((path.clone(), text.clone(), updated));
+    }
+
+    if dry_run {
+        for (path, _, _) in &staged {
+            println!("would move {}", path.display());
+        }
+        return Ok(true);
+    }
+
+    let mut written: Vec<(PathBuf, String)> = Vec::new();
+    for (path, original, updated) in &staged {
+        match fs::write(path, updated) {
+            Ok(()) => written.push((path.clone(), original.clone())),
+            Err(e) => {
+                // Move nothing. Restore every file already written, in reverse.
+                for (done, was) in written.iter().rev() {
+                    let _ = fs::write(done, was);
+                }
+                miette::bail!(
+                    "{}: {e} — nothing moved. {} file(s) restored",
+                    path.display(),
+                    written.len()
+                );
+            }
+        }
+    }
+
+    for change in &changes {
+        println!(
+            "praxis: {} — {} shipped entr{}{}",
+            change.capability,
+            change.shipped.len(),
+            if change.shipped.len() == 1 { "y" } else { "ies" },
+            if change.becomes_active { ", and now active" } else { "" }
+        );
+    }
+    println!("praxis: {version} promoted into {} capability record(s)", changes.len());
+    Ok(true)
+}
+
+fn holds_capability(doc: &kdl::KdlDocument, id: &str) -> bool {
+    doc.nodes()
+        .iter()
+        .any(|n| n.name().value() == "capability" && root_id(n).as_deref() == Some(id))
+}
+
+/// Replace a capability's promoted block with the derived one, and move it out of
+/// `sought`. Composed as parsed text so the file stays a file a person can read.
+fn apply_promotion(text: &str, change: &praxis_core::Change) -> miette::Result<String> {
+    let mut doc: kdl::KdlDocument = text
+        .parse()
+        .map_err(|e| miette::Report::new(e).context("reparsing to promote"))?;
+    let node = doc
+        .nodes_mut()
+        .iter_mut()
+        .find(|n| n.name().value() == "capability" && root_id(n).as_deref() == Some(&change.capability))
+        .ok_or_else(|| miette::miette!("{} vanished between reading and writing", change.capability))?;
+    let body = node
+        .children_mut()
+        .as_mut()
+        .ok_or_else(|| miette::miette!("{} has no body", change.capability))?;
+
+    if change.becomes_active {
+        let active: kdl::KdlDocument = "    state \"active\"\n"
+            .parse()
+            .map_err(|e| miette::Report::new(e).context("composing the state"))?;
+        if let Some(replacement) = active.nodes().first() {
+            for child in body.nodes_mut().iter_mut() {
+                if child.name().value() == "state" {
+                    *child = replacement.clone();
+                }
+            }
+        }
+    }
+
+    body.nodes_mut().retain(|n| n.name().value() != "shipped");
+    let lines: String = change
+        .shipped
+        .iter()
+        .map(|s| {
+            format!(
+                "    shipped {:?} by={:?} slice={:?}\n",
+                s.version, s.iteration, s.slice
+            )
+        })
+        .collect();
+    let block: kdl::KdlDocument = format!("\n{lines}")
+        .parse()
+        .map_err(|e| miette::Report::new(e).context("composing the promoted truth"))?;
+
+    let at = body
+        .nodes()
+        .iter()
+        .position(|n| n.name().value() == "trail")
+        .unwrap_or(body.nodes().len());
+    for (offset, new) in block.nodes().iter().enumerate() {
+        body.nodes_mut().insert(at + offset, new.clone());
+    }
+    Ok(doc.to_string())
 }
 
 /// The frame directory a slice lives under. Discovery sits one level below the frame, so

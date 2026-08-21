@@ -49,6 +49,8 @@ pub enum Refusal {
     BrokenSeal { release: String, expected: String, found: String },
     /// A cut release with no seal at all, so nothing about it can be checked.
     UnsealedRelease { release: String },
+    /// A capability whose promoted truth is not what the record derives from cut releases.
+    HandPromoted { capability: String, found: usize, derived: usize },
     /// A layer the slice declared that the iteration has not evidenced. Reported: it must
     /// be visible as unevidenced rather than absent, which is C2.
     UnevidencedLayer { layer: String, slice: String },
@@ -68,6 +70,7 @@ impl Refusal {
             Self::UndeclaredLayer { .. } | Self::UnevidencedLayer { .. } => "layer",
             Self::SilentDrop { claim, .. } | Self::DroppedClaim { claim, .. } => claim,
             Self::BrokenSeal { .. } | Self::UnsealedRelease { .. } => "seal",
+            Self::HandPromoted { .. } => "shipped",
         }
     }
 
@@ -122,6 +125,12 @@ impl Refusal {
                  slice sets the granularity, and evidence outside it is evidence for something \
                  nobody asked about",
                 if declared.is_empty() { "none".to_owned() } else { declared.join(" · ") }
+            ),
+            Self::HandPromoted { capability, found, derived } => format!(
+                "{capability} declares {found} shipped entr{} and the record derives {derived} from \
+                 what cut releases bound. Promoted truth is DERIVED — if it did not come from bound \
+                 work it is not promotion, it is an assertion about the past",
+                if *found == 1 { "y" } else { "ies" }
             ),
             Self::BrokenSeal { release, expected, found } => format!(
                 "{release} is cut and its content no longer matches the seal written when it was \
@@ -426,6 +435,30 @@ pub fn check_corpus(docs: &[KdlDocument], schema: &Schema) -> Vec<Violation> {
             schema.declares_rule("no-silent-drop"),
             schema.declares_rule("claim-dropped-from-the-slice"),
         ));
+    }
+
+    // `promoted-truth-is-derived`, if the record declares it. This is the rule that makes
+    // W7's class answerable: a derived field written once and never rechecked is a cache;
+    // one recomputed by a rule is a projection with a proof attached.
+    if schema.declares_rule("promoted-truth-is-derived") {
+        let corpus = crate::admission::Corpus::from_documents(docs, schema);
+        for (capability, found, derived) in crate::promote::undeclared_promotions(&corpus) {
+            let span = docs
+                .iter()
+                .flat_map(|d| d.nodes())
+                .find(|n| n.name().value() == "capability" && string_arg(n).as_deref() == Some(&capability))
+                .map_or_else(|| SourceSpan::from(0), KdlNode::span);
+            out.push(Violation {
+                entity_kind: "capability".to_owned(),
+                entity_id: Some(capability.clone()),
+                refusal: Refusal::HandPromoted {
+                    capability,
+                    found: found.len(),
+                    derived: derived.len(),
+                },
+                span,
+            });
+        }
     }
 
     // `cut-release-is-immutable`, if the record declares it.
