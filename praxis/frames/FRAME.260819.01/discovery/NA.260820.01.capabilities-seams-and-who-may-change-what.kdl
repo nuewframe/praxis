@@ -351,8 +351,6 @@ notional-architecture "NA.260820.01" {
 
         entity "frame" is="a problem — symptoms, one root cause, one principle" \
             completes="never; its symptoms resolve individually, each naming a release"
-        entity "event-storm" is="one sweep of a domain's timeline — the evidence a capability is derived FROM" \
-            completes="when the capabilities it clusters into are named"
         entity "thin-slice" is="an atomic vertical slice — one command or one read model, cut so it can exercise a capability" \
             states="proposed active delivered dropped" {
             // The shape a checker refuses, made machine-readable. Derived from the storm's
@@ -373,6 +371,41 @@ notional-architecture "NA.260820.01" {
             field "command"        each="1"    when-kind="command"
             field "produces-event" each="1..n" when-kind="command" because="a refusal is a fact, so a refusable command names both outcomes"
             field "read-model"     each="1..n" when-kind="view" because="E13 — a view slice writes nothing and names the view instead"
+
+            // The optional half. Enumerated by turning the check on and reading what it
+            // refused, rather than by recalling what a slice usually carries — the record
+            // told us its own vocabulary (ITER.260821.01/Q1).
+            field "state"            each="0..1" one-of="proposed" "active" "delivered" "dropped"
+            field "scenario"         each="0..1"
+            field "step"             each="0..n"
+            field "excludes"         each="0..n" because="scope sealed at cut time, so drift has something to hit"
+            field "attacks"          each="0..n" references="symptom"
+            field "depends-on"       each="0..n"
+            field "useful-alone"     each="0..1" because="what you get if this ships and nothing after it does"
+            field "needs-read-model" each="0..n"
+            field "feeds-read-model" each="0..n"
+            field "content-owned-by" each="0..n"
+            field "composes"         each="0..1"
+            field "lifetime"         each="0..1" one-of="working" "archival"
+            field "rendered-by"      each="0..1"
+            field "does-not-prove"   each="0..1"
+            field "amended-by"       each="0..n"
+            field "cut-from"         each="0..1"
+            field "principle-note"   each="0..1"
+            field "note"             each="0..n"
+            field "proves"           each="0..1"
+        }
+
+        entity "config" is="this repository's binding to the schema — it may bind, and may never declare" \
+            note="a root kind the record carried from the first commit and no schema ever named. \
+                Found by ITER.260821.01 the moment the rule it builds was turned on, which is the \
+                slice proving itself against a real omission rather than a fixture" {
+            field "repository"  each="1"
+            field "governed-by" each="0..1" because="unbound today — the schema moved off the ADR and no node has claimed it"
+            field "profile"     each="1"
+            field "versioning"  each="0..1"
+            field "invariants"  each="0..1"
+            field "paths"       each="1"
         }
         entity "notional-architecture" is="what the capabilities are to each other, free of any tool decision" \
             states="sought held"
@@ -384,15 +417,32 @@ notional-architecture "NA.260820.01" {
         entity "release" is="an index into history — what it binds, what it resolves" \
             states="planned released"
         entity "iteration" is="one attempt at a slice — what ITERATE produces" \
-            states="open closed abandoned" \
+            states="open working closed abandoned" \
             owned-by="work-admission" \
             never-deleted=#true because="a closed iteration is history, and history is what makes a slice's maturity legible" \
-            holds="the vet that admitted it · what it froze · the claims it carries and their settlement · \
-                evidence per declared layer · decisions it was forced to make · findings it raised" \
-            constraint="at most one iteration open per slice" \
-            note="defined 2026-08-20 by opening one. It was carried as undefined because three \
-                capabilities wrote facts about it and none declared it; ITER.260820.01 is the \
-                first, and cutting is how you learn what a thing is"
+            constraint="at most one open per slice" \
+            note="declared with fields by ITER.260821.01 so that `phase` — a contained entity — can \
+                be distinguished from a field at all. A container with no shape cannot refuse what \
+                it holds, which is what let `phase` go missing" {
+            field "slug"      each="1"
+            field "on-slice"  each="1" references="thin-slice"
+            field "state"     each="1" one-of="open" "working" "closed" "abandoned"
+            field "opened-at" each="1"
+            field "opened-by" each="1"
+            field "closed-at" each="0..1"
+            field "outcome"   each="0..1" one-of="continue" "pivot" "stop"
+            field "approval"  each="1..n" because="the human's ask is the only gate, and it is recorded or it did not happen"
+            field "vet"       each="1..n" because="vetted at create and again at start"
+            field "frozen"    each="0..1"
+            field "claim"     each="0..n"
+            field "layer"     each="0..n"
+            field "layer-set" each="0..1"
+            field "phase"     each="0..n" holds="phase" because="a contained entity, not a value — without `holds` it is indistinguishable from a field, which is how it went missing"
+            field "decision"  each="0..n"
+            field "finding"   each="0..n"
+            field "close"     each="0..1"
+            field "trail"     each="1"
+        }
 
         entity "phase" is="one stage of work inside an iteration — WHEN in the attempt, as a layer is WHERE in the stack" \
             states="pending active complete skipped" \
@@ -400,9 +450,27 @@ notional-architecture "NA.260820.01" {
             kinds="design-ux · design-system · implement · learn · teach" \
             note="undeclared until ITER.260820.01/P8. It survived the withdrawal of ADR.260819.02, \
                 where it was a first-class node, and nothing carried it forward — so the first \
-                iteration went from admission straight to implement with no phase recorded" {
-            field "kind"    each="1" one-of="design-ux" "design-system" "implement" "learn" "teach"
-            field "state"   each="1" one-of="pending" "active" "complete" "skipped"
+                iteration went from admission straight to implement with no phase recorded" \
+            shape="carried entirely as properties — the node's own argument IS the kind. Declaring \
+                child fields for it would be wrong, so it is deliberately shapeless and reported \
+                as such. Property shapes are a separate cut (TS.260821.01 excludes them by name)"
+
+        entity "event-storm" is="one sweep of a domain's timeline — the evidence a capability is derived FROM" \
+            note="declared with fields so `read-model` stops being indistinguishable from a field" {
+            field "title"      each="1"
+            field "frame"      each="1" references="frame"
+            field "scope"      each="0..1"
+            field "held-at"    each="0..1"
+            field "held-by"    each="0..1"
+            field "actor"      each="0..n"
+            field "external"   each="0..n"
+            field "command"    each="1..n"
+            field "event"      each="1..n"
+            field "policy"     each="0..n"
+            field "read-model" each="0..n" holds="read-model"
+            field "cluster"    each="0..n" because="a capability that traces to no cluster is an assertion"
+            field "process"    each="0..1"
+            field "finding"    each="0..n"
         }
 
         entity "read-model" is="a view an actor must see before acting, owned by exactly one capability" \

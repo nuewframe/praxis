@@ -16,6 +16,10 @@ pub enum Cardinality {
     One,
     /// At least one.
     OneOrMore,
+    /// None or one.
+    Optional,
+    /// Any number, including none.
+    Any,
 }
 
 impl Cardinality {
@@ -23,6 +27,8 @@ impl Cardinality {
         match raw {
             "1" => Some(Self::One),
             "1..n" => Some(Self::OneOrMore),
+            "0..1" => Some(Self::Optional),
+            "0..n" => Some(Self::Any),
             _ => None,
         }
     }
@@ -31,6 +37,8 @@ impl Cardinality {
         match self {
             Self::One => count == 1,
             Self::OneOrMore => count >= 1,
+            Self::Optional => count <= 1,
+            Self::Any => true,
         }
     }
 
@@ -38,6 +46,8 @@ impl Cardinality {
         match self {
             Self::One => "exactly one",
             Self::OneOrMore => "at least one",
+            Self::Optional => "at most one",
+            Self::Any => "any number",
         }
     }
 }
@@ -51,6 +61,11 @@ pub struct FieldSpec {
     pub when_kind: Option<String>,
     /// The entity kind this field's value must name.
     pub references: Option<String>,
+    /// The entity kind this field CONTAINS, when the child is an entity in its own
+    /// right rather than a value. `references` points across the graph by id; `holds`
+    /// nests. Without the distinction a contained entity is indistinguishable from a
+    /// plain field, which is how `phase` went missing.
+    pub holds: Option<String>,
     /// A closed vocabulary for this field's value.
     pub one_of: Vec<String>,
     /// Why the schema requires it, verbatim, for the diagnostic.
@@ -69,6 +84,11 @@ impl FieldSpec {
 
     pub fn satisfied_by(&self, count: usize) -> bool {
         self.each.satisfied_by(count)
+    }
+
+    /// Whether the schema permits this field to be absent.
+    pub fn optional(&self) -> bool {
+        matches!(self.each, Cardinality::Optional | Cardinality::Any)
     }
 }
 
@@ -142,6 +162,7 @@ fn fields_of(entity: &KdlNode) -> Vec<FieldSpec> {
                 each,
                 when_kind: prop(field, "when-kind"),
                 references: prop(field, "references"),
+                holds: prop(field, "holds"),
                 one_of: all_props(field, "one-of"),
                 because: prop(field, "because"),
             })

@@ -1,0 +1,156 @@
+// The second iteration. The first one built the checker; this one points it at the gap
+// that let three entities go missing — including two that the first iteration itself
+// had to declare mid-flight.
+
+iteration "ITER.260821.01" {
+    slug "enforce-the-declared-vocabulary"
+    on-slice "TS.260821.01"
+    state "closed"
+    opened-at "2026-08-21T01:40:00-05:00"
+    opened-by "agent:principal-engineer"
+    closed-at "2026-08-21T02:30:00-05:00"
+    outcome "continue" \
+        because="eight kinds still carry no shape, and the checker now says so on every run instead \
+            of passing in silence. That is the next cut, and it is visible because this one shipped"
+
+    approval "admission" {
+        status "signed"
+        signer "human:waelrabadi"
+        at "2026-08-21T01:40:00-05:00"
+        signed-by "the ask to proceed, given against a stated plan to open this iteration and run both vets"
+        note "one ask covered create and start, because the ask was given after the two were named \
+            together. Recorded as one signature over both rather than split into a ceremony nobody performed"
+    }
+
+    vet "create" state="done" at="2026-08-21T01:40:00-05:00" {
+        condition "the slice exists and is shaped" verdict="passed" \
+            found="TS.260821.01 passes praxis check, and removing its actor produces a refusal — so \
+                it is under the gate rather than ignored by it"
+        condition "the slice's dependency is frozen" verdict="admitted-on-condition" \
+            found="it names `the schema's entity-and-field shape, frozen` — a contract, not a slice, \
+                so it conforms where seventeen others do not. But no seam manifest exists, so \
+                `frozen` is the same informal pin TS.260820.01 used" \
+            resolved-by="pinned at 5bc2e51 below. The weakness is P2 and P6, unchanged and still owed"
+        condition "no other iteration is open" verdict="passed" \
+            found="ITER.260820.01 is closed. Nothing else is in flight"
+        condition "the work is disjoint" verdict="passed" \
+            found="it touches praxis-core's check path and the schema. ITER.260820.01 is closed, so \
+                nothing contends"
+    }
+
+    vet "start" state="done" at="2026-08-21T01:40:00-05:00" {
+        condition "the tree is clean and the freeze is current" verdict="passed" \
+            found="HEAD 5bc2e51, no uncommitted changes. Pinned at HEAD rather than at a commit \
+                already overtaken — the correction P6 asked for, applied"
+        condition "the slice's scope is unchanged since create" verdict="passed" \
+            found="minutes apart. Nothing moved"
+        condition "what turning this rule on will refuse is known BEFORE it is turned on" \
+            verdict="known-and-recorded" \
+            found="`config` is a root kind the schema does not declare. Enabling the rule refuses \
+                praxis/config.kdl immediately" \
+            note="surveyed at open rather than discovered by a red build. The first thing this \
+                slice does is prove itself against a real omission that was already there"
+    }
+
+    frozen {
+        pins "the entity-and-field schema" at="NA.260820.01/schema" at-commit="5bc2e51"
+        pins "the engine's public surface" at="praxis-core 0.8.0" at-commit="5bc2e51" \
+            note="Schema, Known, Violation, Refusal — the shapes the checker already exposes"
+        rule "a schema change while this iteration is open is a FINDING, not an edit" \
+            exception="declaring a kind or its fields IS the mechanism under test. Those are the \
+                slice's own C2 exercised, and each is recorded rather than slipped in"
+    }
+
+    claim "C1" from-slice="TS.260821.01" state="met" \
+        text="a node whose kind the schema does not declare is refused, naming the kind" \
+        settled-by="a negative test with an undeclared kind, asserting the kind appears in the diagnostic" \
+        evidence="tests/declared_vocabulary.rs::c1_an_undeclared_root_kind_is_refused_by_name"
+    claim "C2" from-slice="TS.260821.01" state="met" \
+        text="declaring the kind on the schema admits it, with no engine change" \
+        settled-by="a test that adds a kind to a schema fixture and asserts the same record then passes" \
+        evidence="tests/declared_vocabulary.rs::c2_declaring_the_kind_admits_it_with_no_engine_change, \
+            and the record itself — 254 refusals became zero by declaring the vocabulary, with no engine change"
+    claim "C3" from-slice="TS.260821.01" state="met" \
+        text="a kind declared with no fields is admitted and reported, never silently accepted" \
+        settled-by="a test asserting a report rather than a refusal, and asserting it is not silent" \
+        evidence="tests/declared_vocabulary.rs::c3_a_shapeless_kind_is_reported_not_refused_and_not_silent; \
+            8 reports on every run of the real record"
+    claim "C4" from-slice="TS.260821.01" state="met" \
+        text="the three kinds that went undeclared — iteration, read-model, phase — would each have been caught" \
+        settled-by="a regression test replaying each against the schema with that kind removed" \
+        evidence="tests/declared_vocabulary.rs::c4_the_three_kinds_that_went_missing_would_have_been_caught" \
+        note="only satisfiable because this iteration declared `iteration` and `event-storm` in full, \
+            and added `holds` — two of the three are CONTAINED entities, invisible until their \
+            container had a shape"
+
+    layer "doctrine"    state="evidenced" evidence="skills/declare-an-entity-kind/SKILL.md, registered in the router" reaches="the skill teaches declaring the kind before writing records of it"
+    layer "enforcement" state="evidenced" evidence="12 tests pass; praxis check reports 8 shapeless kinds and refuses undeclared ones" reaches="undeclared-entity-kind, declared since NA.260820.01 and never enforced"
+    layer "docs"        state="evidenced" evidence="the refusal names the kind and says to declare it on the architecture's schema block" reaches="the refusal names the kind and points at where declaring it belongs"
+    layer-set sealed=#true at="2026-08-21T01:40:00-05:00"
+
+    phase "design-ux"     state="complete" produced="the refusal tells the reader where to declare the kind, not merely that it is unknown"
+    phase "design-system" state="complete" produced="severity split — refuse versus report — and `holds` to separate a contained entity from a value"
+    phase "implement"     state="complete" produced="root and contained kind checking, optional cardinalities, and the vocabulary the record itself named"
+    phase "learn"         state="complete" produced="five findings, four of which changed the record or the engine while the iteration was open"
+    phase "teach"         state="complete" produced="skills/declare-an-entity-kind/SKILL.md"
+
+    finding "Q1" state="open" size="owed-work" \
+        text="the record told us its own vocabulary. Turning the rule on produced 254 refusals, and \
+            every one named a field the slices already used and the schema had never declared. \
+            Declaring them took it to zero with no engine change — C2 demonstrated at scale rather \
+            than in a fixture" \
+        note="the method that worked was: enable, read what it refuses, declare that. Recalling what \
+            a slice `usually carries` would have missed a dozen"
+
+    finding "Q2" state="open" size="owed-work" \
+        text="C1 and TS.260820.01's A4 test collide on an empty schema: with nothing declared, every \
+            kind is undeclared, so `refuse the undeclared` and `an empty schema refuses nothing` \
+            cannot both hold literally" \
+        note="resolved by declaring that an empty schema DESCRIBES nothing rather than condemning \
+            everything. Two slices' claims contradicted each other and the contradiction was only \
+            visible once both were executable"
+
+    finding "Q3" state="open" size="owed-work" \
+        text="a contained entity was indistinguishable from a plain field, so a container skipped it \
+            and it went unchecked. That is exactly how `phase` went missing. `holds` now separates \
+            nesting from referencing" \
+        note="found by C4 failing — the claim could not be met until the model gained the distinction \
+            it had been missing all along"
+
+    finding "Q4" state="open" size="owed-work" \
+        text="two duplicate entity declarations were introduced during this iteration and nothing \
+            noticed. The loader takes the last one silently, so a stale declaration can shadow a live \
+            one with no signal. Found by a failing test, not by the checker" \
+        note="the checker has no rule against declaring a kind twice, which is the same class of gap \
+            as the one this slice closed"
+
+    finding "Q5" state="open" size="owed-work" \
+        text="eight kinds carry their shape as PROPERTIES rather than child nodes — `phase` and \
+            `read-model` among them — and the schema can only describe child nodes. They are declared \
+            shapeless and reported on every run" \
+        note="TS.260821.01 excludes property shapes by name, so this is the next cut rather than a \
+            shortfall. The reports are what keep it from being forgotten"
+
+    close {
+        claims-settled "C1" "C2" "C3" "C4" all-met=#true
+        layers-reached "doctrine" "enforcement" "docs" all-evidenced=#true
+        findings-carried "Q1" "Q2" "Q3" "Q4" "Q5"
+        scope-unchanged #true \
+            note="the sealed layer set was not touched. The schema changed repeatedly, which the \
+                freeze rule permits only because declaring kinds IS the mechanism under test — each \
+                change is recorded as the slice's own C2 exercised"
+        verified "cargo test — 12 passed across two suites" \
+            "praxis check praxis — ok, 11 kinds declared, 8 reports" \
+            "254 refusals reduced to 0 by declaring the vocabulary, with no engine change"
+    }
+
+    trail {
+        entry at="2026-08-21T02:30:00-05:00" by="agent:principal-engineer" action="state-changed" \
+            from="working" to="closed" \
+            note="closed with four claims met and three layers evidenced. The rule this iteration \
+                built found a real omission — `config` — the moment it was switched on"
+        entry at="2026-08-21T01:40:00-05:00" by="agent:principal-engineer" action="created" \
+            note="opened with both vets run against a clean tree at HEAD. Phases declared up front \
+                this time — ITER.260820.01/P8 found they had been skipped entirely"
+    }
+}

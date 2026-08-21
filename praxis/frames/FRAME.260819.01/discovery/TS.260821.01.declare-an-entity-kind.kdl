@@ -4,7 +4,7 @@ thin-slice "TS.260821.01" {
     kind "command"
     realizes "CAP.delivery-record"
     from-storm "ES.260819.01"
-    state "proposed"
+    state "delivered"
 
     command "declare-entity"
     actor "maintainer"

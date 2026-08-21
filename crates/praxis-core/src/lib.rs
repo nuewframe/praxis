@@ -8,7 +8,9 @@
 pub mod check;
 pub mod schema;
 
-pub use check::{Known, Refusal, Violation, check_document, check_node, index_all, refused};
+pub use check::{
+    Known, Refusal, Severity, Violation, check_document, check_node, index_all, refused,
+};
 pub use schema::{Cardinality, EntitySpec, FieldSpec, Schema};
 
 /// Parse KDL source, returning the document or the parse error unchanged — the codec

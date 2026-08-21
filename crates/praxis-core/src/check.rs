@@ -10,6 +10,15 @@ use miette::SourceSpan;
 
 use crate::schema::{Schema, prop, string_arg};
 
+/// Whether a finding stops the work or merely tells the reader.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Severity {
+    /// Fails closed.
+    Refuse,
+    /// Named, but admitted. Silence and acceptance must not look the same.
+    Report,
+}
+
 /// Why a node was refused. One variant per rule the schema declares.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Refusal {
@@ -21,6 +30,10 @@ pub enum Refusal {
     NotInVocabulary { field: String, found: String, allowed: Vec<String> },
     /// A field names an entity the record does not hold.
     DanglingReference { field: String, names: String, kind: String },
+    /// A node's kind is absent from the schema, so nothing can say what it must carry.
+    UndeclaredKind { kind: String, within: Option<String> },
+    /// A kind is declared but carries no field declarations, so it refuses nothing.
+    ShapelessKind { kind: String },
 }
 
 impl Refusal {
@@ -32,6 +45,15 @@ impl Refusal {
             | Self::WrongCardinality { field, .. }
             | Self::NotInVocabulary { field, .. }
             | Self::DanglingReference { field, .. } => field,
+            Self::UndeclaredKind { kind, .. } | Self::ShapelessKind { kind } => kind,
+        }
+    }
+
+    /// Whether this stops the work.
+    pub fn severity(&self) -> Severity {
+        match self {
+            Self::ShapelessKind { .. } => Severity::Report,
+            _ => Severity::Refuse,
         }
     }
 
@@ -50,6 +72,19 @@ impl Refusal {
             Self::DanglingReference { field, names, kind } => {
                 format!("`{field}` names {names:?}, which is no {kind} the record holds")
             }
+            Self::UndeclaredKind { kind, within } => match within {
+                Some(parent) => format!(
+                    "`{kind}` inside `{parent}` is neither a field {parent} declares nor a kind the \
+                     schema knows — declare it on the architecture's schema block"
+                ),
+                None => format!(
+                    "`{kind}` is not a kind the schema declares — declare it on the architecture's \
+                     schema block, which is an amendment to the record and not a change to the engine"
+                ),
+            },
+            Self::ShapelessKind { kind } => format!(
+                "`{kind}` is declared with no fields, so nothing about its records can be refused"
+            ),
         }
     }
 }
@@ -61,6 +96,12 @@ pub struct Violation {
     pub entity_id: Option<String>,
     pub refusal: Refusal,
     pub span: SourceSpan,
+}
+
+impl Violation {
+    pub fn severity(&self) -> Severity {
+        self.refusal.severity()
+    }
 }
 
 /// What the record already holds, so a reference can be checked against it.
@@ -101,6 +142,9 @@ pub fn check_node(node: &KdlNode, schema: &Schema, known: &Known) -> Vec<Violati
             continue;
         }
         let found = count_of(node, &field.name);
+        if found == 0 && field.optional() {
+            continue;
+        }
         if found == 0 {
             out.push(Violation {
                 entity_kind: kind.clone(),
@@ -158,15 +202,84 @@ pub fn check_node(node: &KdlNode, schema: &Schema, known: &Known) -> Vec<Violati
             }
         }
     }
+
+    // Contained nodes. Only where the parent declares fields: an entity that declares
+    // none makes no claim about its children, and refusing them would be the engine
+    // inventing a shape the record never stated.
+    if !spec.fields.is_empty()
+        && let Some(body) = node.children()
+    {
+        for child in body.nodes() {
+            let child_kind = child.name().value();
+            // A field that HOLDS an entity is checked as one. The kind it names must be
+            // declared, or the container is nesting something nothing describes.
+            if let Some(field) = spec.fields.iter().find(|f| f.name == child_kind)
+                && let Some(held) = &field.holds
+            {
+                if schema.entity(held).is_none() {
+                    out.push(Violation {
+                        entity_kind: held.clone(),
+                        entity_id: string_arg(child),
+                        refusal: Refusal::UndeclaredKind {
+                            kind: held.clone(),
+                            within: Some(kind.clone()),
+                        },
+                        span: child.span(),
+                    });
+                } else {
+                    out.extend(check_node(child, schema, known));
+                }
+                continue;
+            }
+            if spec.fields.iter().any(|f| f.name == child_kind) {
+                continue;
+            }
+            if schema.entity(child_kind).is_some() {
+                out.extend(check_node(child, schema, known));
+                continue;
+            }
+            out.push(Violation {
+                entity_kind: child_kind.to_owned(),
+                entity_id: string_arg(child),
+                refusal: Refusal::UndeclaredKind {
+                    kind: child_kind.to_owned(),
+                    within: Some(kind.clone()),
+                },
+                span: child.span(),
+            });
+        }
+    }
     out
 }
 
 /// Check every root node in a document.
 pub fn check_document(doc: &KdlDocument, schema: &Schema, known: &Known) -> Vec<Violation> {
-    doc.nodes()
-        .iter()
-        .flat_map(|node| check_node(node, schema, known))
-        .collect()
+    // A schema that declares nothing describes nothing. Refusing every kind here would
+    // make the engine's own emptiness look like a verdict about the record, and it would
+    // put a rule in the engine that no record states (ADR.260819.01/A4).
+    if schema.is_empty() {
+        return Vec::new();
+    }
+    let mut out = Vec::new();
+    for node in doc.nodes() {
+        let kind = node.name().value();
+        match schema.entity(kind) {
+            None => out.push(Violation {
+                entity_kind: kind.to_owned(),
+                entity_id: string_arg(node),
+                refusal: Refusal::UndeclaredKind { kind: kind.to_owned(), within: None },
+                span: node.span(),
+            }),
+            Some(spec) if spec.fields.is_empty() => out.push(Violation {
+                entity_kind: kind.to_owned(),
+                entity_id: string_arg(node),
+                refusal: Refusal::ShapelessKind { kind: kind.to_owned() },
+                span: node.span(),
+            }),
+            Some(_) => out.extend(check_node(node, schema, known)),
+        }
+    }
+    out
 }
 
 fn body(node: &KdlNode) -> Option<&KdlDocument> {
@@ -218,9 +331,10 @@ pub fn index_all(doc: &KdlDocument, known: &mut Known) {
     }
 }
 
-/// Ignore the field-level detail and answer the one question a gate asks.
+/// Ignore the field-level detail and answer the one question a gate asks: does any of
+/// this fail closed? A report is named but does not refuse.
 pub fn refused(violations: &[Violation]) -> bool {
-    !violations.is_empty()
+    violations.iter().any(|v| v.severity() == Severity::Refuse)
 }
 
 /// Re-exported so the shell can render a violation without reaching into `prop`.

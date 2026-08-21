@@ -9,7 +9,7 @@ use std::process::ExitCode;
 
 use clap::{Parser, Subcommand};
 use miette::{Diagnostic, NamedSource, SourceSpan};
-use praxis_core::{Known, Schema, Violation, check_document, index_all, parse};
+use praxis_core::{Known, Schema, Severity, Violation, check_document, index_all, parse};
 
 #[derive(Parser)]
 #[command(name = "praxis", version, about = "The delivery graph engine")]
@@ -30,16 +30,29 @@ enum Command {
 
 /// A refusal, rendered. The span points at the offending node so the reader is told
 /// where, not merely that.
-#[derive(Debug, thiserror::Error, Diagnostic)]
+#[derive(Debug, thiserror::Error)]
 #[error("{message}")]
-#[diagnostic(severity(Error))]
 struct Refused {
     message: String,
-    #[source_code]
     src: NamedSource<String>,
-    #[label("{label}")]
     span: SourceSpan,
     label: String,
+    severity: miette::Severity,
+}
+
+impl Diagnostic for Refused {
+    fn severity(&self) -> Option<miette::Severity> {
+        Some(self.severity)
+    }
+    fn source_code(&self) -> Option<&dyn miette::SourceCode> {
+        Some(&self.src)
+    }
+    fn labels(&self) -> Option<Box<dyn Iterator<Item = miette::LabeledSpan> + '_>> {
+        Some(Box::new(std::iter::once(miette::LabeledSpan::new_with_span(
+            Some(self.label.clone()),
+            self.span,
+        ))))
+    }
 }
 
 fn main() -> ExitCode {
@@ -85,27 +98,35 @@ fn check(root: &Path) -> miette::Result<usize> {
         miette::bail!("the record declares no schema — nothing to check against");
     }
 
-    let mut refusals = 0;
+    let (mut refusals, mut reports) = (0, 0);
     for (path, text, doc) in &sources {
         for violation in check_document(doc, &schema, &known) {
-            refusals += 1;
+            match violation.severity() {
+                Severity::Refuse => refusals += 1,
+                Severity::Report => reports += 1,
+            }
             eprintln!("{:?}", report(path, text, &violation));
         }
     }
 
+    let noted = if reports > 0 { format!(" · {reports} report(s)") } else { String::new() };
     if refusals == 0 {
         println!(
-            "praxis: {} ok — {} entity kinds declared",
+            "praxis: {} ok — {} entity kinds declared{noted}",
             root.display(),
             schema.kinds().count()
         );
     } else {
-        eprintln!("praxis: {refusals} refusal(s) in {}", root.display());
+        eprintln!("praxis: {refusals} refusal(s) in {}{noted}", root.display());
     }
     Ok(refusals)
 }
 
 fn report(path: &Path, text: &str, violation: &Violation) -> miette::Report {
+    let severity = match violation.severity() {
+        Severity::Refuse => miette::Severity::Error,
+        Severity::Report => miette::Severity::Warning,
+    };
     let who = violation
         .entity_id
         .clone()
@@ -115,6 +136,7 @@ fn report(path: &Path, text: &str, violation: &Violation) -> miette::Report {
         src: NamedSource::new(path.display().to_string(), text.to_owned()),
         span: violation.span,
         label: format!("`{}`", violation.refusal.field()),
+        severity,
     })
 }
 

@@ -6,7 +6,7 @@
 
 use std::fs;
 
-use praxis_core::{Known, Refusal, Schema, check_document, index_all, parse};
+use praxis_core::{Known, Refusal, Schema, Severity, check_document, index_all, parse};
 
 const ARCHITECTURE: &str = concat!(
     env!("CARGO_MANIFEST_DIR"),
@@ -72,7 +72,7 @@ fn c1_every_required_field_is_refused_when_absent() {
     let required: Vec<String> = spec
         .fields
         .iter()
-        .filter(|f| f.applies_to(Some("command")))
+        .filter(|f| f.applies_to(Some("command")) && !f.optional())
         .map(|f| f.name.clone())
         .collect();
     assert!(
@@ -151,6 +151,10 @@ fn a_kind_outside_the_declared_vocabulary_is_refused() {
 
 /// The engine encodes nothing. Emptying the schema must disarm the checker completely —
 /// if anything is still refused, a rule is hardcoded, which ADR.260819.01/A4 forbids.
+///
+/// This is why `undeclared-entity-kind` cannot fire on an empty schema: with nothing
+/// declared, every kind is undeclared, and the engine's own emptiness would masquerade
+/// as a verdict about the record (ITER.260821.01/Q2).
 #[test]
 fn a4_the_engine_holds_no_rule_of_its_own() {
     let doc = parse(&whole().replace("actor \"maintainer\"", "")).expect("parses");
@@ -184,7 +188,9 @@ fn the_committed_record_conforms() {
     let mut refused = Vec::new();
     for (path, doc) in &parsed {
         for v in check_document(doc, &schema, &known) {
-            refused.push(format!("{}: {}", path.display(), v.refusal.message()));
+            if v.severity() == Severity::Refuse {
+                refused.push(format!("{}: {}", path.display(), v.refusal.message()));
+            }
         }
     }
     assert!(refused.is_empty(), "the committed record was refused:\n{}", refused.join("\n"));
