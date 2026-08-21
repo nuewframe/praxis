@@ -29,7 +29,8 @@ thin-slice "TS.260820.02" {
     step "4" does="record the four gate tests with the reason each passes"
     step "5" does="write it. A capability owning no cluster is refused"
 
-    excludes "deciding what order capabilities are built in — that is DECOMPOSE's argument"
+    excludes "deciding what order capabilities are built in — that is the slice set's argument, \
+        cut in the same phase and after this (ES.260819.01/E27)"
     excludes "merging or splitting clusters automatically. Judgement stays with the maintainer; only the trace is enforced"
 
     layer "doctrine"    reaches="the skill that teaches clustering and the four gate tests"

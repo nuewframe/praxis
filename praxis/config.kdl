@@ -12,8 +12,11 @@
 config {
     repository "nuewframe/praxis"
 
-    // governed-by — pending. The normative schema lives on the ADR raised by the frame
-    // that identified this repository's capabilities. Bound once that ADR is accepted.
+    // governed-by — no target. This file may bind a normative schema; it may never declare
+    // one. The schema had been carried on ADR.260819.02, which is withdrawn: an ADR is a
+    // TECHNICAL decision, and what a frame or a slice or an invariant IS belongs to the
+    // record itself. The binding is restored when the schema has a home that is not a
+    // decision. See ADR.260819.01's `open`.
 
     // ====================================================================
     // Profile — which guardrails apply, and which layers a slice may declare.

@@ -65,10 +65,6 @@ event-storm "ES.260819.01" {
     event "StormHeld" from="hold-storm" phase="DISCOVER" \
         means="the timeline, its commands, its rules and its views are written down as evidence"
 
-    command "identify-slice" by="maintainer" asks="take one command from the storm and state the journey around it"
-    event "UseCaseIdentified" from="identify-slice" phase="DISCOVER" \
-        means="an atomic vertical use-case exists, anchored to a command that appears in the storm"
-
     command "walk" by="working-agent" asks="run one path end to end and overlay system thinking on it"
     event "PathWalked" from="walk" phase="DISCOVER" \
         means="a path was exercised in depth, and the layers it touches are named"
@@ -81,14 +77,19 @@ event-storm "ES.260819.01" {
     event "CapabilityNamed" from="name-capability" phase="DISCOVER" pivotal=#true \
         means="the system's required doings are known, and each traces to the events it must keep consistent"
 
-    // ---- Decomposition ----
-
-    command "cut-slice" by="maintainer" asks="cut a capability into a piece useful before the next one exists"
-    event "SliceCut" from="cut-slice" phase="DECOMPOSE" \
-        means="a unit of work exists that is vertical by shape rather than by assertion"
+    command "cut-slice" by="maintainer" \
+        asks="take one command from the storm and cut it into an atomic vertical slice — useful before the next one exists" \
+        amended-by="E27" \
+        was="two commands. `identify-slice` anchored a use-case to a storm command and `cut-slice` \
+            cut a capability into a piece; every one of the eighteen slices did both in one act"
+    event "SliceCut" from="cut-slice" phase="DISCOVER" \
+        means="an atomic vertical slice exists — anchored to a command that appears in the storm, \
+            vertical by shape rather than by assertion, and cut so that it can EXERCISE the \
+            capabilities the storm named" \
+        amended-by="E27" was="UseCaseIdentified and SliceCut, in two phases"
 
     command "state-claim" by="maintainer" asks="say what this slice will be true of when it is done"
-    event "ClaimStated" from="state-claim" phase="DECOMPOSE" \
+    event "ClaimStated" from="state-claim" phase="DISCOVER" \
         means="something exists that can later go unmet and be objected to"
 
     // ---- Iteration ----
@@ -313,7 +314,7 @@ event-storm "ES.260819.01" {
 
     // ================================================================
     // CLUSTERS — events grouped by what must stay consistent together.
-    // Each is a CANDIDATE capability. DECOMPOSE applies the four gate tests
+    // Each is a CANDIDATE capability. DISCOVER applies the four gate tests
     // (names a doing · fundable on own terms · slices deliver value
     // independently · can say what it is not) and some of these will merge.
     // ================================================================
@@ -325,7 +326,7 @@ event-storm "ES.260819.01" {
     }
 
     cluster "discovery-record" {
-        owns "StormHeld" "UseCaseIdentified" "PathWalked" "OptionRejected" "CapabilityNamed"
+        owns "StormHeld" "PathWalked" "OptionRejected" "CapabilityNamed"
         doing "derive capabilities from evidence, and keep the options that were not taken"
         not "it does not plan work. Nothing here is schedulable"
     }
@@ -371,8 +372,14 @@ event-storm "ES.260819.01" {
     process "delivery" {
         grounded-in "User-Centered Design" "Lean Management" "Lean Agile"
         phase "FRAME"     closes-on="RootCauseConverged" produces="a problem: symptoms, one cause, one principle, a baseline"
-        phase "DISCOVER"  closes-on="CapabilityNamed"    produces="one shaped solution, its rejected siblings, and the capabilities it requires"
-        phase "DECOMPOSE" closes-on="ClaimStated"        produces="slices, each vertical by shape, each with stated claims" gate="none — cutting is how you learn what a capability is"
+        phase "DISCOVER"  closes-on="CapabilityNamed" \
+            produces="one shaped solution, its rejected siblings, the capabilities it requires, \
+                and the atomic vertical slices that exercise them" \
+            gate="none — nothing here commits to anything" \
+            note="cutting and naming ITERATE inside this phase. Cutting is how you learn what a \
+                capability is, and a capability no slice can be cut from is evidence the \
+                capability is wrong. Neither is a phase boundary" \
+            amended-by="E27" was="DISCOVER closing on CapabilityNamed, with a separate DECOMPOSE phase after it"
         phase "ITERATE"   opens-on="SliceVetted" closes-on="IterationClosed" produces="evidence, decisions, findings, and a slice closer to delivered" gate="the only gate"
         phase "RELEASE"   closes-on="ReleaseCut"         produces="a version, truth promoted, and every published document regenerated for it"
         phase "LEARN"     closes-on="SymptomResolved"    produces="obligations, corrections, and sometimes a new frame"
@@ -406,7 +413,7 @@ event-storm "ES.260819.01" {
 
     finding "E7" \
         text="reviewer, next-agent and reader issue no commands at all — they only consume read models. Every actor who has to TRUST the artifact is read-side and writes nothing. The trust-transfer problem is therefore a read-side problem, and `projection` is the cluster sitting closest to the frame's root cause rather than a convenience on top of it" \
-        obliges="none — carried into DECOMPOSE as an ordering argument"
+        obliges="none — carried into DISCOVER as an ordering argument"
 
     finding "E8" \
         text="S1 (agents improvise structure instead of following a method) is attacked by no policy here. It is `partially-resolved` and the remaining part is narrowed by doctrine and guardrails rather than by the record — correctly outside this storm's scope. Recorded so the absence is deliberate rather than missed" \
@@ -426,7 +433,7 @@ event-storm "ES.260819.01" {
         obliges="a second storm, or an explicit out-of-scope declaration on this frame"
 
     finding "E12" \
-        text="every record file now carries `<KIND>.<YYMMDD>.<NN>.<slug>.kdl`, the ADR version pattern applied to all record kinds. CAP is the deliberate exception: a capability is permanent and identified by what it DOES, so a date stamp would imply a later-dated capability supersedes it, which contradicts permanence. config.kdl is also exempt — it is a binding, not a record" \
+        text="every record file now carries `<KIND>.<YYMMDD>.<NN>.<slug>.kdl`, the ADR version pattern applied to all record kinds. CAP is the deliberate exception: a capability is permanent and identified by what it DOES, so a date stamp would imply a later-dated capability supersedes it, which contradicts permanence. RELEASE.<version>.kdl is exempt for the same reason with a different identity — semver IS the name, and a date beside it would be a second ordering. config.kdl is also exempt — it is a binding, not a record" \
         obliges="no ADR declares this rule. It is applied but undeclared, and the checker may not enforce an invariant the record does not declare" \
         note="the rule governs RECORD FILES. A container directory is named by its id alone — \
             `frames/FRAME.260819.01/` — because the record file inside already carries the full \
@@ -494,6 +501,32 @@ event-storm "ES.260819.01" {
     finding "E26" \
         text="a symptom may be marked resolved only by a release that BOUND A SLICE WHOSE `attacks` NAMES IT. Resolution becomes computed from what shipped rather than asserted by whoever is closing the frame — the frame's own principle applied to the frame's own bookkeeping" \
         obliges="resolution-names-a-release strengthened to require an attacking slice in the named release"
+
+    finding "E27" \
+        text="DECOMPOSE was authored into the spine, not read off it. This storm states that a \
+            phase boundary is a pivotal event and that the spine is read off those `and nothing \
+            else` — and DECOMPOSE is the only one of six phases closing on an event never marked \
+            pivotal. Neither ClaimStated nor SliceCut is pivotal. The artifact had already \
+            collapsed it: all eighteen slices sit in discovery/ and each carries `from-storm` \
+            (a DISCOVER fact) and `claim` nodes (a DECOMPOSE fact) in one record" \
+        obliges="fold DECOMPOSE into DISCOVER; five phases, not six" \
+        note="the fold is SAFE because cutting commits to nothing — work-decomposition already \
+            says so, and selection at pick-up is the commitment. Were cutting the commitment, \
+            collapsing it into discovery would move commitment ahead of the only gate. \
+            The clusters do not move: they group by what must stay consistent, not by phase"
+
+    finding "E28" \
+        text="`identify-slice` and `cut-slice` were the same act recorded twice — one anchoring a \
+            use-case to a storm command, the other cutting a capability into a piece. Every one \
+            of the eighteen slices performs both, carrying `from-storm` and `realizes` together, \
+            so the two events were never independently observable" \
+        obliges="merge into one command. UseCaseIdentified is retired and SliceCut carries its meaning" \
+        falsifier="a use-case that no slice is ever cut from. If one appears, they are two \
+            entities and this merge is wrong" \
+        note="an atomic vertical slice is the right unit POST-STORM because its job is to \
+            exercise: the storm says what the domain does, and a slice is the instrument that \
+            tests whether the capabilities named can actually carry it. A slice adds value and \
+            functionality; the iteration is where it is committed to"
 
     finding "E6" \
         text="ConvergenceRefused, PickupRefused, CloseRefused and DriftDetected are all events. Refusals are facts about the run, and a method that records only its successes cannot show fidelity — it shows the absence of recorded failure, which is what the frame is about" \

@@ -52,7 +52,7 @@ thin-slice "TS.260820.09" {
     useful-alone "there is a point on the version line that everything else can be pinned to. \
         Nothing in publishing, verification or symptom resolution is possible before it"
 
-    amended-by "atomicity split"
+    amended-by "atomicity split" \
         was="one slice carrying bind, cut and promote-truth — three commands, which the schema's own atomicity rule forbids"
 
     attacks "S6"

@@ -19,7 +19,7 @@ capability "delivery-record" {
 
     owns-event "IntentRaised" "SymptomRecorded" "RootCauseConverged" "ConvergenceRefused" \
         "SymptomResolved" "FrameReopened" \
-        "StormHeld" "UseCaseIdentified" "PathWalked" "OptionRejected" "CapabilityNamed" \
+        "StormHeld" "PathWalked" "OptionRejected" "CapabilityNamed" \
         "SliceCut" "ClaimStated" "LifetimeDeclared" "UsageDocumented"
 
     owns-read-model "the-problem-as-it-stands" answers="what have we observed, and does it hang together yet?"
