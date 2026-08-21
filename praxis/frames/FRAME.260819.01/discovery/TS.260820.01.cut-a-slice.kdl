@@ -36,7 +36,7 @@ thin-slice "TS.260820.01" {
 
     command "cut-slice"
     actor "maintainer"
-    produces-event "SliceCut"
+    produces-event "SliceCut" "SliceCutRefused"
     needs-read-model "capabilities-and-what-they-own"
     feeds-read-model "what-is-ready-to-pick-up"
 
@@ -76,6 +76,12 @@ thin-slice "TS.260820.01" {
 
     useful-alone "verticality stops being a word the author applies to their own work. \
         That is S4 answered, with nothing else in this frame delivered"
+
+    amended-by="ITER.260820.01/P5" \
+        change="produces SliceCutRefused as well as SliceCut" \
+        why="the sealed `docs` layer requires a refused slice and its reason to be readable off the \
+            record, and no refusal event existed. Recorded as an amendment rather than an edit \
+            because scope seals at open (ES.260819.01/E29)"
 
     attacks "S4"
 }

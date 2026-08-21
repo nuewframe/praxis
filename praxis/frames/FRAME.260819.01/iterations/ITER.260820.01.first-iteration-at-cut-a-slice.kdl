@@ -14,12 +14,30 @@ iteration "ITER.260820.01" {
     opened-by "agent:principal-engineer"
 
     // ================================================================
-    // THE VET — work-admission's gate. SliceVetted, or this file would not exist.
-    // Every condition is recorded with its verdict, because a gate never invoked and
-    // a gate that admitted look identical afterwards.
+    // ADMISSION — the only gate, and it is human. Selection IS the commitment, so the
+    // human's ask is the approval: there is no separate plan or design gate, and adding
+    // one would contradict ITERATE's `gate="the only gate"`.
+    //
+    // It is recorded rather than assumed. Without a signed node, "a human asked for this"
+    // is the agent's own account of having been asked — the tier this frame exists to shrink.
     // ================================================================
 
-    vet {
+    approval "admission" {
+        status "pending"
+        signed-by "the human's ask to START work on this iteration"
+        note "the ask to CREATE this iteration was given and ran the first vet. The ask to START \
+            has not been given, so this is pending and no implementation may begin. One word signs it"
+    }
+
+    // ================================================================
+    // THE VET — run TWICE. Once when the iteration is asked for, to establish it is ready
+    // for work; again when the ask to start is given, because the tree moves in between and
+    // an admission computed against a tree that has since changed is an admission of
+    // something else.
+    // ================================================================
+
+    vet "create" state="done" at="2026-08-20T23:10:00-05:00" \
+        triggered-by="the ask to select a slice and start an iteration" {
         condition "the slice's dependencies are frozen" verdict="admitted-on-condition" \
             found="TS.260820.01 depends on `the capability record format, frozen`, and nothing had \
                 frozen it — there is no seam manifest yet" \
@@ -41,6 +59,19 @@ iteration "ITER.260820.01" {
         note "selection is the commitment. Choosing this is choosing not to do the other seventeen"
     }
 
+    vet "start" state="pending" \
+        triggered-by="the ask to start work, which also signs the admission" {
+        will-check "the freeze is still current" \
+            already-known="it is NOT. The create-vet pinned 82c8f42 and the tree is at 418c4cb — \
+                the schema this iteration builds against arrived in the later commit. The start-vet \
+                must re-freeze, and this is the second vet earning its place before it has run"
+        will-check "no other iteration has opened on this slice since"
+        will-check "the work is still disjoint from what is in flight"
+        will-check "the slice still exists and its scope is unchanged" \
+            note="it changed. TS.260820.01 gained SliceCutRefused by amendment ITER.260820.01/P5, \
+                which the start-vet must see rather than inherit silently"
+    }
+
     // ================================================================
     // FROZEN — DependencyFrozen. What this iteration stands on, pinned so it cannot move
     // underneath it. Pinned to a commit, because that is the only clock the record has.
@@ -55,8 +86,14 @@ iteration "ITER.260820.01" {
         pins "the thin-slice schema" at="TS.260820.01's own header comment" \
             note="the slice being built carries the schema it must enforce, which is why it can be \
                 its own first test"
-        pins "the entity schema" at="NA.260820.01/schema"
-        pins "the encoding and layout rules" at="ADR.260819.01/enforces"
+        pins "the entity schema" at="NA.260820.01/schema" at-commit="82c8f42" state="stale" \
+            note="the schema MOVED after this pin — it arrived in 418c4cb. A pin without a commit \
+                is not a freeze, and this one had none when written. The start-vet re-freezes"
+        pins "the encoding and layout rules" at="ADR.260819.01/enforces" at-commit="418c4cb"
+
+        rule "the schema is frozen for the duration of this iteration. A schema change while it is \
+            open is a FINDING, not an edit" \
+            because="an engine validating against a node that moves weekly is chasing, never building"
     }
 
     // ================================================================
@@ -102,9 +139,12 @@ iteration "ITER.260820.01" {
         raised="ADR.260819.01/A4" \
         note="serde was rejected on spans: its data model carries none, and C2 requires the \
             refusal to name the missing FIELD"
-    decision-required "whether the shape check is a praxis-core validator or a codec-level refusal" \
-        matters="C2 requires the diagnostic to name the missing FIELD, which a codec that fails on \
-            the whole document cannot do"
+    decision "where the shape check lives" state="recorded" at="2026-08-21T00:00:00-05:00" \
+        decided="a praxis-core validator over a parsed document, never a codec-level refusal" \
+        because="A4 rejected derive, so the codec can only fail on SYNTAX. `which field is missing` \
+            is semantic and lives above it — C2 is unreachable from the codec" \
+        note="a derivation from A4 rather than a choice. Recorded because a decision nobody wrote \
+            down is one the next agent re-derives"
 
     // ================================================================
     // WHAT THIS PASS ALREADY LEARNED — findings raised at the moment they cost something.
@@ -126,7 +166,11 @@ iteration "ITER.260820.01" {
             refused the other seventeen" \
         size="owed-work" \
         note="the rule and its violation are both on the record and neither is enforced, which is \
-            precisely the tier this frame exists to shrink"
+            precisely the tier this frame exists to shrink" \
+        disposition="dormant until a seam manifest exists. The rule cannot be SATISFIED today — \
+            there is nothing frozen to depend on — so re-cutting seventeen slices by hand, with no \
+            checker, would introduce errors nothing can detect. It fails closed the day the \
+            manifest lands, and the engine audits the re-cut"
 
     finding "P4" state="open" \
         text="the parser decision was reached on a principle the record already held — the engine \
@@ -137,6 +181,25 @@ iteration "ITER.260820.01" {
         note="A4 states it as a change. Whether it is also a schema rule — an engine that hardcodes \
             a vocabulary is refused — is unsettled, and the checker that would refuse it is the \
             engine itself"
+
+    finding "P5" state="open" \
+        text="TS.260820.01's sealed `docs` layer — a refused slice and its reason are readable off \
+            the record — was unsatisfiable: cut-slice produced no refusal event, alone among the \
+            storm's refusable commands. C1 and C2 could have been settled at `enforcement` while \
+            the sealed docs layer stayed unreachable" \
+        size="owed-work" \
+        obliged="ES.260819.01/E29 — SliceCutRefused added; TS.260820.01 amended to produce it" \
+        note="found by trying to BUILD the command, not by reading the model. refusal-is-a-fact was \
+            declared as a policy and violated by the storm that declared it"
+
+    finding "P6" state="open" \
+        text="the create-vet's freeze went stale inside one commit. It pinned the entity schema with \
+            no commit at all, and the schema then moved in 418c4cb — the very commit that gave it a \
+            home. An iteration froze against a node that changed underneath it, which is the failure \
+            `depends-on a frozen contract` exists to prevent, occurring inside the freeze mechanism" \
+        size="owed-work" \
+        note="it is also the argument for vetting twice: the second vet catches exactly this, and it \
+            caught it here before running"
 
     finding "P3" state="open" \
         text="the iteration entity was undefined until this iteration opened. Three capabilities wrote facts \

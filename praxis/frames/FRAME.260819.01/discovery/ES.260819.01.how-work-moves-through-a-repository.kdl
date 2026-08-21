@@ -88,6 +88,11 @@ event-storm "ES.260819.01" {
             capabilities the storm named" \
         amended-by="E27" was="UseCaseIdentified and SliceCut, in two phases"
 
+    event "SliceCutRefused" from="cut-slice" phase="DISCOVER" \
+        means="a cut was refused and the missing field is named. Without this a refused cut leaves \
+            no fact, and a slice nobody tried to cut looks identical to one the checker rejected" \
+        added-by="E29"
+
     command "state-claim" by="maintainer" asks="say what this slice will be true of when it is done"
     event "ClaimStated" from="state-claim" phase="DISCOVER" \
         means="something exists that can later go unmet and be objected to"
@@ -332,7 +337,7 @@ event-storm "ES.260819.01" {
     }
 
     cluster "work-decomposition" {
-        owns "SliceCut" "ClaimStated"
+        owns "SliceCut" "SliceCutRefused" "ClaimStated"
         doing "cut capabilities into slices whose verticality is checkable, each carrying stated claims"
         not "it does not admit work. Cutting costs nothing and commits to nothing"
     }
@@ -527,6 +532,17 @@ event-storm "ES.260819.01" {
             exercise: the storm says what the domain does, and a slice is the instrument that \
             tests whether the capabilities named can actually carry it. A slice adds value and \
             functionality; the iteration is where it is committed to"
+
+    finding "E29" \
+        text="`cut-slice` produced no refusal event, alone among the storm's refusable commands. \
+            pick-up, converge and close-iteration each pair a fact with a refusal; cutting did not, \
+            so a refused cut left nothing behind. Found by ITER.260820.01 discovering that \
+            TS.260820.01's sealed `docs` layer — a refused slice and its reason are readable off \
+            the record — was unsatisfiable as written" \
+        obliges="SliceCutRefused, and TS.260820.01 amended to produce it" \
+        note="refusal-is-a-fact was declared as a policy and violated by the storm that declared it. \
+            It surfaced only when something tried to BUILD the command, which is the argument for \
+            opening an iteration before the model feels finished"
 
     finding "E6" \
         text="ConvergenceRefused, PickupRefused, CloseRefused and DriftDetected are all events. Refusals are facts about the run, and a method that records only its successes cannot show fidelity — it shows the absence of recorded failure, which is what the frame is about" \

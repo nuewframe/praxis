@@ -403,8 +403,19 @@ notional-architecture "NA.260820.01" {
             entry-common="at" "by" "action" append-only=#true \
             because="attribution distinguishes human authorship from agent authorship, which is the \
                 distinction a method built on trust transfer exists to make legible"
-        requires "only a human may sign an approval" kinds="acceptance" "admission" "plan" "design" \
+        requires "only a human may sign an approval" kinds="acceptance" "admission" \
             because="an agent-signed approval is the trust-transfer problem expressed as a signature"
+        requires "an iteration is vetted twice — at the ask to create, and again at the ask to start" \
+            because="the tree moves in between. An admission computed against a tree that has since \
+                changed is an admission of something else, and the second vet is where a stale \
+                freeze is caught"
+        requires "an iteration carries a signed admission before it may be worked" \
+            because="selection IS the commitment, and ITERATE has exactly one gate. The human's ask \
+                to start an iteration is that approval — so it is recorded as one, or `the agent \
+                was asked` is the agent's own account of having been asked" \
+            retired-kinds="plan · design" \
+            retired-because="they were tier gates under the withdrawn ADR.260819.02. A second gate \
+                before implementation contradicts `the only gate`"
         requires "a refusal is recorded as a fact, with the condition that caused it" \
             because="a gate never invoked and a gate that refused look identical afterwards"
 
@@ -422,6 +433,8 @@ notional-architecture "NA.260820.01" {
         rule "unknown-approval-kind"        refuses="an approval kind this schema does not name"
         rule "approval-signed-by-agent"     refuses="a signature outside the human namespace"
         rule "adr-accepted-without-approval" refuses="an accepted decision nobody signed"
+        rule "iteration-without-signed-admission" refuses="work beginning on an iteration whose admission is unsigned"
+        rule "iteration-worked-without-start-vet"  refuses="work beginning on a create-vet alone"
         rule "amendment-records-no-change"  refuses="an amendment that changes nothing"
         rule "slice-without-one-capability" refuses="a slice realizing zero or several capabilities"
 
