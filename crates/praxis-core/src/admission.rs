@@ -208,6 +208,18 @@ pub struct Capability {
     /// Promoted truth: what shipped for this capability, and where. Derived, never
     /// hand-written — `promoted-truth-is-derived` recomputes it.
     pub shipped: Vec<crate::promote::Shipped>,
+    /// Usage prose, written while the capability is built and stored IN the record. Not a
+    /// file the record points at — a pointer is a second thing to keep in step.
+    pub usage: Vec<String>,
+}
+
+impl Capability {
+    /// Whether this capability has a surface a person can use at `version` — which is
+    /// exactly whether its truth was promoted for that release. A guide describing
+    /// behaviour that never shipped is worse than no guide: it is confidently wrong.
+    pub fn usable_at(&self, version: &str) -> bool {
+        self.shipped.iter().any(|s| s.version == version)
+    }
 }
 
 /// A version, and the work bound to it. Machine-owned: every field here is derived from
@@ -327,6 +339,11 @@ impl Corpus {
                                 iteration: prop(c, "by").unwrap_or_default(),
                                 slice: prop(c, "slice").unwrap_or_default(),
                             })
+                            .collect(),
+                        usage: node
+                            .iter_children()
+                            .filter(|c| c.name().value() == "usage")
+                            .filter_map(string_arg)
                             .collect(),
                     }),
                     "event-storm" => {

@@ -13,7 +13,7 @@ use praxis_core::{
     Ask, Binding, Closing, Conditions, Corpus, Known, Pickup, Schema, Severity, Violation,
     Cut, Promotion, Publication, Published, Verified, assess, bind, check_corpus,
     check_document, close_iteration, cut, index_all, parse, pick_up, project, promote, publish,
-    review, unbind, verify, what_is_currently_true,
+    guide_for, review, unbind, verify, what_is_currently_true,
 };
 
 mod render;
@@ -128,6 +128,16 @@ enum Command {
         /// Render as Markdown into the working projection path, which is gitignored.
         #[arg(long)]
         markdown: bool,
+    },
+    /// Show how to use a capability at a version, or refuse if that version never shipped it.
+    Guide {
+        /// The capability.
+        capability: String,
+        /// The version whose surface to describe.
+        version: String,
+        /// The state root to read.
+        #[arg(default_value = "praxis")]
+        root: PathBuf,
     },
     /// Show which slices could be started right now, and what would refuse each of the rest.
     ///
@@ -280,6 +290,15 @@ fn main() -> ExitCode {
         },
         Command::Review { iteration, root, markdown } => {
             match reviewing(&iteration, &root, markdown) {
+                Ok(()) => ExitCode::SUCCESS,
+                Err(report) => {
+                    eprintln!("{report:?}");
+                    ExitCode::FAILURE
+                }
+            }
+        }
+        Command::Guide { capability, version, root } => {
+            match guiding(&capability, &version, &root) {
                 Ok(()) => ExitCode::SUCCESS,
                 Err(report) => {
                     eprintln!("{report:?}");
@@ -1063,6 +1082,31 @@ fn reviewing(iteration: &str, root: &Path, markdown: bool) -> miette::Result<()>
         .map_err(|e| miette::miette!("{}: {e}", path.display()))?;
     println!("praxis: preview at {} — gitignored, and safe to delete", path.display());
     Ok(())
+}
+
+/// `TS.260820.15`. A guide describes what a version actually shipped, or it is refused.
+fn guiding(capability: &str, version: &str, root: &Path) -> miette::Result<()> {
+    let sources = load(root)?;
+    let docs: Vec<_> = sources.iter().map(|(_, _, d)| d.clone()).collect();
+    let mut schema = Schema::default();
+    for doc in &docs {
+        let found = Schema::from_document(doc);
+        if !found.is_empty() {
+            schema = found;
+        }
+    }
+    let corpus = Corpus::from_documents(&docs, &schema);
+
+    match guide_for(capability, version, &corpus) {
+        Err(why) => miette::bail!("{}", why.message()),
+        Ok(lines) => {
+            println!("{capability} at {version}\n");
+            for line in lines {
+                println!("  {line}");
+            }
+            Ok(())
+        }
+    }
 }
 
 /// The frame directory a slice lives under. Discovery sits one level below the frame, so

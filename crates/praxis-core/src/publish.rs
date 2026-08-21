@@ -76,6 +76,7 @@ pub fn publish(version: &str, corpus: &Corpus) -> Publication {
             "the-published-set-for-a-release" => published_set(version, corpus),
             "capabilities-and-what-they-own" => capabilities(version, corpus),
             "the-decisions-that-shaped-this" => decisions(version, corpus),
+            "how-to-use-a-capability" => crate::guide::guides(version, corpus),
             other => {
                 uncomposable.push(format!(
                     "{other} is declared publishable and the engine has no composer for it. The \

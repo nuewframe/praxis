@@ -31,6 +31,10 @@ capability "release-binding" {
         being a chore performed beside the work — and a chore beside the work is the thing that \
         gets skipped when the work is late"
 
+    usage "`praxis bind <ITER> <VERSION> [--undo]` — attach closed work to a version. Only closed iterations bind, each binds once, and a cut release does not change."
+    usage "`praxis cut-release <VERSION> --confirm` — cut the version and write its index node in one record. Refused until the published set exists and is committed."
+    usage "`praxis promote <VERSION>` — fold what a cut release shipped into what each capability says it is. Derived from bound work and recomputed by a rule."
+
     trail {
         entry at="2026-08-20T00:00:00-05:00" by="agent:principal-engineer" action="created"
     }

@@ -1,0 +1,147 @@
+// Opened by `praxis pick-up`. Every condition below was evaluated against the
+// tree as it stood at 2026-08-21T20:01:09Z, and the verdicts are recorded
+// rather than summarised: a gate whose reasoning is not on the record is a gate
+// you have to trust.
+
+iteration "ITER.260821.16" {
+    slug "document-how-a-capability-is-used"
+    on-slice "TS.260820.15"
+    state "closed"
+    opened-at "2026-08-21T20:01:09Z"
+    opened-by "agent:praxis"
+
+    approval "admission" {
+        status "signed"
+        signer "human:wael"
+        at "2026-08-21T20:01:09Z"
+        signed-by "the ask to pick up this slice"
+    }
+
+    vet "create" state="done" at="2026-08-21T20:01:09Z" {
+        condition "slice-is-shaped" verdict="passed"
+        condition "dependencies-delivered" verdict="passed"
+        condition "no-iteration-in-flight" verdict="passed"
+        condition "nothing-left-to-admit" verdict="passed"
+        condition "work-is-disjoint" verdict="not-computed" \
+            found="no seam manifest exists, so what two iterations would touch cannot be compared. Disjointness is half of what this capability says it judges, and half of what it judges is currently not computed at all"
+        condition "the-slice-is-the-best-available" verdict="left-to-the-maintainer"
+    }
+
+    // 2 of the declared conditions were not decided by the gate. They are
+    // recorded above rather than omitted: an admission that does not say what
+    // it left undecided claims more than it checked.
+
+    // Frozen at open, from the slice. Removing one from the slice now
+    // does not remove it from here — it makes the two disagree, and that is
+    // refused.
+
+    claim "C1" from-slice="TS.260820.15" state="met" \
+        text="publishing a guide for a release that did not promote the truth it describes is refused" \
+        settled-by="a negative test asserting the capability name in the diagnostic" \
+        evidence="tests/guides.rs::c1_a_guide_for_a_version_that_did_not_ship_it_is_refused, and \
+            ::c1_the_composed_guide_carries_only_what_the_release_promoted. Verified against the \
+            real record: `praxis guide work-admission 0.8.0` refuses, because 0.8.0 is not cut and \
+            has promoted nothing"
+    claim "C2" from-slice="TS.260820.15" state="met" \
+        text="usage prose is stored in the record, not in a file the record points at" \
+        settled-by="a test asserting the guide renders with no filesystem read outside the state root" \
+        evidence="tests/guides.rs::c2_usage_prose_comes_from_the_record_and_nowhere_else — `guides` \
+            takes a Corpus and nothing else, so there is no path in the signature and nowhere to \
+            read a file from. The prose is data, not a pointer to data"
+    claim "C3" from-slice="TS.260820.15" state="met" \
+        text="a capability with a usable surface and no usage prose is reported, not omitted" \
+        settled-by="a test asserting the gap is named rather than the guide silently missing" \
+        evidence="tests/guides.rs::c3_a_shipped_capability_with_no_usage_is_reported_not_omitted — \
+            in the composed document as a section, and by name when asked directly"
+
+    decision "prose written before its truth ships is named, not dropped" \
+        chose="a `written, not yet shipped` section listing usage whose release has not promoted it" \
+        over="omitting it, which is what `only publish what shipped` literally implies" \
+        because="prose written ahead of the release is not WRONG, it is early. Dropping it silently \
+            makes the absence read as an oversight, and the next person writes it again" \
+        falsified-by="that section growing large enough that nobody reads it — at which point it is \
+            a backlog wearing a document's clothes, and belongs somewhere that tracks backlogs" \
+        state="accepted"
+
+    vet "start" state="done" at="2026-08-21T19:58:00Z" {
+        condition "the tree is clean and current" verdict="passed" found="HEAD 9025564"
+        condition "the slice's scope is unchanged" verdict="passed" found="three claims, read line by line"
+        condition "its dependency is genuinely satisfied" verdict="passed" \
+            found="depends-on TS.260820.17, promote-what-shipped, delivered by ITER.260821.11. The \
+                guide follows promoted truth, so promotion had to exist first — and the dependency \
+                is real rather than notional for once"
+    }
+
+    frozen {
+        pins "the entity-and-field schema" at="NA.260820.01/schema" at-commit="9025564"
+        pins "the lifetime declarations" at="ES.260819.01 — read-model" at-commit="9025564"
+        rule "a schema change while this iteration is open is a FINDING, not an edit" \
+            exception="declaring the capability `usage` field is the mechanism this slice depends on"
+    }
+
+    contributes "slice-outcome-added" \
+        because="document-how-a-capability-is-used, and the last composer the published set needed"
+
+    layer "doctrine"    state="evidenced" evidence="skills/document-usage/SKILL.md, registered in the router" reaches="the skill teaches documenting usage inside the iteration, not after it"
+    layer "enforcement" state="evidenced" evidence="150 tests pass; a guide for unpromoted truth is refused by name, and a shipped capability with no usage is reported" reaches="guide-follows-promoted-truth, and a report on capabilities with a usable surface and no usage"
+    layer "docs"        state="evidenced" evidence="docs/releases/0.8.0/guides/how-to-use-a-capability.md — and all four publishable views now compose, so 0.8.0 publishes for the first time since AD2" reaches="published under docs/releases/<version>/guides/"
+    layer-set sealed=#true at="2026-08-21T19:58:00Z"
+
+    phase "design-ux" state="complete" required-by="docs" \
+        produced="three sections where the slice implied two. Shipped-and-documented, shipped-and- \
+            NOT-documented, and documented-but-not-yet-shipped — the third recorded as a decision, \
+            because omitting it is what `only publish what shipped` literally says and doing so \
+            makes early prose look like an oversight"
+    phase "design-system" state="complete" required-by="enforcement" \
+        produced="`usable surface` is defined as `this release promoted its truth` rather than as a \
+            property somebody sets. It reuses the promotion derivation, so a capability cannot be \
+            documented as shipped without having shipped — the two facts are one fact"
+    phase "implement" state="complete" required-by="enforcement · docs" \
+        produced="praxis-core::guide, `praxis guide`, the capability `usage` field, usage prose for \
+            all five capabilities, and eight tests"
+    phase "learn" state="complete" required-by="always" produced="three findings" \
+        note="never skippable — it is the phase that judges the others"
+    phase "teach" state="complete" required-by="doctrine" produced="skills/document-usage/SKILL.md"
+
+    finding "AF1" state="open" size="answered" \
+        text="AD2 is cleared. All four declared publishable views now compose, and \
+            `praxis publish 0.8.0` writes four documents at the paths the record declares — \
+            release-notes.md, capabilities/, decisions/ and guides/" \
+        note="the refusal AD2 introduced held for exactly two iterations and named the two slices \
+            that would clear it. The record derived that sequencing and a human had independently \
+            chosen the same one, which is the only time in this frame those two have been compared"
+
+    finding "AF2" state="open" size="observation" \
+        text="the guide for 0.8.0 is EMPTY, correctly. Five capabilities carry usage prose and none \
+            of their truth is promoted, because 0.8.0 is not cut — so every one lands in `written, \
+            not yet shipped`" \
+        note="the honest shape of a release that has not happened. It also means C1's refusal is the \
+            only path exercised against the real record: the ACCEPTING path — a guide that publishes \
+            because its truth shipped — has been shown in fixtures and nowhere else. Same gap AA4 \
+            named, now with one more command in it"
+
+    finding "AF3" state="open" size="owed-work" \
+        text="`guide_for` accepts both `CAP.delivery-record` and `delivery-record`, because slices \
+            spell it one way and capability records the other" \
+        note="one fact spelled two ways in the record, papered over in the reader. Refusing one \
+            spelling would move the problem rather than fix it, and normalising the record is a \
+            change to nineteen slices. Recorded because a reader that silently accepts two spellings \
+            is exactly the shape AB1 turned out to be"
+    closed-at "2026-08-21T20:05:28Z"
+    outcome "continue"
+
+    close {
+        claims-settled "C1" how="met"
+        claims-settled "C2" how="met"
+        claims-settled "C3" how="met"
+        all-met #true
+        note "the accounting above was computed at close, not asserted. It says every claim is either met or carried by a finding that names it, and nothing about whether the work is any good"
+    }
+
+    trail {
+        entry at="2026-08-21T20:05:28Z" by="agent:praxis" action="state-changed" from="open" to="closed" note="closed by `praxis close`. The accounting was computed; the conclusion is not the machine's to draw"
+
+        entry at="2026-08-21T20:01:09Z" by="agent:praxis" action="created" \
+            note="opened by the gate, on the ask of human:wael"
+    }
+}

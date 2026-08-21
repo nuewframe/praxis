@@ -120,6 +120,7 @@ Load the `SKILL.md` of any skill you intend to follow.
 | | `close-an-iteration` | Close without dropping scope in silence — a shortfall is carried by a finding that names the claim, and deleting a claim to make the close succeed is itself refused |
 | | `review-in-flight` | Preview what an iteration promised against what it has shown, at any moment and writing nothing — the layers it has NOT reached are listed, not omitted |
 | | `record-a-decision` | Record a choice with the alternatives it rejected and what would show it wrong — bound to the iteration that forced it, corrected only by appending |
+| | `document-usage` | Write how a capability is used while building it, into the capability record — and a guide for behaviour a version never shipped is refused |
 | | `bind-work-to-a-version` | Attach closed iterations to a version so its content is derived rather than hand-kept — only closed work binds, once, and the bump is proposed from configured rules |
 | | `cut-the-version` | Cut a planned version and write its index node in one operation — the index points at a commit rather than copying it, and the seal makes a later edit visible |
 | | `declare-a-lifetime` | Decide whether a read model survives being frozen and record why — the publication test, refused in both directions without a reason |

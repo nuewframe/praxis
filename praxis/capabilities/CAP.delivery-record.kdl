@@ -53,6 +53,9 @@ capability "delivery-record" {
         "a capability's existence against the storm cluster it owns" \
         "a slice's shape against the command, actor, event and read model it must name"
 
+    usage "`praxis check [root]` — refuse any record that does not match the shape the record itself declares."
+    usage "`praxis truth` — what this repository already knows, so an arriving agent does not re-derive it. Read the last section: it names what the answer does not cover."
+
     trail {
         entry at="2026-08-20T00:00:00-05:00" by="agent:principal-engineer" action="created" \
             note="derived from ES.260819.01 by clustering, not named off the frame"

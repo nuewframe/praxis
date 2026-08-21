@@ -35,6 +35,9 @@ capability "work-admission" {
     principle-note "selection is the commitment. Choosing to work this is choosing not to work \
         something else, and it is the first moment the information needed to decide actually exists"
 
+    usage "`praxis ready` — which slices could be started right now, and what would refuse each of the rest. Read the `not decided for you` section first: it names the conditions the gate declares and did not compute."
+    usage "`praxis pick-up <SLICE>` — take a slice through the one gate. Either an iteration opens, or a refusal record is written naming the condition that failed. Selection is the commitment."
+
     trail {
         entry at="2026-08-20T00:00:00-05:00" by="agent:principal-engineer" action="created"
     }

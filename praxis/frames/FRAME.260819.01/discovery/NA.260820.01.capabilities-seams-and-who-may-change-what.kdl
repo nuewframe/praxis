@@ -487,6 +487,10 @@ notional-architecture "NA.260820.01" {
             field "doing"            each="1" because="a capability that names no doing is a noun someone liked"
             field "not"              each="1" because="an exclusion something else covers, never scope restated"
             field "state"            each="1" one-of="sought" "active" "retired"
+            field "usage"            each="0..n" \
+                because="how to use this capability, written while it is being built and stored IN \
+                    the record. Not a file the record points at — a pointer is a second thing to \
+                    keep in step, and it is the one that rots"
             field "shipped"          each="0..n" \
                 because="what shipped for this capability, and in which release. Written by \
                     promotion and recomputed by promoted-truth-is-derived — never hand-written"
