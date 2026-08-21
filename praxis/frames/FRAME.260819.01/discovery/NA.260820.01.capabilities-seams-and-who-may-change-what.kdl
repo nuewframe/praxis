@@ -33,6 +33,9 @@ notional-architecture "NA.260820.01" {
     // ================================================================
 
     excludes "the encoding of facts" because="KDL is a binding. The model needs facts to be typed, addressable and trailed — not to be KDL"
+    excludes "identity FORMATS, folder placement, and what may sit in the state root" \
+        because="the schema below says a slice has an identity and an owner. What that id LOOKS \
+            like and which directory holds it are layout, decided on ADR.260819.01"
     excludes "the engine and its language" because="ADR.260819.01 decided a compiled Rust CLI. Nothing below depends on it"
     excludes "file and directory layout" because="which node lives at which path is a locator concern. The model needs identity, not location"
     excludes "the command surface" because="a command in this model is an actor's intent, not a CLI verb"
@@ -108,14 +111,14 @@ notional-architecture "NA.260820.01" {
     }
 
     capability-role "work-admission" {
-        decides "whether a pass may open, and whether an open pass may close"
-        owns-facts "passes and their whole lifecycle" "frozen dependencies" "refusals and the condition that caused each"
+        decides "whether an iteration may open, and whether an open iteration may close"
+        owns-facts "iterations and their whole lifecycle" "frozen dependencies" "refusals and the condition that caused each"
         consumes "slice-facts@v1" from="delivery-record" for="what a slice depends on, and what it declared"
         consumes "settlement-facts@v1" from="claim-settlement" for="which claims are settled and which are carried, at close"
         emits "read-model@v1" to="document-projection" views="what-is-ready-to-pick-up"
-        emits "pass-facts@v1" to="release-binding"
+        emits "iteration-facts@v1" to="release-binding"
         never "judge the work. It judges preconditions at open and accounting at close, and looks at the work itself at neither"
-        owed "the pass is one entity and this capability owns it end to end. `not` currently says \
+        owed "the iteration is one entity and this capability owns it end to end. `not` currently says \
             `and then it is finished`, which W8 falsifies. TS.260820.07 re-files here, and \
             no-silent-drop moves here with it (W8, W9)"
     }
@@ -125,14 +128,14 @@ notional-architecture "NA.260820.01" {
         owns-facts "evidence and the layer each names" "claim settlements" "findings and their triage" "decisions and their alternatives"
         consumes "slice-facts@v1" from="delivery-record" for="the layer set and the claim set a slice declared"
         emits "settlement-facts@v1" to="work-admission" "release-binding"
-        emits "read-model@v1" to="document-projection" views="what-this-pass-claims-and-has-shown" "the-decisions-that-shaped-this"
-        never "produce evidence, judge its quality, or perform a close. It supplies the settlement; the pass's owner acts on it"
+        emits "read-model@v1" to="document-projection" views="what-this-iteration-claims-and-has-shown" "the-decisions-that-shaped-this"
+        never "produce evidence, judge its quality, or perform a close. It supplies the settlement; the iteration's owner acts on it"
     }
 
     capability-role "release-binding" {
         decides "what a version contains, when it is cut, and what current truth becomes as a consequence"
-        owns-facts "bindings of a pass to a version" "releases and their index into history" "the current-truth field of every capability record"
-        consumes "pass-facts@v1" from="work-admission" for="whether a pass closed"
+        owns-facts "bindings of an iteration to a version" "releases and their index into history" "the current-truth field of every capability record"
+        consumes "iteration-facts@v1" from="work-admission" for="whether an iteration closed"
         consumes "settlement-facts@v1" from="claim-settlement" for="which claims are unsettled, so a refusal can name them"
         consumes "lifetime-facts@v1" from="delivery-record" for="which views are publishable, from which the published set is DERIVED and never listed by hand"
         consumes "problem-facts@v1" from="delivery-record" for="which symptoms a release resolved. The release node does not store this twice — it is read from the symptoms that name it"
@@ -190,7 +193,7 @@ notional-architecture "NA.260820.01" {
 
         instance "slice-facts@v1"      from="delivery-record"  to="work-admission" "claim-settlement"
         instance "settlement-facts@v1" from="claim-settlement" to="work-admission" "release-binding"
-        instance "pass-facts@v1"       from="work-admission"   to="release-binding"
+        instance "iteration-facts@v1"       from="work-admission"   to="release-binding"
         instance "release-facts@v1"    from="release-binding"  to="delivery-record"
         instance "lifetime-facts@v1"   from="delivery-record"  to="release-binding"
         instance "problem-facts@v1"    from="delivery-record"  to="release-binding" \
@@ -266,7 +269,7 @@ notional-architecture "NA.260820.01" {
     invariant "enforcement-follows-the-act" {
         states "a policy is enforced by the capability that owns the act it refuses, not by the one that owns the concept it is about"
         so-that "a refusal happens where the change would happen, and cannot be routed around by calling the act from elsewhere"
-        example "no-silent-drop is about claims and refuses a CLOSE, so it belongs to the pass's owner"
+        example "no-silent-drop is about claims and refuses a CLOSE, so it belongs to the iteration's owner"
         checkable-by "a policy listed on a capability that owns none of the acts it refuses"
         derived-from "WALK.260820.02" locator="W9"
         note "applying it reassigns exactly one policy of ten, which is why it reads as a discovery \
@@ -299,9 +302,9 @@ notional-architecture "NA.260820.01" {
     // ================================================================
 
     owes "re-file TS.260820.07 under CAP.work-admission" from="W8" \
-        because="the pass is one entity and work-admission owns it. The slice's content is right; the capability on it is wrong"
+        because="the iteration is one entity and work-admission owns it. The slice's content is right; the capability on it is wrong"
     owes "move no-silent-drop from CAP.claim-settlement to CAP.work-admission" from="W9"
-    owes "restate CAP.work-admission's `not` — `and then it is finished` is false of a capability that owns a pass through its whole life" from="W8"
+    owes "restate CAP.work-admission's `not` — `and then it is finished` is false of a capability that owns an iteration through its whole life" from="W8"
     owes "restate CAP.delivery-record's merge-reason on the consistency argument" from="W13" \
         note="the verdict survives; the reasoning on the record is not the reasoning that justifies it"
     owes "record read-model@v1, fact-set@v1 and change-set@v1 as frozen seam contracts once there is a manifest to freeze them in" from="W7" "W11"
@@ -319,12 +322,127 @@ notional-architecture "NA.260820.01" {
         note="W13 corrected the argument and left the verdict standing. Six slices remain unwalked, \
             and TS.260820.18 is the only one on this boundary that has been exercised"
 
-    open "what a pass IS, as an entity" \
+    open "what an iteration IS, as an entity" \
         note="work-admission owns it, three capabilities write facts about it, and no record defines \
             it. It has surfaced as an entity in every walk and been modelled in none"
 
     open "whether document-projection consuming from all four is a hub or a correct sink" \
         falsifier="if projection ever needs to emit anything back into the record beyond its own publication facts, it is a hub and the topology is wrong"
+
+    // ================================================================
+    // THE SCHEMA — what exists in the record, and what may relate to what.
+    //
+    // Recovered from the withdrawn ADR.260819.02 and re-homed here, because this is not a
+    // decision: it is the model. What a frame IS, what a slice IS, which relationships are
+    // legal — that is what the capabilities are to each other, stated as entities rather
+    // than as behaviours. An ADR is a technical decision, and a schema that needed thirteen
+    // amendments in a day was never one.
+    //
+    // Sorted on the way in. Anything that was really about ENCODING or LAYOUT — filename
+    // patterns, folder placement, Markdown in the tree, empty directories — went to
+    // ADR.260819.01 instead, where the layout is decided. What is left is notional: it
+    // survives KDL being replaced.
+    // ================================================================
+
+    schema {
+        identity "a stable id, assigned once, never reused, and allocable without coordination" \
+            because="two agents naming two things at the same moment must not have to agree first" \
+            note="the literal id FORMAT is a layout decision and lives on ADR.260819.01"
+
+        entity "frame" is="a problem — symptoms, one root cause, one principle" \
+            completes="never; its symptoms resolve individually, each naming a release"
+        entity "event-storm" is="one sweep of a domain's timeline — the evidence a capability is derived FROM" \
+            completes="when the capabilities it clusters into are named"
+        entity "thin-slice" is="an atomic vertical slice — one command or one read model, cut so it can exercise a capability" \
+            states="proposed active delivered dropped"
+        entity "notional-architecture" is="what the capabilities are to each other, free of any tool decision" \
+            states="sought held"
+        entity "capability" is="a permanent doing the system must have" \
+            states="sought active retired" \
+            completes="never; it is retired"
+        entity "adr" is="a durable technical decision, its argument, its alternatives, and its corrections" \
+            states="proposed accepted superseded"
+        entity "release" is="an index into history — what it binds, what it resolves" \
+            states="planned released"
+        entity "iteration" is="one attempt at a slice — what ITERATE produces" \
+            states="open closed abandoned" \
+            owned-by="work-admission" \
+            never-deleted=#true because="a closed iteration is history, and history is what makes a slice's maturity legible" \
+            holds="the vet that admitted it · what it froze · the claims it carries and their settlement · \
+                evidence per declared layer · decisions it was forced to make · findings it raised" \
+            constraint="at most one iteration open per slice" \
+            note="defined 2026-08-20 by opening one. It was carried as undefined because three \
+                capabilities wrote facts about it and none declared it; ITER.260820.01 is the \
+                first, and cutting is how you learn what a thing is"
+
+        entity "read-model" is="a view an actor must see before acting, owned by exactly one capability" \
+            note="already load-bearing in every slice's needs/feeds edges and never declared"
+
+        relates "realizes"      from="thin-slice" to="capability" each="1" \
+            because="a slice with no capability is unfunded work"
+        relates "derived-from"  from="capability" to="event-storm" each="1..n" \
+            because="a capability that traces to no cluster is an assertion, which is this frame's root cause"
+        relates "identifies"    from="frame" to="capability" each="0..n"
+        relates "from-storm"    from="thin-slice" to="event-storm" each="1"
+        relates "raised-by"     from="adr" to="frame" each="1" \
+            because="a decision belongs to the problem that forced it" write-once=#true
+        relates "supersedes"    from="adr" to="adr" each="0..1"
+        relates "exercised-by"  from="notional-architecture" to="thin-slice" each="1..n" \
+            because="an architecture nothing exercised is a drawing"
+        relates "needs-read-model" from="thin-slice" to="read-model" each="0..n" \
+            note="actor-facing. See the reading rules above — this is never a capability seam"
+        relates "feeds-read-model" from="thin-slice" to="read-model" each="0..n" \
+            note="points BACKWARDS as a dependency. See the reading rules above"
+        relates "on-slice"      from="iteration" to="thin-slice" each="1" write-once=#true \
+            because="an iteration is an attempt at ONE slice. Which attempt it is, is derived by ordering the iterations on that slice — never stored"
+        relates "depends-on"    from="thin-slice" to="seam" each="0..n" \
+            constraint="never slice → slice. Dependency is only ever on a frozen contract, which is what makes disjointness a query" \
+            violated-by="seventeen of eighteen slices today. Carried as open"
+
+        requires "every entity carries a trail" \
+            entry-common="at" "by" "action" append-only=#true \
+            because="attribution distinguishes human authorship from agent authorship, which is the \
+                distinction a method built on trust transfer exists to make legible"
+        requires "only a human may sign an approval" kinds="acceptance" "admission" "plan" "design" \
+            because="an agent-signed approval is the trust-transfer problem expressed as a signature"
+        requires "a refusal is recorded as a fact, with the condition that caused it" \
+            because="a gate never invoked and a gate that refused look identical afterwards"
+
+        // Structural rules that fall out of the relationships above. Each is refusable, and
+        // each is enforced by the capability owning the act it refuses — see the invariants.
+        rule "dangling-relationship"        refuses="an edge naming something the record does not hold"
+        rule "duplicate-identity"           refuses="two entities claiming one id"
+        rule "entity-without-identity"      refuses="a node with no id"
+        rule "undeclared-entity-kind"       refuses="a kind this schema does not name"
+        rule "undeclared-state"             refuses="a state this schema does not name for that kind"
+        rule "undeclared-relationship"      refuses="an edge this schema does not name"
+        rule "entity-without-required-owner" refuses="an entity that nests with no singular owner"
+        rule "unknown-trail-action"         refuses="a trail action outside the vocabulary"
+        rule "trail-entry-missing-field"    refuses="a trail entry without at, by or action"
+        rule "unknown-approval-kind"        refuses="an approval kind this schema does not name"
+        rule "approval-signed-by-agent"     refuses="a signature outside the human namespace"
+        rule "adr-accepted-without-approval" refuses="an accepted decision nobody signed"
+        rule "amendment-records-no-change"  refuses="an amendment that changes nothing"
+        rule "slice-without-one-capability" refuses="a slice realizing zero or several capabilities"
+
+        retired "the initiative-era rules" \
+            were="slice-under-unadmitted-initiative · slice-delivers-outside-initiative-ask · covers-unknown-obligation" \
+            because="they name entities the model no longer has. The one that survived is \
+                slice-without-one-capability, which is the same rule against `realizes`"
+
+        // Whether this model is working, six months on. Two of these falsify rather than
+        // confirm, and both fail quietly if the model is right on paper and unused in
+        // practice — the failure mode a method is least likely to notice about itself.
+        fitness "checks-moved-out-of-attestation" \
+            text="most of the agent-attested fidelity checks are computed rather than asked"
+        fitness "no-drift-between-view-and-record" \
+            text="a rendered view and the state it depicts cannot disagree"
+        fitness "a-slice-took-more-than-one-iteration" falsifies=#true \
+            because="if every slice completes in a single iteration, the iteration is ceremony and should be cut"
+        fitness "a-finding-travelled-the-whole-loop" falsifies=#true \
+            because="opened by learning, triaged, addressed by a slice, closed by a release that \
+                shipped. If none ever completes the circuit, the loop is drawn but not running"
+    }
 
     trail {
         entry at="2026-08-20T00:00:00-05:00" by="agent:principal-engineer" action="created" \
@@ -332,6 +450,10 @@ notional-architecture "NA.260820.01" {
                 side end to end (WALK.260820.02). Two undeclared cross-capability edges resolved: \
                 one into a new seam, one into per-fact ownership. CAP.delivery-record was tested \
                 for a split and survived, with the substrate factored out beneath all five"
+        entry at="2026-08-20T00:00:00-05:00" by="agent:principal-engineer" action="amended" \
+            note="the schema moved here from the withdrawn ADR.260819.02, sorted on the way in: \
+                the model stayed, the encoding and layout rules went to ADR.260819.01, and the \
+                rules naming retired entities were retired rather than carried"
         entry at="2026-08-20T00:00:00-05:00" by="agent:principal-engineer" action="checked-against-the-graph" \
             note="all eighteen slices traversed against this record. Read-model ownership matched \
                 exactly. Eight cross-capability edges: five dissolved by the two reading rules, \

@@ -15,7 +15,7 @@ thin-slice "TS.260820.09" {
     outcome "a point exists on the version line, indexed to the commit it was cut at"
 
     scenario #"""
-        Given passes bound to a version, all closed
+        Given iterations bound to a version, all closed
         When the maintainer cuts the release
         Then the version exists and its index node is written in the same operation — version,
              tag, commit, what it binds, what it resolves — because a release without an index
@@ -24,7 +24,7 @@ thin-slice "TS.260820.09" {
         """#
 
     step "1" does="confirm the bump the record proposed from the bound work"
-    step "2" does="refuse if any bound pass did not close"
+    step "2" does="refuse if any bound iteration did not close"
     step "3" does="cut, and write the index node in the same operation — version, tag, commit, binds, resolves"
     step "4" does="the release is now immutable. Nothing rebinds to it and the index node is never edited"
 
@@ -35,11 +35,11 @@ thin-slice "TS.260820.09" {
     excludes "deciding the version number. The record proposes a bump; confirming it is separate"
 
     layer "doctrine"    reaches="the skill teaches truth promotion as part of releasing, not after it"
-    layer "enforcement" reaches="only closed passes may bind, and resolution-names-a-release"
+    layer "enforcement" reaches="only closed iterations may bind, and resolution-names-a-release"
     layer "docs"        reaches="capability records carry what shipped"
 
-    claim "C1" text="cutting with an unclosed bound pass is refused, naming the pass" \
-        settled-by="a negative test asserting non-zero exit and the pass id in the diagnostic"
+    claim "C1" text="cutting with an unclosed bound iteration is refused, naming the iteration" \
+        settled-by="a negative test asserting non-zero exit and the iteration id in the diagnostic"
     claim "C2" text="the cut and the index node are one operation — a failure leaves neither" \
         settled-by="a fault-injection test asserting no tag and no index node after a mid-cut failure"
     claim "C3" text="the recorded commit resolves in git and contains that release's published directory" \

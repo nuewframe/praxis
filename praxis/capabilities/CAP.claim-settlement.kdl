@@ -8,7 +8,7 @@ capability "claim-settlement" {
 
     owns-event "EvidenceAttached" "ClaimSettled" "FindingRaised" "FindingTriaged" "DecisionRecorded"
 
-    owns-read-model "what-this-pass-claims-and-has-shown" \
+    owns-read-model "what-this-iteration-claims-and-has-shown" \
         answers="what did it promise, what has it evidenced, and what is still open?" \
         note="the review view. Working lifetime — composed on demand, discarded after, never entering the published tree"
 
@@ -31,7 +31,7 @@ capability "claim-settlement" {
         because="readiness is work-admission's business, and producing evidence is the worker's. This capability only refuses"
 
     keeps-consistent "every stated claim against its evidence or its recorded shortfall" \
-        "a finding against the pass that raised it" \
+        "a finding against the iteration that raised it" \
         "a decision against the work that forced it"
 
     principle-note "an unmet claim that closes in silence and a met claim look identical afterwards. \

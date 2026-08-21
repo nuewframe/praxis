@@ -1,8 +1,8 @@
-# WALK.260820.02 — Closing a pass that another capability owns
+# WALK.260820.02 — Closing an iteration that another capability owns
 
 **Frame:** FRAME.260819.01 · **Storm:** ES.260819.01 · **Date:** 2026-08-20
 **Kind:** user journey walkthrough with system thinking overlaid — discovery's *depth* activity,
-second pass. `WALK.260820.01` walked the **read** side. This walks the **write** side.
+second iteration. `WALK.260820.01` walked the **read** side. This walks the **write** side.
 
 ## What this walk is for
 
@@ -15,7 +15,7 @@ surfaces two edges that cross a capability boundary in the direction nothing has
 
 | Slice | Realizes | Writes / feeds | Owned by |
 |---|---|---|---|
-| `TS.260820.07` close-a-pass | `CAP.claim-settlement` | `IterationClosed`, `CloseRefused` | `CAP.work-admission` |
+| `TS.260820.07` close-an-iteration | `CAP.claim-settlement` | `IterationClosed`, `CloseRefused` | `CAP.work-admission` |
 | `TS.260820.17` promote-what-shipped | `CAP.release-binding` | `capabilities-and-what-they-own`, `what-is-currently-true` | `CAP.delivery-record` |
 
 Neither is necessarily wrong. Both mean a capability must cause a change to state it does not
@@ -38,7 +38,7 @@ the correct centre of the model or a shared database wearing a capability's name
 
 ### Step 1 — The working agent picks up a slice
 
-`work-admission` must decide: are the dependencies frozen, is another pass open on this slice,
+`work-admission` must decide: are the dependencies frozen, is another iteration open on this slice,
 is the work disjoint from what is in flight. The first two questions are about facts it owns
 (`SliceVetted`, `DependencyFrozen`, `IterationClosed`). The third is not: *what this slice
 depends on* and *what layers and claims it declares* are `SliceCut` and `ClaimStated`, owned by
@@ -80,14 +80,14 @@ The agent asks to close. `no-silent-drop` refuses if any claim is unsettled and 
 slice realizes `claim-settlement` and produces `IterationClosed` and `CloseRefused` — which
 `work-admission` owns. Something has to give, and there are three ways out:
 
-1. **Move the events to `claim-settlement`.** Then the *pass* — one entity — is opened by one
+1. **Move the events to `claim-settlement`.** Then the *iteration* — one entity — is opened by one
    capability and closed by another. The storm clusters by *what must stay consistent together*;
    an entity whose lifecycle spans two owners is the exact thing that principle forbids.
 2. **Merge the two capabilities.** `CAP.work-admission` records this as a predicted merge that
    *did not* happen, because they are complementary exclusions. Nothing in this walk disturbs
    that argument.
 3. **Separate the judgement from the act.** `claim-settlement` decides what is settled and what
-   is carried, and emits that as a fact set. `work-admission` owns the pass, consumes the fact
+   is carried, and emits that as a fact set. `work-admission` owns the iteration, consumes the fact
    set, and closes or refuses. The judgement never performs; the owner never judges.
 
 Option 3 is the only one that keeps one entity under one owner *and* keeps the two exclusions
@@ -111,13 +111,13 @@ slice was wrong; here the slice is right and the capability record is wrong.
 
 ### Step 4 — Binding refuses work that did not close
 
-`TS.260820.16` C1 refuses an unclosed pass, *naming its unsettled claims*. `release-binding`
-therefore needs both the pass's closure state (`work-admission`) and the claim ids that are
+`TS.260820.16` C1 refuses an unclosed iteration, *naming its unsettled claims*. `release-binding`
+therefore needs both the iteration's closure state (`work-admission`) and the claim ids that are
 unsettled (`claim-settlement`) — a third and fourth consumer, and the first that needs fact sets
 from **two** capabilities to produce one diagnostic.
 
 Nothing new breaks. Worth recording only because it is where a shortcut would be tempting:
-`release-binding` could ask *"is this pass bindable?"* and let someone else decide. That would
+`release-binding` could ask *"is this iteration bindable?"* and let someone else decide. That would
 put the binding rule outside the capability that owns binding, and the step-3 rule forbids it.
 
 ### Step 5 — The cut, and the first thing that is not a fact
@@ -128,8 +128,8 @@ The cut also writes a tag into git, which is not part of the record at all.
 This is the first place the walk needs something no seam describes: a **unit of change that
 applies whole or not at all**, spanning more than one fact and, here, more than one system. It
 recurs immediately — `TS.260820.17` C1 requires the record be *byte-unchanged* after a failed
-promotion, and `TS.260820.07` C3 refuses a claim deleted mid-pass, which is only checkable if
-the pass's claim set is pinned at some boundary.
+promotion, and `TS.260820.07` C3 refuses a claim deleted mid-iteration, which is only checkable if
+the iteration's claim set is pinned at some boundary.
 
 Three acceptance criteria on three slices in three capabilities are all settling against the
 same unstated structure. That is an architectural fact, not an implementation detail:
@@ -206,16 +206,16 @@ the right answer through the wrong test, which is worth exactly as much as `E25`
 // consuming capability declares. The consumer computes its own verdict from this
 // plus its own state, and reads nothing else. Same discipline as read-model@v1:
 // values only, and silence is never absence.
-facts "claims-of-pass" for="CAP.work-admission" {
+facts "claims-of-iteration" for="CAP.work-admission" {
     owner "CAP.claim-settlement"
     as-of "2026-08-20T14:02:00-05:00"
-    query "claims-of-pass" pass="PASS.260820.03"
+    query "claims-of-iteration" iteration="PASS.260820.03"
 
     fact "C1" settled=#true  evidence="TEST.260820.11"
     fact "C2" settled=#false carried-by="F7"
     fact "C3" settled=#false carried-by=#null      // the one that refuses the close
 
-    empty "none" says="this pass states claims"    // an unclaimed pass is a fact, not a blank
+    empty "none" says="this iteration states claims"    // an unclaimed iteration is a fact, not a blank
 }
 ```
 
@@ -236,7 +236,7 @@ facts "claims-of-pass" for="CAP.work-admission" {
 ```kdl
 change-set {
     by      "agent:principal-engineer"
-    command "close-pass"
+    command "close-iteration"
     at      "2026-08-20T14:02:11-05:00"
 
     writes "PASS.260820.03" field="state"     was="open"   now="closed"
@@ -266,7 +266,7 @@ change-set {
 | Layer | What this path needs from it |
 |---|---|
 | `doctrine` | the skill teaches that a capability asks for facts and never reads another's state, and that judgement is handed over as a fact, never as an instruction |
-| `enforcement` | per-fact writer checked before a change set applies; `no-silent-drop` enforced at the pass owner; atomicity fault-injectable |
+| `enforcement` | per-fact writer checked before a change set applies; `no-silent-drop` enforced at the iteration owner; atomicity fault-injectable |
 | `harness` | none on this path — it is entirely internal to a repository |
 | `docs` | refusals, carried claims and promoted truth all survive into the release projection |
 
@@ -279,10 +279,10 @@ by another capability in order to decide. `read-model@v1` cannot serve them: it 
 renderer can compose without understanding, and these consumers must understand in order to
 judge. *Obliges: record `fact-set@v1` as a seam contract, with the no-verdict constraint.*
 
-**W8 — `TS.260820.07` realizes the wrong capability.** The pass is one entity; `work-admission`
+**W8 — `TS.260820.07` realizes the wrong capability.** The iteration is one entity; `work-admission`
 opens it, so `work-admission` closes it. `claim-settlement` supplies the settlement fact set and
 does not perform. *Obliges: re-file `TS.260820.07` under `CAP.work-admission`, and restate
-`work-admission`'s `not` — "and then it is finished" is false of a capability that owns a pass
+`work-admission`'s `not` — "and then it is finished" is false of a capability that owns an iteration
 through its whole life.*
 
 **W9 — enforcement location was never stated, and one policy is misplaced.** A policy is

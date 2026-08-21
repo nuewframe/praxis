@@ -31,7 +31,7 @@ boundary twice, in both lifetimes, and then tries to prove the result years late
 **Crosses:** actor → engine.
 
 The question is not a document request. It is a question about admissibility, and only
-`work-admission` can answer it: readiness is *dependencies frozen · no live pass on this slice ·
+`work-admission` can answer it: readiness is *dependencies frozen · no live iteration on this slice ·
 work disjoint from what is in flight*.
 
 **System thinking:** the first thing this walk kills is the obvious design. If projection ran a
@@ -62,7 +62,7 @@ version that does not exist yet — and writes it to the gitignored working path
 **Crosses:** projection → filesystem.
 
 **System thinking:** projection never inspects a field name. It walks a generic structure. Ask
-it to render `what-this-pass-claims-and-has-shown` (`TS.260820.08`, content owned by
+it to render `what-this-iteration-claims-and-has-shown` (`TS.260820.08`, content owned by
 `claim-settlement`) and nothing in projection changes — different result, same walk. **Two
 capabilities, one renderer, zero per-view code.** C3 is satisfiable.
 

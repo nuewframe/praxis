@@ -129,9 +129,21 @@ adr "ADR.260819.01" {
             Diagnostics: miette. A checker whose output cannot point at the offending line and
             span is a checker people route around, and this one exists to be believed.
 
-            Encoding: KDL v2 specifically, not KDL generally. The spike already depends on v2 —
-            #true/#false keywords and the multi-line string dedent rule — so a v1-only parser
-            cannot read the tree that exists today.
+            Encoding: KDL v2 specifically, not KDL generally. The committed tree already uses v2
+            syntax — #true/#false keywords and the multi-line string dedent rule — so a v1-only
+            parser cannot read what exists today.
+
+            Parser: kdl-rs, the reference Rust implementation, used as a DOCUMENT MODEL rather
+            than through a derive macro. Minimum version confirmed at the first commit that
+            depends on it, by the same rule as the toolchain pin.
+
+            The document-model form is not a preference, it is forced. Praxis reads its schema
+            from the record — NA.260820.01 declares the entity kinds, their states and their
+            relationships — so the engine must validate against a schema loaded at runtime. A
+            derive-based deserializer encodes the schema in Rust types, which makes extending a
+            vocabulary a recompile instead of an amendment, and puts the engine in the position
+            of enforcing rules no record declares. That is the one thing this method forbids of
+            its own checker.
             """#
 
         section "alternatives" #"""
@@ -158,7 +170,75 @@ adr "ADR.260819.01" {
 
             Shell scripts retained — rejected on the portability and expressiveness ceiling
             recorded in `problem`, which is the frame's baseline, not a preference.
+
+            On the parser, four ways were available.
+
+            knuffel — the derive-based KDL deserializer named in the original record. Rejected
+            twice over: it targets KDL v1, which cannot read this tree, and it is derive-based,
+            which is the disqualifying half. A v2-capable successor would still be wrong.
+
+            A maintained derive-based successor — rejected on the derive argument alone. The
+            schema lives in the record, not in the type system, and a struct definition is a
+            second writer for facts NA.260820.01 owns.
+
+            serde with a generic value model — rejected: serde's data model carries no spans, and
+            TS.260820.01 C2 requires a refusal to name the missing FIELD. A diagnostic that can
+            only say the document is invalid fails the claim.
+
+            A hand-rolled parser — rejected. It is small enough to write; the spike proved a
+            usable subset in a few hundred lines. But it makes this project the owner of KDL v2
+            grammar conformance forever, and the subtleties already load-bearing in this tree —
+            multi-line string dedent, raw strings, slashdash — are exactly where a hand-rolled
+            parser drifts from the spec silently.
             """#
+    }
+
+    // ================================================================
+    // WHAT THIS DECISION ENFORCES — the encoding and layout half of the schema.
+    //
+    // Sorted here from the withdrawn ADR.260819.02. Everything about what an entity IS and
+    // what may relate to what went to NA.260820.01, where the model lives. What is left is
+    // decided by THIS decision and dies with it: change the encoding or the layout and every
+    // rule below is renegotiated, while nothing in the notional architecture moves.
+    // ================================================================
+
+    enforces {
+        identity-format "<KIND>.<YYMMDD>.<NN>" \
+            exempt="CAP.<name> — a capability is permanent and identified by what it DOES, so a \
+                date would imply a later-dated capability supersedes it" \
+            exempt="RELEASE.<semver> — semver IS the name, and a date beside it is a second ordering" \
+            exempt="config — a binding, not a record" \
+            derived-from="ES.260819.01/E12"
+
+        rule "node-id-is-the-filename-prefix" refuses="a record file whose name does not begin with its node id" \
+            note="a record file is <KIND>.<YYMMDD>.<NN>.<slug>.kdl. The slug is what makes a \
+                directory listing readable without opening every file"
+        rule "markdown-in-the-state-root" refuses="a Markdown source under the state root" \
+            because="every Markdown file in this repository is generated. A state root holding two \
+                kinds of source blurs the one distinction this decision exists to make" \
+            violated-by="the two walk records, which are Markdown. See `open`"
+        rule "locator-not-repo-root-relative" refuses="a locator resolved from the file's own directory" \
+            because="a file-relative locator breaks the moment the tree moves, and graphs are meant to merge across repositories"
+        rule "placeholder-file" refuses=".gitkeep and friends" because="directories materialize on demand"
+        rule "empty-directory" refuses="a directory holding nothing"
+        rule "comment-states-a-path" reports="a comment naming a file path" \
+            because="a comment may explain a shape; it may not state a fact the graph owns"
+        rule "config-declares-normative-content" refuses="a declaration in config" \
+            because="config binds. A declaration there is a second writer for a fact the record owns"
+        rule "checker-enforces-undeclared-rule" refuses="an engine rule no record declares" \
+            because="a checker that enforces what nothing declares is legislating"
+
+        placement "an entity nests under its owner when it has exactly one owner for all time and that owner is a container"
+        placement "a container folder is named for what its contents ARE to the owner — discovery, adr — never for the plural of one kind" \
+            because="discovery produces storms, slices and an architecture together and they are read together"
+        placement "a decision sits beside discovery under the frame that raised it" \
+            was="a decision sits at the state root, never under a frame" \
+            because="that rule assumed a transient container. A frame is PERMANENT — it has no \
+                terminal state — so the argument against burying a durable decision in it does not apply"
+        placement "a container directory is named by its id alone; the record file inside carries the full name"
+        placement "an iteration sits under the frame in iterations/, one file per iteration" \
+            because="one file per independently-mutated entity, with distinct names — two agents \
+                opening two iterations create two files and never contend"
     }
 
     amendment "A1" raised-by="FRAME.260819.01" {
@@ -179,22 +259,17 @@ adr "ADR.260819.01" {
         why "every one of these was a passing mention in the original record, and the spike has since depended on KDL v2 specifics. A dependency the decision does not state is a dependency nobody can review"
     }
 
-    open "which KDL crate parses v2, and whether knuffel can" \
-        note="the original named knuffel and serde. knuffel targets KDL v1, and this tree is v2 \
-            by the spike's own grammar. Either a v2-capable parser is selected or the encoding \
-            claim is not implementable as written. Decide before praxis-core has a codec"
+    amendment "A4" raised-by="ITER.260820.01" {
+        change "knuffel is rejected. The parser is kdl-rs, used as a document model"
+        change "the engine may not encode the schema in its own types. It validates against the schema the record declares, loaded at runtime"
+        why "knuffel targets KDL v1 and cannot read this tree — but the disqualifying reason is that it is derive-based. Praxis reads its entity kinds, states and relationships from NA.260820.01, so a schema baked into Rust structs would make extending a vocabulary a recompile, and would put the engine in the position of enforcing rules no record declares"
+        note "raised by the first iteration, at the moment the decision blocked it, rather than filed beside the work"
+    }
 
     open "the exact stable toolchain version to pin" \
         note="stated here as policy — current stable, pinned in rust-toolchain.toml. The literal \
             version is written at the first commit that needs it, by whoever runs the toolchain, \
             because a version invented in a document is a fact nobody verified"
-
-    open "where the method's normative schema lives, now that it is not here" \
-        note="the withdrawn decision carried the entity catalog, trail vocabulary, approval \
-            kinds, placement rules, thirty-five invariant ids and the fitness function, and \
-            config.kdl bound to it so a checker could read vocabularies from a decision rather \
-            than hardcode them. Under `an ADR is a technical decision` that binding has no \
-            target. The schema is not lost — it is parked — but it has no home in the tree"
 
     trail {
         entry at="2026-08-19T00:00:00-05:00" by="human:waelrabadi" action="created"

@@ -11,11 +11,11 @@ thin-slice "TS.260820.15" {
     needs-read-model "capabilities-and-what-they-own"
     feeds-read-model "how-to-use-a-capability"
 
-    trigger "a capability gained a usable surface during a pass"
+    trigger "a capability gained a usable surface during an iteration"
     outcome "usage prose is attached to the capability record, and it can only publish for a release that actually promoted it"
 
     scenario #"""
-        Given a pass that added something a person can use
+        Given an iteration that added something a person can use
         When the agent documents the usage
         Then the prose attaches to the capability record as the work happens — not assembled at
              release time — and publishing it for a release whose truth was never promoted is
@@ -32,7 +32,7 @@ thin-slice "TS.260820.15" {
     excludes "rendering. The guide is prose in the record until document-projection composes it"
     excludes "judging whether the prose is any good"
 
-    layer "doctrine"    reaches="the skill teaches documenting usage inside the pass, not after it"
+    layer "doctrine"    reaches="the skill teaches documenting usage inside the iteration, not after it"
     layer "enforcement" reaches="guide-follows-promoted-truth, and a report on capabilities with a usable surface and no usage"
     layer "docs"        reaches="published under docs/releases/<version>/guides/"
 

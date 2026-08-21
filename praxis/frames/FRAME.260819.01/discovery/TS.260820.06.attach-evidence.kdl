@@ -8,8 +8,8 @@ thin-slice "TS.260820.06" {
     command "attach-evidence"
     actor "working-agent"
     produces-event "EvidenceAttached"
-    needs-read-model "what-this-pass-claims-and-has-shown"
-    feeds-read-model "what-this-pass-claims-and-has-shown"
+    needs-read-model "what-this-iteration-claims-and-has-shown"
+    feeds-read-model "what-this-iteration-claims-and-has-shown"
 
     trigger "a layer declared by the slice has been reached"
     outcome "the claim is backed by something that exists, and the layer it evidences is named"
@@ -26,7 +26,7 @@ thin-slice "TS.260820.06" {
     step "1" does="reach a layer the slice declared"
     step "2" does="attach the artifact that shows it — a test, a diagnostic, a generated file"
     step "3" does="name which declared layer it evidences"
-    step "4" does="the evidence is bound to the claim it settles, not filed beside the pass"
+    step "4" does="the evidence is bound to the claim it settles, not filed beside the iteration"
 
     excludes "judging the evidence. It refuses absence and mismatch, never quality"
     excludes "producing the evidence. That is the work itself"
@@ -40,7 +40,7 @@ thin-slice "TS.260820.06" {
     claim "C2" text="a declared layer with no evidence is visible as unevidenced, not absent" \
         settled-by="a test asserting the view lists the layer with no artifact rather than omitting it"
 
-    depends-on "TS.260820.05 — a pass must be open for evidence to attach to"
+    depends-on "TS.260820.05 — an iteration must be open for evidence to attach to"
 
     useful-alone "how much of a slice was actually reached becomes readable off the record, \
         with nothing else about closing or releasing in place"

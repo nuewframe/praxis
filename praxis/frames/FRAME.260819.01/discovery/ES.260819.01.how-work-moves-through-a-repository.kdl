@@ -100,11 +100,11 @@ event-storm "ES.260819.01" {
     event "PickupRefused" from="pick-up" phase="ITERATE" \
         means="the gate refused, and said which condition failed. A refusal that is not recorded is indistinguishable from never having been asked"
 
-    command "freeze-dependency" by="working-agent" asks="pin what this pass builds on so it cannot move underneath it"
+    command "freeze-dependency" by="working-agent" asks="pin what this iteration builds on so it cannot move underneath it"
     event "DependencyFrozen" from="freeze-dependency" phase="ITERATE" \
-        means="what the pass stands on is fixed for its duration"
+        means="what the iteration stands on is fixed for its duration"
 
-    command "record-decision" by="working-agent" asks="record a choice this pass had to make, with its alternatives"
+    command "record-decision" by="working-agent" asks="record a choice this iteration had to make, with its alternatives"
     event "DecisionRecorded" from="record-decision" phase="ITERATE" \
         means="a decision is bound to the work that forced it, rather than filed beside it"
 
@@ -126,15 +126,15 @@ event-storm "ES.260819.01" {
     event "FindingRaised" from="raise-finding" phase="ITERATE" \
         means="a surprise is captured at the moment it cost something, not reconstructed later"
 
-    command "close-pass" by="working-agent" asks="finish this pass"
-    event "IterationClosed" from="close-pass" phase="ITERATE" pivotal=#true \
-        means="a pass ended with every claim settled or every shortfall carried forward as owed work"
-    event "CloseRefused" from="close-pass" phase="ITERATE" \
+    command "close-iteration" by="working-agent" asks="finish this iteration"
+    event "IterationClosed" from="close-iteration" phase="ITERATE" pivotal=#true \
+        means="an iteration ended with every claim settled or every shortfall carried forward as owed work"
+    event "CloseRefused" from="close-iteration" phase="ITERATE" \
         means="closing was refused because scope was about to be dropped in silence"
 
     // ---- Release ----
 
-    command "bind" by="maintainer" asks="attach finished passes to a version"
+    command "bind" by="maintainer" asks="attach finished iterations to a version"
     event "WorkBound" from="bind" phase="RELEASE" \
         means="a version now has a definite content"
 
@@ -205,7 +205,7 @@ event-storm "ES.260819.01" {
         note="without this, a gate that was never invoked and a gate that refused look identical afterwards"
 
     policy "no-silent-drop" \
-        whenever="a pass is closed with an unsettled claim and no finding" \
+        whenever="an iteration is closed with an unsettled claim and no finding" \
         then="refuse the close" \
         attacks="S5"
 
@@ -271,11 +271,11 @@ event-storm "ES.260819.01" {
         publishable=#false \
         because="`right now` is in the question. Frozen it is not merely stale, it is wrong"
 
-    read-model "what-this-pass-claims-and-has-shown" needed-by="reviewer" before="close-pass" \
+    read-model "what-this-iteration-claims-and-has-shown" needed-by="reviewer" before="close-iteration" \
         answers="what did it promise, what has it evidenced, and what is still open?" \
         attacks="S2" \
         publishable=#false \
-        because="a pass is transient. What survives it is what shipped, which the release record carries"
+        because="an iteration is transient. What survives it is what shipped, which the release record carries"
 
     read-model "what-is-currently-true" needed-by="next-agent" before="pick-up" \
         answers="what does this repository already know, so I do not re-derive it?" \
@@ -351,14 +351,14 @@ event-storm "ES.260819.01" {
 
     cluster "release-binding" {
         owns "WorkBound" "ReleaseCut" "TruthPromoted"
-        doing "bind finished passes to a version and promote what shipped into current truth"
+        doing "bind finished iterations to a version and promote what shipped into current truth"
         not "it does not write documents"
     }
 
     cluster "projection" {
         owns "DocumentsProjected" "DocumentStamped" "DriftDetected"
         also-owns-read-models "the-problem-as-it-stands" "capabilities-and-what-they-own" \
-            "what-is-ready-to-pick-up" "what-this-pass-claims-and-has-shown" \
+            "what-is-ready-to-pick-up" "what-this-iteration-claims-and-has-shown" \
             "what-is-currently-true" "the-published-set-for-a-release"
         doing "compose any view of the record as a whole document, and prove a published one still matches the release it claims"
         not "it never mutates the record, and never edits a document toward a new state"

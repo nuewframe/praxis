@@ -16,7 +16,7 @@ thin-slice "TS.260820.04" {
         Given slices cut against capabilities, some blocked and some not
         When the working agent asks what is ready
         Then it sees the admissible set, and for every excluded slice the specific condition
-             that excludes it — an unfrozen dependency, a pass already in flight, work that
+             that excludes it — an unfrozen dependency, an iteration already in flight, work that
              is not disjoint — so the answer teaches the gate instead of merely applying it.
         """#
 

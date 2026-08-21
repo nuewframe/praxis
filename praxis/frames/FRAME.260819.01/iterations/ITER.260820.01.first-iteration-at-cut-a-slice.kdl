@@ -1,0 +1,154 @@
+// The first iteration. ITERATE, run by hand because there is no engine yet — which is the
+// same reason walk-001 ran the loop by hand, and the same justification: running the
+// blueprint is not a description of the loop, it is an iteration of it.
+//
+// The iteration entity did not exist until this file. NA.260820.01 carried it as an open
+// question — three capabilities wrote facts about it and none defined it — and it is
+// defined here by opening one, then declared on the schema. Cutting is how you learn.
+
+iteration "ITER.260820.01" {
+    slug "first-iteration-at-cut-a-slice"
+    on-slice "TS.260820.01"
+    state "open"
+    opened-at "2026-08-20T23:10:00-05:00"
+    opened-by "agent:principal-engineer"
+
+    // ================================================================
+    // THE VET — work-admission's gate. SliceVetted, or this file would not exist.
+    // Every condition is recorded with its verdict, because a gate never invoked and
+    // a gate that admitted look identical afterwards.
+    // ================================================================
+
+    vet {
+        condition "the slice's dependencies are frozen" verdict="admitted-on-condition" \
+            found="TS.260820.01 depends on `the capability record format, frozen`, and nothing had \
+                frozen it — there is no seam manifest yet" \
+            resolved-by="this iteration freezes it, which is exactly what freeze-dependency is for: \
+                pinning what an iteration stands on for its duration, not globally"
+        condition "no other iteration is open on this slice" verdict="passed" \
+            found="no iteration exists at all. This is the first"
+        condition "the work is disjoint from what is in flight" verdict="passed" \
+            found="nothing is in flight"
+        condition "the slice is admissible at all" verdict="passed" \
+            found="TS.260820.01 is the only slice at dependency depth 0 of eighteen, and the only \
+                one whose depends-on names a contract rather than another slice"
+
+        selected-over "TS.260820.11" \
+            because="TS.260820.11 is the only slice reaching the `harness` layer and would have \
+                exercised the most layers — and it sits at depth 8, the deepest in the set. \
+                Maximum coverage and admissibility point at opposite ends of the DAG, and the \
+                gate decides admissibility"
+        note "selection is the commitment. Choosing this is choosing not to do the other seventeen"
+    }
+
+    // ================================================================
+    // FROZEN — DependencyFrozen. What this iteration stands on, pinned so it cannot move
+    // underneath it. Pinned to a commit, because that is the only clock the record has.
+    // ================================================================
+
+    frozen {
+        pins "the capability record format" at-commit="82c8f42" \
+            shape="the five CAP.<name>.kdl records as committed — doing · not · state · derived-from · \
+                from-cluster · owns-event · owns-read-model · enforces · attacks · gate-test · \
+                keeps-consistent · trail" \
+            note="frozen for this iteration only. An iteration freezes; it does not legislate"
+        pins "the thin-slice schema" at="TS.260820.01's own header comment" \
+            note="the slice being built carries the schema it must enforce, which is why it can be \
+                its own first test"
+        pins "the entity schema" at="NA.260820.01/schema"
+        pins "the encoding and layout rules" at="ADR.260819.01/enforces"
+    }
+
+    // ================================================================
+    // CARRIED CLAIMS — stated at cut time, on the slice, not here. This iteration may settle
+    // them or carry a shortfall; it may not edit them (TS.260820.07 C3).
+    // ================================================================
+
+    claim "C1" from-slice="TS.260820.01" state="unmet" \
+        text="a slice missing any of command/actor/event/layer is refused at write time" \
+        settled-by="one negative test per missing field"
+    claim "C2" from-slice="TS.260820.01" state="unmet" \
+        text="the refusal names which field is missing, not that the file is invalid" \
+        settled-by="a test asserting the field name appears in the diagnostic"
+    claim "C3" from-slice="TS.260820.01" state="unmet" \
+        text="a slice that names a capability which does not exist is refused" \
+        settled-by="a negative test naming an absent capability"
+
+    // ================================================================
+    // LAYERS — declared by the slice, sealed at this first iteration. Evidence attaches per
+    // layer as it is reached; a declared layer with no evidence is visible as unevidenced,
+    // never absent.
+    // ================================================================
+
+    layer "doctrine"    state="unevidenced" reaches="the skill teaches naming the command, the actor and the layers before writing the slice"
+    layer "enforcement" state="unevidenced" reaches="slice-shape, refusing at write time and naming the missing field"
+    layer "docs"        state="unevidenced" reaches="a refused slice and its reason are readable off the record"
+    layer-set sealed=#true at="2026-08-20T23:10:00-05:00" \
+        because="the set is fixed before the cost is known, so it cannot be trimmed at close to make done cheaper"
+
+    // ================================================================
+    // DECISIONS THIS PASS MUST MAKE — bound to the work that forced them, rather than
+    // filed beside it. Each becomes a DecisionRecorded, or the iteration cannot close.
+    // ================================================================
+
+    // DecisionRecorded — bound to the work that forced it. It amended ADR.260819.01
+    // rather than living here, because the choice is durable and the iteration is not.
+    decision "the KDL parser" state="recorded" at="2026-08-20T23:40:00-05:00" \
+        decided="kdl-rs, as a document model. Not knuffel, and not any derive-based deserializer" \
+        because="the disqualifying property is derive, not the version. The schema lives in \
+            NA.260820.01, so the engine must validate against a schema loaded at runtime — types \
+            that encode it would make extending a vocabulary a recompile" \
+        alternatives="knuffel · a maintained derive-based successor · serde with a generic value model · a hand-rolled parser" \
+        raised="ADR.260819.01/A4" \
+        note="serde was rejected on spans: its data model carries none, and C2 requires the \
+            refusal to name the missing FIELD"
+    decision-required "whether the shape check is a praxis-core validator or a codec-level refusal" \
+        matters="C2 requires the diagnostic to name the missing FIELD, which a codec that fails on \
+            the whole document cannot do"
+
+    // ================================================================
+    // WHAT THIS PASS ALREADY LEARNED — findings raised at the moment they cost something.
+    // ================================================================
+
+    finding "P1" state="open" \
+        text="no slice in this set reaches all four layers. Sixteen of eighteen reach three; the \
+            only slice touching `harness` is TS.260820.11, and it sits at depth 8. This frame's \
+            slice set cannot exercise the full layer vocabulary in any single iteration, ever" \
+        size="owed-work" \
+        note="consistent with ES.260819.01/E11 — the storm modelled work moving through a \
+            repository, not Praxis being installed — and with WALK.260820.02/W15. It is evidence \
+            the layer vocabulary in config.kdl is wider than this frame, not that the slices are thin"
+
+    finding "P2" state="open" \
+        text="seventeen of eighteen slices declare depends-on another slice, which NA.260820.01's \
+            schema forbids: dependency is only ever on a frozen contract. TS.260820.01 is the sole \
+            conforming slice, and it is conforming by accident rather than by check — nothing \
+            refused the other seventeen" \
+        size="owed-work" \
+        note="the rule and its violation are both on the record and neither is enforced, which is \
+            precisely the tier this frame exists to shrink"
+
+    finding "P4" state="open" \
+        text="the parser decision was reached on a principle the record already held — the engine \
+            may not encode what the record declares — and neither ADR.260819.01 nor NA.260820.01 \
+            stated it as a rule anything could check. It was inferred from the deleted spike's one \
+            interesting property" \
+        size="owed-work" \
+        note="A4 states it as a change. Whether it is also a schema rule — an engine that hardcodes \
+            a vocabulary is refused — is unsettled, and the checker that would refuse it is the \
+            engine itself"
+
+    finding "P3" state="open" \
+        text="the iteration entity was undefined until this iteration opened. Three capabilities wrote facts \
+            about it and none declared it, and it went unnoticed through a storm, two walks and an \
+            architecture" \
+        size="owed-work" \
+        note="a schema derived from what the record ALREADY says will miss an entity nothing \
+            declares. `read-model` was the same case, found in the same act"
+
+    trail {
+        entry at="2026-08-20T23:10:00-05:00" by="agent:principal-engineer" action="created" \
+            note="opened by hand. The gate, the freeze and the seal are recorded as facts rather \
+                than performed by an engine, because the engine is what this iteration is for"
+    }
+}

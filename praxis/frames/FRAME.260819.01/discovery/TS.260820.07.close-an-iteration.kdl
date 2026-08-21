@@ -1,20 +1,20 @@
 thin-slice "TS.260820.07" {
-    slug "close-a-pass"
-    title "Refuse to close a pass that is about to drop scope in silence"
+    slug "close-an-iteration"
+    title "Refuse to close an iteration that is about to drop scope in silence"
     kind "command"
     realizes "CAP.claim-settlement"
     from-storm "ES.260819.01"
 
-    command "close-pass"
+    command "close-iteration"
     actor "working-agent"
     produces-event "IterationClosed" "CloseRefused"
-    needs-read-model "what-this-pass-claims-and-has-shown"
+    needs-read-model "what-this-iteration-claims-and-has-shown"
 
-    trigger "the agent believes the pass is finished"
-    outcome "the pass closes with every claim settled or every shortfall carried forward, or it does not close"
+    trigger "the agent believes the iteration is finished"
+    outcome "the iteration closes with every claim settled or every shortfall carried forward, or it does not close"
 
     scenario #"""
-        Given a pass with claims stated at cut time
+        Given an iteration with claims stated at cut time
         When the agent tries to close it while a claim is unmet and unaccounted for
         Then the close is refused and the unmet claim is named — because an unmet claim that
              closes in silence and a met claim look identical afterwards, and the refusal is
@@ -23,12 +23,12 @@ thin-slice "TS.260820.07" {
 
     step "1" does="ask to close"
     step "2" does="every claim is checked: settled against evidence, or carried as a recorded finding"
-    step "3a" does="on pass, close, and the pass is finished for binding" when="all claims accounted for"
-    step "3b" does="on refusal, record CloseRefused naming each unaccounted claim. The pass stays open" when="any claim unaccounted"
+    step "3a" does="on acceptance, close, and the iteration is finished for binding" when="all claims accounted for"
+    step "3b" does="on refusal, record CloseRefused naming each unaccounted claim. The iteration stays open" when="any claim unaccounted"
 
     excludes "deciding whether a shortfall is acceptable. A recorded finding is enough to close; \
         judging it is LEARN's job"
-    excludes "reopening a closed pass. A later pass is a new pass"
+    excludes "reopening a closed iteration. A later iteration is a new iteration"
 
     layer "doctrine"    reaches="the skill teaches that a shortfall is recorded, never quietly dropped"
     layer "enforcement" reaches="no-silent-drop, failing closed and naming each unaccounted claim"
@@ -39,7 +39,7 @@ thin-slice "TS.260820.07" {
     claim "C2" text="closing with an unmet claim AND a recorded finding succeeds" \
         settled-by="a positive test asserting the close and the finding both persist"
     claim "C3" text="deleting a claim to make a close succeed is itself refused" \
-        settled-by="a negative test mutating the slice to remove a claim mid-pass"
+        settled-by="a negative test mutating the slice to remove a claim mid-iteration"
 
     depends-on "TS.260820.06 — claims settle against evidence, so evidence must attach first"
 

@@ -24,12 +24,12 @@ capability "work-admission" {
     gate-test "fundable-on-own-terms" verdict="pass" \
         because="a gate that records its refusals is worth funding with no other gate present"
     gate-test "slices-deliver-independently" verdict="pass" \
-        because="vet on pickup / record the refusal and its failing condition / freeze dependencies / refuse a second concurrent pass"
+        because="vet on pickup / record the refusal and its failing condition / freeze dependencies / refuse a second concurrent iteration"
     gate-test "states-an-exclusion" verdict="pass" \
         because="quality is claim-settlement's business. This capability never looks at the work, only at its preconditions"
 
-    keeps-consistent "a slice's pickup against every other pass in flight" \
-        "a pass's frozen dependencies against what it stands on" \
+    keeps-consistent "a slice's pickup against every other iteration in flight" \
+        "an iteration's frozen dependencies against what it stands on" \
         "a refusal against the condition that caused it"
 
     principle-note "selection is the commitment. Choosing to work this is choosing not to work \

@@ -1,23 +1,23 @@
 thin-slice "TS.260820.08" {
-    slug "review-a-pass-in-flight"
-    title "Review what a pass has actually shown, writing nothing to the published record"
+    slug "review-an-iteration-in-flight"
+    title "Review what an iteration has actually shown, writing nothing to the published record"
     kind "view"
     realizes "CAP.claim-settlement"
     from-storm "ES.260819.01"
 
-    read-model "what-this-pass-claims-and-has-shown"
+    read-model "what-this-iteration-claims-and-has-shown"
     content-owned-by "CAP.claim-settlement"
     rendered-by "CAP.document-projection"
     lifetime "working"
     actor "reviewer"
 
-    trigger "a pass is underway and someone needs to see what it has done"
+    trigger "an iteration is underway and someone needs to see what it has done"
     outcome "they read it as a document, marked as a preview, and reviewing leaves no residue"
 
     scenario #"""
-        Given a pass in progress
+        Given an iteration in progress
         When the reviewer asks to see it
-        Then they get a whole document composed from the record as it stands — what the pass
+        Then they get a whole document composed from the record as it stands — what the iteration
              promised, what it has evidenced, what is still open — plainly marked as a preview
              of a version that does not exist yet, and thrown away after, which is what lets
              the published tree stay written-once.
