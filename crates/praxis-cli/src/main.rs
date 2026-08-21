@@ -11,8 +11,8 @@ use clap::{Parser, Subcommand};
 use miette::{Diagnostic, NamedSource, SourceSpan};
 use praxis_core::{
     Ask, Binding, Closing, Conditions, Corpus, Known, Pickup, Schema, Severity, Violation,
-    assess, bind, check_corpus, check_document, close_iteration, index_all, parse, pick_up,
-    project, unbind,
+    Cut, assess, bind, check_corpus, check_document, close_iteration, cut, index_all, parse,
+    pick_up, project, unbind,
 };
 
 mod render;
@@ -68,6 +68,17 @@ enum Command {
         /// Remove the binding instead. Allowed while the release is planned, refused after cut.
         #[arg(long)]
         undo: bool,
+    },
+    /// Cut a planned version, writing its index node in the same operation.
+    CutRelease {
+        /// The version to cut.
+        version: String,
+        /// The state root to read and write.
+        #[arg(default_value = "praxis")]
+        root: PathBuf,
+        /// Confirm the proposed bump. The record proposes; choosing the version is yours.
+        #[arg(long)]
+        confirm: bool,
     },
     /// Show which slices could be started right now, and what would refuse each of the rest.
     ///
@@ -147,6 +158,21 @@ fn main() -> ExitCode {
             match binding(&iteration, &version, &root, undo) {
                 Ok(bound) => {
                     if bound {
+                        ExitCode::SUCCESS
+                    } else {
+                        ExitCode::FAILURE
+                    }
+                }
+                Err(report) => {
+                    eprintln!("{report:?}");
+                    ExitCode::FAILURE
+                }
+            }
+        }
+        Command::CutRelease { version, root, confirm } => {
+            match cutting(&version, &root, confirm) {
+                Ok(made) => {
+                    if made {
                         ExitCode::SUCCESS
                     } else {
                         ExitCode::FAILURE
@@ -462,6 +488,67 @@ fn binding(iteration: &str, version: &str, root: &Path, undo: bool) -> miette::R
             Ok(true)
         }
     }
+}
+
+/// `TS.260820.09`. A point on the version line, indexed to the commit it was cut at.
+fn cutting(version: &str, root: &Path, confirm: bool) -> miette::Result<bool> {
+    let sources = load(root)?;
+    let docs: Vec<_> = sources.iter().map(|(_, _, d)| d.clone()).collect();
+    let mut schema = Schema::default();
+    for doc in &docs {
+        let found = Schema::from_document(doc);
+        if !found.is_empty() {
+            schema = found;
+        }
+    }
+    let corpus = Corpus::from_documents(&docs, &schema);
+    let ask = Ask { signer: human()?, at: now(), by: "agent:praxis".to_owned() };
+    let commit = head_commit()?;
+
+    match cut(version, &commit, confirm, &corpus, &ask, &ids_in_use(&docs)) {
+        Cut::NotFound(why) => miette::bail!("{why}"),
+        Cut::Refused(record) => {
+            for (condition, why) in &record.failed {
+                eprintln!("praxis: cut refused — {condition}: {why}");
+            }
+            let path = root.join(&record.file);
+            write_once(&path, &record.kdl)?;
+            eprintln!("praxis: {} recorded at {} — {version} is still planned", record.id, path.display());
+            Ok(false)
+        }
+        Cut::Made(record) => {
+            // The release and its index are one write. There is no half-cut state to
+            // recover from, because they were never two operations.
+            let path = root.join(&record.file);
+            let staging = path.with_extension("kdl.cutting");
+            fs::write(&staging, &record.kdl)
+                .map_err(|e| miette::miette!("{}: {e}", staging.display()))?;
+            fs::rename(&staging, &path).map_err(|e| {
+                let _ = fs::remove_file(&staging);
+                miette::miette!("{}: {e}", path.display())
+            })?;
+            println!("praxis: {version} cut at {commit} — {}", path.display());
+            println!("praxis: the index node is written. Nothing rebinds to it, and editing it is refused");
+            Ok(true)
+        }
+    }
+}
+
+/// Where the tree is. What HEAD is is a fact about the tree, not about the record, so the
+/// shell answers it — and a detached or absent git is a refusal rather than a guess.
+fn head_commit() -> miette::Result<String> {
+    let out = std::process::Command::new("git")
+        .args(["rev-parse", "HEAD"])
+        .output()
+        .map_err(|e| miette::miette!("cannot read the commit: {e}"))?;
+    let commit = String::from_utf8_lossy(&out.stdout).trim().to_owned();
+    if commit.is_empty() {
+        miette::bail!(
+            "no commit to index. A release without an index is a release nothing can be \
+             verified against"
+        );
+    }
+    Ok(commit)
 }
 
 /// The frame directory a slice lives under. Discovery sits one level below the frame, so

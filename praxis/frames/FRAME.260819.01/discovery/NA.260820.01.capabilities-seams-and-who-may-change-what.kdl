@@ -547,6 +547,10 @@ notional-architecture "NA.260820.01" {
                 because="an iteration that declares no `contributes` informed the proposal with \
                     nothing, and a proposal computed from half the work is not a proposal"
             field "confirmation" each="0..1"
+            field "index"        each="0..1" when-kind="released" \
+                because="a release without an index is a release nothing can be verified against. \
+                    It POINTS at a commit and never mirrors what git already holds"
+            field "seal"         each="0..1" when-kind="released"
             field "resolves"     each="0..n" references="symptom"
             field "trail"        each="1"
         }
@@ -703,6 +707,13 @@ notional-architecture "NA.260820.01" {
         rule "iteration-without-signed-admission" refuses="work beginning on an iteration whose admission is unsigned"
         rule "iteration-worked-without-start-vet"  refuses="work beginning on a create-vet alone"
         rule "complete-phase-without-evidence"     refuses="a phase marked complete that produced nothing"
+        rule "cut-release-is-immutable"            refuses="a cut release whose content no longer matches the seal written when it was cut" \
+            because="a release is a POINT on the version line, and a point that moved is not one. \
+                Everything downstream — publication, verification, symptom resolution — pins to it" \
+            note="the seal makes an edit VISIBLE. It is not a signature and does not make forgery \
+                hard: anyone who can edit the record can recompute it. What it catches is the edit \
+                nobody meant to make and nobody would otherwise notice, which is the failure this \
+                frame is actually about"
         rule "no-silent-drop"                      refuses="a closed iteration carrying a claim that is neither met nor carried by a finding" \
             because="an unmet claim that closes in silence and a met claim look identical \
                 afterwards, and the refusal is the only thing that makes them different. This is \

@@ -199,6 +199,8 @@ pub struct Corpus {
     pub slices: Vec<Slice>,
     pub attempts: Vec<Attempt>,
     pub releases: Vec<Release>,
+    /// Symptom id, and the version it names as having resolved it.
+    pub symptoms: Vec<(String, String)>,
     pub config: Config,
     /// Ids the shape check refuses. A slice the checker refuses is not work waiting.
     pub refused: Vec<String>,
@@ -226,6 +228,13 @@ impl Corpus {
                     "thin-slice" => corpus.slices.push(slice_from(node)),
                     "iteration" => corpus.attempts.push(attempt_from(node)),
                     "release" => corpus.releases.push(release_from(node)),
+                    "symptom" => {
+                        if let (Some(id), Some(by)) =
+                            (string_arg(node), child_arg(node, "resolved-by"))
+                        {
+                            corpus.symptoms.push((id, by));
+                        }
+                    }
                     "config" => corpus.config = config_from(node),
                     _ => {}
                 }
@@ -342,6 +351,17 @@ impl Corpus {
     /// The release a given iteration is bound to, if any. An iteration binds exactly once.
     pub fn bound_to(&self, iteration: &str) -> Option<&Release> {
         self.releases.iter().find(|r| r.binds.iter().any(|b| b == iteration))
+    }
+
+    /// Symptoms naming this release as what resolved them. Derived from the symptoms,
+    /// never stored beside them: a second copy whose fidelity is unverifiable without
+    /// checking the first is what this frame is about.
+    pub fn resolved_by(&self, version: &str) -> Vec<&str> {
+        self.symptoms
+            .iter()
+            .filter(|(_, by)| by == version)
+            .map(|(id, _)| id.as_str())
+            .collect()
     }
 
     pub fn release(&self, version: &str) -> Option<&Release> {

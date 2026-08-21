@@ -45,6 +45,10 @@ pub enum Refusal {
     SilentDrop { claim: String, state: String },
     /// A claim frozen into an iteration that its slice no longer declares.
     DroppedClaim { claim: String, slice: String },
+    /// A cut release whose content no longer matches the seal written when it was cut.
+    BrokenSeal { release: String, expected: String, found: String },
+    /// A cut release with no seal at all, so nothing about it can be checked.
+    UnsealedRelease { release: String },
     /// A layer the slice declared that the iteration has not evidenced. Reported: it must
     /// be visible as unevidenced rather than absent, which is C2.
     UnevidencedLayer { layer: String, slice: String },
@@ -63,6 +67,7 @@ impl Refusal {
             Self::ContestedValue { field, .. } | Self::UnclaimedValue { field, .. } => field,
             Self::UndeclaredLayer { .. } | Self::UnevidencedLayer { .. } => "layer",
             Self::SilentDrop { claim, .. } | Self::DroppedClaim { claim, .. } => claim,
+            Self::BrokenSeal { .. } | Self::UnsealedRelease { .. } => "seal",
         }
     }
 
@@ -117,6 +122,15 @@ impl Refusal {
                  slice sets the granularity, and evidence outside it is evidence for something \
                  nobody asked about",
                 if declared.is_empty() { "none".to_owned() } else { declared.join(" · ") }
+            ),
+            Self::BrokenSeal { release, expected, found } => format!(
+                "{release} is cut and its content no longer matches the seal written when it was \
+                 cut — expected {expected}, computed {found}. A cut release is a point on the \
+                 version line, and a point that moved is not one"
+            ),
+            Self::UnsealedRelease { release } => format!(
+                "{release} is cut and carries no seal, so nothing about it can be checked against \
+                 what was cut"
             ),
             Self::SilentDrop { claim, state } => format!(
                 "closed with {claim} {} and no finding carrying it — record a finding that names \
@@ -414,6 +428,11 @@ pub fn check_corpus(docs: &[KdlDocument], schema: &Schema) -> Vec<Violation> {
         ));
     }
 
+    // `cut-release-is-immutable`, if the record declares it.
+    if schema.declares_rule("cut-release-is-immutable") {
+        out.extend(check_seals(docs));
+    }
+
     // Second pass: values that wanted a claimant and found none.
     for doc in docs {
         for node in doc.nodes() {
@@ -437,6 +456,59 @@ pub fn check_corpus(docs: &[KdlDocument], schema: &Schema) -> Vec<Violation> {
                         });
                     }
                 }
+            }
+        }
+    }
+    out
+}
+
+/// `TS.260820.09`/C4. A cut release's index node is never edited, and the seal is how
+/// that stops being a promise. It detects an edit; it does not prevent one.
+fn check_seals(docs: &[KdlDocument]) -> Vec<Violation> {
+    let mut out = Vec::new();
+    for doc in docs {
+        for node in doc.nodes().iter().filter(|n| n.name().value() == "release") {
+            let state = children_named(node, "state").first().and_then(|n| string_arg(n));
+            if state.as_deref() != Some("released") {
+                continue;
+            }
+            let id = string_arg(node);
+            let version =
+                children_named(node, "version").first().and_then(|n| string_arg(n)).unwrap_or_default();
+            let binds: Vec<String> =
+                children_named(node, "binds").iter().filter_map(|n| string_arg(n)).collect();
+            let resolves: Vec<String> =
+                children_named(node, "resolves").iter().filter_map(|n| string_arg(n)).collect();
+            let commit = children_named(node, "index")
+                .first()
+                .and_then(|index| children_named(index, "commit").first().and_then(|n| string_arg(n)))
+                .unwrap_or_default();
+
+            let Some(written) = children_named(node, "seal").first().and_then(|n| string_arg(n))
+            else {
+                out.push(Violation {
+                    entity_kind: "release".to_owned(),
+                    entity_id: id.clone(),
+                    refusal: Refusal::UnsealedRelease {
+                        release: id.clone().unwrap_or_else(|| version.clone()),
+                    },
+                    span: node.span(),
+                });
+                continue;
+            };
+
+            let computed = crate::cut::seal(&version, &commit, &binds, &resolves);
+            if computed != written {
+                out.push(Violation {
+                    entity_kind: "release".to_owned(),
+                    entity_id: id.clone(),
+                    refusal: Refusal::BrokenSeal {
+                        release: id.clone().unwrap_or_else(|| version.clone()),
+                        expected: written,
+                        found: computed,
+                    },
+                    span: node.span(),
+                });
             }
         }
     }

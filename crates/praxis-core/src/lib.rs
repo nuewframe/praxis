@@ -8,6 +8,7 @@
 pub mod admission;
 pub mod binding;
 pub mod check;
+pub mod cut;
 pub mod close;
 pub mod pickup;
 pub mod schema;
@@ -19,6 +20,7 @@ pub use check::{
 };
 pub use admission::{Assessment, Carried, Config, Release, Condition, Conditions, Corpus, Settled, Verdict, assess, project};
 pub use binding::{Binding, Proposal, Rejected, bind, propose, unbind};
+pub use cut::{Blocked, Cut, cut, seal};
 pub use close::{Closing, Unaccounted, close_iteration};
 pub use pickup::{Ask, Pickup, Record, pick_up};
 pub use schema::{Cardinality, EntitySpec, FieldSpec, Schema};

@@ -118,6 +118,7 @@ Load the `SKILL.md` of any skill you intend to follow.
 | | `attach-evidence` | Back a declared layer with an artifact at the moment it is reached — evidence outside the slice's declared set is refused, and a layer you did not reach stays visible as unevidenced |
 | | `close-an-iteration` | Close without dropping scope in silence — a shortfall is carried by a finding that names the claim, and deleting a claim to make the close succeed is itself refused |
 | | `bind-work-to-a-version` | Attach closed iterations to a version so its content is derived rather than hand-kept — only closed work binds, once, and the bump is proposed from configured rules |
+| | `cut-the-version` | Cut a planned version and write its index node in one operation — the index points at a commit rather than copying it, and the seal makes a later edit visible |
 | | `create-initiative` | Scaffold or refine a single-file growth initiative (`INIT.<initiative-name>.md`) |
 | | `create-capability-record` | Scaffold or update a living capability record (`CAP.<capability-name>.md`) |
 | | `create-wave` | Alias for `create-initiative` — single-file growth initiative on `docs/product.md` |
