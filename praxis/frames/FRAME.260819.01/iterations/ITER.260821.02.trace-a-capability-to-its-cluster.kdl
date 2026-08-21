@@ -155,6 +155,11 @@ iteration "ITER.260821.02" {
             they named. capability, frame, adr and notional-architecture are checked for the first time"
     }
 
+    contributes "slice-outcome-added" \
+        because="name-a-capability, and capability-must-trace enforced" \
+        note="the bump rule this work matches, from config.kdl. Declared by the iteration \
+            because only whoever did the work knows what kind of change it was"
+
     trail {
         entry at="2026-08-21T03:30:00-05:00" by="agent:principal-engineer" action="state-changed" \
             from="working" to="closed" \

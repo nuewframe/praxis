@@ -155,6 +155,36 @@ pub struct Attempt {
     pub state: String,
     pub claims: Vec<Settled>,
     pub findings: Vec<Carried>,
+    /// Which of the configured bump rules this iteration's work matches. Declared by the
+    /// iteration, because only whoever did the work knows what kind of change it was.
+    pub contributes: Vec<String>,
+}
+
+/// A version, and the work bound to it. Machine-owned: every field here is derived from
+/// what was bound, which is why the record is rewritten whole rather than edited.
+#[derive(Debug, Clone)]
+pub struct Release {
+    pub id: String,
+    pub version: String,
+    pub state: String,
+    pub binds: Vec<String>,
+}
+
+impl Release {
+    /// Binding is reversible until the release is cut. Cutting is not.
+    pub fn cut(&self) -> bool {
+        self.state == "released"
+    }
+}
+
+/// This repository's binding to the schema — the parts the engine reads.
+#[derive(Debug, Clone, Default)]
+pub struct Config {
+    pub scheme: String,
+    /// change-kind → which position to bump. Read from the record, never assumed: Praxis
+    /// is pre-1.0 and bumps MINOR for a breaking change, so a hardcoded semver rule would
+    /// misreport its own author's releases.
+    pub bump_rules: Vec<(String, String)>,
 }
 
 impl Attempt {
@@ -168,6 +198,8 @@ impl Attempt {
 pub struct Corpus {
     pub slices: Vec<Slice>,
     pub attempts: Vec<Attempt>,
+    pub releases: Vec<Release>,
+    pub config: Config,
     /// Ids the shape check refuses. A slice the checker refuses is not work waiting.
     pub refused: Vec<String>,
 }
@@ -193,6 +225,8 @@ impl Corpus {
                 match node.name().value() {
                     "thin-slice" => corpus.slices.push(slice_from(node)),
                     "iteration" => corpus.attempts.push(attempt_from(node)),
+                    "release" => corpus.releases.push(release_from(node)),
+                    "config" => corpus.config = config_from(node),
                     _ => {}
                 }
             }
@@ -268,6 +302,7 @@ fn attempt_from(node: &KdlNode) -> Attempt {
                 state: prop(c, "state").unwrap_or_default(),
             })
             .collect(),
+        contributes: child_args(node, "contributes"),
         findings: node
             .iter_children()
             .filter(|c| c.name().value() == "finding")
@@ -276,6 +311,41 @@ fn attempt_from(node: &KdlNode) -> Attempt {
                 carries: prop(c, "carries"),
             })
             .collect(),
+    }
+}
+
+fn release_from(node: &KdlNode) -> Release {
+    Release {
+        id: string_arg(node).unwrap_or_default(),
+        version: child_arg(node, "version").unwrap_or_default(),
+        state: child_arg(node, "state").unwrap_or_default(),
+        binds: child_args(node, "binds"),
+    }
+}
+
+fn config_from(node: &KdlNode) -> Config {
+    let mut config = Config::default();
+    for versioning in node.iter_children().filter(|c| c.name().value() == "versioning") {
+        config.scheme = child_arg(versioning, "scheme").unwrap_or_default();
+        for proposal in versioning.iter_children().filter(|c| c.name().value() == "bump-proposal") {
+            for rule in proposal.iter_children() {
+                if let Some(position) = string_arg(rule) {
+                    config.bump_rules.push((rule.name().value().to_owned(), position));
+                }
+            }
+        }
+    }
+    config
+}
+
+impl Corpus {
+    /// The release a given iteration is bound to, if any. An iteration binds exactly once.
+    pub fn bound_to(&self, iteration: &str) -> Option<&Release> {
+        self.releases.iter().find(|r| r.binds.iter().any(|b| b == iteration))
+    }
+
+    pub fn release(&self, version: &str) -> Option<&Release> {
+        self.releases.iter().find(|r| r.version == version)
     }
 }
 

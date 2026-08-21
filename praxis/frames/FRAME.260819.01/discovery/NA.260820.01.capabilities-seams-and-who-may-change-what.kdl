@@ -530,7 +530,26 @@ notional-architecture "NA.260820.01" {
             field "open"       each="0..n"
         }
         entity "release" is="an index into history — what it binds, what it resolves" \
-            states="planned released"
+            states="planned released" \
+            owned-by="release-binding" \
+            note="machine-owned. Every field is derived from what was bound, so the record is \
+                composed whole on each bind rather than edited — there is nothing in it a human \
+                wrote that a rewrite could lose. Declared with fields by ITER.260821.07" {
+            field "version"      each="1"
+            field "state"        each="1" one-of="planned" "released"
+            field "binds"        each="0..n" references="iteration" \
+                because="a version with no content and a version nobody has computed are not the \
+                    same thing, so an empty one says so rather than being absent"
+            field "proposed-bump" each="1" \
+                because="the record PROPOSES from the configured rules. Confirming is the \
+                    maintainer's, at cut"
+            field "proposal-incomplete-for" each="0..n" \
+                because="an iteration that declares no `contributes` informed the proposal with \
+                    nothing, and a proposal computed from half the work is not a proposal"
+            field "confirmation" each="0..1"
+            field "resolves"     each="0..n" references="symptom"
+            field "trail"        each="1"
+        }
         entity "iteration" is="one attempt at a slice — what ITERATE produces" \
             states="open working closed abandoned" \
             owned-by="work-admission" \
@@ -552,6 +571,11 @@ notional-architecture "NA.260820.01" {
             field "claim"     each="0..n"
             field "layer"     each="0..n"
             field "layer-set" each="0..1"
+            field "contributes" each="0..n" \
+                because="which configured bump rule this work matches. Declared by the iteration \
+                    rather than inferred, because only whoever did the work knows what kind of \
+                    change it was — and a bump proposal inferred from a diff is a guess about \
+                    intent"
             field "phase"     each="0..n" holds="phase" because="a contained entity, not a value — without `holds` it is indistinguishable from a field, which is how it went missing"
             field "decision"  each="0..n"
             field "finding"   each="0..n"
@@ -567,7 +591,12 @@ notional-architecture "NA.260820.01" {
                 policy produces had no shape, so nothing could hold one. It sits in iterations/ \
                 because an admission and a refusal are the two outcomes of ONE command, and a \
                 container is named for what its contents are to the owner" {
-            field "on-slice"  each="1" references="thin-slice"
+            field "on-slice"     each="0..1" references="thin-slice"
+            field "on-iteration" each="0..1" references="iteration" \
+                because="a close is refused about an ITERATION, not about the slice under it"
+            field "on-version"   each="0..1" \
+                because="a bind is refused about a VERSION, which is not an entity the refusal \
+                    can reference until a release exists to be refused against"
             field "at"        each="1"
             field "by"        each="1"
             field "asked-by"  each="0..1" because="the human whose ask was refused, where there was one"
@@ -575,6 +604,12 @@ notional-architecture "NA.260820.01" {
                 because="a refusal that does not name the condition is indistinguishable from \
                     never having been asked, which is S3"
             field "trail"     each="1"
+
+            // on-slice, on-iteration and on-version are `0..1` and EXACTLY ONE should be
+            // present. The schema cannot say that: it has cardinality per field and no way
+            // to constrain a choice ACROSS fields. So a refusal naming nothing at all is
+            // accepted today. Recorded as W4 — the first thing the record has needed to say
+            // that its own vocabulary cannot express.
         }
 
         entity "phase" is="one stage of work inside an iteration — WHEN in the attempt, as a layer is WHERE in the stack" \

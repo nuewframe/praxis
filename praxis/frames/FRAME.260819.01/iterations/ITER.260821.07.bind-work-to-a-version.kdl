@@ -1,0 +1,177 @@
+// Opened by `praxis pick-up`. Every condition below was evaluated against the
+// tree as it stood at 2026-08-21T14:18:09Z, and the verdicts are recorded
+// rather than summarised: a gate whose reasoning is not on the record is a gate
+// you have to trust.
+
+iteration "ITER.260821.07" {
+    slug "bind-work-to-a-version"
+    on-slice "TS.260820.16"
+    state "closed"
+    opened-at "2026-08-21T14:18:09Z"
+    opened-by "agent:praxis"
+
+    approval "admission" {
+        status "signed"
+        signer "human:wael"
+        at "2026-08-21T14:18:09Z"
+        signed-by "the ask to pick up this slice"
+    }
+
+    vet "create" state="done" at="2026-08-21T14:18:09Z" {
+        condition "slice-is-shaped" verdict="passed"
+        condition "dependencies-delivered" verdict="passed"
+        condition "no-iteration-in-flight" verdict="passed"
+        condition "nothing-left-to-admit" verdict="passed"
+        condition "work-is-disjoint" verdict="not-computed" \
+            found="no seam manifest exists, so what two iterations would touch cannot be compared. Disjointness is half of what this capability says it judges, and half of what it judges is currently not computed at all"
+        condition "the-slice-is-the-best-available" verdict="left-to-the-maintainer"
+    }
+
+    // 2 of the declared conditions were not decided by the gate. They are
+    // recorded above rather than omitted: an admission that does not say what
+    // it left undecided claims more than it checked.
+
+    // Frozen at open, from the slice. Removing one from the slice now
+    // does not remove it from here — it makes the two disagree, and that is
+    // refused.
+
+    claim "C1" from-slice="TS.260820.16" state="met" \
+        text="binding an unclosed iteration is refused, naming the iteration and its unsettled claims" \
+        settled-by="a negative test asserting the iteration id and the claim ids in the diagnostic" \
+        evidence="tests/binding_work.rs::c1_binding_an_unclosed_iteration_is_refused_naming_it_and_its_unsettled_claims \
+            — and it asserts the SETTLED claim is not named, because a refusal that lists \
+            everything tells you nothing"
+    claim "C2" from-slice="TS.260820.16" state="met" \
+        text="an iteration already bound to another version is refused" \
+        settled-by="a negative test with a double bind" \
+        evidence="tests/binding_work.rs::c2_an_iteration_already_bound_elsewhere_is_refused — the \
+            refusal says WHERE it is already bound"
+    claim "C3" from-slice="TS.260820.16" state="met" \
+        text="the proposed bump follows the configured rules from what is bound" \
+        settled-by="one test per bump rule in config, each asserting the proposal" \
+        evidence="tests/binding_work.rs::c3_the_proposed_bump_follows_the_configured_rules — all \
+            five rules — plus ::c3_the_highest_bump_among_what_is_bound_wins and a test that a \
+            scheme the engine does not know still applies the RULES, since it is only the ranking \
+            between positions that a scheme decides"
+    claim "C4" from-slice="TS.260820.16" state="met" \
+        text="unbinding is possible before cut and refused after" \
+        settled-by="a positive test before cut and a negative test after" \
+        evidence="tests/binding_work.rs::c4_unbinding_is_possible_before_cut, \
+            ::c4_unbinding_after_cut_is_refused, and ::c4_binding_into_a_cut_release_is_refused_too \
+            — a cut release does not change in either direction"
+
+    vet "start" state="done" at="2026-08-21T14:20:00Z" {
+        condition "the tree is clean and current" verdict="passed" found="HEAD cb8494b"
+        condition "the slice's scope is unchanged" verdict="passed" found="four claims, read line by line"
+        condition "C3 is computable from the record" verdict="admitted-on-condition" \
+            found="config.kdl declares five bump rules and nothing in the record says which rule a \
+                given iteration matches. The proposal has an input the record does not hold" \
+            resolved-by="`contributes` declared on the iteration, and the seven closed iterations \
+                amended to carry it. Declared by the iteration rather than inferred from a diff, \
+                because a diff cannot tell an added outcome from a remediated gap. Recorded as W3"
+    }
+
+    frozen {
+        pins "the entity-and-field schema" at="NA.260820.01/schema" at-commit="cb8494b"
+        pins "the versioning binding" at="praxis/config.kdl — versioning/bump-proposal" at-commit="cb8494b"
+        rule "a schema change while this iteration is open is a FINDING, not an edit" \
+            exception="declaring the shape of `release` and the `contributes` field is the mechanism \
+                this slice depends on. Amending `refusal` to accept on-version was NOT planned and \
+                is recorded as W1"
+    }
+
+    layer "doctrine"    state="evidenced" evidence="skills/bind-work-to-a-version/SKILL.md, registered in the router" reaches="the skill teaches binding as the moment scope for a version becomes fact"
+    layer "enforcement" state="evidenced" evidence="64 tests pass; an unclosed iteration, a double bind, and any change to a cut release are all refused" reaches="only closed iterations may bind, and an iteration binds exactly once"
+    layer "docs"        state="evidenced" evidence="praxis/releases/REL.0.8.0.kdl — seven iterations bound, with the proposed bump and the rule that decided it" reaches="what a version will contain is readable before it is cut"
+    layer-set sealed=#true at="2026-08-21T14:20:00Z"
+
+    phase "design-ux" state="complete" required-by="docs" \
+        produced="what an unbindable iteration is TOLD — not `it has not closed` but which claims \
+            are unsettled, and NOT the ones that are settled. And a release with nothing bound \
+            states its emptiness rather than being blank, because a version with no content and a \
+            version nobody has computed are not the same thing"
+    phase "design-system" state="complete" required-by="enforcement" \
+        produced="two write disciplines, decided by who authors the content. The release index is \
+            MACHINE-OWNED — every field derived from what is bound — so it is composed whole on \
+            every bind and nothing a human wrote can be lost. An iteration is a HUMAN's record, so \
+            it is edited in place. Which one applies is not a preference, it is a fact about the \
+            record"
+    phase "implement" state="complete" required-by="enforcement · docs" \
+        produced="praxis-core::binding, `praxis bind` and `--undo`, the `release` shape, the \
+            `contributes` field, and ten tests"
+    phase "learn" state="complete" required-by="always" produced="five findings, one of them a gap in the record's own vocabulary" \
+        note="never skippable — it is the phase that judges the others"
+    phase "teach" state="complete" required-by="doctrine" produced="skills/bind-work-to-a-version/SKILL.md"
+
+    finding "W1" state="open" size="owed-work" \
+        text="the engine wrote a record the record refuses. `bind`'s refusal carries `on-version`, \
+            and the declared shape of `refusal` required `on-slice` and knew no such field. Two \
+            refusal records were written and praxis check refused both" \
+        note="every command before this wrote a conforming record because its shape was declared \
+            FIRST and the writer built to it. Here the writer was built first and the shape \
+            invented at the keyboard. The check caught it immediately, which is the system working \
+            — but nothing catches it at the moment of writing, and a command that writes an \
+            invalid record has already written it"
+
+    finding "W2" state="open" size="observation" \
+        text="there are now two write disciplines: compose-whole for machine-owned records, edit-in- \
+            place for human-authored ones. The release index is entirely derived, so rewriting it \
+            loses nothing; an iteration holds prose a person wrote, so a rewrite would" \
+        note="the distinction is not about size or convenience — it is about who authored the \
+            content. Worth stating as doctrine before a third command has to guess"
+
+    finding "W3" state="open" size="owed-work" \
+        text="the bump proposal had an input the record did not hold. config.kdl declares five bump \
+            rules and nothing said which rule an iteration matched, so `contributes` was added and \
+            seven closed iterations amended to carry it" \
+        note="it is DECLARED rather than inferred on purpose. A diff cannot tell an added outcome \
+            from a remediated gap, and a bump proposal inferred from one is a guess about intent \
+            wearing the record's authority. But nothing refuses an iteration that declares none — \
+            it is named in the release as incomplete, which is the softest enforcement in the frame"
+
+    finding "W4" state="open" size="frame-sized" \
+        text="the schema cannot say `exactly one of these fields`. A refusal is about a slice, an \
+            iteration or a version, and on-slice/on-iteration/on-version are each 0..1 with no way \
+            to constrain the choice ACROSS them. A refusal naming nothing at all is accepted today" \
+        obliges="NA.260820.01/schema — a cross-field constraint, or a rule that carries one" \
+        note="the first thing the record has needed to say that its own vocabulary cannot express. \
+            Every previous gap was a kind or a field that was simply never declared. This one is a \
+            gap in the SCHEMA LANGUAGE, which is a different kind of owed work"
+
+    finding "W6" state="open" size="owed-work" \
+        text="this iteration carried every claim TWICE — once as the gate pinned it at open, once \
+            as the working agent wrote it settled — and nothing refused that. The close read the \
+            pending copies and refused, which is how it was noticed" \
+        obliges="NA.260820.01/schema — a claim id is unique within its iteration, and the working \
+            agent UPDATES the pinned node rather than adding beside it" \
+        note="the pinning added in ITER.260821.06 changed what an iteration looks like at open, and \
+            the habit of writing claims at close did not change with it. The refusal record \
+            REF.260821.04 is left standing: it is the first time a rule caught the agent that \
+            wrote it, on the real tree rather than in a fixture"
+
+    finding "W5" state="open" size="observation" \
+        text="bind refusals are written into praxis/releases/, beside the release index that \
+            config.kdl describes as `an index into git, not a copy of it`. They are neither" \
+        note="defensible by the same placement rule that put pick-up refusals beside iterations — a \
+            container is named for what its contents ARE to the owner, and these are the outcomes \
+            of release-binding's commands. But `releases/` is named for a kind, which that rule \
+            warns against, and the refusals will accumulate there. Not changed; recorded"
+    closed-at "2026-08-21T14:24:16Z"
+    outcome "continue"
+
+    close {
+        claims-settled "C1" how="met"
+        claims-settled "C2" how="met"
+        claims-settled "C3" how="met"
+        claims-settled "C4" how="met"
+        all-met #true
+        note "the accounting above was computed at close, not asserted. It says every claim is either met or carried by a finding that names it, and nothing about whether the work is any good"
+    }
+
+    trail {
+        entry at="2026-08-21T14:24:16Z" by="agent:praxis" action="state-changed" from="open" to="closed" note="closed by `praxis close`. The accounting was computed; the conclusion is not the machine's to draw"
+
+        entry at="2026-08-21T14:18:09Z" by="agent:praxis" action="created" \
+            note="opened by the gate, on the ask of human:wael"
+    }
+}

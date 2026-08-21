@@ -227,6 +227,11 @@ iteration "ITER.260821.03" {
                 slice delivered, and blocks the gate behind it"
     }
 
+    contributes "slice-outcome-added" \
+        because="see-what-is-ready — the first answer the engine computes rather than refuses" \
+        note="the bump rule this work matches, from config.kdl. Declared by the iteration \
+            because only whoever did the work knows what kind of change it was"
+
     trail {
         entry at="2026-08-21T14:20:00Z" by="agent:principal-engineer" action="amended" \
             note="S1 now says `carries=C1`. It always did carry it — that is what the finding is \

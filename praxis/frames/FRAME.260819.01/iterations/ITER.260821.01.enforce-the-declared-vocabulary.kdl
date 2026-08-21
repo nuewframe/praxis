@@ -144,6 +144,11 @@ iteration "ITER.260821.01" {
             "254 refusals reduced to 0 by declaring the vocabulary, with no engine change"
     }
 
+    contributes "slice-outcome-added" \
+        because="declare-an-entity-kind, and the record enumerating its own vocabulary" \
+        note="the bump rule this work matches, from config.kdl. Declared by the iteration \
+            because only whoever did the work knows what kind of change it was"
+
     trail {
         entry at="2026-08-21T02:30:00-05:00" by="agent:principal-engineer" action="state-changed" \
             from="working" to="closed" \

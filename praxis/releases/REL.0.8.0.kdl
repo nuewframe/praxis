@@ -1,0 +1,29 @@
+// Machine-owned. Every field here is derived from what is bound, so this file
+// is composed whole on each bind rather than edited — there is nothing in it a
+// human wrote that a rewrite could lose. An index into history, never a copy
+// of it.
+
+release "REL.0.8.0" {
+    version "0.8.0"
+    state "planned"
+    binds "ITER.260820.01"
+    binds "ITER.260821.01"
+    binds "ITER.260821.02"
+    binds "ITER.260821.03"
+    binds "ITER.260821.04"
+    binds "ITER.260821.05"
+    binds "ITER.260821.06"
+    binds "ITER.260821.07"
+
+    proposed-bump "minor" \
+        because="slice-outcome-added (ITER.260820.01)"
+    proposal-incomplete-for "ITER.260821.07" \
+        because="these declare no `contributes`, so they informed the proposal with nothing"
+    confirmation "required" by="human" \
+        note="the record PROPOSES. Choosing the version is the maintainer's, at cut"
+
+    trail {
+        entry at="2026-08-21T14:24:33Z" by="agent:praxis" action="bound" \
+            note="composed from what is bound. Rewritten whole on every bind"
+    }
+}

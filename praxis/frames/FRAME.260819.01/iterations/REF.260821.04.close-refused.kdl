@@ -1,0 +1,23 @@
+// Written by `praxis close`, which refused. The iteration stays open, and
+// every claim it could not account for is named below. Nothing was closed.
+
+refusal "REF.260821.04" {
+    on-slice "TS.260820.16"
+    at "2026-08-21T14:23:53Z"
+    by "agent:praxis"
+    asked-by "human:wael"
+    on-iteration "ITER.260821.07"
+    condition "claim-C1-is-unaccounted" failed=#true \
+        found="C1 is \"pending\" and no finding carries it — record a finding that names it, or settle it. A shortfall nobody wrote down and a claim that was met look identical afterwards"
+    condition "claim-C2-is-unaccounted" failed=#true \
+        found="C2 is \"pending\" and no finding carries it — record a finding that names it, or settle it. A shortfall nobody wrote down and a claim that was met look identical afterwards"
+    condition "claim-C3-is-unaccounted" failed=#true \
+        found="C3 is \"pending\" and no finding carries it — record a finding that names it, or settle it. A shortfall nobody wrote down and a claim that was met look identical afterwards"
+    condition "claim-C4-is-unaccounted" failed=#true \
+        found="C4 is \"pending\" and no finding carries it — record a finding that names it, or settle it. A shortfall nobody wrote down and a claim that was met look identical afterwards"
+
+    trail {
+        entry at="2026-08-21T14:23:53Z" by="agent:praxis" action="created" \
+            note="the close was refused. The iteration stays open"
+    }
+}

@@ -6,6 +6,7 @@
 //! so every rule applied here arrives as data from `NA.260820.01/schema`.
 
 pub mod admission;
+pub mod binding;
 pub mod check;
 pub mod close;
 pub mod pickup;
@@ -16,7 +17,8 @@ pub use check::{
     Known, Refusal, Severity, Violation, check_corpus, check_document, check_node, index_all,
     refused,
 };
-pub use admission::{Assessment, Carried, Condition, Conditions, Corpus, Settled, Verdict, assess, project};
+pub use admission::{Assessment, Carried, Config, Release, Condition, Conditions, Corpus, Settled, Verdict, assess, project};
+pub use binding::{Binding, Proposal, Rejected, bind, propose, unbind};
 pub use close::{Closing, Unaccounted, close_iteration};
 pub use pickup::{Ask, Pickup, Record, pick_up};
 pub use schema::{Cardinality, EntitySpec, FieldSpec, Schema};

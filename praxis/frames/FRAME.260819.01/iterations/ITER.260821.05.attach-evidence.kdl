@@ -163,6 +163,11 @@ iteration "ITER.260821.05" {
             two-stage vet doing the thing it exists for rather than being described"
     }
 
+    contributes "slice-outcome-added" \
+        because="attach-evidence, and evidence-names-its-layer enforced" \
+        note="the bump rule this work matches, from config.kdl. Declared by the iteration \
+            because only whoever did the work knows what kind of change it was"
+
     trail {
         entry at="2026-08-21T10:30:00-05:00" by="agent:principal-engineer" action="state-changed" \
             from="open" to="closed" \

@@ -10,8 +10,9 @@ use std::process::ExitCode;
 use clap::{Parser, Subcommand};
 use miette::{Diagnostic, NamedSource, SourceSpan};
 use praxis_core::{
-    Ask, Closing, Conditions, Corpus, Known, Pickup, Schema, Severity, Violation, assess,
-    check_corpus, check_document, close_iteration, index_all, parse, pick_up, project,
+    Ask, Binding, Closing, Conditions, Corpus, Known, Pickup, Schema, Severity, Violation,
+    assess, bind, check_corpus, check_document, close_iteration, index_all, parse, pick_up,
+    project, unbind,
 };
 
 mod render;
@@ -54,6 +55,19 @@ enum Command {
         /// The state root to read and write.
         #[arg(default_value = "praxis")]
         root: PathBuf,
+    },
+    /// Bind a closed iteration to a version, or refuse and say what stopped it.
+    Bind {
+        /// The iteration to bind.
+        iteration: String,
+        /// The version to bind it to.
+        version: String,
+        /// The state root to read and write.
+        #[arg(default_value = "praxis")]
+        root: PathBuf,
+        /// Remove the binding instead. Allowed while the release is planned, refused after cut.
+        #[arg(long)]
+        undo: bool,
     },
     /// Show which slices could be started right now, and what would refuse each of the rest.
     ///
@@ -129,6 +143,21 @@ fn main() -> ExitCode {
                 ExitCode::FAILURE
             }
         },
+        Command::Bind { iteration, version, root, undo } => {
+            match binding(&iteration, &version, &root, undo) {
+                Ok(bound) => {
+                    if bound {
+                        ExitCode::SUCCESS
+                    } else {
+                        ExitCode::FAILURE
+                    }
+                }
+                Err(report) => {
+                    eprintln!("{report:?}");
+                    ExitCode::FAILURE
+                }
+            }
+        }
         Command::Ready { root } => match ready(&root) {
             Ok(()) => ExitCode::SUCCESS,
             Err(report) => {
@@ -377,6 +406,62 @@ fn apply_close(
     }
 
     Ok(doc.to_string())
+}
+
+/// `TS.260820.16`. What a version contains stops being a list somebody keeps alongside
+/// the record and becomes a fact about it.
+fn binding(iteration: &str, version: &str, root: &Path, undo: bool) -> miette::Result<bool> {
+    let sources = load(root)?;
+    let docs: Vec<_> = sources.iter().map(|(_, _, d)| d.clone()).collect();
+    let mut schema = Schema::default();
+    for doc in &docs {
+        let found = Schema::from_document(doc);
+        if !found.is_empty() {
+            schema = found;
+        }
+    }
+    let corpus = Corpus::from_documents(&docs, &schema);
+    let ask = Ask { signer: human()?, at: now(), by: "agent:praxis".to_owned() };
+    let taken = ids_in_use(&docs);
+
+    let outcome = if undo {
+        unbind(iteration, version, &corpus, &ask, &taken)
+    } else {
+        bind(iteration, version, &corpus, &ask, &taken)
+    };
+
+    match outcome {
+        Binding::NotFound(why) => miette::bail!("{why}"),
+        Binding::Refused(record) => {
+            for (who, why) in &record.failed {
+                eprintln!("praxis: bind refused — {who}: {why}");
+            }
+            let path = root.join(&record.file);
+            write_once(&path, &record.kdl)?;
+            eprintln!("praxis: {} recorded at {} — nothing bound", record.id, path.display());
+            Ok(false)
+        }
+        Binding::Bound { release, proposal } => {
+            // The release index is machine-owned, so it is written whole. An iteration is
+            // a human's record, and that one is edited in place.
+            let path = root.join(&release.file);
+            if let Some(dir) = path.parent() {
+                fs::create_dir_all(dir).map_err(|e| miette::miette!("{}: {e}", dir.display()))?;
+            }
+            fs::write(&path, &release.kdl)
+                .map_err(|e| miette::miette!("{}: {e}", path.display()))?;
+            println!(
+                "praxis: {iteration} {} {version} — {}",
+                if undo { "unbound from" } else { "bound to" },
+                path.display()
+            );
+            println!("praxis: proposed bump {} — {}", proposal.position, proposal.because);
+            for silent in &proposal.silent {
+                println!("praxis: {silent} declares no `contributes`, so it informed nothing");
+            }
+            Ok(true)
+        }
+    }
 }
 
 /// The frame directory a slice lives under. Discovery sits one level below the frame, so

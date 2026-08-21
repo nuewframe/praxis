@@ -189,6 +189,11 @@ iteration "ITER.260821.04" {
             admitted anyway. Both are facts, both are checked, and neither hides the other"
     }
 
+    contributes "slice-outcome-added" \
+        because="the one gate, and the first command that writes to the record" \
+        note="the bump rule this work matches, from config.kdl. Declared by the iteration \
+            because only whoever did the work knows what kind of change it was"
+
     trail {
         entry at="2026-08-21T09:40:00-05:00" by="agent:principal-engineer" action="state-changed" \
             from="working" to="closed" \
