@@ -1,0 +1,199 @@
+// The fifth iteration, and the first that WRITES. Everything before this read the record
+// and judged it. This one adds a record to it — which is why change-set@v1 stops being a
+// seam on the architecture and becomes a rename() call that either happened or did not.
+//
+// It also breaks the deadlock ITER.260821.03/S8 printed: TS.260820.05 was blocked on
+// TS.260820.04, whose last claim only the gate could settle. The gate is what this
+// iteration builds, so it settles that claim on the way past.
+
+iteration "ITER.260821.04" {
+    slug "the-one-gate"
+    on-slice "TS.260820.05"
+    state "closed"
+    opened-at "2026-08-21T08:40:00-05:00"
+    opened-by "agent:principal-engineer"
+    closed-at "2026-08-21T09:40:00-05:00"
+    outcome "continue" \
+        because="the gate exists, it refuses, and its refusals are on the record as records rather \
+            than as sentences inside a vet block. The first thing it did was refuse the slice it \
+            was being built for, correctly, and write REF.260821.01 saying so"
+
+    approval "admission" {
+        status "signed"
+        signer "human:waelrabadi"
+        at "2026-08-21T08:40:00-05:00"
+        signed-by "the ask to work the rest of the slices through to done, working through the \
+            challenges as they come. That ask is what admits an iteration the machine gate refused"
+    }
+
+    vet "create" state="done" at="2026-08-21T08:40:00-05:00" {
+        condition "the machine gate was asked first" verdict="refused" \
+            found="`praxis pick-up TS.260820.05` refused and wrote REF.260821.01 — \
+                dependencies-delivered: TS.260820.04 is not delivered" \
+            resolved-by="the human's ask admits over the computed refusal, and BOTH are on the \
+                record. This is the first override in the frame, and the shape of it is the point: \
+                the refusal is a file, the admission is a signature, and a reader six months out \
+                can see that the gate ran, what it said, and who decided otherwise" \
+            note="the alternative was to weaken dependencies-delivered until it admitted, which \
+                would have made every future refusal less trustworthy to save one argument"
+        condition "the block is real, or an artefact" verdict="artefact" \
+            found="TS.260820.04 is undelivered because C1 is met-in-part, and C1's residue can only \
+                be settled by the gate. The dependency is genuinely satisfied — the view is built \
+                and working — and what blocks is the accounting, not the work" \
+            resolved-by="the accounting was wrong, and this iteration corrects it (T2). Delivery is \
+                now measured against the claims the SLICE declares, met by any iteration, so a \
+                residue can be settled later by whoever finally has what settling it takes"
+        condition "no other iteration is open" verdict="passed" found="all four prior iterations are closed"
+        condition "the slice is the best available" verdict="passed" \
+            found="every remaining slice is downstream of this one. Fifteen of nineteen are blocked \
+                and the chain runs through here — S2 says the backlog is a queue, and this is the \
+                head of it"
+    }
+
+    vet "start" state="done" at="2026-08-21T08:40:00-05:00" {
+        condition "the tree is clean and current" verdict="passed" found="HEAD 7a0c6b9, working tree clean at open"
+        condition "the slice's scope is unchanged" verdict="passed" \
+            found="read line by line. Its three claims are exactly what this iteration settles"
+        condition "what this will write is known before it writes" verdict="known-and-recorded" \
+            found="a refusal record for every failing condition, or one iteration record in state \
+                `open`. The engine has never created a file before, so `whole or nothing` had to be \
+                built rather than assumed: composed in memory, written to a staging name, renamed \
+                into place, and never over an existing record"
+    }
+
+    frozen {
+        pins "the entity-and-field schema" at="NA.260820.01/schema" at-commit="7a0c6b9"
+        pins "the admission conditions" at="NA.260820.01 — work-admission/admits" at-commit="7a0c6b9"
+        pins "read-model@v1 and change-set@v1" at="NA.260820.01/seam" at-commit="7a0c6b9"
+        rule "a schema change while this iteration is open is a FINDING, not an edit" \
+            exception="declaring the `refusal` kind is the mechanism this slice depends on — the \
+                policy refusal-is-a-fact has existed since the storm and the fact it produces had \
+                no shape to be held in. Recorded as T4"
+    }
+
+    claim "C1" from-slice="TS.260820.05" state="met" \
+        text="a refused pickup writes a PickupRefused event naming the failing condition" \
+        settled-by="one test per condition, each asserting the record exists and names that condition" \
+        evidence="tests/the_gate.rs — three conditions, three tests, each asserting the refusal \
+            names the SPECIFIC thing: which dependency, which iteration holds it, which iteration \
+            delivered it. A refusal naming only its category is a refusal you cannot act on"
+    claim "C2" from-slice="TS.260820.05" state="met" \
+        text="a refused pickup opens nothing" \
+        settled-by="a test asserting no iteration exists after refusal" \
+        evidence="tests/the_gate.rs::c2_a_refused_pickup_opens_nothing — no iteration node is \
+            composed, the id is REF rather than ITER, and the shell writes exactly one file"
+    claim "C3" from-slice="TS.260820.05" state="met" \
+        text="a second iteration on a live slice is refused" \
+        settled-by="a negative test with an iteration already open" \
+        evidence="tests/the_gate.rs::c3_a_second_iteration_on_a_live_slice_is_refused — and the \
+            refusal names which iteration holds it, because the reader's next question is who"
+
+    claim "C1" from-slice="TS.260820.04" state="met" \
+        text="the view and the gate evaluate identical conditions" \
+        settled-by="a property test asserting every slice the view calls ready is admitted by the \
+            gate, and every slice it excludes is refused" \
+        evidence="tests/the_gate.rs::ts_260820_04_c1_the_view_and_the_gate_evaluate_identical_conditions \
+            — both directions, over a record containing ready, blocked and delivered slices" \
+        note="the residue ITER.260821.03 recorded as S1 and could not settle. It is settled here \
+            because settling it required the gate, and the gate required the view. Carrying it \
+            forward rather than calling it met is what made that possible"
+
+    decision "the machine gate implements half of the doctrine, and says so" \
+        chose="`pick-up` writes an iteration in state `open` carrying the CREATE vet only" \
+        over="writing it in state `working` with both vets recorded at the same moment" \
+        because="the record says an iteration is vetted twice BECAUSE the tree moves in between. \
+            One command cannot reproduce that — both vets would run against one tree, and the \
+            second would add nothing but a line claiming it had been done. The start vet is a \
+            second ask, and until there is a command for it the record shows an open iteration \
+            rather than a falsely-started one" \
+        owed="a `start` command, and the rule iteration-worked-without-start-vet enforced (T3)"
+
+    layer "doctrine"    state="evidenced" evidence="skills/pick-up-a-slice/SKILL.md, registered in the router under ITERATE" reaches="the skill teaches that selection IS the commitment, and that refusals are recorded"
+    layer "enforcement" state="evidenced" evidence="40 tests pass; the gate refuses on every declared condition and opens nothing when it does" reaches="the one gate — the only place in the method that refuses at open"
+    layer "docs"        state="evidenced" evidence="REF.260821.01 is a record in the tree, checked by praxis check like any other" reaches="refusals appear in the iteration record and survive into the release projection"
+    layer-set sealed=#true at="2026-08-21T08:40:00-05:00"
+
+    phase "design-ux" state="complete" required-by="docs" \
+        produced="what a refusal record CONTAINS. Not only the conditions that failed but the ones \
+            nobody decided, carried into the record either way — because a refusal that lists only \
+            its failures reads as though everything else passed, and two of the six conditions are \
+            not computed at all"
+    phase "design-system" state="complete" required-by="enforcement" \
+        produced="the gate is pure and the shell writes. Every condition is testable with no \
+            filesystem, and change-set@v1 becomes one rename: composed in memory, staged under a \
+            temporary name, moved into place, never over an existing record. And placement is the \
+            SHELL's question — derived from where the slice lives, because a record belongs to the \
+            frame that raised the work and only the tree knows which frame that is"
+    phase "implement" state="complete" required-by="enforcement · docs" \
+        produced="praxis-core::pickup, `praxis pick-up`, the `refusal` kind, and ten tests"
+    phase "learn" state="complete" required-by="always" produced="five findings" \
+        note="never skippable — it is the phase that judges the others"
+    phase "teach" state="complete" required-by="doctrine" produced="skills/pick-up-a-slice/SKILL.md"
+
+    finding "T1" state="open" size="owed-work" \
+        text="the gate wrote a correct record to the wrong place — praxis/iterations/ rather than \
+            under the frame — because it composed the path from the state root. Caught by looking \
+            at the output, not by any check. The placement rules are prose in ADR.260819.01 and \
+            nothing enforces them" \
+        obliges="a rule that refuses a record filed outside the container its kind belongs to" \
+        note="the record was VALID. praxis check passed on it in the wrong directory, because \
+            nothing in the schema says where a kind lives. Shape is checked; placement is not"
+
+    finding "T2" state="open" size="frame-sized" \
+        text="delivery was being derived from one iteration's own accounting — closed, with every \
+            claim IT carried met — rather than from the claims the SLICE declares. That is what \
+            turned S1's residue into a deadlock: no later iteration could ever finish a slice, \
+            because delivery could only be claimed by the iteration that was on it" \
+        note="corrected: a slice is delivered when every claim it declares has been met by some \
+            iteration, wherever that iteration was pointed. The falsifier that fired in S8 was \
+            real, and this is the mechanism that lets a slice take more than one iteration WITHOUT \
+            being stuck — which is what the fitness function assumed and nothing implemented"
+
+    finding "T3" state="open" size="owed-work" \
+        text="one command cannot perform a two-stage vet. The record says an iteration is vetted at \
+            create and again at start BECAUSE the tree moves in between; `praxis pick-up` runs \
+            once, against one tree, so a second vet inside it would be a line claiming a check that \
+            did not happen" \
+        obliges="a `start` command, and iteration-worked-without-start-vet enforced against it" \
+        note="the gate writes `open`, never `working`. Half the doctrine, implemented honestly, is \
+            worth more than all of it implemented as a formality — and the record now shows which \
+            half"
+
+    finding "T4" state="open" size="owed-work" \
+        text="`refusal` is the first kind the record needed that discovery never named. \
+            refusal-is-a-fact has been a policy since the storm was held, and the thing that policy \
+            produces had no shape — so for four iterations every refusal was prose inside a vet \
+            block, readable by a human and by nothing else" \
+        note="the same class as `iteration`, `read-model`, `phase` and `config` before it. Five \
+            kinds now, each found by USING the model rather than by reading it. The delivery graph \
+            is incomplete in discovery by construction, and that has stopped being a surprise"
+
+    finding "T5" state="open" size="observation" \
+        text="the gate signs the admission with the tree's own git identity, and there is no way to \
+            spell an agent's name in that field — not because a check refuses it, but because the \
+            shell has nowhere to put one. The impossibility is structural" \
+        note="worth noticing as the pattern to prefer: approval-signed-by-agent is a rule that can \
+            refuse, and this is a shape in which the thing it refuses cannot be expressed"
+
+    close {
+        claims-settled "C1" "C2" "C3" all-met=#true \
+            note="and TS.260820.04/C1, carried from ITER.260821.03. Four claims across two slices, \
+                which is the first time an iteration has settled a claim it did not open"
+        layers-reached "doctrine" "enforcement" "docs" all-evidenced=#true
+        findings-carried "T1" "T2" "T3" "T4" "T5"
+        scope-unchanged #true
+        verified "cargo test — 40 passed across five suites" \
+            "praxis check praxis — ok, 14 kinds declared, zero reports" \
+            "praxis pick-up TS.260820.05 — refused, REF.260821.01 written, nothing opened, exit 1"
+        note "the record now contains a refusal the machine wrote about a slice a human then \
+            admitted anyway. Both are facts, both are checked, and neither hides the other"
+    }
+
+    trail {
+        entry at="2026-08-21T09:40:00-05:00" by="agent:principal-engineer" action="state-changed" \
+            from="working" to="closed" \
+            note="the one gate exists. Its first act was to refuse the slice it was being built for"
+        entry at="2026-08-21T08:40:00-05:00" by="agent:principal-engineer" action="created" \
+            note="admitted over REF.260821.01 on the human's ask, with the refusal left standing"
+    }
+}

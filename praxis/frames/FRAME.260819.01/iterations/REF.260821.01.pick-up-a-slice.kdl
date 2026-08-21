@@ -1,0 +1,21 @@
+// Written by `praxis pick-up`, which refused. It sits beside the iterations because
+// an admission and a refusal are the two outcomes of one command, and a folder is
+// named for what its contents ARE to the owner (ADR.260819.01). Nothing was opened.
+
+refusal "REF.260821.01" {
+    on-slice "TS.260820.05"
+    at "2026-08-21T13:52:24Z"
+    by "agent:praxis"
+    asked-by "human:wael"
+    condition "dependencies-delivered" failed=#true \
+        found="TS.260820.04 is not delivered"
+    condition "work-is-disjoint" failed=#false \
+        found="not decided — no seam manifest exists, so what two iterations would touch cannot be compared. Disjointness is half of what this capability says it judges, and half of what it judges is currently not computed at all"
+    condition "the-slice-is-the-best-available" failed=#false \
+        found="not decided — left to the maintainer"
+
+    trail {
+        entry at="2026-08-21T13:52:24Z" by="agent:praxis" action="created" \
+            note="the gate refused. Nothing opened"
+    }
+}

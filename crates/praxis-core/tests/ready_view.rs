@@ -23,6 +23,7 @@ notional-architecture "NA.test" {
             field "layer"      each="0..n"
             field "depends-on" each="0..n"
             field "state"      each="0..1"
+            field "claim"      each="0..n"
         }
         entity "iteration" {
             field "on-slice" each="1"
@@ -219,11 +220,12 @@ thin-slice "TS.a" {
     slug "a"
     kind "command"
     realizes "CAP.x"
+    claim "C1"
 }
 iteration "ITER.1" {
     on-slice "TS.a"
     state "closed"
-    claim "C1" state="met"
+    claim "C1" from-slice="TS.a" state="met"
 }
 "##,
     );
@@ -250,12 +252,14 @@ thin-slice "TS.a" {
     slug "a"
     kind "command"
     realizes "CAP.x"
+    claim "C1"
+    claim "C2"
 }
 iteration "ITER.1" {
     on-slice "TS.a"
     state "closed"
-    claim "C1" state="met"
-    claim "C2" state="carried"
+    claim "C1" from-slice="TS.a" state="met"
+    claim "C2" from-slice="TS.a" state="carried"
 }
 "##,
     );
@@ -294,22 +298,24 @@ thin-slice "TS.a" {
     slug "a"
     kind "command"
     realizes "CAP.x"
+    claim "C1"
 }
 iteration "ITER.1" {
     on-slice "TS.a"
     state "closed"
-    claim "C1" state="met"
+    claim "C1" from-slice="TS.a" state="met"
 }
 thin-slice "TS.b" {
     slug "b"
     kind "command"
     realizes "CAP.x"
     state "active"
+    claim "C1"
 }
 iteration "ITER.2" {
     on-slice "TS.b"
     state "closed"
-    claim "C1" state="met"
+    claim "C1" from-slice="TS.b" state="met"
 }
 "##,
     );

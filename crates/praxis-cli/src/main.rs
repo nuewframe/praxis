@@ -10,8 +10,8 @@ use std::process::ExitCode;
 use clap::{Parser, Subcommand};
 use miette::{Diagnostic, NamedSource, SourceSpan};
 use praxis_core::{
-    Conditions, Corpus, Known, Schema, Severity, Violation, assess, check_corpus, check_document,
-    index_all, parse, project,
+    Ask, Conditions, Corpus, Known, Pickup, Schema, Severity, Violation, assess, check_corpus,
+    check_document, index_all, parse, pick_up, project,
 };
 
 mod render;
@@ -30,6 +30,19 @@ enum Command {
         /// The state root to read.
         #[arg(default_value = "praxis")]
         root: PathBuf,
+    },
+    /// Take a slice. The gate admits and opens an iteration, or refuses and records why.
+    ///
+    /// Selection is the commitment: choosing this is choosing not to work something else.
+    PickUp {
+        /// The slice to take.
+        slice: String,
+        /// The state root to read and write.
+        #[arg(default_value = "praxis")]
+        root: PathBuf,
+        /// Say what would happen and write nothing.
+        #[arg(long)]
+        dry_run: bool,
     },
     /// Show which slices could be started right now, and what would refuse each of the rest.
     ///
@@ -79,6 +92,19 @@ fn main() -> ExitCode {
                 ExitCode::FAILURE
             }
         },
+        Command::PickUp { slice, root, dry_run } => match pickup(&slice, &root, dry_run) {
+            Ok(admitted) => {
+                if admitted {
+                    ExitCode::SUCCESS
+                } else {
+                    ExitCode::FAILURE
+                }
+            }
+            Err(report) => {
+                eprintln!("{report:?}");
+                ExitCode::FAILURE
+            }
+        },
         Command::Ready { root } => match ready(&root) {
             Ok(()) => ExitCode::SUCCESS,
             Err(report) => {
@@ -87,6 +113,147 @@ fn main() -> ExitCode {
             }
         },
     }
+}
+
+/// `TS.260820.05` — the one gate. Either an iteration is open, or a refusal is on the
+/// record naming the condition that failed. Never both, and never neither.
+fn pickup(slice: &str, root: &Path, dry_run: bool) -> miette::Result<bool> {
+    let sources = load(root)?;
+    let docs: Vec<_> = sources.iter().map(|(_, _, d)| d.clone()).collect();
+
+    let mut schema = Schema::default();
+    let mut conditions = Conditions::default();
+    for doc in &docs {
+        let found = Schema::from_document(doc);
+        if !found.is_empty() {
+            schema = found;
+        }
+        let declared = Conditions::from_document(doc);
+        if !declared.is_empty() {
+            conditions = declared;
+        }
+    }
+    if conditions.is_empty() {
+        miette::bail!("the record declares no admission conditions — an empty gate is not an open one");
+    }
+
+    // The signer is whoever is asking, read from the tree they are asking in. An
+    // agent-signed approval is the trust-transfer problem expressed as a signature, so
+    // there is nowhere here to put an agent's name.
+    let signer = human()?;
+    let ask = Ask {
+        signer,
+        at: now(),
+        by: "agent:praxis".to_owned(),
+    };
+
+    let corpus = Corpus::from_documents(&docs, &schema);
+    let assessment = assess(&corpus, &conditions, &ask.at);
+    let taken = ids_in_use(&docs);
+
+    // Where the record goes is a layout question, so the shell answers it — and it
+    // answers it from where the SLICE lives, not from the state root. A record belongs to
+    // the frame that raised the work, and only the tree knows which frame that is.
+    let home = frame_of(slice, &sources).ok_or_else(|| {
+        miette::miette!("cannot tell which frame {slice} belongs to, so there is nowhere to put the record")
+    })?;
+
+    match pick_up(slice, &corpus, &assessment, &ask, &taken) {
+        Pickup::NoSuchSlice(why) => miette::bail!("{why}"),
+        Pickup::Opened(record) => {
+            let path = home.join(&record.file);
+            if dry_run {
+                println!("would open {} at {}\n\n{}", record.id, path.display(), record.kdl);
+            } else {
+                write_once(&path, &record.kdl)?;
+                println!("praxis: {} opened on {slice} — {}", record.id, path.display());
+            }
+            Ok(true)
+        }
+        Pickup::Refused(record) => {
+            let path = home.join(&record.file);
+            for (condition, detail) in &record.failed {
+                eprintln!("praxis: refused — {condition}: {detail}");
+            }
+            if dry_run {
+                eprintln!("would record {} at {}", record.id, path.display());
+            } else {
+                write_once(&path, &record.kdl)?;
+                eprintln!("praxis: {} recorded at {} — nothing opened", record.id, path.display());
+            }
+            Ok(false)
+        }
+    }
+}
+
+/// The frame directory a slice lives under. Discovery sits one level below the frame, so
+/// the frame is the grandparent of the file the slice was found in.
+fn frame_of(slice: &str, sources: &[Source]) -> Option<PathBuf> {
+    let holder = sources.iter().find(|(_, _, doc)| {
+        doc.nodes().iter().any(|n| {
+            n.name().value() == "thin-slice"
+                && n.entries()
+                    .iter()
+                    .find(|e| e.name().is_none())
+                    .and_then(|e| e.value().as_string())
+                    == Some(slice)
+        })
+    })?;
+    holder.0.parent()?.parent().map(Path::to_path_buf)
+}
+
+/// Every id the record already uses, so a new one cannot collide.
+fn ids_in_use(docs: &[kdl::KdlDocument]) -> Vec<String> {
+    let mut out = Vec::new();
+    for doc in docs {
+        for node in doc.nodes() {
+            if let Some(id) = node
+                .entries()
+                .iter()
+                .find(|e| e.name().is_none())
+                .and_then(|e| e.value().as_string())
+            {
+                out.push(id.to_owned());
+            }
+        }
+    }
+    out
+}
+
+/// Whoever is asking. `human:<name>`, from the tree's own git identity — the record
+/// refuses a signature outside the human namespace, and there is no way to spell an
+/// agent's name here.
+fn human() -> miette::Result<String> {
+    let out = std::process::Command::new("git")
+        .args(["config", "user.email"])
+        .output()
+        .map_err(|e| miette::miette!("cannot read the git identity: {e}"))?;
+    let email = String::from_utf8_lossy(&out.stdout).trim().to_owned();
+    let name = email.split('@').next().unwrap_or_default().to_owned();
+    if name.is_empty() {
+        miette::bail!(
+            "no git identity, so there is nobody to sign the admission. An unsigned admission \
+             is refused by the record, and an agent may not sign one"
+        );
+    }
+    Ok(format!("human:{name}"))
+}
+
+/// `change-set@v1`: whole or nothing, leaving the record unchanged on failure. The file
+/// is written complete under a temporary name and moved into place, so a reader never
+/// sees half a record and a crash leaves nothing behind.
+fn write_once(path: &Path, content: &str) -> miette::Result<()> {
+    if path.exists() {
+        miette::bail!("{} already exists — the gate never overwrites a record", path.display());
+    }
+    let dir = path.parent().unwrap_or(Path::new("."));
+    fs::create_dir_all(dir).map_err(|e| miette::miette!("{}: {e}", dir.display()))?;
+    let staging = path.with_extension("kdl.writing");
+    fs::write(&staging, content).map_err(|e| miette::miette!("{}: {e}", staging.display()))?;
+    fs::rename(&staging, path).map_err(|e| {
+        let _ = fs::remove_file(&staging);
+        miette::miette!("{}: {e}", path.display())
+    })
 }
 
 /// `TS.260820.04`. The conditions come from the record, the verdicts from the core, and

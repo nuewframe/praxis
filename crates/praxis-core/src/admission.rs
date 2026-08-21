@@ -121,8 +121,21 @@ pub struct Slice {
     pub realizes: String,
     pub layers: Vec<String>,
     pub depends_on: Vec<String>,
+    /// The claim ids the slice declares. Delivery is measured against these, never
+    /// against one iteration's own accounting of what it took on.
+    pub claims: Vec<String>,
     /// What the record SAYS its state is — which may disagree with what the iterations show.
     pub declared_state: Option<String>,
+}
+
+/// One claim, as an iteration settled it. `from` is the slice that declared it, which
+/// need not be the slice this iteration is on: a residue can be settled later, by the
+/// iteration that finally had what settling it required.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Settled {
+    pub id: String,
+    pub from: String,
+    pub state: String,
 }
 
 /// An attempt at a slice.
@@ -131,19 +144,12 @@ pub struct Attempt {
     pub id: String,
     pub on_slice: String,
     pub state: String,
-    pub claims: Vec<String>,
+    pub claims: Vec<Settled>,
 }
 
 impl Attempt {
     pub fn in_flight(&self) -> bool {
         matches!(self.state.as_str(), "open" | "working")
-    }
-
-    /// Closed with every claim met. A close carrying an unsettled claim is a close, not a
-    /// delivery — `no-silent-drop` refuses it, and until that rule runs this is what
-    /// distinguishes them.
-    pub fn delivered(&self) -> bool {
-        self.state == "closed" && !self.claims.is_empty() && self.claims.iter().all(|c| c == "met")
     }
 }
 
@@ -189,12 +195,39 @@ impl Corpus {
         self.slices.iter().find(|s| s.id == id)
     }
 
-    /// Whether a slice is delivered — derived from its attempts, never read from its own
-    /// `state`. A second copy of a derivable fact is what this frame is about.
+    /// Whether a slice is delivered — every claim IT declares met by some iteration.
+    ///
+    /// Measured against the slice's own claims rather than against one iteration's
+    /// accounting, for two reasons. A closed iteration that met everything it took on has
+    /// not delivered a slice it only partly attempted. And a claim whose settlement
+    /// depends on work downstream of its own slice can be settled later, by the iteration
+    /// that finally had what settling it required (ITER.260821.03/S1).
     pub fn delivered(&self, id: &str) -> bool {
+        let Some(slice) = self.slice(id) else {
+            return false;
+        };
+        !slice.claims.is_empty()
+            && slice.claims.iter().all(|claim| {
+                self.attempts.iter().any(|a| {
+                    a.state == "closed"
+                        && a.claims
+                            .iter()
+                            .any(|c| c.id == *claim && c.from == id && c.state == "met")
+                })
+            })
+    }
+
+    /// Which iteration settled the last of a slice's claims. What a reader wants next
+    /// after being told something is done is who did it.
+    pub fn delivered_by(&self, id: &str) -> Option<&str> {
+        if !self.delivered(id) {
+            return None;
+        }
         self.attempts
             .iter()
-            .any(|a| a.on_slice == id && a.delivered())
+            .filter(|a| a.claims.iter().any(|c| c.from == id && c.state == "met"))
+            .map(|a| a.id.as_str())
+            .next_back()
     }
 }
 
@@ -206,6 +239,7 @@ fn slice_from(node: &KdlNode) -> Slice {
         realizes: child_arg(node, "realizes").unwrap_or_default(),
         layers: child_args(node, "layer"),
         depends_on: child_args(node, "depends-on"),
+        claims: child_args(node, "claim"),
         declared_state: child_arg(node, "state"),
     }
 }
@@ -218,7 +252,11 @@ fn attempt_from(node: &KdlNode) -> Attempt {
         claims: node
             .iter_children()
             .filter(|c| c.name().value() == "claim")
-            .map(|c| prop(c, "state").unwrap_or_default())
+            .map(|c| Settled {
+                id: string_arg(c).unwrap_or_default(),
+                from: prop(c, "from-slice").unwrap_or_default(),
+                state: prop(c, "state").unwrap_or_default(),
+            })
             .collect(),
     }
 }
@@ -362,12 +400,8 @@ fn decide(condition: &Condition, slice: &Slice, corpus: &Corpus) -> Verdict {
             Some(a) => Verdict::Blocks(format!("{} is {} on this slice", a.id, a.state)),
             None => Verdict::Admits,
         },
-        "nothing-left-to-admit" => match corpus
-            .attempts
-            .iter()
-            .find(|a| a.on_slice == slice.id && a.delivered())
-        {
-            Some(a) => Verdict::Blocks(format!("delivered by {}", a.id)),
+        "nothing-left-to-admit" => match corpus.delivered_by(&slice.id) {
+            Some(by) => Verdict::Blocks(format!("delivered by {by}")),
             None => Verdict::Admits,
         },
         other => Verdict::Uncomputed(format!(

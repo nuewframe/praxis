@@ -7,6 +7,7 @@
 
 pub mod admission;
 pub mod check;
+pub mod pickup;
 pub mod schema;
 pub mod view;
 
@@ -15,6 +16,7 @@ pub use check::{
     refused,
 };
 pub use admission::{Assessment, Condition, Conditions, Corpus, Verdict, assess, project};
+pub use pickup::{Ask, Pickup, Record, pick_up};
 pub use schema::{Cardinality, EntitySpec, FieldSpec, Schema};
 pub use view::{Cell, ReadModel, Section};
 

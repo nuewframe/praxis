@@ -559,6 +559,24 @@ notional-architecture "NA.260820.01" {
             field "trail"     each="1"
         }
 
+        entity "refusal" is="a pick-up the gate refused, and the condition that failed" \
+            owned-by="work-admission" \
+            never-deleted=#true because="a refusal nobody kept is a gate nobody can prove ran" \
+            note="declared by ITER.260821.04, and the first kind the record needed that discovery \
+                never named. `refusal-is-a-fact` has been a policy since the storm; the thing the \
+                policy produces had no shape, so nothing could hold one. It sits in iterations/ \
+                because an admission and a refusal are the two outcomes of ONE command, and a \
+                container is named for what its contents are to the owner" {
+            field "on-slice"  each="1" references="thin-slice"
+            field "at"        each="1"
+            field "by"        each="1"
+            field "asked-by"  each="0..1" because="the human whose ask was refused, where there was one"
+            field "condition" each="1..n" \
+                because="a refusal that does not name the condition is indistinguishable from \
+                    never having been asked, which is S3"
+            field "trail"     each="1"
+        }
+
         entity "phase" is="one stage of work inside an iteration — WHEN in the attempt, as a layer is WHERE in the stack" \
             states="pending active complete skipped" \
             owned-by="the iteration" \
