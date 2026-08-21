@@ -194,17 +194,24 @@ iteration "ITER.260820.01" {
 
     // DecisionRecorded — bound to the work that forced it. It amended ADR.260819.01
     // rather than living here, because the choice is durable and the iteration is not.
-    decision "the KDL parser" state="recorded" at="2026-08-20T23:40:00-05:00" \
-        decided="kdl-rs, as a document model. Not knuffel, and not any derive-based deserializer" \
+    decision "the KDL parser" state="accepted" at="2026-08-20T23:40:00-05:00" \
+        chose="kdl-rs, as a document model. Not knuffel, and not any derive-based deserializer" \
         because="the disqualifying property is derive, not the version. The schema lives in \
             NA.260820.01, so the engine must validate against a schema loaded at runtime — types \
             that encode it would make extending a vocabulary a recompile" \
-        alternatives="knuffel · a maintained derive-based successor · serde with a generic value model · a hand-rolled parser" \
+        over="knuffel · a maintained derive-based successor · serde with a generic value model · a hand-rolled parser" \
+        falsified-by="a derive-based codec that can validate against a schema loaded at RUNTIME. If \
+            one exists, the disqualifying property was never derive and this decision was about \
+            maturity, which is a different argument with a different answer" \
         raised="ADR.260819.01/A4" \
         note="serde was rejected on spans: its data model carries none, and C2 requires the \
             refusal to name the missing FIELD"
-    decision "where the shape check lives" state="recorded" at="2026-08-21T00:00:00-05:00" \
-        decided="a praxis-core validator over a parsed document, never a codec-level refusal" \
+    decision "where the shape check lives" state="accepted" at="2026-08-21T00:00:00-05:00" \
+        chose="a praxis-core validator over a parsed document, never a codec-level refusal" \
+        over="a codec-level refusal · a two-stage parse that types the document as it reads it" \
+        falsified-by="a codec-level refusal that names the MISSING FIELD rather than the syntax \
+            error. If a codec can say `missing realizes`, the layering here is one indirection \
+            nobody needed" \
         because="A4 rejected derive, so the codec can only fail on SYNTAX. `which field is missing` \
             is semantic and lives above it — C2 is unreachable from the codec" \
         note="a derivation from A4 rather than a choice. Recorded because a decision nobody wrote \

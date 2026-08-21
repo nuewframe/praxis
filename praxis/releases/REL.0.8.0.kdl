@@ -21,6 +21,7 @@ release "REL.0.8.0" {
     binds "ITER.260821.12"
     binds "ITER.260821.13"
     binds "ITER.260821.14"
+    binds "ITER.260821.15"
 
     proposed-bump "minor" \
         because="slice-outcome-added (ITER.260820.01)"
@@ -28,7 +29,7 @@ release "REL.0.8.0" {
         note="the record PROPOSES. Choosing the version is the maintainer's, at cut"
 
     trail {
-        entry at="2026-08-21T19:52:18Z" by="agent:praxis" action="bound" \
+        entry at="2026-08-21T19:59:17Z" by="agent:praxis" action="bound" \
             note="composed from what is bound. Rewritten whole on every bind"
     }
 }

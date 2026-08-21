@@ -91,6 +91,9 @@ iteration "ITER.260821.03" {
     decision "a delivered slice is not marked delivered" \
         chose="leave TS.260820.04 with no `state`, and let the derivation from its iterations stand" \
         over="writing `state \"delivered\"` on it, as the three slices before it carry" \
+        falsified-by="a reader who needs the stored state because deriving it is too slow, or a \
+            case where the derivation is genuinely ambiguous and the record has to say which \
+            reading it meant" \
         because="delivery is now computed. A stored copy of a computed fact is the second copy whose \
             fidelity is unverifiable-without-checking-the-first, which is what this frame is about. \
             The drift check treats silence as deference and only a CONTRADICTION as drift, so the \

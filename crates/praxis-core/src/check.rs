@@ -49,6 +49,12 @@ pub enum Refusal {
     BrokenSeal { release: String, expected: String, found: String },
     /// A cut release with no seal at all, so nothing about it can be checked.
     UnsealedRelease { release: String },
+    /// A decision with no alternatives, or none that would show it wrong.
+    PreferenceNotDecision { decision: String, missing: &'static str },
+    /// A decision that belongs to no iteration.
+    UnboundDecision { decision: String },
+    /// An accepted decision whose body no longer matches the seal written when it was accepted.
+    RewrittenDecision { decision: String },
     /// A read model nobody has said whether to publish.
     UndeclaredLifetime { view: String },
     /// A publishable view with no reason, or nowhere to land.
@@ -76,6 +82,8 @@ impl Refusal {
             Self::BrokenSeal { .. } | Self::UnsealedRelease { .. } => "seal",
             Self::HandPromoted { .. } => "shipped",
             Self::UndeclaredLifetime { .. } => "publishable",
+            Self::PreferenceNotDecision { missing, .. } => missing,
+            Self::UnboundDecision { .. } | Self::RewrittenDecision { .. } => "decision",
             Self::UnjustifiedLifetime { missing, .. } => missing,
         }
     }
@@ -131,6 +139,20 @@ impl Refusal {
                  slice sets the granularity, and evidence outside it is evidence for something \
                  nobody asked about",
                 if declared.is_empty() { "none".to_owned() } else { declared.join(" · ") }
+            ),
+            Self::PreferenceNotDecision { decision, missing } => format!(
+                "{decision:?} declares no `{missing}`. A decision with no alternatives it rejected, \
+                 or nothing that would show it wrong, is a preference — and a preference recorded \
+                 as a decision is the hardest kind to argue with later"
+            ),
+            Self::UnboundDecision { decision } => format!(
+                "{decision:?} belongs to no iteration. A decision bound to a folder beside the work \
+                 loses the one thing that makes it readable later: what forced it"
+            ),
+            Self::RewrittenDecision { decision } => format!(
+                "{decision:?} is accepted and its body no longer matches what was accepted. Correct \
+                 it by APPENDING an amendment — a decision that can be edited afterwards is a \
+                 decision nobody can cite"
             ),
             Self::UndeclaredLifetime { view } => format!(
                 "{view} does not say whether it survives being frozen. There is no repository-wide \
@@ -453,6 +475,16 @@ pub fn check_corpus(docs: &[KdlDocument], schema: &Schema) -> Vec<Violation> {
         ));
     }
 
+    // The decision rules, if the record declares them. A decision is bound to the
+    // iteration that FORCED it, names what it rejected and what would show it wrong, and
+    // once accepted is corrected only by appending.
+    if schema.declares_rule("a-decision-names-what-it-rejected")
+        || schema.declares_rule("a-decision-names-its-falsifier")
+        || schema.declares_rule("an-accepted-decision-is-append-only")
+    {
+        out.extend(check_decisions(docs, schema));
+    }
+
     // `publish-only-what-survives-freezing`, if the record declares it. Membership of the
     // published set comes from these declarations and from nothing else.
     if schema.declares_rule("publish-only-what-survives-freezing") {
@@ -559,6 +591,97 @@ pub fn check_corpus(docs: &[KdlDocument], schema: &Schema) -> Vec<Violation> {
         }
     }
     out
+}
+
+/// `TS.260820.14`. A decision is bound, argued and falsifiable, or it is a preference.
+fn check_decisions(docs: &[KdlDocument], schema: &Schema) -> Vec<Violation> {
+    let mut out = Vec::new();
+    for doc in docs {
+        // A decision at the root belongs to no iteration at all.
+        if schema.declares_rule("a-decision-is-bound-to-an-iteration") {
+            for node in doc.nodes().iter().filter(|n| n.name().value() == "decision") {
+                out.push(Violation {
+                    entity_kind: "decision".to_owned(),
+                    entity_id: string_arg(node),
+                    refusal: Refusal::UnboundDecision {
+                        decision: string_arg(node).unwrap_or_default(),
+                    },
+                    span: node.span(),
+                });
+            }
+        }
+
+        for iteration in doc.nodes().iter().filter(|n| n.name().value() == "iteration") {
+            for decision in children_named(iteration, "decision") {
+                let Some(title) = string_arg(decision) else { continue };
+                let id = string_arg(iteration);
+
+                if schema.declares_rule("a-decision-names-what-it-rejected")
+                    && prop(decision, "over").is_none()
+                    && children_named(decision, "over").is_empty()
+                {
+                    out.push(Violation {
+                        entity_kind: "iteration".to_owned(),
+                        entity_id: id.clone(),
+                        refusal: Refusal::PreferenceNotDecision {
+                            decision: title.clone(),
+                            missing: "over",
+                        },
+                        span: decision.span(),
+                    });
+                }
+                if schema.declares_rule("a-decision-names-its-falsifier")
+                    && prop(decision, "falsified-by").is_none()
+                {
+                    out.push(Violation {
+                        entity_kind: "iteration".to_owned(),
+                        entity_id: id.clone(),
+                        refusal: Refusal::PreferenceNotDecision {
+                            decision: title.clone(),
+                            missing: "falsified-by",
+                        },
+                        span: decision.span(),
+                    });
+                }
+
+                // Append-only. The seal covers the body and deliberately not the
+                // amendments, so appending one is not an edit.
+                if schema.declares_rule("an-accepted-decision-is-append-only")
+                    && prop(decision, "state").as_deref().unwrap_or("accepted") == "accepted"
+                    && let Some(written) = prop(decision, "seal")
+                {
+                    let body = decision_body(decision, &title);
+                    if crate::cut::seal(&body, "", &[], &[]) != written {
+                        out.push(Violation {
+                            entity_kind: "iteration".to_owned(),
+                            entity_id: id.clone(),
+                            refusal: Refusal::RewrittenDecision { decision: title.clone() },
+                            span: decision.span(),
+                        });
+                    }
+                }
+            }
+        }
+    }
+    out
+}
+
+/// The sealed material of a decision: what it chose, what it rejected, why, and what would
+/// show it wrong. Amendments are excluded — appending one must not read as an edit.
+pub fn decision_body(node: &KdlNode, title: &str) -> String {
+    let mut over: Vec<String> = children_named(node, "over").iter().filter_map(|n| string_arg(n)).collect();
+    if let Some(single) = prop(node, "over") {
+        over.push(single);
+    }
+    over.sort();
+    const UNIT: char = '\u{1f}';
+    format!(
+        "{title}{UNIT}{}{UNIT}{}{UNIT}{}{UNIT}{}",
+        prop(node, "chose").unwrap_or_default(),
+        over.join(","),
+        prop(node, "because").unwrap_or_default(),
+        prop(node, "falsified-by").unwrap_or_default()
+    )
 }
 
 /// `TS.260820.09`/C4. A cut release's index node is never edited, and the seal is how

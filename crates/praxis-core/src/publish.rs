@@ -75,6 +75,7 @@ pub fn publish(version: &str, corpus: &Corpus) -> Publication {
         let model = match view.name.as_str() {
             "the-published-set-for-a-release" => published_set(version, corpus),
             "capabilities-and-what-they-own" => capabilities(version, corpus),
+            "the-decisions-that-shaped-this" => decisions(version, corpus),
             other => {
                 uncomposable.push(format!(
                     "{other} is declared publishable and the engine has no composer for it. The \
@@ -98,6 +99,62 @@ pub fn publish(version: &str, corpus: &Corpus) -> Publication {
     }
 
     Publication::Ready { version: version.to_owned(), documents }
+}
+
+/// `the-decisions-that-shaped-this` — what was decided, what the alternatives were, and
+/// what tested it.
+///
+/// `E19`'s second use: claim-settlement carries the decision, its amendments and the
+/// findings that tested it. What discovery rejected is delivery-record's half, and reaches
+/// a reader through this same document once that half exists.
+fn decisions(version: &str, corpus: &Corpus) -> ReadModel {
+    let mut made = Section::new(
+        "what was decided",
+        &["decision", "forced by", "chose", "would be shown wrong by"],
+    )
+    .empty_because("nothing recorded — no iteration has had to make a choice explicitly");
+    let mut rejected = Section::new("what it rejected", &["decision", "alternative"])
+        .empty_because("nothing recorded — no decision names an alternative");
+    let mut tested = Section::new("what tested it", &["decision", "finding", "from"])
+        .empty_because("nothing recorded — no finding names a decision it tested");
+    let mut amended = Section::new("corrections", &["decision", "amendment"])
+        .empty_because("nothing recorded — no decision has been amended");
+
+    for decision in &corpus.decisions {
+        made.push(vec![
+            decision.title.clone(),
+            decision.iteration.clone(),
+            decision.chose.clone(),
+            decision
+                .falsified_by
+                .clone()
+                .unwrap_or_else(|| "nothing named — which makes it a preference".to_owned()),
+        ]);
+        for alternative in &decision.over {
+            rejected.push(vec![decision.title.clone(), alternative.clone()]);
+        }
+        for amendment in &decision.amendments {
+            amended.push(vec![decision.title.clone(), amendment.clone()]);
+        }
+        // C4: the findings that tested it, reachable FROM the decision.
+        for attempt in &corpus.attempts {
+            for finding in attempt.findings.iter().filter(|f| f.tests.as_deref() == Some(decision.title.as_str())) {
+                tested.push(vec![
+                    decision.title.clone(),
+                    finding.id.clone(),
+                    attempt.id.clone(),
+                ]);
+            }
+        }
+    }
+
+    let mut model = ReadModel::new(
+        "the-decisions-that-shaped-this",
+        "what was decided, what were the alternatives, and what tested it?",
+        version,
+    );
+    model.publishable = true;
+    model.section(made).section(rejected).section(tested).section(amended)
 }
 
 /// Where a view lands, from its own `publishes-to`. A path ending in `/` is a directory,

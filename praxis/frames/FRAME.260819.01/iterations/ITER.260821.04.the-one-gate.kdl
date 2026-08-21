@@ -106,6 +106,9 @@ iteration "ITER.260821.04" {
             second would add nothing but a line claiming it had been done. The start vet is a \
             second ask, and until there is a command for it the record shows an open iteration \
             rather than a falsely-started one" \
+        falsified-by="a `start` command landing and the second vet turning out to add nothing — if \
+            it never catches a tree that moved, the two-stage vet was ceremony and one command \
+            should do both" \
         owed="a `start` command, and the rule iteration-worked-without-start-vet enforced (T3)"
 
     layer "doctrine"    state="evidenced" evidence="skills/pick-up-a-slice/SKILL.md, registered in the router under ITERATE" reaches="the skill teaches that selection IS the commitment, and that refusals are recorded"
@@ -150,6 +153,7 @@ iteration "ITER.260821.04" {
             being stuck — which is what the fitness function assumed and nothing implemented"
 
     finding "T3" state="open" size="owed-work" \
+        tests="the machine gate implements half of the doctrine, and says so" \
         text="one command cannot perform a two-stage vet. The record says an iteration is vetted at \
             create and again at start BECAUSE the tree moves in between; `praxis pick-up` runs \
             once, against one tree, so a second vet inside it would be a line claiming a check that \

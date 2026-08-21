@@ -584,7 +584,8 @@ notional-architecture "NA.260820.01" {
                     change it was — and a bump proposal inferred from a diff is a guess about \
                     intent"
             field "phase"     each="0..n" holds="phase" because="a contained entity, not a value — without `holds` it is indistinguishable from a field, which is how it went missing"
-            field "decision"  each="0..n"
+            field "decision"  each="0..n" holds="decision" \
+                because="a decision is bound to the iteration that FORCED it, by nesting inside it"
             field "finding"   each="0..n"
             field "close"     each="0..1"
             field "trail"     each="1"
@@ -618,6 +619,14 @@ notional-architecture "NA.260820.01" {
             // accepted today. Recorded as W4 — the first thing the record has needed to say
             // that its own vocabulary cannot express.
         }
+
+        entity "decision" is="a choice an iteration could not make implicitly, with what it rejected and what would show it wrong" \
+            owned-by="the iteration" \
+            never-deleted=#true because="a decision nobody can read later is one that gets remade" \
+            shape="carried as properties — chose, over, because, falsified-by, state, seal — with \
+                `amendment` as the only child. Deliberately shapeless in the same way as `phase`" \
+            note="declared by ITER.260821.15. The record has carried decisions since ITER.260821.04 \
+                and nothing checked one"
 
         entity "phase" is="one stage of work inside an iteration — WHEN in the attempt, as a layer is WHERE in the stack" \
             states="pending active complete skipped" \
@@ -712,6 +721,20 @@ notional-architecture "NA.260820.01" {
         rule "iteration-without-signed-admission" refuses="work beginning on an iteration whose admission is unsigned"
         rule "iteration-worked-without-start-vet"  refuses="work beginning on a create-vet alone"
         rule "complete-phase-without-evidence"     refuses="a phase marked complete that produced nothing"
+        rule "a-decision-names-what-it-rejected"   refuses="a decision that names no alternative it rejected" \
+            because="a decision with no alternatives is a preference, and a preference recorded as a \
+                decision is the hardest kind to argue with later — there is nothing to argue against"
+        rule "a-decision-names-its-falsifier"      refuses="a decision that names nothing which would show it wrong" \
+            because="the same reason. A decision nothing could falsify was never a choice between \
+                real options, and a reader two years out cannot tell whether it still holds"
+        rule "a-decision-is-bound-to-an-iteration" refuses="a decision that belongs to no iteration" \
+            because="a decision filed beside the work loses the one thing that makes it readable \
+                later — what forced it"
+        rule "an-accepted-decision-is-append-only" refuses="an accepted decision whose body no longer matches what was accepted" \
+            because="a decision that can be edited afterwards is a decision nobody can cite" \
+            note="the seal covers the body and deliberately NOT the amendments, so appending a \
+                correction is not an edit. Same mechanism as cut-release-is-immutable and the same \
+                honest limit: it makes a rewrite visible, it does not prevent one"
         rule "publish-only-what-survives-freezing" refuses="a read model that does not declare whether it survives being frozen, or declares a lifetime with no reason" \
             because="the publication test is a judgement about perishability, and an unjustified \
                 judgement is indistinguishable from an oversight. There is no repository-wide \

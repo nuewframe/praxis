@@ -138,6 +138,24 @@ pub struct Settled {
     pub state: String,
 }
 
+/// A choice an iteration could not make implicitly, with what it rejected and what would
+/// show it wrong.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Decision {
+    pub title: String,
+    pub iteration: String,
+    pub chose: String,
+    /// The alternatives genuinely available. A decision with none is a preference.
+    pub over: Vec<String>,
+    pub because: String,
+    /// What would show it wrong. A decision with no falsifier is a preference too.
+    pub falsified_by: Option<String>,
+    pub state: String,
+    pub seal: Option<String>,
+    /// Corrections, appended. The original stays readable.
+    pub amendments: Vec<String>,
+}
+
 /// One finding an iteration recorded, and the claim it accounts for if it accounts for
 /// one. A shortfall carried by a finding is accounted; a shortfall carried by nothing is
 /// scope dropped in silence.
@@ -145,6 +163,8 @@ pub struct Settled {
 pub struct Carried {
     pub id: String,
     pub carries: Option<String>,
+    /// A decision this finding tested, where it tested one.
+    pub tests: Option<String>,
 }
 
 /// An attempt at a slice.
@@ -233,6 +253,7 @@ pub struct Corpus {
     pub symptoms: Vec<(String, String)>,
     pub capabilities: Vec<Capability>,
     pub views: Vec<View>,
+    pub decisions: Vec<Decision>,
     pub config: Config,
     /// Ids the shape check refuses. A slice the checker refuses is not work waiting.
     pub refused: Vec<String>,
@@ -258,7 +279,33 @@ impl Corpus {
             for node in doc.nodes() {
                 match node.name().value() {
                     "thin-slice" => corpus.slices.push(slice_from(node)),
-                    "iteration" => corpus.attempts.push(attempt_from(node)),
+                    "iteration" => {
+                        let id = string_arg(node).unwrap_or_default();
+                        for child in node.iter_children().filter(|c| c.name().value() == "decision")
+                        {
+                            corpus.decisions.push(Decision {
+                                title: string_arg(child).unwrap_or_default(),
+                                iteration: id.clone(),
+                                chose: prop(child, "chose").unwrap_or_default(),
+                                over: child
+                                    .iter_children()
+                                    .filter(|g| g.name().value() == "over")
+                                    .filter_map(string_arg)
+                                    .chain(prop(child, "over"))
+                                    .collect(),
+                                because: prop(child, "because").unwrap_or_default(),
+                                falsified_by: prop(child, "falsified-by"),
+                                state: prop(child, "state").unwrap_or_else(|| "accepted".to_owned()),
+                                seal: prop(child, "seal"),
+                                amendments: child
+                                    .iter_children()
+                                    .filter(|g| g.name().value() == "amendment")
+                                    .filter_map(string_arg)
+                                    .collect(),
+                            });
+                        }
+                        corpus.attempts.push(attempt_from(node));
+                    }
                     "release" => corpus.releases.push(release_from(node)),
                     "capability" => corpus.capabilities.push(Capability {
                         id: string_arg(node).unwrap_or_default(),
@@ -411,6 +458,7 @@ fn attempt_from(node: &KdlNode) -> Attempt {
             .map(|c| Carried {
                 id: string_arg(c).unwrap_or_default(),
                 carries: prop(c, "carries"),
+                tests: prop(c, "tests"),
             })
             .collect(),
     }
