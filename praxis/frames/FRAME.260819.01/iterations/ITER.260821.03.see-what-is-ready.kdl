@@ -132,7 +132,7 @@ iteration "ITER.260821.03" {
             ready set — because the first real answer produced one, and the instinct it invites is \
             to weaken a condition"
 
-    finding "S1" state="open" size="owed-work" \
+    finding "S1" state="open" size="owed-work" carries="C1" \
         text="C1 cannot be settled by the slice that owns it. It asks for a property test against \
             the GATE, and the gate is TS.260820.05, which depends on TS.260820.04. The settlement \
             is circular in the cut, and neither the cut nor three iterations of vetting noticed" \
@@ -228,6 +228,11 @@ iteration "ITER.260821.03" {
     }
 
     trail {
+        entry at="2026-08-21T14:20:00Z" by="agent:principal-engineer" action="amended" \
+            note="S1 now says `carries=C1`. It always did carry it — that is what the finding is \
+                about — but it said so only in prose, so when no-silent-drop was turned on in \
+                ITER.260821.05 this close was the one record in the tree it refused. The rule was \
+                right: the accounting existed and was not legible"
         entry at="2026-08-21T07:55:00-05:00" by="agent:principal-engineer" action="state-changed" \
             from="working" to="closed" \
             note="the record answers a question for the first time. It said the backlog is a chain \

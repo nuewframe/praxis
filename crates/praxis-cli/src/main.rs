@@ -10,8 +10,8 @@ use std::process::ExitCode;
 use clap::{Parser, Subcommand};
 use miette::{Diagnostic, NamedSource, SourceSpan};
 use praxis_core::{
-    Ask, Conditions, Corpus, Known, Pickup, Schema, Severity, Violation, assess, check_corpus,
-    check_document, index_all, parse, pick_up, project,
+    Ask, Closing, Conditions, Corpus, Known, Pickup, Schema, Severity, Violation, assess,
+    check_corpus, check_document, close_iteration, index_all, parse, pick_up, project,
 };
 
 mod render;
@@ -43,6 +43,17 @@ enum Command {
         /// Say what would happen and write nothing.
         #[arg(long)]
         dry_run: bool,
+    },
+    /// Close an iteration, or refuse and name every claim it cannot account for.
+    Close {
+        /// The iteration to close.
+        iteration: String,
+        /// What this iteration concluded.
+        #[arg(long, default_value = "continue")]
+        outcome: String,
+        /// The state root to read and write.
+        #[arg(default_value = "praxis")]
+        root: PathBuf,
     },
     /// Show which slices could be started right now, and what would refuse each of the rest.
     ///
@@ -95,6 +106,19 @@ fn main() -> ExitCode {
         Command::PickUp { slice, root, dry_run } => match pickup(&slice, &root, dry_run) {
             Ok(admitted) => {
                 if admitted {
+                    ExitCode::SUCCESS
+                } else {
+                    ExitCode::FAILURE
+                }
+            }
+            Err(report) => {
+                eprintln!("{report:?}");
+                ExitCode::FAILURE
+            }
+        },
+        Command::Close { iteration, outcome, root } => match close(&iteration, &outcome, &root) {
+            Ok(closed) => {
+                if closed {
                     ExitCode::SUCCESS
                 } else {
                     ExitCode::FAILURE
@@ -184,6 +208,175 @@ fn pickup(slice: &str, root: &Path, dry_run: bool) -> miette::Result<bool> {
             Ok(false)
         }
     }
+}
+
+/// `TS.260820.07`. Every claim settled, or every shortfall carried forward — or it does
+/// not close. This is the first command that CHANGES a record rather than adding one, so
+/// it rewrites the file whole: the document model preserves what it did not touch, and a
+/// failed write leaves the original exactly as it was.
+fn close(iteration: &str, outcome: &str, root: &Path) -> miette::Result<bool> {
+    let sources = load(root)?;
+    let docs: Vec<_> = sources.iter().map(|(_, _, d)| d.clone()).collect();
+
+    let mut schema = Schema::default();
+    for doc in &docs {
+        let found = Schema::from_document(doc);
+        if !found.is_empty() {
+            schema = found;
+        }
+    }
+    let corpus = Corpus::from_documents(&docs, &schema);
+    let ask = Ask { signer: human()?, at: now(), by: "agent:praxis".to_owned() };
+    let taken = ids_in_use(&docs);
+
+    match close_iteration(iteration, &corpus, &ask, &taken) {
+        Closing::NoSuchIteration(why) | Closing::NotOpen(why) => miette::bail!("{why}"),
+        Closing::Refused(record) => {
+            for (claim, why) in &record.failed {
+                eprintln!("praxis: close refused — {claim}: {why}");
+            }
+            let home = frame_of_iteration(iteration, &sources).ok_or_else(|| {
+                miette::miette!("cannot tell which frame {iteration} belongs to")
+            })?;
+            let path = home.join(&record.file);
+            write_once(&path, &record.kdl)?;
+            eprintln!(
+                "praxis: {} recorded at {} — {iteration} stays open",
+                record.id,
+                path.display()
+            );
+            Ok(false)
+        }
+        Closing::Accepted { accounting, all_met, .. } => {
+            let (path, text, _) = sources
+                .iter()
+                .find(|(_, _, doc)| holds_iteration(doc, iteration))
+                .ok_or_else(|| miette::miette!("{iteration} is in no file"))?;
+            let updated = apply_close(text, iteration, outcome, &accounting, all_met, &ask)?;
+            fs::write(path, updated).map_err(|e| miette::miette!("{}: {e}", path.display()))?;
+            for (claim, how) in &accounting {
+                println!("praxis: {claim} — {how}");
+            }
+            println!(
+                "praxis: {iteration} closed ({outcome}){}",
+                if all_met { "" } else { " — with shortfalls carried" }
+            );
+            Ok(true)
+        }
+    }
+}
+
+fn holds_iteration(doc: &kdl::KdlDocument, id: &str) -> bool {
+    doc.nodes()
+        .iter()
+        .any(|n| n.name().value() == "iteration" && root_id(n).as_deref() == Some(id))
+}
+
+fn frame_of_iteration(id: &str, sources: &[Source]) -> Option<PathBuf> {
+    sources
+        .iter()
+        .find(|(_, _, doc)| holds_iteration(doc, id))
+        .and_then(|(path, _, _)| path.parent()?.parent().map(Path::to_path_buf))
+}
+
+/// Rewrite the iteration in place: `state`, `closed-at`, `outcome`, an accounting block,
+/// and a trail entry. Every value written here was COMPUTED — the machine states what it
+/// checked and nothing about whether the work was any good.
+///
+/// New nodes are composed as TEXT and parsed, rather than built node by node. A node built
+/// through the API carries no formatting, so it lands unindented with its values written
+/// as bare identifiers — valid, and a record a human has to read. Parsing a fragment keeps
+/// the formatting the fragment was written with (ITER.260821.06/V6).
+fn apply_close(
+    text: &str,
+    iteration: &str,
+    outcome: &str,
+    accounting: &[(String, String)],
+    all_met: bool,
+    ask: &Ask,
+) -> miette::Result<String> {
+    let mut doc: kdl::KdlDocument = text
+        .parse()
+        .map_err(|e| miette::Report::new(e).context("reparsing to close"))?;
+    let node = doc
+        .nodes_mut()
+        .iter_mut()
+        .find(|n| n.name().value() == "iteration" && root_id(n).as_deref() == Some(iteration))
+        .ok_or_else(|| miette::miette!("{iteration} vanished between reading and writing"))?;
+    let body = node
+        .children_mut()
+        .as_mut()
+        .ok_or_else(|| miette::miette!("{iteration} has no body"))?;
+
+    // Swapped as a parsed fragment, not as a value: a value set through the API is
+    // written as a bare identifier, so `state "open"` would become `state closed` —
+    // valid KDL, and a diff that looks like the file changed shape.
+    let closed_state: kdl::KdlDocument = "    state \"closed\"\n"
+        .parse()
+        .map_err(|e| miette::Report::new(e).context("composing the state"))?;
+    if let Some(replacement) = closed_state.nodes().first() {
+        for child in body.nodes_mut().iter_mut() {
+            if child.name().value() == "state" {
+                *child = replacement.clone();
+            }
+        }
+    }
+
+    let settled: String = accounting
+        .iter()
+        .map(|(claim, how)| format!("        claims-settled {claim:?} how={how:?}\n"))
+        .collect();
+    let note = concat!(
+        "the accounting above was computed at close, not asserted. It says every claim is ",
+        "either met or carried by a finding that names it, and nothing about whether the ",
+        "work is any good"
+    );
+    let closing: kdl::KdlDocument = format!(
+        "    closed-at {:?}\n    outcome {outcome:?}\n\n    close {{\n{settled}        all-met #{all_met}\n        note {note:?}\n    }}\n",
+        ask.at
+    )
+    .parse()
+    .map_err(|e| miette::Report::new(e).context("composing the close"))?;
+
+    // After `opened-by`, and before the trail — where a reader looking for how it ended
+    // would go first. Appending to the end is correct and unreadable.
+    let at = body
+        .nodes()
+        .iter()
+        .position(|n| n.name().value() == "trail")
+        .unwrap_or(body.nodes().len());
+    for (offset, new) in closing.nodes().iter().enumerate() {
+        body.nodes_mut().insert(at + offset, new.clone());
+    }
+
+    let closing_note = concat!(
+        "closed by `praxis close`. The accounting was computed; the conclusion is not the ",
+        "machine's to draw"
+    );
+    let entry: kdl::KdlDocument = format!(
+        "entry at={:?} by={:?} action=\"state-changed\" from=\"open\" to=\"closed\" note={closing_note:?}\n",
+        ask.at, ask.by
+    )
+    .parse()
+    .map_err(|e| miette::Report::new(e).context("composing the trail entry"))?;
+
+    for child in body.nodes_mut().iter_mut() {
+        if child.name().value() == "trail"
+            && let Some(entries) = child.children_mut().as_mut()
+            && let Some(first) = entry.nodes().first()
+        {
+            // A node's indentation is its own leading trivia, and a fragment parsed at
+            // column zero has none. Inserting it without this puts it on the same line as
+            // the `{` it went inside.
+            let mut placed = first.clone();
+            let mut format = placed.format().cloned().unwrap_or_default();
+            format.leading = "\n        ".to_owned();
+            placed.set_format(format);
+            entries.nodes_mut().insert(0, placed);
+        }
+    }
+
+    Ok(doc.to_string())
 }
 
 /// The frame directory a slice lives under. Discovery sits one level below the frame, so

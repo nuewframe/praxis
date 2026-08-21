@@ -73,7 +73,7 @@ pub fn pick_up(slice_id: &str, corpus: &Corpus, assessment: &Assessment, ask: &A
 
     if failed.is_empty() {
         let id = next_id("ITER", &ask.at, taken);
-        let kdl = iteration_kdl(&id, slice_id, &slice.slug, ask, verdicts, &undecided);
+        let kdl = iteration_kdl(&id, slice_id, &slice.slug, &slice.claims, ask, verdicts, &undecided);
         Pickup::Opened(Record {
             file: format!("iterations/{id}.{}.kdl", slice.slug),
             id,
@@ -95,7 +95,7 @@ pub fn pick_up(slice_id: &str, corpus: &Corpus, assessment: &Assessment, ask: &A
 /// `PREFIX.YYMMDD.NN`, the first NN not already taken. Two agents picking up on one day
 /// get distinct files and never contend — the layout rule ADR.260819.01 gives for
 /// iterations, applied to what a refused pick-up produces as well.
-fn next_id(prefix: &str, at: &str, taken: &[String]) -> String {
+pub(crate) fn next_id(prefix: &str, at: &str, taken: &[String]) -> String {
     let day: String = at.chars().filter(|c| c.is_ascii_digit()).take(8).collect();
     let day = if day.len() == 8 { day[2..].to_owned() } else { day };
     (1..100)
@@ -108,6 +108,7 @@ fn iteration_kdl(
     id: &str,
     slice_id: &str,
     slug: &str,
+    claims: &[String],
     ask: &Ask,
     verdicts: &[(String, Verdict)],
     undecided: &[(String, String)],
@@ -158,6 +159,21 @@ fn iteration_kdl(
         out.push_str("    // recorded above rather than omitted: an admission that does not say what\n");
         out.push_str("    // it left undecided claims more than it checked.\n");
     }
+    // The claims, pinned at open. Not a convenience: a claim list that can be edited
+    // mid-iteration is a close you can always make succeed by dropping what you did not
+    // reach, which is exactly how scope goes quietly in a Markdown checklist
+    // (TS.260820.07/C3).
+    if !claims.is_empty() {
+        out.push_str("\n    // Frozen at open, from the slice. Removing one from the slice now\n");
+        out.push_str("    // does not remove it from here — it makes the two disagree, and that is\n");
+        out.push_str("    // refused.\n");
+        for claim in claims {
+            out.push_str(&format!(
+                "    claim {claim:?} from-slice={slice_id:?} state=\"pending\"\n"
+            ));
+        }
+    }
+
     out.push_str("\n    trail {\n");
     out.push_str(&format!(
         "        entry at={:?} by={:?} action=\"created\" \\\n            note=\"opened by the gate, on the ask of {}\"\n",

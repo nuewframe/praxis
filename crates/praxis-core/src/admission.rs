@@ -138,6 +138,15 @@ pub struct Settled {
     pub state: String,
 }
 
+/// One finding an iteration recorded, and the claim it accounts for if it accounts for
+/// one. A shortfall carried by a finding is accounted; a shortfall carried by nothing is
+/// scope dropped in silence.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Carried {
+    pub id: String,
+    pub carries: Option<String>,
+}
+
 /// An attempt at a slice.
 #[derive(Debug, Clone)]
 pub struct Attempt {
@@ -145,6 +154,7 @@ pub struct Attempt {
     pub on_slice: String,
     pub state: String,
     pub claims: Vec<Settled>,
+    pub findings: Vec<Carried>,
 }
 
 impl Attempt {
@@ -256,6 +266,14 @@ fn attempt_from(node: &KdlNode) -> Attempt {
                 id: string_arg(c).unwrap_or_default(),
                 from: prop(c, "from-slice").unwrap_or_default(),
                 state: prop(c, "state").unwrap_or_default(),
+            })
+            .collect(),
+        findings: node
+            .iter_children()
+            .filter(|c| c.name().value() == "finding")
+            .map(|c| Carried {
+                id: string_arg(c).unwrap_or_default(),
+                carries: prop(c, "carries"),
             })
             .collect(),
     }

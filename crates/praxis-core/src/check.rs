@@ -41,6 +41,10 @@ pub enum Refusal {
     /// An iteration evidencing a layer its slice never declared. The slice sets the
     /// granularity; evidence outside it is evidence for something nobody asked about.
     UndeclaredLayer { layer: String, slice: String, declared: Vec<String> },
+    /// A closed iteration carrying a claim that is neither met nor carried by a finding.
+    SilentDrop { claim: String, state: String },
+    /// A claim frozen into an iteration that its slice no longer declares.
+    DroppedClaim { claim: String, slice: String },
     /// A layer the slice declared that the iteration has not evidenced. Reported: it must
     /// be visible as unevidenced rather than absent, which is C2.
     UnevidencedLayer { layer: String, slice: String },
@@ -58,6 +62,7 @@ impl Refusal {
             Self::UndeclaredKind { kind, .. } | Self::ShapelessKind { kind } => kind,
             Self::ContestedValue { field, .. } | Self::UnclaimedValue { field, .. } => field,
             Self::UndeclaredLayer { .. } | Self::UnevidencedLayer { .. } => "layer",
+            Self::SilentDrop { claim, .. } | Self::DroppedClaim { claim, .. } => claim,
         }
     }
 
@@ -112,6 +117,16 @@ impl Refusal {
                  slice sets the granularity, and evidence outside it is evidence for something \
                  nobody asked about",
                 if declared.is_empty() { "none".to_owned() } else { declared.join(" · ") }
+            ),
+            Self::SilentDrop { claim, state } => format!(
+                "closed with {claim} {} and no finding carrying it — record a finding that names \
+                 the claim, or settle it. A shortfall nobody wrote down and a claim that was met \
+                 look identical afterwards",
+                if state.is_empty() { "unsettled".to_owned() } else { format!("{state:?}") }
+            ),
+            Self::DroppedClaim { claim, slice } => format!(
+                "carries {claim}, frozen at open, and {slice} no longer declares it — deleting a \
+                 claim is not a way to settle it"
             ),
             Self::UnevidencedLayer { layer, slice } => format!(
                 "layer {layer:?} is declared by {slice} and this iteration evidences nothing for \
@@ -387,6 +402,18 @@ pub fn check_corpus(docs: &[KdlDocument], schema: &Schema) -> Vec<Violation> {
         out.extend(check_layers(docs));
     }
 
+    // `no-silent-drop` and `claim-dropped-from-the-slice`, if the record declares them.
+    // The close command refuses at the moment; these refuse forever, over a record nobody
+    // is currently asking about.
+    if schema.declares_rule("no-silent-drop") || schema.declares_rule("claim-dropped-from-the-slice")
+    {
+        out.extend(check_claims(
+            docs,
+            schema.declares_rule("no-silent-drop"),
+            schema.declares_rule("claim-dropped-from-the-slice"),
+        ));
+    }
+
     // Second pass: values that wanted a claimant and found none.
     for doc in docs {
         for node in doc.nodes() {
@@ -409,6 +436,76 @@ pub fn check_corpus(docs: &[KdlDocument], schema: &Schema) -> Vec<Violation> {
                             span: child.span(),
                         });
                     }
+                }
+            }
+        }
+    }
+    out
+}
+
+/// `TS.260820.07`. A closed iteration accounts for every claim it holds, and no claim it
+/// froze at open has since vanished from its slice.
+fn check_claims(docs: &[KdlDocument], silent_drop: bool, dropped: bool) -> Vec<Violation> {
+    let mut declared: Vec<(String, Vec<String>)> = Vec::new();
+    for doc in docs {
+        for node in doc.nodes().iter().filter(|n| n.name().value() == "thin-slice") {
+            if let Some(id) = string_arg(node) {
+                let claims =
+                    children_named(node, "claim").iter().filter_map(|c| string_arg(c)).collect();
+                declared.push((id, claims));
+            }
+        }
+    }
+
+    let mut out = Vec::new();
+    for doc in docs {
+        for node in doc.nodes().iter().filter(|n| n.name().value() == "iteration") {
+            let id = string_arg(node);
+            let on_slice = children_named(node, "on-slice")
+                .first()
+                .and_then(|n| string_arg(n))
+                .unwrap_or_default();
+            let closed = children_named(node, "state")
+                .first()
+                .and_then(|n| string_arg(n))
+                .is_some_and(|s| s == "closed");
+            let findings: Vec<Option<String>> =
+                children_named(node, "finding").iter().map(|f| prop(f, "carries")).collect();
+
+            for claim in children_named(node, "claim") {
+                let Some(claim_id) = string_arg(claim) else { continue };
+                let from = prop(claim, "from-slice").unwrap_or_default();
+                let state = prop(claim, "state").unwrap_or_default();
+
+                if dropped
+                    && from == on_slice
+                    && let Some((_, claims)) = declared.iter().find(|(s, _)| s == &on_slice)
+                    && !claims.is_empty()
+                    && !claims.contains(&claim_id)
+                {
+                    out.push(Violation {
+                        entity_kind: "iteration".to_owned(),
+                        entity_id: id.clone(),
+                        refusal: Refusal::DroppedClaim {
+                            claim: claim_id.clone(),
+                            slice: on_slice.clone(),
+                        },
+                        span: claim.span(),
+                    });
+                    continue;
+                }
+
+                if silent_drop
+                    && closed
+                    && state != "met"
+                    && !findings.iter().any(|f| f.as_deref() == Some(claim_id.as_str()))
+                {
+                    out.push(Violation {
+                        entity_kind: "iteration".to_owned(),
+                        entity_id: id.clone(),
+                        refusal: Refusal::SilentDrop { claim: claim_id, state },
+                        span: claim.span(),
+                    });
                 }
             }
         }
