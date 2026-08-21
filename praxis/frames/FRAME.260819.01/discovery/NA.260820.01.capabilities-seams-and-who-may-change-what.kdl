@@ -354,7 +354,26 @@ notional-architecture "NA.260820.01" {
         entity "event-storm" is="one sweep of a domain's timeline — the evidence a capability is derived FROM" \
             completes="when the capabilities it clusters into are named"
         entity "thin-slice" is="an atomic vertical slice — one command or one read model, cut so it can exercise a capability" \
-            states="proposed active delivered dropped"
+            states="proposed active delivered dropped" {
+            // The shape a checker refuses, made machine-readable. Derived from the storm's
+            // `slice-shape` policy and E13's two-kind split — not invented here. Added by
+            // ITER.260820.01/P7: the schema declared entities and relations but no FIELDS,
+            // so the validator had nothing to read and would have had to hardcode them,
+            // which is exactly what A4 forbids.
+            field "slug"           each="1"
+            field "title"          each="1"
+            field "kind"           each="1" one-of="command" "view"
+            field "realizes"       each="1" references="capability"
+            field "from-storm"     each="1" references="event-storm"
+            field "actor"          each="1"
+            field "trigger"        each="1"
+            field "outcome"        each="1"
+            field "layer"          each="1..n" because="verticality is the declared set, and a slice with none asserts nothing"
+            field "claim"          each="1..n" because="a slice with no claim cannot go unmet, so nothing can object"
+            field "command"        each="1"    when-kind="command"
+            field "produces-event" each="1..n" when-kind="command" because="a refusal is a fact, so a refusable command names both outcomes"
+            field "read-model"     each="1..n" when-kind="view" because="E13 — a view slice writes nothing and names the view instead"
+        }
         entity "notional-architecture" is="what the capabilities are to each other, free of any tool decision" \
             states="sought held"
         entity "capability" is="a permanent doing the system must have" \
@@ -374,6 +393,17 @@ notional-architecture "NA.260820.01" {
             note="defined 2026-08-20 by opening one. It was carried as undefined because three \
                 capabilities wrote facts about it and none declared it; ITER.260820.01 is the \
                 first, and cutting is how you learn what a thing is"
+
+        entity "phase" is="one stage of work inside an iteration — WHEN in the attempt, as a layer is WHERE in the stack" \
+            states="pending active complete skipped" \
+            owned-by="the iteration" \
+            kinds="design-ux · design-system · implement · learn · teach" \
+            note="undeclared until ITER.260820.01/P8. It survived the withdrawal of ADR.260819.02, \
+                where it was a first-class node, and nothing carried it forward — so the first \
+                iteration went from admission straight to implement with no phase recorded" {
+            field "kind"    each="1" one-of="design-ux" "design-system" "implement" "learn" "teach"
+            field "state"   each="1" one-of="pending" "active" "complete" "skipped"
+        }
 
         entity "read-model" is="a view an actor must see before acting, owned by exactly one capability" \
             note="already load-bearing in every slice's needs/feeds edges and never declared"
@@ -435,6 +465,8 @@ notional-architecture "NA.260820.01" {
         rule "adr-accepted-without-approval" refuses="an accepted decision nobody signed"
         rule "iteration-without-signed-admission" refuses="work beginning on an iteration whose admission is unsigned"
         rule "iteration-worked-without-start-vet"  refuses="work beginning on a create-vet alone"
+        rule "complete-phase-without-evidence"     refuses="a phase marked complete that produced nothing"
+        rule "skipped-phase-without-rationale"     refuses="a phase skipped with no reason recorded"
         rule "amendment-records-no-change"  refuses="an amendment that changes nothing"
         rule "slice-without-one-capability" refuses="a slice realizing zero or several capabilities"
 

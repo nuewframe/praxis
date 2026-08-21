@@ -1,0 +1,6 @@
+# Pinned exactly, never `stable`. A floating channel means two agents compile with
+# two compilers, which is the portability defect ADR.260819.01 exists to remove,
+# one layer up. Bumping this is an amendment to that decision.
+[toolchain]
+channel = "1.97.1"
+components = ["rustfmt", "clippy"]

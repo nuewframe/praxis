@@ -1,0 +1,17 @@
+# The imperative shell. It touches the filesystem, parses arguments and renders
+# diagnostics. It decides nothing.
+[package]
+name = "praxis-cli"
+version = "0.8.0"
+edition.workspace = true
+rust-version.workspace = true
+
+[[bin]]
+name = "praxis"
+path = "src/main.rs"
+
+[dependencies]
+praxis-core = { path = "../praxis-core" }
+clap = { version = "4", features = ["derive"] }
+miette = { workspace = true, features = ["fancy"] }
+thiserror.workspace = true

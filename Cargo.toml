@@ -1,0 +1,12 @@
+[workspace]
+resolver = "3"
+members = ["crates/praxis-core", "crates/praxis-cli"]
+
+[workspace.package]
+edition = "2024"
+rust-version = "1.97.1"
+
+[workspace.dependencies]
+kdl = "6.7"
+miette = "7"
+thiserror = "2"

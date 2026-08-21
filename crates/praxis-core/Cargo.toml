@@ -1,0 +1,12 @@
+# The functional core. Pure: it parses, loads a schema, and decides. It opens no
+# files and prints nothing — every input arrives as text the shell already read.
+[package]
+name = "praxis-core"
+version = "0.8.0"
+edition.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+kdl.workspace = true
+miette.workspace = true
+thiserror.workspace = true
