@@ -43,7 +43,10 @@ enum Command {
         #[arg(required = true, num_args = 1..)]
         slices: Vec<String>,
         /// The state root to read and write.
-        #[arg(default_value = "praxis")]
+        ///
+        /// A flag rather than a positional: a variadic slice list followed by an optional
+        /// positional is ambiguous, and clap refuses to build it (ITER.260821.19/AK1).
+        #[arg(long, default_value = "praxis")]
         root: PathBuf,
         /// Say what would happen and write nothing.
         #[arg(long)]

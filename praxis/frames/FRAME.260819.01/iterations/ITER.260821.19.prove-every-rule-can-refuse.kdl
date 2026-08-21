@@ -258,6 +258,38 @@ iteration "ITER.260821.19" {
             rules, so the guard passed and the code ran, and nothing would ever have shown it. The \
             witness ran the rule ALONE, which is what made it visible"
 
+    finding "AK1" state="open" size="frame-sized" \
+        text="`praxis pick-up` panicked on startup for a whole iteration and nothing noticed. The \
+            commitment change made its arguments invalid — a variadic slice list followed by an \
+            optional positional, which clap refuses to BUILD — so the command died at the first \
+            keystroke while 185 tests passed over it" \
+        note="every test calls the CORE. The binary had no test at all, so the one surface a user \
+            actually touches was the one surface nothing checked. Found by running the tool on a \
+            different project, which is the first time in this frame it has been run anywhere but \
+            here. crates/praxis-cli/tests/the_binary_runs.rs now builds every subcommand"
+
+    finding "AK2" state="open" size="frame-sized" \
+        text="a new project cannot use the engine without copying two disjoint blocks out of this \
+            repository's own architecture: the 729-line `schema` block, and the `admits` block that \
+            lives inside a capability-role. Neither has a portable home" \
+        obliges="ADR.260819.01 and praxis/config.kdl — `governed-by` has had no target since \
+            ADR.260819.02 was withdrawn, and the comment there already says the binding is restored \
+            when the schema has a home that is not a decision. It still does not" \
+        note="the schema is the METHOD's vocabulary — entity kinds, rules, cardinalities — and has \
+            nothing to do with any adopting project. Copying it means every repository forks the \
+            method and drifts from it silently, which is the second-copy problem this frame exists \
+            to attack, applied to the frame's own definition of itself"
+
+    finding "AK3" state="open" size="observation" \
+        text="the router still describes the sprint-era spine — create-wave, start-thin-slice, \
+            create-sprint, intake, close-sprint — and none of those commands exist. The twelve \
+            skills this frame wrote are registered in the index below a spine that contradicts them" \
+        obliges="skills/using-praxis/SKILL.md — the spine is the first thing an arriving agent \
+            reads, and it points at a workflow that was replaced" \
+        note="found by asking what a NEW project would do and reading the router as a newcomer \
+            would. Eighteen iterations of building the graph, and the front door still opens onto \
+            the old house"
+
     finding "AJ6" state="open" size="frame-sized" \
         text="an iteration can drop a slice's claims entirely by not carrying them, and the close \
             accepts it. An edit to this record deleted all four TS.260821.02 claims and \
