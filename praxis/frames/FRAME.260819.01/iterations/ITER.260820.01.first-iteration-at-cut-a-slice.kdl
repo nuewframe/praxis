@@ -9,9 +9,13 @@
 iteration "ITER.260820.01" {
     slug "first-iteration-at-cut-a-slice"
     on-slice "TS.260820.01"
-    state "working"
+    state "closed"
     opened-at "2026-08-20T23:10:00-05:00"
     opened-by "agent:principal-engineer"
+    closed-at "2026-08-21T01:10:00-05:00"
+    outcome "continue" \
+        because="the slice delivered what it claimed and the frame's next slice is visible — P9, the \
+            engine ignoring kinds the schema does not declare, is the obvious follow-on"
 
     // ================================================================
     // ADMISSION — the only gate, and it is human. Selection IS the commitment, so the
@@ -132,14 +136,19 @@ iteration "ITER.260820.01" {
         evidence="cargo test — 7 passed; praxis check refuses 4 and exits 1 on a malformed slice, \
             and passes on the committed record"
 
-    phase "learn" state="active" \
-        produced="nine findings, four of which changed the record during the iteration" \
-        note="stays active until close"
+    phase "teach" state="complete" \
+        produced="skills/cut-a-slice/SKILL.md, registered in the using-praxis router" \
+        evidence="the skill teaches naming the command, the one actor, the declared layers and the \
+            claims-with-evidence, and teaches that a refusable command names its refusal too" \
+        note="it deliberately does NOT restate the field list. Doctrine that duplicates a fact the \
+            graph owns becomes a second writer for it, so the skill points at `praxis check` and \
+            says the answer is the checker's, not the document's"
 
-    phase "teach" state="pending" \
-        blocks="the doctrine layer, which is unevidenced. The skill does not yet teach naming the \
-            command, the actor and the layers before writing the slice" \
-        note="this iteration cannot close on evidence alone while a sealed layer is unreached"
+    phase "learn" state="complete" \
+        produced="nine findings. Four changed the record while the iteration was open — the missing \
+            refusal event, the missing field declarations, the missing phase entity, and the stale \
+            freeze — and five are carried as owed work" \
+        note="learn closes last because it is the phase that judges the others"
 
     // ================================================================
     // CARRIED CLAIMS — stated at cut time, on the slice, not here. This iteration may settle
@@ -168,8 +177,8 @@ iteration "ITER.260820.01" {
     // never absent.
     // ================================================================
 
-    layer "doctrine"    state="unevidenced" reaches="the skill teaches naming the command, the actor and the layers before writing the slice" \
-        note="NOT reached. The teach phase is pending, and no skill was touched. Carried, not dropped"
+    layer "doctrine"    state="evidenced" reaches="the skill teaches naming the command, the actor and the layers before writing the slice" \
+        evidence="skills/cut-a-slice/SKILL.md, registered in skills/using-praxis/SKILL.md"
     layer "enforcement" state="evidenced" reaches="slice-shape, refusing at write time and naming the missing field" \
         evidence="cargo test — 7 passed; praxis check exits 1 with 4 refusals on a malformed slice"
     layer "docs"        state="evidenced" reaches="a refused slice and its reason are readable off the record" \
@@ -301,7 +310,35 @@ iteration "ITER.260820.01" {
             method: the delivery graph is INCOMPLETE in discovery by construction, and building \
             is what completes it"
 
+    // ================================================================
+    // CLOSE — every claim settled against evidence, every declared layer reached, and
+    // every shortfall carried forward as a recorded finding. Nothing was dropped in
+    // silence, and the sealed layer set was never trimmed to make `done` cheaper.
+    // ================================================================
+
+    close {
+        claims-settled "C1" "C2" "C3" all-met=#true
+        layers-reached "doctrine" "enforcement" "docs" all-evidenced=#true
+        findings-carried "P1" "P2" "P3" "P4" "P5" "P6" "P7" "P8" "P9" \
+            note="carried as owed work, not resolved. Five are owed against future slices; four \
+                already obliged changes that were made while this iteration was open"
+        scope-unchanged #true \
+            note="the layer set sealed at open was never edited. TS.260820.01 gained an event by \
+                amendment, which WIDENED what had to be built rather than narrowing what was promised"
+        verified "cargo test — 7 passed" "praxis check praxis — ok" \
+            "praxis check on a malformed slice — 4 refusals, exit 1"
+        note "the close itself was refused first. Writing this block introduced two malformed nodes \
+            — a dropped line continuation and a bare property with no node name — and `praxis check` \
+            named both with spans. The throwaway parser used before the engine existed had tolerated \
+            the same class of error silently. The first thing the engine refused was its own author, \
+            which is the only kind of evidence this frame accepts"
+    }
+
     trail {
+        entry at="2026-08-21T01:10:00-05:00" by="agent:principal-engineer" action="state-changed" \
+            from="working" to="closed" \
+            note="closed with every claim met and every declared layer evidenced. Nine findings \
+                carried. The engine that this iteration built is what will check the next one"
         entry at="2026-08-21T00:20:00-05:00" by="human:waelrabadi" action="state-changed" \
             from="open" to="working" \
             note="admission signed by the ask to start. The start-vet refused one condition — the \

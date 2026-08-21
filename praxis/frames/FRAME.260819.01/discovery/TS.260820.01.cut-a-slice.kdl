@@ -33,6 +33,8 @@ thin-slice "TS.260820.01" {
     kind "command"
     realizes "CAP.delivery-record"
     from-storm "ES.260819.01"
+    state "delivered" by="ITER.260820.01" \
+        note="all three claims met against named evidence, all three declared layers reached"
 
     command "cut-slice"
     actor "maintainer"
