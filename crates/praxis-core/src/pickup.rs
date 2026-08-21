@@ -113,14 +113,15 @@ fn iteration_kdl(
     undecided: &[(String, String)],
 ) -> String {
     let mut out = String::new();
-    out.push_str(&format!(
-        "// Opened by `praxis pick-up`. Every condition below was evaluated against the tree\n\
-         // as it stood at {}, and the verdicts are recorded rather than summarised: a gate\n\
-         // whose reasoning is not on the record is a gate you have to trust.\n\n",
-        ask.at
-    ));
+    out.push_str("// Opened by `praxis pick-up`. Every condition below was evaluated against the\n");
+    out.push_str(&format!("// tree as it stood at {}, and the verdicts are recorded\n", ask.at));
+    out.push_str("// rather than summarised: a gate whose reasoning is not on the record is a gate\n");
+    out.push_str("// you have to trust.\n\n");
     out.push_str(&format!("iteration {id:?} {{\n"));
-    out.push_str(&format!("    slug {:?}\n", format!("picked-up-{slug}")));
+    // The slug names the ATTEMPT, and the gate cannot know what this attempt will be
+    // about — only which slice it is on. So it seeds from the slice and expects a human
+    // to rename it once there is something to name.
+    out.push_str(&format!("    slug {slug:?}\n"));
     out.push_str(&format!("    on-slice {slice_id:?}\n"));
     out.push_str("    state \"open\"\n");
     out.push_str(&format!("    opened-at {:?}\n", ask.at));
@@ -151,11 +152,11 @@ fn iteration_kdl(
     out.push_str("    }\n");
     if !undecided.is_empty() {
         out.push_str(&format!(
-            "\n    // {} of the declared conditions were not decided by the gate. Recorded here\n\
-             // because an admission that does not say what it left undecided claims more than\n\
-             // it checked.\n",
+            "\n    // {} of the declared conditions were not decided by the gate. They are\n",
             undecided.len()
         ));
+        out.push_str("    // recorded above rather than omitted: an admission that does not say what\n");
+        out.push_str("    // it left undecided claims more than it checked.\n");
     }
     out.push_str("\n    trail {\n");
     out.push_str(&format!(

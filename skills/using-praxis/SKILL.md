@@ -115,6 +115,7 @@ Load the `SKILL.md` of any skill you intend to follow.
 | | `declare-an-entity-kind` | Declare a kind the record must hold, and its shape, on the architecture's schema — an amendment to the record, never a change to the engine |
 | | `see-what-is-ready` | Ask which slices could be started right now, and what would refuse each of the rest — including the conditions the gate declares and nobody computed |
 | | `pick-up-a-slice` | Take a slice through the one gate — selection is the commitment, refusals are recorded as facts, and the override is recorded beside the refusal it overrides |
+| | `attach-evidence` | Back a declared layer with an artifact at the moment it is reached — evidence outside the slice's declared set is refused, and a layer you did not reach stays visible as unevidenced |
 | | `create-initiative` | Scaffold or refine a single-file growth initiative (`INIT.<initiative-name>.md`) |
 | | `create-capability-record` | Scaffold or update a living capability record (`CAP.<capability-name>.md`) |
 | | `create-wave` | Alias for `create-initiative` — single-file growth initiative on `docs/product.md` |

@@ -108,6 +108,7 @@ pub struct EntitySpec {
 #[derive(Debug, Clone, Default)]
 pub struct Schema {
     entities: BTreeMap<String, EntitySpec>,
+    rules: Vec<String>,
 }
 
 impl Schema {
@@ -118,6 +119,7 @@ impl Schema {
     /// simply not the architecture.
     pub fn from_document(doc: &KdlDocument) -> Self {
         let mut entities = BTreeMap::new();
+        let mut rules = Vec::new();
         for node in doc.nodes() {
             let Some(children) = node.children() else {
                 continue;
@@ -134,8 +136,24 @@ impl Schema {
                 };
                 entities.insert(name, EntitySpec { fields: fields_of(entity) });
             }
+            for rule in body.nodes().iter().filter(|n| n.name().value() == "rule") {
+                if let Some(name) = string_arg(rule) {
+                    rules.push(name);
+                }
+            }
         }
-        Self { entities }
+        Self { entities, rules }
+    }
+
+    /// Whether the record declares this rule. A rule the record does not name is a rule
+    /// the engine may not apply — the same reading of A4 that put the admission
+    /// conditions on the architecture rather than in the gate.
+    pub fn declares_rule(&self, name: &str) -> bool {
+        self.rules.iter().any(|r| r == name)
+    }
+
+    pub fn rules(&self) -> impl Iterator<Item = &str> {
+        self.rules.iter().map(String::as_str)
     }
 
     pub fn entity(&self, kind: &str) -> Option<&EntitySpec> {

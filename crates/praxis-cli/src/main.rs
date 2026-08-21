@@ -207,13 +207,8 @@ fn ids_in_use(docs: &[kdl::KdlDocument]) -> Vec<String> {
     let mut out = Vec::new();
     for doc in docs {
         for node in doc.nodes() {
-            if let Some(id) = node
-                .entries()
-                .iter()
-                .find(|e| e.name().is_none())
-                .and_then(|e| e.value().as_string())
-            {
-                out.push(id.to_owned());
+            if let Some(id) = root_id(node) {
+                out.push(id);
             }
         }
     }
@@ -372,12 +367,8 @@ fn check(root: &Path) -> miette::Result<usize> {
     let (mut refusals, mut reports) = (0, 0);
     for (i, (path, text, doc)) in sources.iter().enumerate() {
         let mut found = check_document(doc, &schema, &known);
-        found.extend(
-            corpus
-                .iter()
-                .filter(|v| std::ptr::eq(&docs[i], &docs[i]) && belongs(v, doc))
-                .cloned(),
-        );
+        let _ = i;
+        found.extend(corpus.iter().filter(|v| belongs(v, doc)).cloned());
         for violation in found {
             match violation.severity() {
                 Severity::Refuse => refusals += 1,
@@ -400,17 +391,25 @@ fn check(root: &Path) -> miette::Result<usize> {
     Ok(refusals)
 }
 
-/// Whether a corpus-level violation was raised by this document. Attribution is by
-/// entity id, because the span is only meaningful in the file the node lives in.
+/// Whether a corpus-level violation was raised by this document. Attribution is by entity
+/// ID, because the span is only meaningful in the file the node lives in — and matching on
+/// KIND as well would report one violation once per file holding any record of that kind
+/// (ITER.260821.03/S7).
 fn belongs(violation: &Violation, doc: &kdl::KdlDocument) -> bool {
-    doc.nodes().iter().any(|n| {
-        n.name().value() == violation.entity_kind
-            || n.entries()
-                .iter()
-                .find(|e| e.name().is_none())
-                .and_then(|e| e.value().as_string())
-                .is_some_and(|id| Some(id.to_owned()) == violation.entity_id)
-    })
+    match &violation.entity_id {
+        Some(id) => doc.nodes().iter().any(|n| root_id(n).as_deref() == Some(id.as_str())),
+        // An anonymous violation can only be placed by kind, which is imprecise — so a
+        // corpus rule that cannot name the entity it is about is a rule to reconsider.
+        None => doc.nodes().iter().any(|n| n.name().value() == violation.entity_kind),
+    }
+}
+
+fn root_id(node: &kdl::KdlNode) -> Option<String> {
+    node.entries()
+        .iter()
+        .find(|e| e.name().is_none())
+        .and_then(|e| e.value().as_string())
+        .map(str::to_owned)
 }
 
 fn report(path: &Path, text: &str, violation: &Violation) -> miette::Report {

@@ -668,6 +668,15 @@ notional-architecture "NA.260820.01" {
         rule "iteration-without-signed-admission" refuses="work beginning on an iteration whose admission is unsigned"
         rule "iteration-worked-without-start-vet"  refuses="work beginning on a create-vet alone"
         rule "complete-phase-without-evidence"     refuses="a phase marked complete that produced nothing"
+        rule "evidence-names-its-layer"            refuses="an iteration evidencing a layer its slice never declared" \
+            reports="a layer the slice declared that a sealed iteration evidences nothing for" \
+            because="the slice set the granularity when it was cut. Evidence outside it is evidence \
+                for something nobody asked about, and a declared layer that vanishes from the \
+                accounting was never reached AND never refused — which is S2 at layer granularity" \
+            note="declared in the storm as a policy the day it was held, and enforced by nothing \
+                until ITER.260821.05. Reported rather than refused on the absent side, because an \
+                iteration is allowed to close having reached less than it hoped — it is not allowed \
+                to do so silently"
         rule "phase-required-by-a-declared-layer"  refuses="a phase skipped while a layer it is the only route to stays sealed and unevidenced" \
             note="which phases are mandatory is decided by the slice's sealed LAYER SET, not by \
                 preference. A slice declaring `doctrine` cannot skip teach; one declaring \

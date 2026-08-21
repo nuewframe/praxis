@@ -38,6 +38,12 @@ pub enum Refusal {
     ContestedValue { field: String, value: String, kind: String, other: String },
     /// A value nothing claims. Reported: a coverage gap, not a malformed fact.
     UnclaimedValue { field: String, value: String, wanted_by: String },
+    /// An iteration evidencing a layer its slice never declared. The slice sets the
+    /// granularity; evidence outside it is evidence for something nobody asked about.
+    UndeclaredLayer { layer: String, slice: String, declared: Vec<String> },
+    /// A layer the slice declared that the iteration has not evidenced. Reported: it must
+    /// be visible as unevidenced rather than absent, which is C2.
+    UnevidencedLayer { layer: String, slice: String },
 }
 
 impl Refusal {
@@ -51,13 +57,16 @@ impl Refusal {
             | Self::DanglingReference { field, .. } => field,
             Self::UndeclaredKind { kind, .. } | Self::ShapelessKind { kind } => kind,
             Self::ContestedValue { field, .. } | Self::UnclaimedValue { field, .. } => field,
+            Self::UndeclaredLayer { .. } | Self::UnevidencedLayer { .. } => "layer",
         }
     }
 
     /// Whether this stops the work.
     pub fn severity(&self) -> Severity {
         match self {
-            Self::ShapelessKind { .. } | Self::UnclaimedValue { .. } => Severity::Report,
+            Self::ShapelessKind { .. }
+            | Self::UnclaimedValue { .. }
+            | Self::UnevidencedLayer { .. } => Severity::Report,
             _ => Severity::Refuse,
         }
     }
@@ -97,6 +106,17 @@ impl Refusal {
             Self::UnclaimedValue { field, value, wanted_by } => format!(
                 "`{field}` {value:?} is claimed by no {wanted_by} — it belongs to nothing, which is \
                  a gap in the model rather than a malformed record"
+            ),
+            Self::UndeclaredLayer { layer, slice, declared } => format!(
+                "evidences layer {layer:?}, which {slice} never declared — it declares {}. The \
+                 slice sets the granularity, and evidence outside it is evidence for something \
+                 nobody asked about",
+                if declared.is_empty() { "none".to_owned() } else { declared.join(" · ") }
+            ),
+            Self::UnevidencedLayer { layer, slice } => format!(
+                "layer {layer:?} is declared by {slice} and this iteration evidences nothing for \
+                 it — carried as unevidenced rather than dropped, because a layer that vanishes \
+                 from the accounting was never reached and never refused"
             ),
         }
     }
@@ -360,6 +380,13 @@ pub fn check_corpus(docs: &[KdlDocument], schema: &Schema) -> Vec<Violation> {
         }
     }
 
+    // `evidence-names-its-layer`, if the record declares it. An iteration's layers are
+    // bounded by the layers its SLICE declared: the slice set the granularity when it was
+    // cut, and that is what makes "how much of this was reached" answerable at all.
+    if schema.declares_rule("evidence-names-its-layer") {
+        out.extend(check_layers(docs));
+    }
+
     // Second pass: values that wanted a claimant and found none.
     for doc in docs {
         for node in doc.nodes() {
@@ -383,6 +410,78 @@ pub fn check_corpus(docs: &[KdlDocument], schema: &Schema) -> Vec<Violation> {
                         });
                     }
                 }
+            }
+        }
+    }
+    out
+}
+
+/// `TS.260820.06`. Evidence naming a layer the slice never declared is refused; a
+/// declared layer the iteration evidences nothing for is reported, never omitted.
+fn check_layers(docs: &[KdlDocument]) -> Vec<Violation> {
+    let mut declared: Vec<(String, Vec<String>)> = Vec::new();
+    for doc in docs {
+        for node in doc.nodes().iter().filter(|n| n.name().value() == "thin-slice") {
+            if let Some(id) = string_arg(node) {
+                let layers = children_named(node, "layer")
+                    .iter()
+                    .filter_map(|c| string_arg(c))
+                    .collect();
+                declared.push((id, layers));
+            }
+        }
+    }
+
+    let mut out = Vec::new();
+    for doc in docs {
+        for node in doc.nodes().iter().filter(|n| n.name().value() == "iteration") {
+            let Some(on_slice) = children_named(node, "on-slice").first().and_then(|n| string_arg(n))
+            else {
+                continue;
+            };
+            let Some((_, allowed)) = declared.iter().find(|(id, _)| id == &on_slice) else {
+                continue;
+            };
+            let id = string_arg(node);
+
+            let mut evidenced: Vec<String> = Vec::new();
+            for layer in children_named(node, "layer") {
+                let Some(name) = string_arg(layer) else { continue };
+                if allowed.contains(&name) {
+                    evidenced.push(name);
+                    continue;
+                }
+                out.push(Violation {
+                    entity_kind: "iteration".to_owned(),
+                    entity_id: id.clone(),
+                    refusal: Refusal::UndeclaredLayer {
+                        layer: name,
+                        slice: on_slice.clone(),
+                        declared: allowed.clone(),
+                    },
+                    span: layer.span(),
+                });
+            }
+
+            // An iteration that has not sealed its layer set is still deciding what it
+            // will reach, so an absent layer is not yet a gap.
+            let sealed = children_named(node, "layer-set")
+                .first()
+                .and_then(|n| n.get("sealed").and_then(|v| v.as_bool()))
+                .unwrap_or(false);
+            if !sealed {
+                continue;
+            }
+            for layer in allowed.iter().filter(|l| !evidenced.contains(l)) {
+                out.push(Violation {
+                    entity_kind: "iteration".to_owned(),
+                    entity_id: id.clone(),
+                    refusal: Refusal::UnevidencedLayer {
+                        layer: layer.clone(),
+                        slice: on_slice.clone(),
+                    },
+                    span: node.span(),
+                });
             }
         }
     }
