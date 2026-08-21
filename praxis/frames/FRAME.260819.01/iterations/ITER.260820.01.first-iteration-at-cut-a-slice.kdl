@@ -205,7 +205,7 @@ iteration "ITER.260820.01" {
             maturity, which is a different argument with a different answer" \
         raised="ADR.260819.01/A4" \
         note="serde was rejected on spans: its data model carries none, and C2 requires the \
-            refusal to name the missing FIELD"
+            refusal to name the missing FIELD" seal=fnv1a64:6f58ae16a5eaaaf7
     decision "where the shape check lives" state="accepted" at="2026-08-21T00:00:00-05:00" \
         chose="a praxis-core validator over a parsed document, never a codec-level refusal" \
         over="a codec-level refusal · a two-stage parse that types the document as it reads it" \
@@ -215,7 +215,7 @@ iteration "ITER.260820.01" {
         because="A4 rejected derive, so the codec can only fail on SYNTAX. `which field is missing` \
             is semantic and lives above it — C2 is unreachable from the codec" \
         note="a derivation from A4 rather than a choice. Recorded because a decision nobody wrote \
-            down is one the next agent re-derives"
+            down is one the next agent re-derives" seal=fnv1a64:98824524a6d5d1b3
 
     // ================================================================
     // WHAT THIS PASS ALREADY LEARNED — findings raised at the moment they cost something.

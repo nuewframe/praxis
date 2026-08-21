@@ -71,7 +71,7 @@ iteration "ITER.260821.17" {
         falsified-by="a frame where withdrawing pre-record claims loses so much true history that \
             readers start keeping it somewhere else — at which point the record has made itself less \
             useful than the prose it replaced" \
-        state="accepted"
+        state="accepted" seal=fnv1a64:672384a348385932
 
     vet "start" state="done" at="2026-08-21T20:05:00Z" {
         condition "the tree is clean and current" verdict="passed" found="HEAD e42a096"

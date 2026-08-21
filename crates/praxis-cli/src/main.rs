@@ -13,8 +13,10 @@ use praxis_core::{
     Ask, Binding, Closing, Conditions, Corpus, Known, Pickup, Schema, Severity, Violation,
     Cut, Promotion, Publication, Published, Verified, assess, bind, check_corpus,
     check_document, close_iteration, cut, index_all, parse, pick_up, project, promote, publish,
-    dashboard, guide_for, review, unbind, verify, what_is_currently_true,
+    dashboard, guide_for, prove, review, unbind, verify, what_is_currently_true,
 };
+use praxis_core::check::decision_body;
+use praxis_core::cut::seal;
 
 mod render;
 
@@ -145,6 +147,25 @@ enum Command {
         /// The state root to read.
         #[arg(default_value = "praxis")]
         root: PathBuf,
+    },
+    /// Report any declared rule that nothing demonstrates refusing.
+    ///
+    /// A rule that has never been shown to refuse is indistinguishable from one that cannot.
+    Prove {
+        /// The state root to read.
+        #[arg(default_value = "praxis")]
+        root: PathBuf,
+    },
+    /// Seal every accepted decision and resolved symptom that carries no seal.
+    ///
+    /// Acceptance is an ACT. A state nobody performs is a state nobody seals.
+    Accept {
+        /// The state root to read and write.
+        #[arg(default_value = "praxis")]
+        root: PathBuf,
+        /// Say what would be sealed and write nothing.
+        #[arg(long)]
+        dry_run: bool,
     },
     /// Show which slices could be started right now, and what would refuse each of the rest.
     ///
@@ -314,6 +335,21 @@ fn main() -> ExitCode {
             }
         }
         Command::Dashboard { root } => match dashboarding(&root) {
+            Ok(()) => ExitCode::SUCCESS,
+            Err(report) => {
+                eprintln!("{report:?}");
+                ExitCode::FAILURE
+            }
+        },
+        Command::Prove { root } => match proving(&root) {
+            Ok(0) => ExitCode::SUCCESS,
+            Ok(_) => ExitCode::SUCCESS,
+            Err(report) => {
+                eprintln!("{report:?}");
+                ExitCode::FAILURE
+            }
+        },
+        Command::Accept { root, dry_run } => match accepting(&root, dry_run) {
             Ok(()) => ExitCode::SUCCESS,
             Err(report) => {
                 eprintln!("{report:?}");
@@ -1175,6 +1211,121 @@ fn dashboarding(root: &Path) -> miette::Result<()> {
         }
     }
     print!("{}", render::render_composed(&document));
+    Ok(())
+}
+
+/// `TS.260821.02`. Which of our gates has never fired.
+fn proving(root: &Path) -> miette::Result<usize> {
+    let sources = load(root)?;
+    let mut schema = Schema::default();
+    for (_, _, doc) in &sources {
+        let found = Schema::from_document(doc);
+        if !found.is_empty() {
+            schema = found;
+        }
+    }
+    if schema.is_empty() {
+        miette::bail!("the record declares no schema, so there are no rules to prove");
+    }
+
+    let proofs = prove(&schema);
+    let (witnessed, unwitnessed): (Vec<_>, Vec<_>) = proofs.iter().partition(|p| p.proven());
+
+    for proof in &witnessed {
+        if let praxis_core::Proof::Witnessed { rule, refusals } = proof {
+            println!("praxis: {rule} — witnessed, {refusals} refusal(s)");
+        }
+    }
+    for proof in &unwitnessed {
+        if let praxis_core::Proof::Unwitnessed { rule, why } = proof {
+            eprintln!("praxis: {rule} — UNWITNESSED, {why}");
+        }
+    }
+    println!(
+        "praxis: {} of {} declared rules are witnessed",
+        witnessed.len(),
+        proofs.len()
+    );
+    Ok(unwitnessed.len())
+}
+
+/// `TS.260820.14`/AE3 and `TS.260820.18`/C3. Seal what has become immutable.
+///
+/// The seal is computed from the record's own content by the same function the rule uses
+/// to check it, so sealing and checking cannot disagree about what was sealed.
+fn accepting(root: &Path, dry_run: bool) -> miette::Result<()> {
+    let sources = load(root)?;
+    let mut sealed = 0;
+
+    for (path, text, _) in &sources {
+        let mut doc: kdl::KdlDocument = match text.parse() {
+            Ok(doc) => doc,
+            Err(_) => continue,
+        };
+        let mut touched = false;
+
+        for node in doc.nodes_mut().iter_mut() {
+            let kind = node.name().value().to_owned();
+            let Some(body) = node.children_mut().as_mut() else { continue };
+            for child in body.nodes_mut().iter_mut() {
+                let name = child.name().value().to_owned();
+                let (is_target, material) = match (kind.as_str(), name.as_str()) {
+                    ("iteration", "decision") => {
+                        let accepted = child
+                            .get("state")
+                            .and_then(|v| v.as_string())
+                            .unwrap_or("accepted")
+                            == "accepted";
+                        let title = child
+                            .entries()
+                            .iter()
+                            .find(|e| e.name().is_none())
+                            .and_then(|e| e.value().as_string())
+                            .unwrap_or_default()
+                            .to_owned();
+                        (accepted, decision_body(child, &title))
+                    }
+                    ("frame", "symptom") => {
+                        let state =
+                            child.get("state").and_then(|v| v.as_string()).unwrap_or_default();
+                        let id = child
+                            .entries()
+                            .iter()
+                            .find(|e| e.name().is_none())
+                            .and_then(|e| e.value().as_string())
+                            .unwrap_or_default()
+                            .to_owned();
+                        let resolved = matches!(state, "resolved" | "partially-resolved");
+                        let by = child.get("resolved-by").and_then(|v| v.as_string()).unwrap_or("");
+                        (resolved, format!("{id}\u{1f}{state}\u{1f}{by}"))
+                    }
+                    _ => (false, String::new()),
+                };
+                if !is_target || child.get("seal").is_some() {
+                    continue;
+                }
+                let computed = seal(&material, "", &[], &[]);
+                if dry_run {
+                    println!("would seal {name} in {}", path.display());
+                } else {
+                    child.push(("seal", computed.as_str()));
+                    touched = true;
+                }
+                sealed += 1;
+            }
+        }
+
+        if touched && !dry_run {
+            fs::write(path, doc.to_string())
+                .map_err(|e| miette::miette!("{}: {e}", path.display()))?;
+            println!("praxis: sealed {}", path.display());
+        }
+    }
+
+    println!(
+        "praxis: {sealed} record(s) {}",
+        if dry_run { "would be sealed" } else { "sealed" }
+    );
     Ok(())
 }
 

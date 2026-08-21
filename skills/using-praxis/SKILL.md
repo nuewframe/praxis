@@ -114,6 +114,7 @@ Load the `SKILL.md` of any skill you intend to follow.
 | | `name-a-capability` | Derive a capability from a cluster of events in a storm — consistency boundaries, the four gate tests with their reasons, and the exclusion that makes the boundary real |
 | | `cut-a-slice` | Cut an atomic vertical slice in a shape a checker can refuse — one command or one view, one actor, declared layers, claims naming their evidence |
 | | `declare-an-entity-kind` | Declare a kind the record must hold, and its shape, on the architecture's schema — an amendment to the record, never a change to the engine |
+| | `witness-a-rule` | Declare a rule together with the record that demonstrates it refusing — a rule never shown to refuse is indistinguishable from one that cannot |
 | | `see-what-is-ready` | Ask which slices could be started right now, and what would refuse each of the rest — including the conditions the gate declares and nobody computed |
 | | `see-the-dashboard` | Where the product stands right now — several views composed on demand into one document, each still singly owned, and never committed |
 | | `pick-up-a-slice` | Take a slice through the one gate — selection is the commitment, refusals are recorded as facts, and the override is recorded beside the refusal it overrides |

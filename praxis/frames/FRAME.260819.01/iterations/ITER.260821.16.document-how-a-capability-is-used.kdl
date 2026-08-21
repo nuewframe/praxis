@@ -61,7 +61,7 @@ iteration "ITER.260821.16" {
             makes the absence read as an oversight, and the next person writes it again" \
         falsified-by="that section growing large enough that nobody reads it — at which point it is \
             a backlog wearing a document's clothes, and belongs somewhere that tracks backlogs" \
-        state="accepted"
+        state="accepted" seal=fnv1a64:f30a6d7652af3a3b
 
     vet "start" state="done" at="2026-08-21T19:58:00Z" {
         condition "the tree is clean and current" verdict="passed" found="HEAD 9025564"

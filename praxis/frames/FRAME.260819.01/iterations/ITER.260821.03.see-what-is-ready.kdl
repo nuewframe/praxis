@@ -98,7 +98,7 @@ iteration "ITER.260821.03" {
             fidelity is unverifiable-without-checking-the-first, which is what this frame is about. \
             The drift check treats silence as deference and only a CONTRADICTION as drift, so the \
             record stays consistent without duplicating anything" \
-        owed="the three slices that do carry it, and the schema field that allows it (S4)"
+        owed="the three slices that do carry it, and the schema field that allows it (S4)" seal=fnv1a64:f53af813d9c456c9
 
     layer "doctrine"    state="evidenced" evidence="skills/see-what-is-ready/SKILL.md, registered in the router under PLAN" reaches="the skill tells an agent to ask this before choosing, and to read the uncomputed conditions FIRST"
     layer "enforcement" state="evidenced" evidence="30 tests pass; the conditions are declared on the record and evaluated in one place" reaches="one implementation of the conditions, so the view cannot drift from the gate"

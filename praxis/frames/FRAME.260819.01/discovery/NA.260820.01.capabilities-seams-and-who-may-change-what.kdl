@@ -758,7 +758,83 @@ notional-architecture "NA.260820.01" {
 
         // Structural rules that fall out of the relationships above. Each is refusable, and
         // each is enforced by the capability owning the act it refuses — see the invariants.
-        rule "dangling-relationship"        refuses="an edge naming something the record does not hold"
+        // Five rules the ENGINE has enforced since ITER.260820.01 and this record never
+        // named. A4 says the engine may not hold a rule the record does not state; these
+        // were exactly that, and nothing found them until refusals were asked which rule
+        // they enforce (ITER.260821.19/AJ1).
+        rule "entity-without-a-required-field" refuses="a record missing a field its kind requires" \
+            witness=#"""
+                thin-slice "TS.witness" {
+                    slug "missing-its-title"
+                }
+                """#
+        rule "field-outside-its-cardinality"   refuses="a field appearing more or fewer times than its kind allows" \
+            witness=#"""
+                capability "witness" {
+                    state "sought"
+                    state "active"
+                }
+                """#
+        rule "kind-declared-without-a-shape"   reports="a kind the schema names and gives no fields, so nothing about its records can be refused"
+        rule "a-value-claimed-twice"           refuses="two records claiming one value for a field that must be unique" \
+            witness=#"""
+                capability "witness-one" {
+                    state "sought"
+                    derived-from "ES.260819.01"
+                    from-cluster "iteration-control"
+                    owns-event "ContestedByTwo"
+                    doing "one"
+                    not "two"
+                    trail {
+                        entry at="2026-08-21T00:00:00Z" by="human:witness" action="created"
+                    }
+                }
+                capability "witness-two" {
+                    state "sought"
+                    derived-from "ES.260819.01"
+                    from-cluster "iteration-control"
+                    owns-event "ContestedByTwo"
+                    doing "one"
+                    not "two"
+                    trail {
+                        entry at="2026-08-21T00:00:00Z" by="human:witness" action="created"
+                    }
+                }
+                """#
+        rule "a-value-nothing-claims"          reports="a value that wanted a claimant and found none"
+
+        rule "dangling-relationship"        refuses="an edge naming something the record does not hold" \
+            note="the witness carries a capability of its own. `dangling-relationship` is skipped \
+                when the corpus knows NO entity of the target kind — a guard against false \
+                positives on a partial document — so a witness that declares only the dangling edge \
+                witnesses nothing. Found by the prover on its first run (ITER.260821.19/AJ2)" \
+            witness=#"""
+                capability "witness-context" {
+                    state "sought"
+                    derived-from "ES.260819.01"
+                    from-cluster "iteration-control"
+                    owns-event "SomethingHappened"
+                    doing "exist, so the target kind is known"
+                    not "anything else"
+                    trail {
+                        entry at="2026-08-21T00:00:00Z" by="human:witness" action="created"
+                    }
+                }
+                thin-slice "TS.witness" {
+                    slug "points-nowhere"
+                    title "a slice realizing a capability the record does not hold"
+                    kind "command"
+                    realizes "CAP.nowhere"
+                    from-storm "ES.260819.01"
+                    actor "someone"
+                    trigger "something"
+                    outcome "something"
+                    layer "docs"
+                    claim "C1" text="a claim"
+                    command "do-a-thing"
+                    produces-event "ThingDone"
+                }
+                """#
         rule "duplicate-identity"           refuses="two entities claiming one id"
         rule "entity-without-identity"      refuses="a node with no id"
         rule "undeclared-entity-kind"       refuses="a kind this schema does not name"
@@ -790,13 +866,59 @@ notional-architecture "NA.260820.01" {
                 Append-only that nothing seals is append-only nobody has" \
             found-by="ITER.260821.15/AE3 and ITER.260821.17/AG3" \
             note="the rule that makes the other two mean anything. It refuses the current record \
-                until every accepted decision and every resolved symptom is sealed"
+                until every accepted decision and every resolved symptom is sealed" \
+            witness=#"""
+                iteration "ITER.witness" {
+                    on-slice "TS.witness"
+                    state "closed"
+                    decision "accepted and sealed by nothing" chose="this" over="that" \
+                        falsified-by="something" state="accepted"
+                    trail {
+                        entry at="2026-08-21T00:00:00Z" by="human:witness" action="created"
+                    }
+                }
+                frame "F.witness" {
+                    symptom "S.witness" state="resolved" resolved-by="9.9.9" text="sealed by nothing"
+                }
+                """#
+        rule "a-commitment-carries-every-claim"    refuses="a commitment that does not carry a claim one of its slices declares" \
+            because="the close accounts for the claims an ITERATION holds, so a claim dropped from \
+                the iteration is a claim nothing objects to. TS.260820.07/C3 refuses deleting it \
+                from the SLICE; this is the same move one level over, and nothing checked it" \
+            found-by="ITER.260821.19/AJ6 — an edit dropped four claims and the close passed, \
+                reporting three" \
+            witness=#"""
+                thin-slice "TS.witness" {
+                    slug "witnessed"
+                    claim "C1"
+                    claim "C2"
+                }
+                iteration "ITER.witness" {
+                    on-slice "TS.witness"
+                    state "closed"
+                    claim "C1" from-slice="TS.witness" state="met"
+                    trail {
+                        entry at="2026-08-21T00:00:00Z" by="human:witness" action="created"
+                    }
+                }
+                """#
         rule "a-claim-id-is-unique-in-its-iteration" refuses="an iteration carrying two claims with one id" \
             because="the gate pins claims at open and the working agent settles them. Writing the \
                 settled claim BESIDE the pinned one rather than onto it leaves both, and the close \
                 reads whichever comes first" \
             found-by="ITER.260821.07/W6 — the first time a rule caught the agent who wrote it, on \
-                the real tree rather than in a fixture"
+                the real tree rather than in a fixture" \
+            witness=#"""
+                iteration "ITER.witness" {
+                    on-slice "TS.witness"
+                    state "working"
+                    claim "C1" from-slice="TS.witness" state="pending"
+                    claim "C1" from-slice="TS.witness" state="met"
+                    trail {
+                        entry at="2026-08-21T00:00:00Z" by="human:witness" action="created"
+                    }
+                }
+                """#
         rule "a-record-is-filed-in-its-container"  refuses="a record whose kind belongs to a container it is not in" \
             because="shape is checked and PLACEMENT is not. praxis check passed on a valid record in \
                 the wrong directory, and only looking caught it" \
@@ -824,16 +946,44 @@ notional-architecture "NA.260820.01" {
                 and a method that exempts its own progress reports from the standard it sets is the \
                 root cause with a nicer surface" \
             note="the sharpest check in the set. It is also the one most likely to refuse something \
-                the maintainer believes, which is the point"
+                the maintainer believes, which is the point" \
+            witness=#"""
+                frame "F.witness" {
+                    symptom "S.witness" state="resolved" resolved-by="0.0.0" text="claimed by nothing"
+                }
+                """#
         rule "a-decision-names-what-it-rejected"   refuses="a decision that names no alternative it rejected" \
             because="a decision with no alternatives is a preference, and a preference recorded as a \
-                decision is the hardest kind to argue with later — there is nothing to argue against"
+                decision is the hardest kind to argue with later — there is nothing to argue against" \
+            witness=#"""
+                iteration "ITER.witness" {
+                    on-slice "TS.witness"
+                    state "closed"
+                    decision "no alternative was available" chose="this" falsified-by="something"
+                    trail {
+                        entry at="2026-08-21T00:00:00Z" by="human:witness" action="created"
+                    }
+                }
+                """#
         rule "a-decision-names-its-falsifier"      refuses="a decision that names nothing which would show it wrong" \
             because="the same reason. A decision nothing could falsify was never a choice between \
-                real options, and a reader two years out cannot tell whether it still holds"
+                real options, and a reader two years out cannot tell whether it still holds" \
+            witness=#"""
+                iteration "ITER.witness" {
+                    on-slice "TS.witness"
+                    state "closed"
+                    decision "a preference wearing a decision's clothes" chose="this" over="that"
+                    trail {
+                        entry at="2026-08-21T00:00:00Z" by="human:witness" action="created"
+                    }
+                }
+                """#
         rule "a-decision-is-bound-to-an-iteration" refuses="a decision that belongs to no iteration" \
             because="a decision filed beside the work loses the one thing that makes it readable \
-                later — what forced it"
+                later — what forced it" \
+            witness=#"""
+                decision "filed beside the work" chose="this" over="that" falsified-by="something"
+                """#
         rule "an-accepted-decision-is-append-only" refuses="an accepted decision whose body no longer matches what was accepted" \
             because="a decision that can be edited afterwards is a decision nobody can cite" \
             note="the seal covers the body and deliberately NOT the amendments, so appending a \
@@ -845,33 +995,80 @@ notional-architecture "NA.260820.01" {
                 default: perishability belongs to the question, not to the file type" \
             note="a publishable view must also declare WHERE it lands, because the published set is \
                 derived from these declarations and from nothing else — an engine that composes its \
-                own paths has taken the decision back"
+                own paths has taken the decision back" \
+            witness=#"""
+                event-storm "ES.witness" {
+                    read-model "nobody-decided-about-this-one"
+                }
+                """#
         rule "promoted-truth-is-derived"           refuses="a capability whose promoted truth is not what the record derives from what cut releases bound" \
             because="if it did not come from bound work it is not promotion, it is an assertion \
                 about the past — which is the root cause with a version number attached" \
             note="the answer to W7's class. A derived field written once and never rechecked is a \
                 cache; one RECOMPUTED by a rule is a projection with a proof attached. The command \
-                and the check call the same derivation, so they cannot disagree about what truth is"
+                and the check call the same derivation, so they cannot disagree about what truth is" \
+            witness=#"""
+                capability "witness" {
+                    state "active"
+                    shipped "9.9.9" by="ITER.nowhere" slice="TS.nowhere"
+                }
+                """#
         rule "cut-release-is-immutable"            refuses="a cut release whose content no longer matches the seal written when it was cut" \
             because="a release is a POINT on the version line, and a point that moved is not one. \
                 Everything downstream — publication, verification, symptom resolution — pins to it" \
             note="the seal makes an edit VISIBLE. It is not a signature and does not make forgery \
                 hard: anyone who can edit the record can recompute it. What it catches is the edit \
                 nobody meant to make and nobody would otherwise notice, which is the failure this \
-                frame is actually about"
+                frame is actually about" \
+            witness=#"""
+                release "REL.witness" {
+                    version "9.9.9"
+                    state "released"
+                    binds "ITER.witness"
+                    seal "fnv1a64:0000000000000000"
+                }
+                """#
         rule "no-silent-drop"                      refuses="a closed iteration carrying a claim that is neither met nor carried by a finding" \
             because="an unmet claim that closes in silence and a met claim look identical \
                 afterwards, and the refusal is the only thing that makes them different. This is \
                 S5, the symptom with the most day-to-day cost" \
             note="a recorded finding is enough to close. Judging whether the shortfall is \
                 acceptable is LEARN's job, not the gate's — this rule refuses silence, never \
-                shortfall"
+                shortfall" \
+            witness=#"""
+                thin-slice "TS.witness" {
+                    slug "witnessed"
+                    claim "C1"
+                }
+                iteration "ITER.witness" {
+                    on-slice "TS.witness"
+                    state "closed"
+                    claim "C1" from-slice="TS.witness" state="pending"
+                    trail {
+                        entry at="2026-08-21T00:00:00Z" by="human:witness" action="created"
+                    }
+                }
+                """#
         rule "claim-dropped-from-the-slice"        refuses="an iteration carrying a claim its slice no longer declares" \
             because="every other check here is defeated by editing the claim list, which is exactly \
                 how scope goes quietly in a Markdown checklist today. The claims are frozen into \
                 the iteration when the gate opens it, so deleting one from the slice does not \
                 remove it — it makes the two disagree" \
-            note="the check that matters (TS.260820.07). Without it, no-silent-drop is advice"
+            note="the check that matters (TS.260820.07). Without it, no-silent-drop is advice" \
+            witness=#"""
+                thin-slice "TS.witness" {
+                    slug "witnessed"
+                    claim "C1"
+                }
+                iteration "ITER.witness" {
+                    on-slice "TS.witness"
+                    state "working"
+                    claim "C9" from-slice="TS.witness" state="met"
+                    trail {
+                        entry at="2026-08-21T00:00:00Z" by="human:witness" action="created"
+                    }
+                }
+                """#
         rule "evidence-names-its-layer"            refuses="an iteration evidencing a layer its slice never declared" \
             reports="a layer the slice declared that a sealed iteration evidences nothing for" \
             because="the slice set the granularity when it was cut. Evidence outside it is evidence \
@@ -880,7 +1077,22 @@ notional-architecture "NA.260820.01" {
             note="declared in the storm as a policy the day it was held, and enforced by nothing \
                 until ITER.260821.05. Reported rather than refused on the absent side, because an \
                 iteration is allowed to close having reached less than it hoped — it is not allowed \
-                to do so silently"
+                to do so silently" \
+            witness=#"""
+                thin-slice "TS.witness" {
+                    slug "witnessed"
+                    layer "doctrine"
+                }
+                iteration "ITER.witness" {
+                    on-slice "TS.witness"
+                    state "closed"
+                    layer "harness" state="evidenced"
+                    layer-set sealed=#true
+                    trail {
+                        entry at="2026-08-21T00:00:00Z" by="human:witness" action="created"
+                    }
+                }
+                """#
         rule "phase-required-by-a-declared-layer"  refuses="a phase skipped while a layer it is the only route to stays sealed and unevidenced" \
             note="which phases are mandatory is decided by the slice's sealed LAYER SET, not by \
                 preference. A slice declaring `doctrine` cannot skip teach; one declaring \

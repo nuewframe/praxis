@@ -14,6 +14,7 @@ pub mod pickup;
 pub mod dashboard;
 pub mod guide;
 pub mod promote;
+pub mod prove;
 pub mod publish;
 pub mod review;
 pub mod schema;
@@ -32,9 +33,12 @@ pub use close::{Closing, Unaccounted, close_iteration};
 pub use pickup::{Ask, Pickup, Record, pick_up};
 pub use dashboard::{Composed, Part, dashboard};
 pub use guide::{NoGuide, guide_for, guides};
+pub use prove::{
+    NO_WITNESS, Proof, WITNESS_REFUSED_NOTHING, WITNESS_UNPARSEABLE, prove, unwitnessed,
+};
 pub use promote::{Change, Promotion, Shipped, derive, promote, undeclared_promotions};
 pub use publish::{Document, Publication, publish};
-pub use schema::{Cardinality, EntitySpec, FieldSpec, Schema};
+pub use schema::{Cardinality, EntitySpec, FieldSpec, Rule, Schema};
 pub use review::review;
 pub use truth::what_is_currently_true;
 pub use verify::{Drift, Published, Verified, verify};

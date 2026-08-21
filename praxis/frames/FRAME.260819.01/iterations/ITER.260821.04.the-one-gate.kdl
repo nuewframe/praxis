@@ -109,7 +109,7 @@ iteration "ITER.260821.04" {
         falsified-by="a `start` command landing and the second vet turning out to add nothing — if \
             it never catches a tree that moved, the two-stage vet was ceremony and one command \
             should do both" \
-        owed="a `start` command, and the rule iteration-worked-without-start-vet enforced (T3)"
+        owed="a `start` command, and the rule iteration-worked-without-start-vet enforced (T3)" seal=fnv1a64:5e6c6d97477d24df
 
     layer "doctrine"    state="evidenced" evidence="skills/pick-up-a-slice/SKILL.md, registered in the router under ITERATE" reaches="the skill teaches that selection IS the commitment, and that refusals are recorded"
     layer "enforcement" state="evidenced" evidence="40 tests pass; the gate refuses on every declared condition and opens nothing when it does" reaches="the one gate — the only place in the method that refuses at open"

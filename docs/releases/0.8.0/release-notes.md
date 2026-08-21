@@ -28,6 +28,7 @@ what shipped at 0.8.0, which symptoms it resolved, and what it left owed
 | ITER.260821.16 | TS.260820.15 — document-how-a-capability-is-used | slice-outcome-added |
 | ITER.260821.17 | TS.260820.18 — resolve-a-symptom | slice-outcome-added |
 | ITER.260821.18 | TS.260820.13 — project-the-dashboard-on-demand | slice-outcome-added |
+| ITER.260821.19 | TS.260821.02 — prove-every-rule-can-refuse · TS.260820.18 — resolve-a-symptom | not declared |
 
 ## symptoms it resolved
 
@@ -125,4 +126,12 @@ _Nothing here — no symptom names this version as what resolved it._
 | ITER.260821.18 | AH1 | — |
 | ITER.260821.18 | AH2 | — |
 | ITER.260821.18 | AH3 | — |
+| ITER.260821.19 | AI2 | — |
+| ITER.260821.19 | AI1 | — |
+| ITER.260821.19 | AJ1 | — |
+| ITER.260821.19 | AJ2 | — |
+| ITER.260821.19 | AJ3 | — |
+| ITER.260821.19 | AJ6 | — |
+| ITER.260821.19 | AJ5 | — |
+| ITER.260821.19 | AJ4 | — |
 

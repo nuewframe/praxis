@@ -108,7 +108,16 @@ pub struct EntitySpec {
 #[derive(Debug, Clone, Default)]
 pub struct Schema {
     entities: BTreeMap<String, EntitySpec>,
-    rules: Vec<String>,
+    rules: Vec<Rule>,
+}
+
+/// A rule as the record declares it: its name, and the record that demonstrates it
+/// refusing. A witness written in the RECORD is evidence; one written in the engine would
+/// be a second implementation of the same check.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Rule {
+    pub name: String,
+    pub witness: Option<String>,
 }
 
 impl Schema {
@@ -138,7 +147,7 @@ impl Schema {
             }
             for rule in body.nodes().iter().filter(|n| n.name().value() == "rule") {
                 if let Some(name) = string_arg(rule) {
-                    rules.push(name);
+                    rules.push(Rule { name, witness: prop(rule, "witness") });
                 }
             }
         }
@@ -149,11 +158,11 @@ impl Schema {
     /// the engine may not apply — the same reading of A4 that put the admission
     /// conditions on the architecture rather than in the gate.
     pub fn declares_rule(&self, name: &str) -> bool {
-        self.rules.iter().any(|r| r == name)
+        self.rules.iter().any(|r| r.name == name)
     }
 
-    pub fn rules(&self) -> impl Iterator<Item = &str> {
-        self.rules.iter().map(String::as_str)
+    pub fn rules(&self) -> impl Iterator<Item = &Rule> {
+        self.rules.iter()
     }
 
     pub fn entity(&self, kind: &str) -> Option<&EntitySpec> {

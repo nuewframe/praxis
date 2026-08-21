@@ -9,11 +9,11 @@ what must the system be able to do, and which events does each keep consistent?
 
 | capability | derived from | events owned |
 | --- | --- | --- |
-| claim-settlement | evidence-and-settlement | 5 |
-| delivery-record | problem-record | 17 |
+| claim-settlement | evidence-and-settlement | 7 |
+| delivery-record | problem-record | 19 |
 | document-projection | projection | 3 |
 | release-binding | release-binding | 3 |
-| work-admission | iteration-control | 5 |
+| work-admission | iteration-control | 7 |
 
 ## what each owns
 
@@ -24,6 +24,8 @@ what must the system be able to do, and which events does each keep consistent?
 | claim-settlement | FindingRaised |
 | claim-settlement | FindingTriaged |
 | claim-settlement | DecisionRecorded |
+| claim-settlement | DecisionAccepted |
+| claim-settlement | AcceptanceRefused |
 | delivery-record | IntentRaised |
 | delivery-record | SymptomRecorded |
 | delivery-record | RootCauseConverged |
@@ -41,6 +43,8 @@ what must the system be able to do, and which events does each keep consistent?
 | delivery-record | UsageDocumented |
 | delivery-record | EntityDeclared |
 | delivery-record | EntityDeclarationRefused |
+| delivery-record | ClaimWithdrawn |
+| delivery-record | RecordAmended |
 | document-projection | DocumentsProjected |
 | document-projection | DocumentStamped |
 | document-projection | DriftDetected |
@@ -52,6 +56,8 @@ what must the system be able to do, and which events does each keep consistent?
 | work-admission | DependencyFrozen |
 | work-admission | IterationClosed |
 | work-admission | CloseRefused |
+| work-admission | IterationStarted |
+| work-admission | StartRefused |
 
 ## Notes
 

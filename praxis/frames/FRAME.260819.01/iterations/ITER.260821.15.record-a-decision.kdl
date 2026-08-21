@@ -68,7 +68,7 @@ iteration "ITER.260821.15" {
             teaches everyone to ignore the refusal" \
         falsified-by="an amendment that contradicts the body rather than extending it. If that \
             happens the split is wrong, because a contradiction would pass unsealed" \
-        state="accepted"
+        state="accepted" seal=fnv1a64:2101d04fc331528b
 
     vet "start" state="done" at="2026-08-21T19:52:00Z" {
         condition "the tree is clean and current" verdict="passed" found="HEAD 866a44c"

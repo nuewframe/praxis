@@ -49,6 +49,14 @@ pub enum Refusal {
     BrokenSeal { release: String, expected: String, found: String },
     /// A cut release with no seal at all, so nothing about it can be checked.
     UnsealedRelease { release: String },
+    /// An iteration carrying two claims with one id, from one slice.
+    DuplicateClaim { claim: String, slice: String },
+    /// A record whose kind declares immutability and that carries no seal.
+    Unsealed { kind: String, id: String, state: String },
+    /// A commitment that does not carry a claim one of its slices declares.
+    ClaimNotCarried { claim: String, slice: String },
+    /// A declared rule that nothing demonstrates refusing.
+    UnwitnessedRule { rule: String, why: &'static str },
     /// A symptom resolved by a release the record does not hold.
     ResolvedByNothing { symptom: String, version: String },
     /// A symptom resolved by a release that bound no slice attacking it.
@@ -71,6 +79,48 @@ pub enum Refusal {
 }
 
 impl Refusal {
+    /// The rule this refusal enforces, by the name the RECORD declares for it.
+    ///
+    /// This is what makes "which rule fired" answerable, and therefore what makes a
+    /// witness checkable. Writing it also found that the engine was enforcing five rules
+    /// the record never named — A4 inverted (ITER.260821.19/AJ1).
+    pub fn rule(&self) -> &'static str {
+        match self {
+            Self::MissingField { .. } => "entity-without-a-required-field",
+            Self::WrongCardinality { .. } => "field-outside-its-cardinality",
+            Self::NotInVocabulary { .. } => "undeclared-state",
+            Self::DanglingReference { .. } => "dangling-relationship",
+            Self::UndeclaredKind { .. } => "undeclared-entity-kind",
+            Self::ShapelessKind { .. } => "kind-declared-without-a-shape",
+            Self::ContestedValue { .. } => "a-value-claimed-twice",
+            Self::UnclaimedValue { .. } => "a-value-nothing-claims",
+            Self::UndeclaredLayer { .. } | Self::UnevidencedLayer { .. } => "evidence-names-its-layer",
+            Self::SilentDrop { .. } => "no-silent-drop",
+            Self::DroppedClaim { .. } => "claim-dropped-from-the-slice",
+            Self::DuplicateClaim { .. } => "a-claim-id-is-unique-in-its-iteration",
+            Self::ClaimNotCarried { .. } => "a-commitment-carries-every-claim",
+            Self::BrokenSeal { .. } | Self::UnsealedRelease { .. } => "cut-release-is-immutable",
+            Self::Unsealed { .. } => "an-immutable-record-carries-a-seal",
+            Self::HandPromoted { .. } => "promoted-truth-is-derived",
+            Self::UndeclaredLifetime { .. } | Self::UnjustifiedLifetime { .. } => {
+                "publish-only-what-survives-freezing"
+            }
+            Self::PreferenceNotDecision { missing, .. } => {
+                if *missing == "over" {
+                    "a-decision-names-what-it-rejected"
+                } else {
+                    "a-decision-names-its-falsifier"
+                }
+            }
+            Self::UnboundDecision { .. } => "a-decision-is-bound-to-an-iteration",
+            Self::RewrittenDecision { .. } => "an-accepted-decision-is-append-only",
+            Self::ResolvedByNothing { .. } | Self::ResolvedWithoutAttack { .. } => {
+                "resolution-names-a-release"
+            }
+            Self::UnwitnessedRule { .. } => "a-rule-has-a-witness",
+        }
+    }
+
     /// The field this refusal is about. C2: the diagnostic names the field, never
     /// merely that the document is invalid.
     pub fn field(&self) -> &str {
@@ -89,6 +139,9 @@ impl Refusal {
             Self::PreferenceNotDecision { missing, .. } => missing,
             Self::UnboundDecision { .. } | Self::RewrittenDecision { .. } => "decision",
             Self::ResolvedByNothing { .. } | Self::ResolvedWithoutAttack { .. } => "resolved-by",
+            Self::DuplicateClaim { claim, .. } | Self::ClaimNotCarried { claim, .. } => claim,
+            Self::Unsealed { .. } => "seal",
+            Self::UnwitnessedRule { .. } => "witness",
             Self::UnjustifiedLifetime { missing, .. } => missing,
         }
     }
@@ -98,6 +151,7 @@ impl Refusal {
         match self {
             Self::ShapelessKind { .. }
             | Self::UnclaimedValue { .. }
+            | Self::UnwitnessedRule { .. }
             | Self::UnevidencedLayer { .. } => Severity::Report,
             _ => Severity::Refuse,
         }
@@ -144,6 +198,26 @@ impl Refusal {
                  slice sets the granularity, and evidence outside it is evidence for something \
                  nobody asked about",
                 if declared.is_empty() { "none".to_owned() } else { declared.join(" · ") }
+            ),
+            Self::ClaimNotCarried { claim, slice } => format!(
+                "commits to {slice} and does not carry its {claim}. The close accounts for the \
+                 claims an ITERATION holds, so a claim dropped from the iteration is a claim \
+                 nothing objects to — the same move as deleting it from the slice, one level over"
+            ),
+            Self::DuplicateClaim { claim, slice } => format!(
+                "carries {claim} from {slice} twice. The gate pins a claim at open and the working \
+                 agent settles it — writing the settled one BESIDE the pinned one leaves both, and \
+                 the close reads whichever comes first"
+            ),
+            Self::Unsealed { kind, id, state } => format!(
+                "{id} is a {kind} in state {state:?} and carries no seal. Append-only that nothing \
+                 seals is append-only nobody has: the rules that check a seal check it ONLY WHEN \
+                 PRESENT, so an unsealed record is protected by nothing"
+            ),
+            Self::UnwitnessedRule { rule, why } => format!(
+                "{rule} is declared and {why}. A rule that has never been shown to refuse is \
+                 indistinguishable from one that CANNOT — which is S3 turned on the enforcement \
+                 layer itself"
             ),
             Self::ResolvedByNothing { symptom, version } => format!(
                 "{symptom} names {version:?} as what resolved it, and the record holds no cut \
@@ -489,6 +563,21 @@ pub fn check_corpus(docs: &[KdlDocument], schema: &Schema) -> Vec<Violation> {
         ));
     }
 
+    // `an-immutable-record-carries-a-seal` and `a-claim-id-is-unique-in-its-iteration`.
+    // The first is what makes the other seal rules mean anything: they check a seal ONLY
+    // WHEN PRESENT, so an unsealed record is protected by nothing.
+    if schema.declares_rule("an-immutable-record-carries-a-seal")
+        || schema.declares_rule("a-claim-id-is-unique-in-its-iteration")
+        || schema.declares_rule("a-commitment-carries-every-claim")
+    {
+        out.extend(check_seals_and_claims(
+            docs,
+            schema.declares_rule("an-immutable-record-carries-a-seal"),
+            schema.declares_rule("a-claim-id-is-unique-in-its-iteration"),
+            schema.declares_rule("a-commitment-carries-every-claim"),
+        ));
+    }
+
     // `resolution-names-a-release`, if the record declares it. The sharpest check here:
     // it makes progress against a problem computable from the record rather than declared
     // by whoever wants to close it.
@@ -537,8 +626,12 @@ pub fn check_corpus(docs: &[KdlDocument], schema: &Schema) -> Vec<Violation> {
     // The decision rules, if the record declares them. A decision is bound to the
     // iteration that FORCED it, names what it rejected and what would show it wrong, and
     // once accepted is corrected only by appending.
+    // Every decision rule, including the one this guard originally omitted — which made
+    // a-decision-is-bound-to-an-iteration unreachable whenever it was the only decision
+    // rule declared. Found by its own witness (ITER.260821.19/AJ3).
     if schema.declares_rule("a-decision-names-what-it-rejected")
         || schema.declares_rule("a-decision-names-its-falsifier")
+        || schema.declares_rule("a-decision-is-bound-to-an-iteration")
         || schema.declares_rule("an-accepted-decision-is-append-only")
     {
         out.extend(check_decisions(docs, schema));
@@ -645,6 +738,132 @@ pub fn check_corpus(docs: &[KdlDocument], schema: &Schema) -> Vec<Violation> {
                             span: child.span(),
                         });
                     }
+                }
+            }
+        }
+    }
+    out
+}
+
+/// `TS.260821.02`/C4 and `ITER.260821.19`/AI1.
+///
+/// A record whose kind declares immutability carries a seal, and an iteration carries each
+/// of a slice's claims once. Both were declared before they were enforced, and the second
+/// reproduced itself inside the iteration that declared it.
+fn check_seals_and_claims(
+    docs: &[KdlDocument],
+    seals: bool,
+    unique: bool,
+    carried: bool,
+) -> Vec<Violation> {
+    let mut out = Vec::new();
+
+    // What each slice declares, so a commitment can be held to all of it.
+    let mut declared: Vec<(String, Vec<String>)> = Vec::new();
+    if carried {
+        for doc in docs {
+            for node in doc.nodes().iter().filter(|n| n.name().value() == "thin-slice") {
+                if let Some(id) = string_arg(node) {
+                    let claims =
+                        children_named(node, "claim").iter().filter_map(|c| string_arg(c)).collect();
+                    declared.push((id, claims));
+                }
+            }
+        }
+    }
+
+    for doc in docs {
+        if seals {
+            // An accepted decision. Immutability begins at acceptance, not before.
+            for iteration in doc.nodes().iter().filter(|n| n.name().value() == "iteration") {
+                for decision in children_named(iteration, "decision") {
+                    let state = prop(decision, "state").unwrap_or_else(|| "accepted".to_owned());
+                    if state == "accepted" && prop(decision, "seal").is_none() {
+                        out.push(Violation {
+                            entity_kind: "iteration".to_owned(),
+                            entity_id: string_arg(iteration),
+                            refusal: Refusal::Unsealed {
+                                kind: "decision".to_owned(),
+                                id: string_arg(decision).unwrap_or_default(),
+                                state,
+                            },
+                            span: decision.span(),
+                        });
+                    }
+                }
+            }
+            // A resolved symptom. TS.260820.18/C3: without a seal, a silent revert to
+            // `present` is accepted, because the check has no memory of what was there.
+            for frame in doc.nodes().iter().filter(|n| n.name().value() == "frame") {
+                for symptom in children_named(frame, "symptom") {
+                    let state = prop(symptom, "state").unwrap_or_default();
+                    if matches!(state.as_str(), "resolved" | "partially-resolved")
+                        && prop(symptom, "seal").is_none()
+                    {
+                        out.push(Violation {
+                            entity_kind: "frame".to_owned(),
+                            entity_id: string_arg(frame),
+                            refusal: Refusal::Unsealed {
+                                kind: "symptom".to_owned(),
+                                id: string_arg(symptom).unwrap_or_default(),
+                                state,
+                            },
+                            span: symptom.span(),
+                        });
+                    }
+                }
+            }
+        }
+
+        if carried {
+            for iteration in doc.nodes().iter().filter(|n| n.name().value() == "iteration") {
+                let on: Vec<String> = children_named(iteration, "on-slice")
+                    .iter()
+                    .filter_map(|n| string_arg(n))
+                    .collect();
+                let held: Vec<(String, String)> = children_named(iteration, "claim")
+                    .iter()
+                    .filter_map(|c| {
+                        Some((prop(c, "from-slice").unwrap_or_default(), string_arg(c)?))
+                    })
+                    .collect();
+                for slice in &on {
+                    let Some((_, claims)) = declared.iter().find(|(id, _)| id == slice) else {
+                        continue;
+                    };
+                    for claim in claims {
+                        if !held.iter().any(|(from, id)| from == slice && id == claim) {
+                            out.push(Violation {
+                                entity_kind: "iteration".to_owned(),
+                                entity_id: string_arg(iteration),
+                                refusal: Refusal::ClaimNotCarried {
+                                    claim: claim.clone(),
+                                    slice: slice.clone(),
+                                },
+                                span: iteration.span(),
+                            });
+                        }
+                    }
+                }
+            }
+        }
+
+        if unique {
+            for iteration in doc.nodes().iter().filter(|n| n.name().value() == "iteration") {
+                let mut seen: Vec<(String, String)> = Vec::new();
+                for claim in children_named(iteration, "claim") {
+                    let Some(id) = string_arg(claim) else { continue };
+                    let from = prop(claim, "from-slice").unwrap_or_default();
+                    if seen.contains(&(id.clone(), from.clone())) {
+                        out.push(Violation {
+                            entity_kind: "iteration".to_owned(),
+                            entity_id: string_arg(iteration),
+                            refusal: Refusal::DuplicateClaim { claim: id, slice: from },
+                            span: claim.span(),
+                        });
+                        continue;
+                    }
+                    seen.push((id, from));
                 }
             }
         }
