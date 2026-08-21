@@ -72,6 +72,19 @@ fn title_case(slug: &str) -> String {
     out
 }
 
+/// A composed document. Several results, in declared order, with one heading each — and
+/// still no branch on what any of them MEANS. Composition is ordering, not interpretation.
+pub fn render_composed(document: &praxis_core::Composed) -> String {
+    let mut out = String::new();
+    out.push_str(&format!("{}\n", document.title));
+    out.push_str(&format!("as of {} · composed on demand, never committed\n", document.as_of));
+    for part in &document.parts {
+        out.push_str(&format!("\n{}\n{}\n", "═".repeat(60), part.owner));
+        out.push_str(&render(&part.model));
+    }
+    out
+}
+
 pub fn render(model: &ReadModel) -> String {
     let mut out = String::new();
     out.push_str(&format!("{}\n", model.view));

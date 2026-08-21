@@ -168,7 +168,7 @@ fn landing(declared: &str, version: &str, view: &str) -> String {
 
 /// `the-published-set-for-a-release` — what shipped at version N, which symptoms it
 /// resolved, and what it left owed.
-fn published_set(version: &str, corpus: &Corpus) -> ReadModel {
+pub(crate) fn published_set(version: &str, corpus: &Corpus) -> ReadModel {
     let release = corpus.release(version);
     let mut shipped = Section::new("what shipped", &["iteration", "slice", "contributes"])
         .empty_because("this version binds nothing");

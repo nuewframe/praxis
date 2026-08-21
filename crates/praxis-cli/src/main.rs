@@ -13,7 +13,7 @@ use praxis_core::{
     Ask, Binding, Closing, Conditions, Corpus, Known, Pickup, Schema, Severity, Violation,
     Cut, Promotion, Publication, Published, Verified, assess, bind, check_corpus,
     check_document, close_iteration, cut, index_all, parse, pick_up, project, promote, publish,
-    guide_for, review, unbind, verify, what_is_currently_true,
+    dashboard, guide_for, review, unbind, verify, what_is_currently_true,
 };
 
 mod render;
@@ -135,6 +135,12 @@ enum Command {
         capability: String,
         /// The version whose surface to describe.
         version: String,
+        /// The state root to read.
+        #[arg(default_value = "praxis")]
+        root: PathBuf,
+    },
+    /// Where the product stands right now. Composed on demand, never committed.
+    Dashboard {
         /// The state root to read.
         #[arg(default_value = "praxis")]
         root: PathBuf,
@@ -306,6 +312,13 @@ fn main() -> ExitCode {
                 }
             }
         }
+        Command::Dashboard { root } => match dashboarding(&root) {
+            Ok(()) => ExitCode::SUCCESS,
+            Err(report) => {
+                eprintln!("{report:?}");
+                ExitCode::FAILURE
+            }
+        },
         Command::Ready { root } => match ready(&root) {
             Ok(()) => ExitCode::SUCCESS,
             Err(report) => {
@@ -1107,6 +1120,45 @@ fn guiding(capability: &str, version: &str, root: &Path) -> miette::Result<()> {
             Ok(())
         }
     }
+}
+
+/// `TS.260820.13`. One document from several read models, each still singly owned, thrown
+/// away after reading. There is no path under the archival root anywhere in this function.
+fn dashboarding(root: &Path) -> miette::Result<()> {
+    let sources = load(root)?;
+    let docs: Vec<_> = sources.iter().map(|(_, _, d)| d.clone()).collect();
+    let mut schema = Schema::default();
+    let mut conditions = Conditions::default();
+    for doc in &docs {
+        let found = Schema::from_document(doc);
+        if !found.is_empty() {
+            schema = found;
+        }
+        let declared = Conditions::from_document(doc);
+        if !declared.is_empty() {
+            conditions = declared;
+        }
+    }
+    let corpus = Corpus::from_documents(&docs, &schema);
+    let document = dashboard(&corpus, &conditions, &now());
+
+    if !document.owners_are_distinct() {
+        miette::bail!(
+            "a capability contributed more than one part. A DOCUMENT composes several read \
+             models; a READ MODEL still has exactly one owner"
+        );
+    }
+    for part in &document.parts {
+        let flaws = part.model.flaws();
+        if !flaws.is_empty() {
+            for flaw in &flaws {
+                eprintln!("praxis: read-model@v1 violated in {} — {flaw}", part.owner);
+            }
+            miette::bail!("the dashboard does not satisfy read-model@v1");
+        }
+    }
+    print!("{}", render::render_composed(&document));
+    Ok(())
 }
 
 /// The frame directory a slice lives under. Discovery sits one level below the frame, so

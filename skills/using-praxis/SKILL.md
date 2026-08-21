@@ -115,6 +115,7 @@ Load the `SKILL.md` of any skill you intend to follow.
 | | `cut-a-slice` | Cut an atomic vertical slice in a shape a checker can refuse — one command or one view, one actor, declared layers, claims naming their evidence |
 | | `declare-an-entity-kind` | Declare a kind the record must hold, and its shape, on the architecture's schema — an amendment to the record, never a change to the engine |
 | | `see-what-is-ready` | Ask which slices could be started right now, and what would refuse each of the rest — including the conditions the gate declares and nobody computed |
+| | `see-the-dashboard` | Where the product stands right now — several views composed on demand into one document, each still singly owned, and never committed |
 | | `pick-up-a-slice` | Take a slice through the one gate — selection is the commitment, refusals are recorded as facts, and the override is recorded beside the refusal it overrides |
 | | `attach-evidence` | Back a declared layer with an artifact at the moment it is reached — evidence outside the slice's declared set is refused, and a layer you did not reach stays visible as unevidenced |
 | | `close-an-iteration` | Close without dropping scope in silence — a shortfall is carried by a finding that names the claim, and deleting a claim to make the close succeed is itself refused |
