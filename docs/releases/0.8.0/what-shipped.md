@@ -19,6 +19,7 @@ what shipped at 0.8.0, which symptoms it resolved, and what it left owed
 | ITER.260821.07 | TS.260820.16 — bind-work-to-a-version | slice-outcome-added |
 | ITER.260821.08 | TS.260820.09 — cut-the-version | slice-outcome-added |
 | ITER.260821.09 | TS.260820.10 — publish-the-release-set | slice-outcome-added |
+| ITER.260821.10 | TS.260820.11 — verify-the-published-tree | slice-outcome-added |
 
 ## symptoms it resolved
 
@@ -88,4 +89,8 @@ _Nothing here — no symptom names this version as what resolved it._
 | ITER.260821.09 | Y3 | — |
 | ITER.260821.09 | Y4 | — |
 | ITER.260821.09 | Y5 | — |
+| ITER.260821.10 | Z1 | — |
+| ITER.260821.10 | Z2 | — |
+| ITER.260821.10 | Z3 | — |
+| ITER.260821.10 | Z4 | — |
 

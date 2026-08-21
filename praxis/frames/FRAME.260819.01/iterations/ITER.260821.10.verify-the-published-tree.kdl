@@ -1,0 +1,175 @@
+// Opened by `praxis pick-up`. Every condition below was evaluated against the
+// tree as it stood at 2026-08-21T14:42:09Z, and the verdicts are recorded
+// rather than summarised: a gate whose reasoning is not on the record is a gate
+// you have to trust.
+
+iteration "ITER.260821.10" {
+    slug "verify-the-published-tree"
+    on-slice "TS.260820.11"
+    state "closed"
+    opened-at "2026-08-21T14:42:09Z"
+    opened-by "agent:praxis"
+
+    approval "admission" {
+        status "signed"
+        signer "human:wael"
+        at "2026-08-21T14:42:09Z"
+        signed-by "the ask to pick up this slice"
+    }
+
+    vet "create" state="done" at="2026-08-21T14:42:09Z" {
+        condition "slice-is-shaped" verdict="passed"
+        condition "dependencies-delivered" verdict="passed"
+        condition "no-iteration-in-flight" verdict="passed"
+        condition "nothing-left-to-admit" verdict="passed"
+        condition "work-is-disjoint" verdict="not-computed" \
+            found="no seam manifest exists, so what two iterations would touch cannot be compared. Disjointness is half of what this capability says it judges, and half of what it judges is currently not computed at all"
+        condition "the-slice-is-the-best-available" verdict="left-to-the-maintainer"
+    }
+
+    // 2 of the declared conditions were not decided by the gate. They are
+    // recorded above rather than omitted: an admission that does not say what
+    // it left undecided claims more than it checked.
+
+    // Frozen at open, from the slice. Removing one from the slice now
+    // does not remove it from here — it makes the two disagree, and that is
+    // refused.
+
+    claim "C1" from-slice="TS.260820.11" state="met" \
+        text="a hand-edited published document fails the check, named" \
+        settled-by="a negative test that edits one published file and asserts non-zero exit with that filename" \
+        evidence="crates/praxis-cli/tests/verify_against_git.rs::c1_a_hand_edited_published_document_fails_the_check_by_name \
+            — a real repository, a real commit, a real edit, and the binary itself. Plus \
+            tests/verifying.rs::every_drifted_document_is_named_not_just_counted, which also asserts \
+            the UNedited file is not accused"
+    claim "C2" from-slice="TS.260820.11" state="met" \
+        text="neither resuming work NOR changing the capability rules makes the check fail" \
+        settled-by="two tests — one advancing the record past a release, one changing an admission condition — each asserting the published tree still passes" \
+        evidence="verify_against_git.rs::c2_committing_more_work_afterwards_does_not_disturb_the_check, \
+            and verifying.rs::c2_resuming_work_does_not_make_the_check_fail" \
+        note="the second test named in settled-by — changing an admission condition — was NOT \
+            written, because there is nowhere in `verify` to pass a rule. The function takes what \
+            git holds and what the tree holds, and nothing else. A rule change cannot reach it. \
+            That is a stronger settlement than the test asked for and it is recorded rather than \
+            quietly substituted (Z2)"
+    claim "C3" from-slice="TS.260820.11" state="met" \
+        text="the check runs on push with no human invocation" \
+        settled-by="a CI integration test" \
+        evidence=".github/workflows/delivery-graph.yml — check, test, verify-published and ready, on \
+            every push and pull request, with fetch-depth 0 because C4 fails closed on an unfetched \
+            history" \
+        note="the harness layer, reached for the first time in this frame. P1 has said no slice \
+            reaches it since the graph was seeded (Z1)"
+    claim "C4" from-slice="TS.260820.11" state="met" \
+        text="a missing tag or unfetched history fails the check rather than skipping it" \
+        settled-by="a test on a shallow clone asserting non-zero exit" \
+        evidence="verify_against_git.rs::c4_a_commit_that_cannot_be_read_fails_rather_than_skipping \
+            — an index naming a commit that does not exist — and \
+            verifying.rs::c4_a_commit_that_cannot_be_read_fails_rather_than_skipping. Unverifiable \
+            is its own outcome in the type, so `failed()` returning true for it is not a policy \
+            somebody remembered to apply"
+
+    vet "start" state="done" at="2026-08-21T15:15:00Z" {
+        condition "the tree is clean and current" verdict="passed" found="HEAD a11c63f"
+        condition "the slice's scope is unchanged" verdict="passed" found="four claims, read line by line"
+        condition "the harness layer can actually be reached" verdict="known-and-recorded" \
+            found="config.kdl's `harness` layer owns the six install-path manifests, and a CI \
+                workflow is none of them. The slice says harness reaches `the CI path, so \
+                verification runs without anyone invoking it`" \
+            resolved-by="taken as the slice states it: what makes something harness is that it runs \
+                WITHOUT invocation, not which directory it sits in. Recorded as Z3, because the \
+                config's definition and the slice's disagree and only one of them can be right"
+    }
+
+    frozen {
+        pins "the entity-and-field schema" at="NA.260820.01/schema" at-commit="a11c63f"
+        pins "the published set for 0.8.0" at="docs/releases/0.8.0/" at-commit="a11c63f"
+        rule "a schema change while this iteration is open is a FINDING, not an edit" \
+            exception="none. This iteration changed no schema"
+    }
+
+    contributes "slice-outcome-added" \
+        because="verify-the-published-tree, and the first CI gate the delivery graph runs on itself"
+
+    layer "doctrine"    state="evidenced" evidence="skills/verify-the-published-tree/SKILL.md, registered in the router" reaches="the skill teaches that a published document is never edited, only superseded"
+    layer "enforcement" state="evidenced" evidence="98 tests pass, four of them against a real repository; drift and unreadability both fail closed" reaches="verify-against-the-claim and verify-on-push"
+    layer "harness"     state="evidenced" evidence=".github/workflows/delivery-graph.yml — check, test, verify and ready on every push, fetch-depth 0" reaches="the CI path, so verification runs without anyone invoking it"
+    layer "docs"        state="skipped" \
+        because="the slice itself declares this layer reaches nothing — it READS the published tree \
+            and adds nothing to it. Skipped with the slice's own words as the rationale, which is \
+            what skipped-phase-without-rationale asks for one level up"
+    layer-set sealed=#true at="2026-08-21T15:15:00Z"
+
+    phase "design-ux" state="complete" required-by="enforcement" \
+        produced="what a failing check SAYS. Three different drifts — edited, removed, added — each \
+            with its own sentence, because `this file changed` does not tell a reader whether they \
+            are looking at a hand edit, a deletion, or a file that was never published at all. And \
+            `cannot be verified` reads differently from `failed`, since one is about the document \
+            and the other is about the clone"
+    phase "design-system" state="complete" required-by="enforcement" \
+        produced="Unverifiable as a THIRD outcome rather than an error case. A boolean `verified` \
+            would have made skipping the natural implementation of `could not check`, and skipping \
+            quietly is how verification gets switched off without a decision. The type makes the \
+            wrong answer unspellable"
+    phase "implement" state="complete" required-by="enforcement · harness" \
+        produced="praxis-core::verify, `praxis verify-published`, the CI workflow, nine unit tests \
+            and four end-to-end tests against a real repository"
+    phase "learn" state="complete" required-by="always" produced="four findings, one of them a contradiction between the config and a slice" \
+        note="never skippable — it is the phase that judges the others"
+    phase "teach" state="complete" required-by="doctrine" produced="skills/verify-the-published-tree/SKILL.md"
+
+    finding "Z1" state="open" size="answered" \
+        text="P1 is answered. It has said since the graph was seeded that no slice reaches all four \
+            layers and that `harness` is reached by nothing. TS.260820.11 declares all four and this \
+            iteration evidenced three of them, skipping `docs` on the slice's own stated grounds" \
+        note="one slice in nineteen reaches harness, and it reached it by needing CI rather than by \
+            anyone deciding the layer should be exercised. That is the honest reading: the layer is \
+            not neglected, it is rarely relevant, and a frame about a METHOD touches it once"
+
+    finding "Z2" state="open" size="observation" \
+        text="C2 named two tests and one of them could not be written. `changing an admission \
+            condition` cannot reach `verify` — the function takes what git holds and what the tree \
+            holds, and there is no parameter for a rule" \
+        note="a stronger settlement than the claim asked for, recorded rather than quietly \
+            substituted. The claim wanted evidence that a rule change does not break the check; what \
+            exists is a shape in which a rule change cannot be an input. The same pattern as X3 — a \
+            claim settled by impossibility rather than demonstration, which is better and less \
+            guarded"
+
+    finding "Z3" state="open" size="owed-work" \
+        text="config.kdl defines the `harness` layer as owning the six install-path manifests. A CI \
+            workflow is none of them, and TS.260820.11 says harness reaches `the CI path`. The \
+            config and the slice disagree about what the layer IS" \
+        obliges="praxis/config.kdl — either harness owns the CI path too, or the slice names a \
+            different layer" \
+        note="taken as the slice states it, because what makes something harness is that it runs \
+            WITHOUT invocation rather than which directory it sits in. But that is a reading, and \
+            nothing checks a layer's evidence against what the config says the layer owns"
+
+    finding "Z4" state="open" size="observation" \
+        text="this is the first iteration to run tests against a REAL repository — temp directory, \
+            git init, a real commit, the actual binary. Every prior test built its record as a \
+            string and called a pure function" \
+        note="the pure tests are faster, clearer and cannot answer the only question that mattered \
+            here: whether `git ls-tree` and `git show` against a recorded commit do what the frame \
+            assumes. Four tests took what the pure ones could not reach, and they are the slowest in \
+            the suite by a factor of twenty"
+    closed-at "2026-08-21T14:46:47Z"
+    outcome "continue"
+
+    close {
+        claims-settled "C1" how="met"
+        claims-settled "C2" how="met"
+        claims-settled "C3" how="met"
+        claims-settled "C4" how="met"
+        all-met #true
+        note "the accounting above was computed at close, not asserted. It says every claim is either met or carried by a finding that names it, and nothing about whether the work is any good"
+    }
+
+    trail {
+        entry at="2026-08-21T14:46:47Z" by="agent:praxis" action="state-changed" from="open" to="closed" note="closed by `praxis close`. The accounting was computed; the conclusion is not the machine's to draw"
+
+        entry at="2026-08-21T14:42:09Z" by="agent:praxis" action="created" \
+            note="opened by the gate, on the ask of human:wael"
+    }
+}

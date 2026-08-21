@@ -11,8 +11,8 @@ use clap::{Parser, Subcommand};
 use miette::{Diagnostic, NamedSource, SourceSpan};
 use praxis_core::{
     Ask, Binding, Closing, Conditions, Corpus, Known, Pickup, Schema, Severity, Violation,
-    Cut, Publication, assess, bind, check_corpus, check_document, close_iteration, cut,
-    index_all, parse, pick_up, project, publish, unbind,
+    Cut, Publication, Published, Verified, assess, bind, check_corpus, check_document,
+    close_iteration, cut, index_all, parse, pick_up, project, publish, unbind, verify,
 };
 
 mod render;
@@ -90,6 +90,15 @@ enum Command {
         /// Say what would be written and write nothing.
         #[arg(long)]
         dry_run: bool,
+    },
+    /// Prove every published document is byte-identical to what was published.
+    ///
+    /// Compares each release's directory against the commit its own index node names —
+    /// never against the current record, which an archival document is meant to outlive.
+    VerifyPublished {
+        /// The state root to read.
+        #[arg(default_value = "praxis")]
+        root: PathBuf,
     },
     /// Show which slices could be started right now, and what would refuse each of the rest.
     ///
@@ -210,6 +219,14 @@ fn main() -> ExitCode {
                 }
             }
         }
+        Command::VerifyPublished { root } => match verifying(&root) {
+            Ok(0) => ExitCode::SUCCESS,
+            Ok(_) => ExitCode::FAILURE,
+            Err(report) => {
+                eprintln!("{report:?}");
+                ExitCode::FAILURE
+            }
+        },
         Command::Ready { root } => match ready(&root) {
             Ok(()) => ExitCode::SUCCESS,
             Err(report) => {
@@ -666,6 +683,115 @@ fn publishing(version: &str, root: &Path, dry_run: bool) -> miette::Result<bool>
     }
 }
 
+/// `TS.260820.11`. Either every published document is byte-identical to what was
+/// published, or the edited one is named.
+fn verifying(root: &Path) -> miette::Result<usize> {
+    let sources = load(root)?;
+    let docs: Vec<_> = sources.iter().map(|(_, _, d)| d.clone()).collect();
+    let mut schema = Schema::default();
+    for doc in &docs {
+        let found = Schema::from_document(doc);
+        if !found.is_empty() {
+            schema = found;
+        }
+    }
+    let corpus = Corpus::from_documents(&docs, &schema);
+
+    let cut_releases: Vec<_> = corpus.releases.iter().filter(|r| r.cut()).collect();
+    if cut_releases.is_empty() {
+        // Not a pass and not a failure: there is genuinely nothing published yet. Said
+        // out loud, because "verified" and "nothing to verify" must not read alike.
+        println!("praxis: no cut release yet — nothing has been published to verify");
+        return Ok(0);
+    }
+
+    let mut failures = 0;
+    for release in cut_releases {
+        let commit = index_commit(&docs, &release.id);
+        let dir = format!("docs/releases/{}", release.version);
+        let at_commit = commit.as_deref().and_then(|c| files_at(c, &dir));
+        let in_tree = files_in_tree(&dir);
+
+        match verify(&release.version, at_commit.as_deref(), &in_tree) {
+            Verified::Clean { files, .. } => {
+                println!("praxis: {} verified — {files} document(s) unchanged since publication", release.version);
+            }
+            Verified::Drifted { drift, .. } => {
+                failures += 1;
+                for item in &drift {
+                    eprintln!("praxis: drift in {} — {}", release.version, item.message());
+                }
+            }
+            Verified::Unverifiable { why, .. } => {
+                failures += 1;
+                eprintln!("praxis: {} cannot be verified — {why}", release.version);
+            }
+        }
+    }
+    if failures > 0 {
+        eprintln!("praxis: {failures} release(s) failed verification");
+    }
+    Ok(failures)
+}
+
+/// The commit a release's index node names.
+fn index_commit(docs: &[kdl::KdlDocument], release_id: &str) -> Option<String> {
+    for doc in docs {
+        for node in doc.nodes() {
+            if node.name().value() != "release" || root_id(node).as_deref() != Some(release_id) {
+                continue;
+            }
+            let index = node.iter_children().find(|c| c.name().value() == "index")?;
+            let commit = index.iter_children().find(|c| c.name().value() == "commit")?;
+            return commit
+                .entries()
+                .iter()
+                .find(|e| e.name().is_none())
+                .and_then(|e| e.value().as_string())
+                .map(str::to_owned);
+        }
+    }
+    None
+}
+
+/// Every file under `dir` at `commit`. `None` when the commit itself cannot be read —
+/// which is a failure, never a skip.
+fn files_at(commit: &str, dir: &str) -> Option<Vec<Published>> {
+    let listed = std::process::Command::new("git")
+        .args(["ls-tree", "-r", "--name-only", commit, "--", dir])
+        .output()
+        .ok()?;
+    if !listed.status.success() {
+        return None;
+    }
+    let mut out = Vec::new();
+    for path in String::from_utf8_lossy(&listed.stdout).lines() {
+        let blob = std::process::Command::new("git")
+            .arg("show")
+            .arg(format!("{commit}:{path}"))
+            .output()
+            .ok()?;
+        if !blob.status.success() {
+            return None;
+        }
+        out.push(Published { path: path.to_owned(), bytes: blob.stdout });
+    }
+    Some(out)
+}
+
+fn files_in_tree(dir: &str) -> Vec<Published> {
+    let mut paths = Vec::new();
+    walk_all(Path::new(dir), &mut paths);
+    paths.sort();
+    paths
+        .into_iter()
+        .filter_map(|path| {
+            let bytes = fs::read(&path).ok()?;
+            Some(Published { path: path.to_string_lossy().into_owned(), bytes })
+        })
+        .collect()
+}
+
 /// The frame directory a slice lives under. Discovery sits one level below the frame, so
 /// the frame is the grandparent of the file the slice was found in.
 fn frame_of(slice: &str, sources: &[Source]) -> Option<PathBuf> {
@@ -918,14 +1044,24 @@ fn kdl_files(root: &Path) -> Vec<PathBuf> {
 }
 
 fn walk(dir: &Path, out: &mut Vec<PathBuf>) {
+    collect(dir, out, Some("kdl"));
+}
+
+/// Every file under a directory. Verification compares what is THERE, not what it
+/// expected to find — a filter would let an added file hide behind its extension.
+fn walk_all(dir: &Path, out: &mut Vec<PathBuf>) {
+    collect(dir, out, None);
+}
+
+fn collect(dir: &Path, out: &mut Vec<PathBuf>, extension: Option<&str>) {
     let Ok(entries) = fs::read_dir(dir) else {
         return;
     };
     for entry in entries.flatten() {
         let path = entry.path();
         if path.is_dir() {
-            walk(&path, out);
-        } else if path.extension().is_some_and(|e| e == "kdl") {
+            collect(&path, out, extension);
+        } else if extension.is_none_or(|want| path.extension().is_some_and(|e| e == want)) {
             out.push(path);
         }
     }

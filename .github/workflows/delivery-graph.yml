@@ -1,0 +1,44 @@
+# The delivery graph's own gates, run on push with nobody remembering to ask.
+#
+# TS.260820.11/C3: verification that has to be invoked is verification that stops being
+# invoked. This is the harness layer of that slice — the only place in FRAME.260819.01
+# where `harness` is reached at all.
+
+name: delivery-graph
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  graph:
+    name: check · test · verify
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # TS.260820.11/C4 fails closed on an unfetched history rather than skipping,
+          # which is correct and would fire on every run of a shallow checkout. Full
+          # history is what makes the check answerable, not what makes it lenient.
+          fetch-depth: 0
+
+      - name: Install the pinned toolchain
+        run: rustup show active-toolchain || rustup toolchain install
+
+      - name: Refuse any record the schema does not admit
+        run: cargo run --quiet -- check praxis
+
+      - name: Run the engine's own tests
+        run: cargo test --quiet
+
+      - name: Prove no published document was hand-edited
+        run: cargo run --quiet -- verify-published praxis
+
+      - name: Report what is ready, for the log
+        # Not a gate. It runs so the answer is in the record of the run, where the next
+        # agent can read what was admissible at that commit without recomputing it.
+        run: cargo run --quiet -- ready praxis

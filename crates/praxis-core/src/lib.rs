@@ -13,6 +13,7 @@ pub mod close;
 pub mod pickup;
 pub mod publish;
 pub mod schema;
+pub mod verify;
 pub mod view;
 
 pub use check::{
@@ -26,6 +27,7 @@ pub use close::{Closing, Unaccounted, close_iteration};
 pub use pickup::{Ask, Pickup, Record, pick_up};
 pub use publish::{Document, Publication, publish};
 pub use schema::{Cardinality, EntitySpec, FieldSpec, Schema};
+pub use verify::{Drift, Published, Verified, verify};
 pub use view::{Cell, ReadModel, Section};
 
 /// Parse KDL source, returning the document or the parse error unchanged — the codec
