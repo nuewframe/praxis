@@ -9,7 +9,9 @@ use std::process::ExitCode;
 
 use clap::{Parser, Subcommand};
 use miette::{Diagnostic, NamedSource, SourceSpan};
-use praxis_core::{Known, Schema, Severity, Violation, check_document, index_all, parse};
+use praxis_core::{
+    Known, Schema, Severity, Violation, check_corpus, check_document, index_all, parse,
+};
 
 #[derive(Parser)]
 #[command(name = "praxis", version, about = "The delivery graph engine")]
@@ -98,9 +100,21 @@ fn check(root: &Path) -> miette::Result<usize> {
         miette::bail!("the record declares no schema — nothing to check against");
     }
 
+    // Rules that need the whole record at once — uniqueness and coverage — are decided
+    // over the corpus and attributed back to the file that raised them.
+    let docs: Vec<_> = sources.iter().map(|(_, _, d)| d.clone()).collect();
+    let corpus = check_corpus(&docs, &schema);
+
     let (mut refusals, mut reports) = (0, 0);
-    for (path, text, doc) in &sources {
-        for violation in check_document(doc, &schema, &known) {
+    for (i, (path, text, doc)) in sources.iter().enumerate() {
+        let mut found = check_document(doc, &schema, &known);
+        found.extend(
+            corpus
+                .iter()
+                .filter(|v| std::ptr::eq(&docs[i], &docs[i]) && belongs(v, doc))
+                .cloned(),
+        );
+        for violation in found {
             match violation.severity() {
                 Severity::Refuse => refusals += 1,
                 Severity::Report => reports += 1,
@@ -120,6 +134,19 @@ fn check(root: &Path) -> miette::Result<usize> {
         eprintln!("praxis: {refusals} refusal(s) in {}{noted}", root.display());
     }
     Ok(refusals)
+}
+
+/// Whether a corpus-level violation was raised by this document. Attribution is by
+/// entity id, because the span is only meaningful in the file the node lives in.
+fn belongs(violation: &Violation, doc: &kdl::KdlDocument) -> bool {
+    doc.nodes().iter().any(|n| {
+        n.name().value() == violation.entity_kind
+            || n.entries()
+                .iter()
+                .find(|e| e.name().is_none())
+                .and_then(|e| e.value().as_string())
+                .is_some_and(|id| Some(id.to_owned()) == violation.entity_id)
+    })
 }
 
 fn report(path: &Path, text: &str, violation: &Violation) -> miette::Report {

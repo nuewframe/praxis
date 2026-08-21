@@ -8,7 +8,7 @@
 use kdl::{KdlDocument, KdlNode};
 use miette::SourceSpan;
 
-use crate::schema::{Schema, prop, string_arg};
+use crate::schema::{FieldSpec, Schema, prop, string_arg, string_args};
 
 /// Whether a finding stops the work or merely tells the reader.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -34,6 +34,10 @@ pub enum Refusal {
     UndeclaredKind { kind: String, within: Option<String> },
     /// A kind is declared but carries no field declarations, so it refuses nothing.
     ShapelessKind { kind: String },
+    /// Two records of one kind claim the same value for a field that must be unique.
+    ContestedValue { field: String, value: String, kind: String, other: String },
+    /// A value nothing claims. Reported: a coverage gap, not a malformed fact.
+    UnclaimedValue { field: String, value: String, wanted_by: String },
 }
 
 impl Refusal {
@@ -46,13 +50,14 @@ impl Refusal {
             | Self::NotInVocabulary { field, .. }
             | Self::DanglingReference { field, .. } => field,
             Self::UndeclaredKind { kind, .. } | Self::ShapelessKind { kind } => kind,
+            Self::ContestedValue { field, .. } | Self::UnclaimedValue { field, .. } => field,
         }
     }
 
     /// Whether this stops the work.
     pub fn severity(&self) -> Severity {
         match self {
-            Self::ShapelessKind { .. } => Severity::Report,
+            Self::ShapelessKind { .. } | Self::UnclaimedValue { .. } => Severity::Report,
             _ => Severity::Refuse,
         }
     }
@@ -84,6 +89,14 @@ impl Refusal {
             },
             Self::ShapelessKind { kind } => format!(
                 "`{kind}` is declared with no fields, so nothing about its records can be refused"
+            ),
+            Self::ContestedValue { field, value, kind, other } => format!(
+                "`{field}` claims {value:?}, which {other:?} also claims — one {kind} owns it, or the \
+                 boundary between them is drawn wrong"
+            ),
+            Self::UnclaimedValue { field, value, wanted_by } => format!(
+                "`{field}` {value:?} is claimed by no {wanted_by} — it belongs to nothing, which is \
+                 a gap in the model rather than a malformed record"
             ),
         }
     }
@@ -308,6 +321,80 @@ fn field_span(node: &KdlNode, field: &str) -> Option<SourceSpan> {
         .map(|n| n.span())
 }
 
+/// Rules that can only be decided by looking at the whole record at once: whether two
+/// entities contest one value, and whether a value nothing claims exists.
+pub fn check_corpus(docs: &[KdlDocument], schema: &Schema) -> Vec<Violation> {
+    let mut out = Vec::new();
+    let mut claimed: Vec<(String, String, String)> = Vec::new(); // kind.field, value, owner
+
+    // First pass: everything anyone claims, and any contest over it.
+    for doc in docs {
+        for node in doc.nodes() {
+            let kind = node.name().value();
+            let Some(spec) = schema.entity(kind) else { continue };
+            let owner = string_arg(node).unwrap_or_else(|| kind.to_owned());
+            for field in &spec.fields {
+                let Some(unique_in) = &field.unique_in else { continue };
+                for child in children_named(node, &field.name) {
+                    for value in string_args(child) {
+                        let key = format!("{unique_in}.{}", field.name);
+                        if let Some((_, _, other)) =
+                            claimed.iter().find(|(k, v, o)| k == &key && v == &value && o != &owner)
+                        {
+                            out.push(Violation {
+                                entity_kind: kind.to_owned(),
+                                entity_id: Some(owner.clone()),
+                                refusal: Refusal::ContestedValue {
+                                    field: field.name.clone(),
+                                    value: value.clone(),
+                                    kind: unique_in.clone(),
+                                    other: other.clone(),
+                                },
+                                span: child.span(),
+                            });
+                        }
+                        claimed.push((key, value, owner.clone()));
+                    }
+                }
+            }
+        }
+    }
+
+    // Second pass: values that wanted a claimant and found none.
+    for doc in docs {
+        for node in doc.nodes() {
+            let kind = node.name().value();
+            let Some(spec) = schema.entity(kind) else { continue };
+            for field in &spec.fields {
+                let Some(target) = &field.claimed_by else { continue };
+                for child in children_named(node, &field.name) {
+                    let Some(value) = string_arg(child) else { continue };
+                    let wanted = target.replace('.', ".");
+                    if !claimed.iter().any(|(k, v, _)| k == &wanted && v == &value) {
+                        out.push(Violation {
+                            entity_kind: kind.to_owned(),
+                            entity_id: string_arg(node),
+                            refusal: Refusal::UnclaimedValue {
+                                field: field.name.clone(),
+                                value,
+                                wanted_by: target.split('.').next().unwrap_or(target).to_owned(),
+                            },
+                            span: child.span(),
+                        });
+                    }
+                }
+            }
+        }
+    }
+    out
+}
+
+fn children_named<'a>(node: &'a KdlNode, name: &str) -> Vec<&'a KdlNode> {
+    node.children()
+        .map(|b| b.nodes().iter().filter(|n| n.name().value() == name).collect())
+        .unwrap_or_default()
+}
+
 /// Index every entity a document declares, so references can be checked later.
 pub fn index(doc: &KdlDocument, schema: &Schema, known: &mut Known) {
     for node in doc.nodes() {
@@ -324,10 +411,18 @@ pub fn index(doc: &KdlDocument, schema: &Schema, known: &mut Known) {
 /// Index a node whose kind the schema may not declare — used for capabilities, which
 /// carry their identity as the node's own argument.
 pub fn index_all(doc: &KdlDocument, known: &mut Known) {
-    for node in doc.nodes() {
+    fn walk(node: &KdlNode, known: &mut Known) {
         if let Some(id) = string_arg(node) {
             known.insert(node.name().value(), id);
         }
+        if let Some(body) = node.children() {
+            for child in body.nodes() {
+                walk(child, known);
+            }
+        }
+    }
+    for node in doc.nodes() {
+        walk(node, known);
     }
 }
 

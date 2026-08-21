@@ -9,7 +9,8 @@ pub mod check;
 pub mod schema;
 
 pub use check::{
-    Known, Refusal, Severity, Violation, check_document, check_node, index_all, refused,
+    Known, Refusal, Severity, Violation, check_corpus, check_document, check_node, index_all,
+    refused,
 };
 pub use schema::{Cardinality, EntitySpec, FieldSpec, Schema};
 

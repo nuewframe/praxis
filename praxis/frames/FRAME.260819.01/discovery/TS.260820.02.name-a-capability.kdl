@@ -4,6 +4,7 @@ thin-slice "TS.260820.02" {
     kind "command"
     realizes "CAP.delivery-record"
     from-storm "ES.260819.01"
+    state "delivered"
 
     command "name-capability"
     actor "maintainer"
@@ -26,7 +27,7 @@ thin-slice "TS.260820.02" {
     step "1" does="cluster the storm's events by what must stay consistent together"
     step "2" does="name the doing the cluster performs"
     step "3" does="state what it is not, as an exclusion something else covers — not as scope restated"
-    step "4" does="record the four gate tests with the reason each iterations"
+    step "4" does="record the four gate tests with the reason each passes"
     step "5" does="write it. A capability owning no cluster is refused"
 
     excludes "deciding what order capabilities are built in — that is the slice set's argument, \

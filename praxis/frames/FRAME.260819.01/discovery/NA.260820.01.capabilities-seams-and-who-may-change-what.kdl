@@ -350,7 +350,26 @@ notional-architecture "NA.260820.01" {
             note="the literal id FORMAT is a layout decision and lives on ADR.260819.01"
 
         entity "frame" is="a problem — symptoms, one root cause, one principle" \
-            completes="never; its symptoms resolve individually, each naming a release"
+            completes="never; its symptoms resolve individually, each naming a release" \
+            note="only one frame exists, so every cardinality here is inferred from a sample of ONE. \
+                Required is limited to what a frame's own definition demands; the rest stays optional \
+                until a second frame says otherwise (ITER.260821.02/R4)" {
+            field "slug"             each="1"
+            field "title"            each="1"
+            field "symptom"          each="1..n" holds="symptom" because="a frame with no symptom cannot resolve, and resolution is per symptom"
+            field "root-cause"       each="1" because="the convergence gate — symptoms that do not reduce to one cause were more than one problem"
+            field "principle"        each="1"
+            field "trail"            each="1"
+            field "current-ceiling"  each="0..1"
+            field "affected"         each="0..1"
+            field "baseline"         each="0..1"
+            field "cost-of-inaction" each="0..1"
+            field "identifies"       each="0..n"
+            field "retires"          each="0..n"
+            field "out-of-scope"     each="0..n"
+            field "created-by"       each="0..1"
+            field "created-at"       each="0..1"
+        }
         entity "thin-slice" is="an atomic vertical slice — one command or one read model, cut so it can exercise a capability" \
             states="proposed active delivered dropped" {
             // The shape a checker refuses, made machine-readable. Derived from the storm's
@@ -408,12 +427,74 @@ notional-architecture "NA.260820.01" {
             field "paths"       each="1"
         }
         entity "notional-architecture" is="what the capabilities are to each other, free of any tool decision" \
-            states="sought held"
+            states="sought held" \
+            note="one record; cardinalities conservative for the same reason as frame" {
+            field "slug"            each="1"
+            field "title"           each="1"
+            field "frame"           each="1" references="frame"
+            field "state"           each="1" one-of="sought" "held"
+            field "schema"          each="1" because="the model's own vocabulary. Without it nothing in the record can be checked at all"
+            field "trail"           each="1"
+            field "derived-from"    each="0..n"
+            field "exercised-by"    each="0..1"
+            field "excludes"        each="0..n" because="what it refuses to decide is what makes it notional"
+            field "substrate"       each="0..n"
+            field "external"        each="0..n"
+            field "capability-role" each="0..n"
+            field "seam"            each="0..n"
+            field "reading-rule"    each="0..n"
+            field "invariant"       each="0..n"
+            field "owes"            each="0..n"
+            field "open"            each="0..n"
+        }
         entity "capability" is="a permanent doing the system must have" \
             states="sought active retired" \
-            completes="never; it is retired"
+            completes="never; it is retired" {
+            field "doing"            each="1" because="a capability that names no doing is a noun someone liked"
+            field "not"              each="1" because="an exclusion something else covers, never scope restated"
+            field "state"            each="1" one-of="sought" "active" "retired"
+            field "derived-from"     each="1" references="event-storm" \
+                because="capability-must-trace — a capability owns a cluster of events from a storm, or it is an assertion"
+            field "from-cluster"     each="1" references="cluster" \
+                because="the cluster IS the derivation. Naming a storm without the cluster inside it proves nothing"
+            field "owns-event"       each="1" unique-in="capability" \
+                because="an event kept consistent by two capabilities has no single owner, and the boundary between them is drawn wrong"
+            field "owns-read-model"  each="1..n"
+            field "gate-test"        each="1..n" because="the four tests, each with the reason it passes"
+            field "keeps-consistent" each="1"
+            field "attacks"          each="1" references="symptom"
+            field "trail"            each="1"
+            field "enforces"         each="0..n"
+            field "principle-note"   each="0..1"
+            field "merge-reason"     each="0..1"
+            field "split-reason"     each="0..1"
+            field "narrowed-by"      each="0..1"
+            field "property"         each="0..n"
+        }
+
+        entity "cluster" is="a group of events that must stay consistent together — the unit a capability is derived FROM" \
+            note="contained in an event-storm. Declared so `from-cluster` resolves rather than merely being present"
+
+        entity "symptom" is="one observable thing that is wrong, resolving on its own schedule by naming a release" \
+            note="contained in a frame. Declared so `attacks` resolves"
         entity "adr" is="a durable technical decision, its argument, its alternatives, and its corrections" \
-            states="proposed accepted superseded"
+            states="proposed accepted superseded" \
+            note="one record; cardinalities conservative for the same reason as frame" {
+            field "slug"       each="1"
+            field "title"      each="1"
+            field "state"      each="1" one-of="proposed" "accepted" "superseded"
+            field "body"       each="1" because="a decision with no argument is an instruction"
+            field "approval"   each="1..n" because="an accepted decision nobody signed is unsigned"
+            field "trail"      each="1"
+            field "decided-at" each="0..1"
+            field "matured-at" each="0..1"
+            field "deciders"   each="0..1"
+            field "raised-by"  each="0..1"
+            field "supersedes" each="0..n"
+            field "amendment"  each="0..n"
+            field "enforces"   each="0..1"
+            field "open"       each="0..n"
+        }
         entity "release" is="an index into history — what it binds, what it resolves" \
             states="planned released"
         entity "iteration" is="one attempt at a slice — what ITERATE produces" \
@@ -465,10 +546,11 @@ notional-architecture "NA.260820.01" {
             field "actor"      each="0..n"
             field "external"   each="0..n"
             field "command"    each="1..n"
-            field "event"      each="1..n"
+            field "event"      each="1..n" claimed-by="capability.owns-event" \
+                because="an event no capability owns belongs to nothing — reported, not refused"
             field "policy"     each="0..n"
             field "read-model" each="0..n" holds="read-model"
-            field "cluster"    each="0..n" because="a capability that traces to no cluster is an assertion"
+            field "cluster"    each="0..n" holds="cluster" because="a capability that traces to no cluster is an assertion"
             field "process"    each="0..1"
             field "finding"    each="0..n"
         }
@@ -534,6 +616,11 @@ notional-architecture "NA.260820.01" {
         rule "iteration-without-signed-admission" refuses="work beginning on an iteration whose admission is unsigned"
         rule "iteration-worked-without-start-vet"  refuses="work beginning on a create-vet alone"
         rule "complete-phase-without-evidence"     refuses="a phase marked complete that produced nothing"
+        rule "phase-required-by-a-declared-layer"  refuses="a phase skipped while a layer it is the only route to stays sealed and unevidenced" \
+            note="which phases are mandatory is decided by the slice's sealed LAYER SET, not by \
+                preference. A slice declaring `doctrine` cannot skip teach; one declaring \
+                `enforcement` or `docs` cannot skip implement. design-ux and design-system are \
+                judgement, and skipping either is a recorded rationale rather than a silence"
         rule "skipped-phase-without-rationale"     refuses="a phase skipped with no reason recorded"
         rule "amendment-records-no-change"  refuses="an amendment that changes nothing"
         rule "slice-without-one-capability" refuses="a slice realizing zero or several capabilities"

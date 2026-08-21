@@ -187,7 +187,7 @@ event-storm "ES.1" {
     }
 }
 
-/// The committed record passes, and its shapeless kinds are reported rather than ignored.
+/// The committed record passes, and a report never fails closed.
 #[test]
 fn the_record_conforms_and_names_what_still_has_no_shape() {
     let root = std::path::Path::new(concat!(env!("CARGO_MANIFEST_DIR"), "/../../praxis"));
@@ -215,10 +215,11 @@ fn the_record_conforms_and_names_what_still_has_no_shape() {
         }
     }
     assert!(hard.is_empty(), "the committed record was refused:\n{}", hard.join("\n"));
-    assert!(
-        reported > 0,
-        "kinds still carry no shape; the check must say so rather than pass in silence"
-    );
+    // Reports are informational and their COUNT is not an invariant. This assertion
+    // originally read `reported > 0`, which encoded a transient gap — eight kinds without
+    // shapes — as a requirement, and started failing the moment the gap was closed
+    // (ITER.260821.02/R5). What matters is that a report never fails closed.
+    let _ = reported;
 }
 
 fn collect(dir: &std::path::Path, out: &mut Vec<(std::path::PathBuf, String)>) {

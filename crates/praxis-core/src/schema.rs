@@ -61,6 +61,12 @@ pub struct FieldSpec {
     pub when_kind: Option<String>,
     /// The entity kind this field's value must name.
     pub references: Option<String>,
+    /// No two records of this kind may claim the same value for this field.
+    pub unique_in: Option<String>,
+    /// Every value of this field should be claimed by `<kind>.<field>` somewhere in the
+    /// record. Unclaimed values are reported, never refused — absence of a claim is a
+    /// gap in coverage, not a malformed fact.
+    pub claimed_by: Option<String>,
     /// The entity kind this field CONTAINS, when the child is an entity in its own
     /// right rather than a value. `references` points across the graph by id; `holds`
     /// nests. Without the distinction a contained entity is indistinguishable from a
@@ -163,10 +169,22 @@ fn fields_of(entity: &KdlNode) -> Vec<FieldSpec> {
                 when_kind: prop(field, "when-kind"),
                 references: prop(field, "references"),
                 holds: prop(field, "holds"),
+                unique_in: prop(field, "unique-in"),
+                claimed_by: prop(field, "claimed-by"),
                 one_of: all_props(field, "one-of"),
                 because: prop(field, "because"),
             })
         })
+        .collect()
+}
+
+/// Every positional argument of a node, as strings. `owns-event "A" "B"` carries two.
+pub fn string_args(node: &KdlNode) -> Vec<String> {
+    node.entries()
+        .iter()
+        .filter(|e| e.name().is_none())
+        .filter_map(|e| e.value().as_string())
+        .map(str::to_owned)
         .collect()
 }
 
