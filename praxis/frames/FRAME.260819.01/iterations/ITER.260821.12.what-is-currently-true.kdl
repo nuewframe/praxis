@@ -1,0 +1,122 @@
+// Opened by `praxis pick-up`. Every condition below was evaluated against the
+// tree as it stood at 2026-08-21T19:37:13Z, and the verdicts are recorded
+// rather than summarised: a gate whose reasoning is not on the record is a gate
+// you have to trust.
+
+iteration "ITER.260821.12" {
+    slug "what-is-currently-true"
+    on-slice "TS.260820.03"
+    state "closed"
+    opened-at "2026-08-21T19:37:13Z"
+    opened-by "agent:praxis"
+
+    approval "admission" {
+        status "signed"
+        signer "human:wael"
+        at "2026-08-21T19:37:13Z"
+        signed-by "the ask to pick up this slice"
+    }
+
+    vet "create" state="done" at="2026-08-21T19:37:13Z" {
+        condition "slice-is-shaped" verdict="passed"
+        condition "dependencies-delivered" verdict="passed"
+        condition "no-iteration-in-flight" verdict="passed"
+        condition "nothing-left-to-admit" verdict="passed"
+        condition "work-is-disjoint" verdict="not-computed" \
+            found="no seam manifest exists, so what two iterations would touch cannot be compared. Disjointness is half of what this capability says it judges, and half of what it judges is currently not computed at all"
+        condition "the-slice-is-the-best-available" verdict="left-to-the-maintainer"
+    }
+
+    // 2 of the declared conditions were not decided by the gate. They are
+    // recorded above rather than omitted: an admission that does not say what
+    // it left undecided claims more than it checked.
+
+    // Frozen at open, from the slice. Removing one from the slice now
+    // does not remove it from here — it makes the two disagree, and that is
+    // refused.
+
+    claim "C1" from-slice="TS.260820.03" state="met" \
+        text="the answer is computed from the record, never from a cached or written summary" \
+        settled-by="a test that mutates state and asserts the answer changes with no regeneration step" \
+        evidence="tests/current_truth.rs::c1_the_answer_changes_with_the_record_and_has_no_regeneration_step \
+            — the only input is the corpus, so there is no cache to invalidate and nowhere to put one"
+    claim "C2" from-slice="TS.260820.03" state="met" \
+        text="an empty area answers 'nothing recorded' rather than returning nothing" \
+        settled-by="a test on a repository with no releases" \
+        evidence="tests/current_truth.rs::c2_an_empty_area_says_nothing_recorded_rather_than_returning_nothing \
+            — asserted across four sections on a record that holds nothing at all"
+
+    vet "start" state="done" at="2026-08-21T19:35:00Z" {
+        condition "the tree is clean and current" verdict="passed" found="HEAD f8a5031"
+        condition "the slice's scope is unchanged" verdict="passed" found="two claims, read line by line"
+        condition "the machinery this needs already exists" verdict="passed" \
+            found="read-model@v1 and both renderers were delivered by TS.260820.04 and .10. This is \
+                the first slice built entirely on seams other slices froze"
+    }
+
+    frozen {
+        pins "the entity-and-field schema" at="NA.260820.01/schema" at-commit="f8a5031"
+        pins "read-model@v1" at="NA.260820.01/seam" at-commit="f8a5031"
+        rule "a schema change while this iteration is open is a FINDING, not an edit" \
+            exception="none. This iteration changed no schema"
+    }
+
+    contributes "slice-outcome-added" \
+        because="what-is-currently-true, and an arriving agent that asks instead of re-deriving"
+
+    layer "doctrine"    state="evidenced" evidence="skills/ask-what-is-true/SKILL.md, registered first under PLAN" reaches="the skill tells an arriving agent to ask before deriving"
+    layer "enforcement" state="evidenced" evidence="115 tests pass; `praxis truth` is a command, so a stale hand-written summary has nothing to stand in for" reaches="the query is a first-class command, so a stale hand-written summary cannot stand in for it"
+    layer "docs"        state="skipped" \
+        because="the slice declares this layer reaches `none — this slice is deliberately \
+            pre-projection`. Skipped with the slice's own words, which is the second time a slice \
+            has declared a layer it does not reach"
+
+    layer-set sealed=#true at="2026-08-21T19:35:00Z"
+
+    phase "design-ux" state="complete" required-by="doctrine" \
+        produced="the section a reader is told to look at FIRST — `not covered by this answer`, \
+            naming each question this view does not answer and what to ask instead. Without it the \
+            answer is an impression: complete-looking, and silent about three whole questions"
+    phase "design-system" state="skipped" \
+        because="no new mechanism. This slice is the first built entirely on seams other slices \
+            froze — read-model@v1 from TS.260820.04, both renderers from TS.260820.10 — and \
+            inventing a system decision here would have meant not using them"
+    phase "implement" state="complete" required-by="enforcement" \
+        produced="praxis-core::truth, `praxis truth`, seven tests, and the fix for AB1"
+    phase "learn" state="complete" required-by="always" produced="two findings, one of them a fact the record had been reporting wrongly" \
+        note="never skippable — it is the phase that judges the others"
+    phase "teach" state="complete" required-by="doctrine" produced="skills/ask-what-is-true/SKILL.md"
+
+    finding "AB1" state="open" size="frame-sized" \
+        text="the corpus reader was taking only the FIRST value of a multi-value node, so every \
+            capability in the record reported owning exactly one event. They own between three and \
+            seventeen. The first thing this view printed was a wrong number, stated as fact" \
+        note="the checker had always read these correctly — capability-must-trace uses every value, \
+            which is why no event was ever wrongly reported as unclaimed. TWO readers of one fact, \
+            one right and one wrong, and nothing compared them. A checker that validates the record \
+            cannot catch a reader that misreads it, and this frame has been building both"
+
+    finding "AB2" state="open" size="observation" \
+        text="this is the first slice built entirely on seams other slices froze, and it needed no \
+            new mechanism at all — design-system was skipped with a recorded rationale for the first \
+            time" \
+        note="eleven iterations of building machinery, and the twelfth just used it. That is what a \
+            seam is FOR, and it is the first evidence in this frame that the read-side split pays \
+            rather than merely holds"
+    closed-at "2026-08-21T19:40:15Z"
+    outcome "continue"
+
+    close {
+        claims-settled "C1" how="met"
+        claims-settled "C2" how="met"
+        all-met #true
+        note "the accounting above was computed at close, not asserted. It says every claim is either met or carried by a finding that names it, and nothing about whether the work is any good"
+    }
+
+    trail {
+        entry at="2026-08-21T19:40:15Z" by="agent:praxis" action="state-changed" from="open" to="closed" note="closed by `praxis close`. The accounting was computed; the conclusion is not the machine's to draw"
+
+        entry at="2026-08-21T19:37:13Z" by="agent:praxis" action="created" \
+            note="opened by the gate, on the ask of human:wael"
+    }
+}

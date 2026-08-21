@@ -109,7 +109,8 @@ Load the `SKILL.md` of any skill you intend to follow.
 | **Enter** | `bootstrap-project` | Greenfield repo needs `.github/` + `.claude/` + capability-driven `src/` |
 | | `provision-project-overlay` | Existing repo just installed Praxis; needs a project overlay (interview-driven, idempotent) |
 | | `refactor-layered-to-capability` | Legacy `controllers/` + `services/` → vertical slices, one shippable slice at a time |
-| **PLAN** | `event-storming` | Upstream domain discovery — map business events to bounded contexts & candidate `CAP.` records |
+| **PLAN** | `ask-what-is-true` | Ask the record what this repository already knows before reconstructing it — run first, and read what the answer says it does not cover |
+| | `event-storming` | Upstream domain discovery — map business events to bounded contexts & candidate `CAP.` records |
 | | `name-a-capability` | Derive a capability from a cluster of events in a storm — consistency boundaries, the four gate tests with their reasons, and the exclusion that makes the boundary real |
 | | `cut-a-slice` | Cut an atomic vertical slice in a shape a checker can refuse — one command or one view, one actor, declared layers, claims naming their evidence |
 | | `declare-an-entity-kind` | Declare a kind the record must hold, and its shape, on the architecture's schema — an amendment to the record, never a change to the engine |

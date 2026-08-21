@@ -13,7 +13,7 @@ use praxis_core::{
     Ask, Binding, Closing, Conditions, Corpus, Known, Pickup, Schema, Severity, Violation,
     Cut, Promotion, Publication, Published, Verified, assess, bind, check_corpus,
     check_document, close_iteration, cut, index_all, parse, pick_up, project, promote, publish,
-    unbind, verify,
+    unbind, verify, what_is_currently_true,
 };
 
 mod render;
@@ -111,6 +111,12 @@ enum Command {
         /// Say what would move and move nothing.
         #[arg(long)]
         dry_run: bool,
+    },
+    /// Ask the record what this repository already knows, instead of re-deriving it.
+    Truth {
+        /// The state root to read.
+        #[arg(default_value = "praxis")]
+        root: PathBuf,
     },
     /// Show which slices could be started right now, and what would refuse each of the rest.
     ///
@@ -254,6 +260,13 @@ fn main() -> ExitCode {
                 }
             }
         }
+        Command::Truth { root } => match truth(&root) {
+            Ok(()) => ExitCode::SUCCESS,
+            Err(report) => {
+                eprintln!("{report:?}");
+                ExitCode::FAILURE
+            }
+        },
         Command::Ready { root } => match ready(&root) {
             Ok(()) => ExitCode::SUCCESS,
             Err(report) => {
@@ -960,6 +973,31 @@ fn apply_promotion(text: &str, change: &praxis_core::Change) -> miette::Result<S
         body.nodes_mut().insert(at + offset, new.clone());
     }
     Ok(doc.to_string())
+}
+
+/// `TS.260820.03`. An arriving agent asks instead of reconstructing.
+fn truth(root: &Path) -> miette::Result<()> {
+    let sources = load(root)?;
+    let docs: Vec<_> = sources.iter().map(|(_, _, d)| d.clone()).collect();
+    let mut schema = Schema::default();
+    for doc in &docs {
+        let found = Schema::from_document(doc);
+        if !found.is_empty() {
+            schema = found;
+        }
+    }
+    let corpus = Corpus::from_documents(&docs, &schema);
+    let model = what_is_currently_true(&corpus, &now());
+
+    let flaws = model.flaws();
+    if !flaws.is_empty() {
+        for flaw in &flaws {
+            eprintln!("praxis: read-model@v1 violated — {flaw}");
+        }
+        miette::bail!("the answer does not satisfy read-model@v1");
+    }
+    print!("{}", render::render(&model));
+    Ok(())
 }
 
 /// The frame directory a slice lives under. Discovery sits one level below the frame, so

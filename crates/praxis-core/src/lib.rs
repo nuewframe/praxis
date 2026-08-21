@@ -14,6 +14,7 @@ pub mod pickup;
 pub mod promote;
 pub mod publish;
 pub mod schema;
+pub mod truth;
 pub mod verify;
 pub mod view;
 
@@ -29,6 +30,7 @@ pub use pickup::{Ask, Pickup, Record, pick_up};
 pub use promote::{Change, Promotion, Shipped, derive, promote, undeclared_promotions};
 pub use publish::{Document, Publication, publish};
 pub use schema::{Cardinality, EntitySpec, FieldSpec, Schema};
+pub use truth::what_is_currently_true;
 pub use verify::{Drift, Published, Verified, verify};
 pub use view::{Cell, ReadModel, Section};
 

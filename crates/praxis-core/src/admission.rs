@@ -17,7 +17,7 @@ use std::collections::BTreeMap;
 use kdl::{KdlDocument, KdlNode};
 
 use crate::check::{Known, check_document, index_all};
-use crate::schema::{Schema, prop, string_arg};
+use crate::schema::{Schema, prop, string_arg, string_args};
 use crate::view::{ReadModel, Section};
 
 /// One condition the gate weighs, as the record declares it.
@@ -245,7 +245,14 @@ impl Corpus {
                         id: string_arg(node).unwrap_or_default(),
                         state: child_arg(node, "state").unwrap_or_default(),
                         from_cluster: child_arg(node, "from-cluster").unwrap_or_default(),
-                        owns: child_args(node, "owns-event"),
+                        // Every value, not the first of each node. `owns-event "A" "B" "C"`
+                        // is one node carrying three events, and reading only the first
+                        // reported every capability as owning exactly one (ITER.260821.12/AB1).
+                        owns: node
+                            .iter_children()
+                            .filter(|c| c.name().value() == "owns-event")
+                            .flat_map(string_args)
+                            .collect(),
                         shipped: node
                             .iter_children()
                             .filter(|c| c.name().value() == "shipped")
