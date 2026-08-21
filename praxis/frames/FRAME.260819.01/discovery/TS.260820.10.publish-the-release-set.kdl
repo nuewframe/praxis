@@ -11,7 +11,7 @@ thin-slice "TS.260820.10" {
     needs-read-model "the-published-set-for-a-release"
     lifetime "archival"
 
-    trigger "a release has been cut"
+    trigger "everything intended for the version is bound, and it is about to be cut"
     outcome "the published set exists for exactly that release, written once, never rewritten"
 
     scenario #"""
@@ -48,6 +48,12 @@ thin-slice "TS.260820.10" {
     excludes "publishing a view whose value is being current. Membership comes from declared \
         lifetime (TS.260820.12), and a dashboard is the clearest thing the test rejects"
 
+    amended-by "the publish-before-cut ordering" \
+        was="triggered by `a release has been cut`, which contradicts TS.260820.09/C3 — that slice \
+            requires the release index's commit to CONTAIN this release's published directory, and a \
+            commit taken at cut time cannot contain documents written afterwards. Publishing now \
+            precedes the cut, and cut-release refuses until the directory exists and is committed" \
+        raised-by="ITER.260821.09/Y1"
     amended-by "ES.260819.01/E20" \
         was="also committed the emitted result and a renderer version beside each document, so \
             verification could re-render. Versioned release directories plus the release index \

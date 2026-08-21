@@ -8,6 +8,59 @@
 
 use praxis_core::ReadModel;
 
+/// The same result, as Markdown for an archival document. A SECOND renderer over the same
+/// type, which is the sharper form of E10's falsifier: two renderers, one result type, and
+/// still no branch on what any view means.
+pub fn render_markdown(model: &ReadModel, stamp: &str) -> String {
+    let mut out = String::new();
+    out.push_str(&format!("# {}\n\n", title_case(&model.view)));
+    out.push_str(&format!("{}\n\n", model.answers));
+    // An archival result names the VERSION it depicts, and deliberately not the moment it
+    // was generated. A wall-clock stamp would make every re-render differ from the last,
+    // and verification of a published tree is a comparison (TS.260820.11). The working
+    // renderer stamps the moment for the opposite reason: `right now` is its whole point.
+    out.push_str(&format!("> Depicts **{stamp}**, and nothing else. Regenerated whole from the\n"));
+    out.push_str("> record; never edited in place.\n\n");
+
+    for section in &model.sections {
+        out.push_str(&format!("## {}\n\n", section.name));
+        if section.is_empty() {
+            let why = section.empty_because.as_deref().unwrap_or("(no reason given)");
+            out.push_str(&format!("_Nothing here — {why}._\n\n"));
+            continue;
+        }
+        out.push_str(&format!("| {} |\n", section.columns.join(" | ")));
+        out.push_str(&format!(
+            "| {} |\n",
+            section.columns.iter().map(|_| "---").collect::<Vec<_>>().join(" | ")
+        ));
+        for row in &section.rows {
+            out.push_str(&format!(
+                "| {} |\n",
+                row.iter().map(|c| squash(c)).collect::<Vec<_>>().join(" | ")
+            ));
+        }
+        out.push('\n');
+    }
+
+    if !model.defines.is_empty() {
+        out.push_str("## Notes\n\n");
+        for (name, prose) in &model.defines {
+            out.push_str(&format!("**{name}** — {}\n\n", squash(prose)));
+        }
+    }
+    out
+}
+
+fn title_case(slug: &str) -> String {
+    let words: Vec<String> = slug.split('-').map(str::to_owned).collect();
+    let mut out = words.join(" ");
+    if let Some(first) = out.get_mut(0..1) {
+        first.make_ascii_uppercase();
+    }
+    out
+}
+
 pub fn render(model: &ReadModel) -> String {
     let mut out = String::new();
     out.push_str(&format!("{}\n", model.view));

@@ -160,6 +160,15 @@ pub struct Attempt {
     pub contributes: Vec<String>,
 }
 
+/// A permanent doing the system must have, and the cluster it was derived from.
+#[derive(Debug, Clone)]
+pub struct Capability {
+    pub id: String,
+    pub does: String,
+    pub from_cluster: String,
+    pub owns: Vec<String>,
+}
+
 /// A version, and the work bound to it. Machine-owned: every field here is derived from
 /// what was bound, which is why the record is rewritten whole rather than edited.
 #[derive(Debug, Clone)]
@@ -201,6 +210,7 @@ pub struct Corpus {
     pub releases: Vec<Release>,
     /// Symptom id, and the version it names as having resolved it.
     pub symptoms: Vec<(String, String)>,
+    pub capabilities: Vec<Capability>,
     pub config: Config,
     /// Ids the shape check refuses. A slice the checker refuses is not work waiting.
     pub refused: Vec<String>,
@@ -228,6 +238,12 @@ impl Corpus {
                     "thin-slice" => corpus.slices.push(slice_from(node)),
                     "iteration" => corpus.attempts.push(attempt_from(node)),
                     "release" => corpus.releases.push(release_from(node)),
+                    "capability" => corpus.capabilities.push(Capability {
+                        id: string_arg(node).unwrap_or_default(),
+                        does: child_arg(node, "does").unwrap_or_default(),
+                        from_cluster: child_arg(node, "from-cluster").unwrap_or_default(),
+                        owns: child_args(node, "owns-event"),
+                    }),
                     "symptom" => {
                         if let (Some(id), Some(by)) =
                             (string_arg(node), child_arg(node, "resolved-by"))

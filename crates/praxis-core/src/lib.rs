@@ -11,6 +11,7 @@ pub mod check;
 pub mod cut;
 pub mod close;
 pub mod pickup;
+pub mod publish;
 pub mod schema;
 pub mod view;
 
@@ -18,11 +19,12 @@ pub use check::{
     Known, Refusal, Severity, Violation, check_corpus, check_document, check_node, index_all,
     refused,
 };
-pub use admission::{Assessment, Carried, Config, Release, Condition, Conditions, Corpus, Settled, Verdict, assess, project};
+pub use admission::{Assessment, Capability, Carried, Config, Release, Condition, Conditions, Corpus, Settled, Verdict, assess, project};
 pub use binding::{Binding, Proposal, Rejected, bind, propose, unbind};
 pub use cut::{Blocked, Cut, cut, seal};
 pub use close::{Closing, Unaccounted, close_iteration};
 pub use pickup::{Ask, Pickup, Record, pick_up};
+pub use publish::{Document, Publication, publish};
 pub use schema::{Cardinality, EntitySpec, FieldSpec, Schema};
 pub use view::{Cell, ReadModel, Section};
 

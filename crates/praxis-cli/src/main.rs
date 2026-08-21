@@ -11,8 +11,8 @@ use clap::{Parser, Subcommand};
 use miette::{Diagnostic, NamedSource, SourceSpan};
 use praxis_core::{
     Ask, Binding, Closing, Conditions, Corpus, Known, Pickup, Schema, Severity, Violation,
-    Cut, assess, bind, check_corpus, check_document, close_iteration, cut, index_all, parse,
-    pick_up, project, unbind,
+    Cut, Publication, assess, bind, check_corpus, check_document, close_iteration, cut,
+    index_all, parse, pick_up, project, publish, unbind,
 };
 
 mod render;
@@ -79,6 +79,17 @@ enum Command {
         /// Confirm the proposed bump. The record proposes; choosing the version is yours.
         #[arg(long)]
         confirm: bool,
+    },
+    /// Regenerate the published set for a version, whole, before it is cut.
+    Publish {
+        /// The version to publish for.
+        version: String,
+        /// The state root to read.
+        #[arg(default_value = "praxis")]
+        root: PathBuf,
+        /// Say what would be written and write nothing.
+        #[arg(long)]
+        dry_run: bool,
     },
     /// Show which slices could be started right now, and what would refuse each of the rest.
     ///
@@ -173,6 +184,21 @@ fn main() -> ExitCode {
             match cutting(&version, &root, confirm) {
                 Ok(made) => {
                     if made {
+                        ExitCode::SUCCESS
+                    } else {
+                        ExitCode::FAILURE
+                    }
+                }
+                Err(report) => {
+                    eprintln!("{report:?}");
+                    ExitCode::FAILURE
+                }
+            }
+        }
+        Command::Publish { version, root, dry_run } => {
+            match publishing(&version, &root, dry_run) {
+                Ok(written) => {
+                    if written {
                         ExitCode::SUCCESS
                     } else {
                         ExitCode::FAILURE
@@ -505,6 +531,12 @@ fn cutting(version: &str, root: &Path, confirm: bool) -> miette::Result<bool> {
     let ask = Ask { signer: human()?, at: now(), by: "agent:praxis".to_owned() };
     let commit = head_commit()?;
 
+    // TS.260820.09/C3: the recorded commit must CONTAIN this release's published
+    // directory. A commit taken at cut time cannot contain documents written afterwards,
+    // so publishing comes first and this refuses until it has — which makes the
+    // containment true by construction rather than by hoping the steps ran in order.
+    published_and_committed(version)?;
+
     match cut(version, &commit, confirm, &corpus, &ask, &ids_in_use(&docs)) {
         Cut::NotFound(why) => miette::bail!("{why}"),
         Cut::Refused(record) => {
@@ -534,6 +566,32 @@ fn cutting(version: &str, root: &Path, confirm: bool) -> miette::Result<bool> {
     }
 }
 
+/// Whether this version's published set exists and is in the commit about to be indexed.
+/// Both halves are needed: a directory that exists but is uncommitted is not in HEAD, and
+/// an index pointing at a commit that lacks the documents is exactly what C3 forbids.
+fn published_and_committed(version: &str) -> miette::Result<()> {
+    let dir = format!("docs/releases/{version}");
+    if !Path::new(&dir).is_dir() {
+        miette::bail!(
+            "{dir} does not exist. The index names a commit that must CONTAIN this release's \
+             published set, so publish first: `praxis publish {version}`"
+        );
+    }
+    let out = std::process::Command::new("git")
+        .args(["status", "--porcelain", "--", &dir])
+        .output()
+        .map_err(|e| miette::miette!("cannot read the tree state: {e}"))?;
+    let dirty = String::from_utf8_lossy(&out.stdout);
+    if !dirty.trim().is_empty() {
+        miette::bail!(
+            "{dir} has uncommitted changes, so the commit about to be indexed does not contain \
+             the published set as it stands:\n{}",
+            dirty.trim()
+        );
+    }
+    Ok(())
+}
+
 /// Where the tree is. What HEAD is is a fact about the tree, not about the record, so the
 /// shell answers it — and a detached or absent git is a refusal rather than a guess.
 fn head_commit() -> miette::Result<String> {
@@ -549,6 +607,63 @@ fn head_commit() -> miette::Result<String> {
         );
     }
     Ok(commit)
+}
+
+/// `TS.260820.10`. Every document generated afresh and whole, stamped with the release it
+/// depicts, under that release's own directory. There is no in-place edit anywhere here
+/// and no substitution path to find.
+fn publishing(version: &str, root: &Path, dry_run: bool) -> miette::Result<bool> {
+    let sources = load(root)?;
+    let docs: Vec<_> = sources.iter().map(|(_, _, d)| d.clone()).collect();
+    let mut schema = Schema::default();
+    for doc in &docs {
+        let found = Schema::from_document(doc);
+        if !found.is_empty() {
+            schema = found;
+        }
+    }
+    let corpus = Corpus::from_documents(&docs, &schema);
+
+    match publish(version, &corpus) {
+        Publication::Refused(reasons) => {
+            for why in &reasons {
+                eprintln!("praxis: publish refused — {why}");
+            }
+            Ok(false)
+        }
+        Publication::Ready { documents, .. } => {
+            // Composed first, written second. A document is replaced whole or not at all,
+            // and nothing outside this release's directory is touched.
+            let mut rendered = Vec::new();
+            for document in &documents {
+                let flaws = document.model.flaws();
+                if !flaws.is_empty() {
+                    for flaw in &flaws {
+                        eprintln!("praxis: read-model@v1 violated in {} — {flaw}", document.file);
+                    }
+                    miette::bail!("nothing published: a result does not satisfy read-model@v1");
+                }
+                rendered.push((
+                    PathBuf::from(&document.file),
+                    render::render_markdown(&document.model, version),
+                ));
+            }
+
+            for (path, text) in &rendered {
+                if dry_run {
+                    println!("would write {} ({} bytes)", path.display(), text.len());
+                    continue;
+                }
+                if let Some(dir) = path.parent() {
+                    fs::create_dir_all(dir)
+                        .map_err(|e| miette::miette!("{}: {e}", dir.display()))?;
+                }
+                fs::write(path, text).map_err(|e| miette::miette!("{}: {e}", path.display()))?;
+                println!("praxis: wrote {}", path.display());
+            }
+            Ok(true)
+        }
+    }
 }
 
 /// The frame directory a slice lives under. Discovery sits one level below the frame, so
