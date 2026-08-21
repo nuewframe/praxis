@@ -1,0 +1,62 @@
+// Narrowed to MECHANISM. It owns no read models at all — each is owned by the capability
+// whose decision it serves, and the read-model declaration is the seam between them.
+//
+// The argument is coupling, not size: if projection owned what "ready to pick up" means,
+// changing the vet rules would force a change in projection. See ES.260819.01 finding E10,
+// which carries the falsifier that would collapse this split.
+
+capability "document-projection" {
+    doing "compose any declared read model as a whole document, mark what lifetime it has, and prove a published one still matches the release it claims"
+    not "it never mutates the record, never edits a document toward a new state, and does not decide what any view CONTAINS — only how a view becomes a document"
+    state "sought"
+
+    derived-from "ES.260819.01"
+    from-cluster "projection"
+    narrowed-by "E10"
+
+    owns-event "DocumentsProjected" "DocumentStamped" "DriftDetected"
+    owns-read-model "none" \
+        note="deliberate. Applying the ownership rule evenly leaves this capability with the \
+            mechanism and nothing else"
+
+    enforces "stamp-on-publish"
+    enforces "verify-against-the-claim"
+    enforces "verify-on-push"
+
+    attacks "S2" "S6" "S7"
+
+    // The five load-bearing properties. Four of them are exactly the trust-bearing ones
+    // E7 identified, which is why narrowing this capability does not diminish it.
+    property "whole-document generation" \
+        because="a document that is spliced can be corrupted; a document that is regenerated cannot. This is where the regex ceiling actually dies"
+    property "composition" \
+        because="a DOCUMENT may compose several read models while each read model keeps exactly \
+            one owner. Without this the dashboard would need a cross-capability owner and the \
+            one-owner rule would break (ES.260819.01/E19)"
+    property "declared lifetime" \
+        because="a reader who cannot tell a preview from a record will eventually trust the wrong one"
+    property "release stamping" \
+        because="`eventually out of date` becomes a claim a reader can check"
+    property "archival immutability" \
+        because="a later release publishes a new document; it never rewrites an old one"
+    property "drift verification pinned to the claimed release" \
+        because="comparing against the CURRENT record would fail continuously and correctly the \
+            moment work resumed after a release, which trains everyone to ignore the gate"
+
+    gate-test "names-a-doing" verdict="pass" \
+        because="turning the record into a document that says what it is and can be checked is a doing"
+    gate-test "fundable-on-own-terms" verdict="pass" \
+        because="per E7 every actor who must TRUST the artifact is read-side and issues no commands. This is where trust transfers"
+    gate-test "slices-deliver-independently" verdict="pass" \
+        because="compose a preview / publish a release set / stamp / verify on push. Drift verification is a SLICE here, not a peer capability — it keeps no state of its own (E9)"
+    gate-test "states-an-exclusion" verdict="pass" \
+        because="it owns no view's content and writes nothing to the record. Both exclusions are load-bearing rather than restatements of scope"
+
+    keeps-consistent "a published release directory against the commit its release index names" \
+        "the published set against the lifetime declarations it is derived from"
+
+    trail {
+        entry at="2026-08-20T00:00:00-05:00" by="agent:principal-engineer" action="created" \
+            note="boundary stress-tested before commit: the size argument was replaced with a coupling argument, verification was tested for a split and rejected, and the last read model was moved out to release-binding"
+    }
+}

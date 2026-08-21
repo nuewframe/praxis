@@ -1,0 +1,66 @@
+thin-slice "TS.260820.11" {
+    slug "verify-the-published-tree"
+    title "Prove a published document was never hand-edited after the fact"
+    kind "command"
+    realizes "CAP.document-projection"
+    from-storm "ES.260819.01"
+
+    command "verify-published"
+    actor "automation"
+    produces-event "DriftDetected"
+
+    trigger "git reports a push"
+    outcome "either every published document is byte-identical to what was published, or the edited one is named"
+
+    scenario #"""
+        Given a published tree where each document names the release it depicts
+        When a push happens
+        Then each document is compared against what the record would produce FOR THE RELEASE
+             IT CLAIMS — not against the current record — and drift fails closed naming the
+             document, because comparing against the current record would fail continuously
+             and correctly the moment work resumed, which trains everyone to ignore the gate.
+        """#
+
+    step "1" does="on push, with nobody remembering to ask"
+    step "2" does="for every release in the index, read the commit it names"
+    step "3" does="compare that release's directory in the working tree against the same directory at that commit"
+    step "4" does="fail closed naming any document that differs — and fail closed, not skip, when a commit or tag is missing"
+
+    excludes "fixing drift. It names it and refuses"
+    excludes "comparing against the current record. An archival document is SUPPOSED to disagree with a record that has moved on"
+    excludes "re-rendering anything. Those rules change as the method learns, so re-rendering a past \
+        release with today's logic reports drift that did not occur (WALK.260820.01/W4)"
+
+    layer "doctrine"    reaches="the skill teaches that a published document is never edited, only superseded"
+    layer "enforcement" reaches="verify-against-the-claim and verify-on-push"
+    layer "harness"     reaches="the CI path, so verification runs without anyone invoking it"
+    layer "docs"        reaches="none — this slice reads the published tree, it does not add to it"
+
+    claim "C1" text="a hand-edited published document fails the check, named" \
+        settled-by="a negative test that edits one published file and asserts non-zero exit with that filename"
+    claim "C2" text="neither resuming work NOR changing the capability rules makes the check fail" \
+        settled-by="two tests — one advancing the record past a release, one changing an admission condition — each asserting the published tree still passes"
+    claim "C3" text="the check runs on push with no human invocation" \
+        settled-by="a CI integration test"
+    claim "C4" text="a missing tag or unfetched history fails the check rather than skipping it" \
+        settled-by="a test on a shallow clone asserting non-zero exit" \
+        note="a check that silently skips is how verification gets disabled without anyone deciding to disable it"
+
+    depends-on "TS.260820.10 — there must be a stamped published set to verify"
+
+    useful-alone "a reader asking 'was this ever true?' gets a date rather than a shrug. \
+        S6 fully closed"
+
+    proves "a published document was not hand-edited after the fact"
+    does-not-prove "that the document still agrees with the record. See WALK.260820.01/W5 — \
+        a check whose scope nobody can state is worse than a narrower one that is honest"
+
+    amended-by "WALK.260820.01/W4" "ES.260819.01/E20" \
+        was="regenerate what the record would have produced for that release, and compare — then, \
+            briefly, re-run a pure renderer against committed hashes. Both are unnecessary: each \
+            release directory is compared against the commit its index node names"
+
+    attacks "S6"
+    note "C2 is the load-bearing one. A check that fails continuously is a check everyone disables, \
+        and that failure mode is more likely than the drift it is meant to catch"
+}

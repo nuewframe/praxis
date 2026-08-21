@@ -1,0 +1,79 @@
+// This repository's BINDING to the delivery-graph schema.
+//
+// Three levels of ownership, and this file is the third:
+//
+//   argument   — why a decision was made        an adr's `body`
+//   normative  — what the decision made true    an adr's `normative` block
+//   binding    — how THIS repository applies it (here)
+//
+// A fact true of every Praxis repository does not belong here. If it is here, some
+// other repository could legitimately choose differently.
+
+config {
+    repository "nuewframe/praxis"
+
+    // governed-by — pending. The normative schema lives on the ADR raised by the frame
+    // that identified this repository's capabilities. Bound once that ADR is accepted.
+
+    // ====================================================================
+    // Profile — which guardrails apply, and which layers a slice may declare.
+    //
+    // The layer VOCABULARY is a binding: a service's strata are not a method's.
+    // That `cuts-through` exists and seals at the first iteration is normative.
+    // ====================================================================
+    profile "method" {
+        // A slice of Praxis is vertical when it reaches every stratum it needs.
+        // Doctrine without a probe is unenforceable; a probe wired into one harness
+        // of six ships to one adopter in six; either without docs is invisible.
+        layer "doctrine"    "What the method tells an agent to do" \
+            owns="skills/ instructions/ agents/"
+        layer "enforcement" "What mechanically checks that it happened" \
+            owns="scripts/ hooks/ and the engine"
+        layer "harness"     "The six install paths and their manifests" \
+            owns=".claude-plugin/ .codex-plugin/ .cursor-plugin/ .opencode/ gemini-extension.json"
+        layer "docs"        "What a human reads — the archival projection surface" \
+            owns="docs/"
+
+        // Praxis has no HTTP surface, no externalized runtime config, and no request
+        // path to keep stateless.
+        omit-probe "http-observability"
+        omit-probe "remote-config-externalization"
+        omit-probe "stateless-request-path"
+    }
+
+    // ====================================================================
+    // Versioning. Binding by construction: bump derivation reads this rather than
+    // hardcoding semver. Praxis is pre-1.0 and bumps the MINOR position for a
+    // breaking change; a hardcoded rule would misreport its own author's releases.
+    // ====================================================================
+    versioning {
+        scheme "semver"
+        stage "pre-1.0"
+        bump-proposal {
+            breaking-seam-contract "minor"
+            capability-added       "minor"
+            slice-outcome-added    "minor"
+            gap-remediation-only   "patch"
+            doctrine-only          "patch"
+        }
+        confirmation required=#true by="human"
+    }
+
+    // ====================================================================
+    // Invariant enablement. Ids come from the governing ADR; this file may enable or
+    // omit, never invent. Praxis runs every gate it ships against itself.
+    // ====================================================================
+    invariants {
+        enable-all-fail-closed #true
+        enable-all-report #true
+    }
+
+    paths {
+        product-root "."
+        state-root "praxis/"
+        archival-projection "docs/releases/"   // <version>/ per release. Written once, never rewritten
+        release-index "praxis/releases/"       // RELEASE.<version>.kdl — an index into git, not a copy of it
+        working-projection "praxis/.render/"
+        cache "praxis/.cache/"
+    }
+}

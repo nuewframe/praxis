@@ -1,0 +1,51 @@
+thin-slice "TS.260820.17" {
+    slug "promote-what-shipped"
+    title "Fold what shipped into what each capability says it is, in one operation"
+    kind "command"
+    realizes "CAP.release-binding"
+    from-storm "ES.260819.01"
+
+    command "promote-truth"
+    actor "maintainer"
+    produces-event "TruthPromoted"
+    needs-read-model "the-published-set-for-a-release"
+    feeds-read-model "capabilities-and-what-they-own" "what-is-currently-true"
+
+    trigger "a release has been cut and what each capability says about itself is now behind it"
+    outcome "current truth moved as a consequence of releasing, in one place, atomically"
+
+    scenario #"""
+        Given a release whose bound work changed what capabilities can do
+        When truth is promoted
+        Then every affected capability's current truth moves in a single operation derived from
+             what was bound — and a failure part-way through leaves nothing moved, because a
+             half-promoted record is worse than an unpromoted one: it is wrong in a way nobody
+             can see.
+        """#
+
+    step "1" does="derive what changed from the bound work. Nothing here is hand-written"
+    step "2" does="move every affected capability's current truth in one operation"
+    step "3" does="on any failure, move nothing"
+
+    excludes "writing documents. Promotion moves truth in the record; projection renders it"
+    excludes "hand-editing what a capability says about itself. If it did not come from bound work, it is not promotion"
+
+    layer "doctrine"    reaches="the skill teaches promotion as part of releasing, never as a follow-up task"
+    layer "enforcement" reaches="atomic promotion, and a refusal when a capability's truth was edited outside it"
+    layer "docs"        reaches="capability records carry what shipped, and guides may then publish against it"
+
+    claim "C1" text="promotion is atomic — a failure part-way leaves the record byte-unchanged" \
+        settled-by="a fault-injection test asserting the state root hash is unchanged after a mid-promotion failure"
+    claim "C2" text="promoted truth is derived from bound work, and a hand-edit outside promotion is refused" \
+        settled-by="a negative test editing a capability's current truth directly"
+    claim "C3" text="promoting twice for the same release is a no-op, not a double application" \
+        settled-by="an idempotence test"
+
+    depends-on "TS.260820.09 — a release must be cut for its content to be promoted"
+
+    useful-alone "current truth stops being maintained by hand. This is the difference between \
+        the record being a by-product of the work and a chore performed beside it, and the frame \
+        says that difference is what makes the chore get skipped when the work is late"
+
+    attacks "S6" "S7"
+}

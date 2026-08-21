@@ -1,0 +1,57 @@
+thin-slice "TS.260820.14" {
+    slug "record-a-decision"
+    title "Bind a decision to the work that forced it, and correct it only by appending"
+    kind "command"
+    realizes "CAP.claim-settlement"
+    from-storm "ES.260819.01"
+
+    command "record-decision"
+    actor "working-agent"
+    produces-event "DecisionRecorded"
+    needs-read-model "the-decisions-that-shaped-this"
+    feeds-read-model "the-decisions-that-shaped-this"
+
+    trigger "a pass hits a choice it cannot make implicitly"
+    outcome "the decision exists, attached to the pass that forced it, with what it rejected and what will test it"
+
+    scenario #"""
+        Given a pass that must choose between real alternatives
+        When the agent records the decision
+        Then it is bound to that pass, carries the alternatives it rejected, and names what
+             would show it wrong — and once accepted it is corrected only by APPENDING an
+             amendment, never by rewriting, because a decision that can be edited afterwards
+             is a decision nobody can cite.
+        """#
+
+    step "1" does="state the choice, and the alternatives that were genuinely available"
+    step "2" does="bind it to the pass that forced it, not to a folder beside the work"
+    step "3" does="name what would falsify it — a decision with no falsifier is a preference"
+    step "4" does="on later correction, append an amendment naming what changed and why. The original stays readable"
+
+    excludes "rewriting an accepted decision, at any point, for any reason"
+    excludes "deciding whether the decision was good. Findings test it; this slice records it"
+    excludes "discovery-time rejected options. Those belong to the frame's discovery and reach a \
+        reader through the same composite document (ES.260819.01/E23)"
+
+    layer "doctrine"    reaches="the skill teaches append-only correction and the falsifier requirement"
+    layer "enforcement" reaches="an edit to an accepted decision's body is refused; an amendment is not"
+    layer "docs"        reaches="published under docs/releases/<version>/decisions/, composed with the options discovery rejected"
+
+    claim "C1" text="editing the body of an accepted decision is refused; appending an amendment is not" \
+        settled-by="a negative test mutating an accepted body, and a positive test appending an amendment"
+    claim "C2" text="a decision with no alternatives and no falsifier is refused" \
+        settled-by="two negative tests, one per missing field"
+    claim "C3" text="a decision not bound to a pass is refused" \
+        settled-by="a negative test with a dangling pass reference"
+    claim "C4" text="findings that tested a decision are reachable from it" \
+        settled-by="a test asserting the traversal from a decision to the findings raised against it"
+
+    depends-on "TS.260820.05 — a decision binds to a pass, so a pass must be open"
+
+    useful-alone "a reader stops asking why something is the way it is and getting an answer \
+        reconstructed from memory. Worth having with nothing published at all"
+
+    attacks "S2" "S7"
+    note "the composite decision document is E19's second use: this capability carries the decision, \
+        its amendments and the findings that tested it; delivery-record carries what discovery rejected"
+}

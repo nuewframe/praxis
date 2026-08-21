@@ -1,8 +1,17 @@
 # ADR.260819.02: The Delivery Graph — Iteration-Native Thin Slices, Single-Writer State, and Perishable Markdown Projections
 
-**Status:** Proposed
+**Status:** Accepted
 **Date:** 2026-08-19
 **Deciders:** Principal Engineer, Product Manager, Product Designer
+
+> **Sealed legacy record.** This document was authored under the prose-Markdown practice it
+> replaces, and it is kept as the record of how the decision was made. It is **no longer a
+> source**: the decision now lives in the delivery graph as node
+> [`praxis/adr/ADR.260819.02.kdl`](../../../praxis/adr/ADR.260819.02.kdl) — whose `body` node
+> carries this argument, whose `normative` block carries the enforceable schema, and whose
+> `amendment` blocks carry every correction since acceptance — and the journey walk as
+> [`praxis/initiatives/kdl-state-and-rust-cli-consolidation/journey.kdl`](../../../praxis/initiatives/kdl-state-and-rust-cli-consolidation/journey.kdl).
+> Edit the graph, not this file. Pending archival.
 
 > **Approval mechanics:** `status` is the mechanical gate between architect mode and implementer mode for Major-tier changes. Implementer mode REJECTS the work if `status` is not `Accepted`. Under the model this ADR adopts, the paired signal is a signed `design` approval node on the iteration rather than a line in a sprint file — Commitment 8 retires the sprint as a document. Both signals remain required.
 

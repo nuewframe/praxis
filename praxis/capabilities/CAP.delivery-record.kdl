@@ -1,0 +1,59 @@
+// A capability is a permanent doing the system must have. It is top-level, not nested
+// under the frame that found it: a capability outlives its frame, and a later frame
+// reinforces it rather than re-deriving it.
+//
+// Derivation is not optional. Per ES.260819.01's `capability-must-trace` policy, a
+// capability owns a cluster of events from a storm — or it is an assertion, and an
+// assertion is FRAME.260819.01's root cause reproduced inside the method itself.
+
+capability "delivery-record" {
+    doing "hold everything the method produces — problems, discoveries, capabilities, slices and claims — as typed, queryable, trailed facts"
+    not "it enforces nothing about DOING the work. It refuses a malformed fact, never a bad decision"
+    state "sought"
+
+    derived-from "ES.260819.01"
+    from-cluster "problem-record" "discovery-record" "work-decomposition"
+    merge-reason "you would never ship a Praxis that records frames but not slices — mutually \
+        useless in both directions. Their difference is lifetime (living / immutable evidence / \
+        consumable), which is a type distinction inside one capability, not a boundary between two"
+
+    owns-event "IntentRaised" "SymptomRecorded" "RootCauseConverged" "ConvergenceRefused" \
+        "SymptomResolved" "FrameReopened" \
+        "StormHeld" "UseCaseIdentified" "PathWalked" "OptionRejected" "CapabilityNamed" \
+        "SliceCut" "ClaimStated" "LifetimeDeclared" "UsageDocumented"
+
+    owns-read-model "the-problem-as-it-stands" answers="what have we observed, and does it hang together yet?"
+    owns-read-model "capabilities-and-what-they-own" answers="what must the system be able to do, and which events does each keep consistent?"
+    owns-read-model "how-to-use-a-capability" answers="how do I use what this version can do?" publishable=#true \
+        note="usage prose attaches to the capability record, which this capability owns. \
+            release-binding decides WHICH version publishes, but explicitly does not write documents"
+    owns-read-model "what-is-currently-true" answers="what does this repository already know, so the next agent does not re-derive it?"
+
+    enforces "convergence-or-split"
+    enforces "capability-must-trace"
+    enforces "slice-shape"
+    enforces "resolution-names-a-release"
+    enforces "publish-only-what-survives-freezing"
+    enforces "guide-follows-promoted-truth"
+
+    attacks "S4" "S6" "S7"
+
+    gate-test "names-a-doing" verdict="pass" \
+        because="holding facts in a form that can be queried is a doing, and it is the one the current-ceiling denies"
+    gate-test "fundable-on-own-terms" verdict="pass" \
+        because="typed state is useful before anything reads it — the next agent queries it directly. Nothing else here is fundable before this"
+    gate-test "slices-deliver-independently" verdict="pass" \
+        because="frames, then discoveries, then slices and claims. Each is useful with the later ones absent"
+    gate-test "states-an-exclusion" verdict="pass" \
+        because="it refuses malformed facts and nothing else. Every judgement about the work belongs to another capability"
+
+    keeps-consistent "the published set against the declared lifetimes it is derived from" \
+        "a symptom's state against the release that resolved it" \
+        "a capability's existence against the storm cluster it owns" \
+        "a slice's shape against the command, actor, event and read model it must name"
+
+    trail {
+        entry at="2026-08-20T00:00:00-05:00" by="agent:principal-engineer" action="created" \
+            note="derived from ES.260819.01 by clustering, not named off the frame"
+    }
+}

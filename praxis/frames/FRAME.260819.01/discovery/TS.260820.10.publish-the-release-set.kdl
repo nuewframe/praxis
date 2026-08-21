@@ -1,0 +1,64 @@
+thin-slice "TS.260820.10" {
+    slug "publish-the-release-set"
+    title "Regenerate every published document whole, each stating the release it depicts"
+    kind "command"
+    realizes "CAP.document-projection"
+    from-storm "ES.260819.01"
+
+    command "publish"
+    actor "maintainer"
+    produces-event "DocumentsProjected" "DocumentStamped"
+    needs-read-model "the-published-set-for-a-release"
+    lifetime "archival"
+
+    trigger "a release has been cut"
+    outcome "the published set exists for exactly that release, written once, never rewritten"
+
+    scenario #"""
+        Given a release that has been cut
+        When the maintainer publishes
+        Then every document is generated afresh and whole from the record for exactly that
+             release and carries the release it depicts — never spliced into an existing file,
+             because a document that is spliced can be corrupted and a document that is
+             regenerated cannot.
+        """#
+
+    step "1" does="generate every publishable view whole, from the record, into docs/releases/<version>/"
+    step "2" does="stamp each one with the release it depicts"
+    step "3" does="commit the set with the tag. The release index records the commit"
+    step "4" does="it is written once. A later release publishes a new document; it never rewrites this one"
+
+    excludes "search-and-replace over an existing document, at any point, for any reason"
+    excludes "deciding what any document CONTAINS. The content of every view belongs to the \
+        capability whose decision it serves"
+
+    layer "doctrine"    reaches="the skill forbids editing a published document toward a new state"
+    layer "enforcement" reaches="stamp-on-publish, and archival immutability"
+    layer "docs"        reaches="this slice IS the docs layer"
+
+    claim "C1" text="publishing regenerates whole and performs no in-place edit" \
+        settled-by="a test asserting each output file is byte-identical to a fresh render, plus a check that no regex substitution path exists"
+    claim "C2" text="every published document names its release, and lands under that release's directory" \
+        settled-by="a test asserting a stamp on every file, and that no file is written outside docs/releases/<version>/"
+    claim "C4" text="publishing never writes outside the current release's directory" \
+        settled-by="a test asserting prior release directories are byte-unchanged after a publish"
+    claim "C3" text="rendering needs no code path specific to any one read model, AND no emitted cell contains markup" \
+        settled-by="a test rendering a newly declared read model with no renderer change, plus a check rejecting markup in any cell — WALK.260820.01/W2 found the first half passes even when the split has become fiction, so both halves are required"
+
+    excludes "publishing a view whose value is being current. Membership comes from declared \
+        lifetime (TS.260820.12), and a dashboard is the clearest thing the test rejects"
+
+    amended-by "ES.260819.01/E20" \
+        was="also committed the emitted result and a renderer version beside each document, so \
+            verification could re-render. Versioned release directories plus the release index \
+            make that machinery unnecessary — verification is a git comparison"
+
+    depends-on "TS.260820.09 — a release must exist to publish for"
+
+    useful-alone "the regex ceiling is gone for published output, and every document becomes \
+        true for exactly one version and false for every other"
+
+    attacks "S6"
+    note "C3 is finding E10's falsifier, stated as an acceptance criterion. If it cannot be \
+        met, document-projection and the content-owning capabilities merge"
+}

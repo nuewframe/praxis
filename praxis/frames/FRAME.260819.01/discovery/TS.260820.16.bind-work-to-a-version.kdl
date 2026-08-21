@@ -1,0 +1,52 @@
+thin-slice "TS.260820.16" {
+    slug "bind-work-to-a-version"
+    title "Attach finished passes to a version, and refuse anything that did not close"
+    kind "command"
+    realizes "CAP.release-binding"
+    from-storm "ES.260819.01"
+
+    command "bind"
+    actor "maintainer"
+    produces-event "WorkBound"
+    needs-read-model "what-is-currently-true"
+    feeds-read-model "the-published-set-for-a-release"
+
+    trigger "a pass has closed and belongs in the next version"
+    outcome "the version has a definite content, and the record can propose the bump it implies"
+
+    scenario #"""
+        Given passes that have closed
+        When the maintainer binds them to a version
+        Then the version's content is definite, a pass that did not close is refused, and a
+             pass already bound elsewhere is refused — so what a version contains is a fact
+             about the record rather than a list someone maintains alongside it.
+        """#
+
+    step "1" does="bind a closed pass to the next version"
+    step "2" does="refuse any pass whose claims are not all settled or carried"
+    step "3" does="refuse a pass already bound to another version"
+    step "4" does="the record proposes the bump the bound work implies, from the configured rules"
+
+    excludes "cutting. Binding is reversible until the release is cut; cutting is not"
+    excludes "choosing the version number. The record PROPOSES; confirming is the maintainer's at cut"
+
+    layer "doctrine"    reaches="the skill teaches binding as the moment scope for a version becomes fact"
+    layer "enforcement" reaches="only closed passes may bind, and a pass binds exactly once"
+    layer "docs"        reaches="what a version will contain is readable before it is cut"
+
+    claim "C1" text="binding an unclosed pass is refused, naming the pass and its unsettled claims" \
+        settled-by="a negative test asserting non-zero exit, the pass id, and the claim ids in the diagnostic"
+    claim "C2" text="a pass already bound to another version is refused" \
+        settled-by="a negative test with a double bind"
+    claim "C3" text="the proposed bump follows the configured rules from what is bound" \
+        settled-by="one test per bump rule in config, each asserting the proposal"
+    claim "C4" text="unbinding is possible before cut and refused after" \
+        settled-by="a positive test before cut and a negative test after"
+
+    depends-on "TS.260820.07 — a pass must be closeable before it can be bound"
+
+    useful-alone "what is queued for the next version stops being a hand-kept list, and that is \
+        useful with nothing ever cut"
+
+    attacks "S5"
+}

@@ -1,0 +1,501 @@
+// A lightweight (big-picture) event storm. Discovery's breadth activity: sweep the whole
+// timeline of the domain once, shallow, then let structure fall out of it.
+//
+// It exists to make the step from frame to capability a derivation rather than an
+// assertion. A capability named straight off a frame is a claim made by whoever produced
+// it — which is the root cause of this very frame. Here a capability is a cluster of
+// events that must stay consistent together, and the cluster is on the record.
+//
+// Shape: commands and events are siblings. A command may produce more than one event
+// (`pick-up` produces a vetting OR a refusal), so events point at their cause rather than
+// nesting under it.
+
+event-storm "ES.260819.01" {
+    title "How work actually moves through a repository, and what must stay consistent with what"
+    frame "FRAME.260819.01"
+    scope "big-picture" note="pivotal events first, then only what is needed between them. Depth is the WALK's job, not this one"
+    held-at "2026-08-20"
+    held-by "human:waelrabadi" "agent:principal-engineer"
+
+    // ================================================================
+    // ACTORS — who issues commands. Every command names exactly one.
+    // ================================================================
+
+    actor "maintainer"     is="the person accountable for what the repository claims about itself"
+    actor "working-agent"  is="the LLM agent carrying out a unit of work right now"
+    actor "next-agent"     is="the agent that arrives after, with none of the previous one's context"
+    actor "reviewer"       is="a human or agent judging work they did not do"
+    actor "reader"         is="someone consuming a published document, usually outside the repository"
+    actor "automation"     is="the checker itself, issuing commands nobody typed, in reaction to a push"
+
+    // ================================================================
+    // EXTERNAL SYSTEMS — the boundary. Everything here is a seam we do not own.
+    // ================================================================
+
+    external "git"         gives="commits, tags, and push events — the only clock the record actually has"
+    external "harness"     gives="the agent session itself: which agent, which model, what it was told"
+    external "filesystem"  gives="the working tree the record makes claims about"
+
+    // ================================================================
+    // THE TIMELINE
+    //
+    // Events are past tense: things that became true. `pivotal` marks a phase boundary —
+    // the process spine at the bottom is read off these and nothing else.
+    // ================================================================
+
+    // ---- Framing ----
+
+    command "raise-intent" by="maintainer" asks="something is wrong, or something is wanted"
+    event "IntentRaised" from="raise-intent" phase="FRAME" \
+        means="a problem is on the table, still fused to whatever solution arrived with it"
+
+    command "record-symptom" by="maintainer" asks="name one observable thing that is wrong"
+    event "SymptomRecorded" from="record-symptom" phase="FRAME" \
+        means="an observation now exists that a release can later be held against"
+
+    command "converge" by="maintainer" asks="ask why of each symptom until one cause explains them"
+    event "RootCauseConverged" from="converge" phase="FRAME" pivotal=#true \
+        means="a problem exists as an entity. Symptoms that do not converge were more than one problem"
+    event "ConvergenceRefused" from="converge" phase="FRAME" \
+        means="the symptoms did not reduce to one cause — recorded, because splitting a frame is a finding"
+
+    // ---- Discovery ----
+
+    command "hold-storm" by="maintainer" asks="sweep the domain once and see what actually happens in it"
+    event "StormHeld" from="hold-storm" phase="DISCOVER" \
+        means="the timeline, its commands, its rules and its views are written down as evidence"
+
+    command "identify-slice" by="maintainer" asks="take one command from the storm and state the journey around it"
+    event "UseCaseIdentified" from="identify-slice" phase="DISCOVER" \
+        means="an atomic vertical use-case exists, anchored to a command that appears in the storm"
+
+    command "walk" by="working-agent" asks="run one path end to end and overlay system thinking on it"
+    event "PathWalked" from="walk" phase="DISCOVER" \
+        means="a path was exercised in depth, and the layers it touches are named"
+
+    command "reject-option" by="maintainer" asks="record a way this could have been solved, and why it was not"
+    event "OptionRejected" from="reject-option" phase="DISCOVER" \
+        means="a sibling of the chosen solution is preserved. A solution kept without its siblings was inherited, not chosen"
+
+    command "name-capability" by="maintainer" asks="name what the system must be able to DO"
+    event "CapabilityNamed" from="name-capability" phase="DISCOVER" pivotal=#true \
+        means="the system's required doings are known, and each traces to the events it must keep consistent"
+
+    // ---- Decomposition ----
+
+    command "cut-slice" by="maintainer" asks="cut a capability into a piece useful before the next one exists"
+    event "SliceCut" from="cut-slice" phase="DECOMPOSE" \
+        means="a unit of work exists that is vertical by shape rather than by assertion"
+
+    command "state-claim" by="maintainer" asks="say what this slice will be true of when it is done"
+    event "ClaimStated" from="state-claim" phase="DECOMPOSE" \
+        means="something exists that can later go unmet and be objected to"
+
+    // ---- Iteration ----
+
+    command "pick-up" by="working-agent" asks="take this slice, now, against the tree as it currently stands"
+    event "SliceVetted" from="pick-up" phase="ITERATE" pivotal=#true \
+        means="the one gate passed. Selection is the commitment — choosing this is choosing not to do something else"
+    event "PickupRefused" from="pick-up" phase="ITERATE" \
+        means="the gate refused, and said which condition failed. A refusal that is not recorded is indistinguishable from never having been asked"
+
+    command "freeze-dependency" by="working-agent" asks="pin what this pass builds on so it cannot move underneath it"
+    event "DependencyFrozen" from="freeze-dependency" phase="ITERATE" \
+        means="what the pass stands on is fixed for its duration"
+
+    command "record-decision" by="working-agent" asks="record a choice this pass had to make, with its alternatives"
+    event "DecisionRecorded" from="record-decision" phase="ITERATE" \
+        means="a decision is bound to the work that forced it, rather than filed beside it"
+
+    command "attach-evidence" by="working-agent" asks="attach what proves this layer was actually reached"
+    event "EvidenceAttached" from="attach-evidence" phase="ITERATE" \
+        means="a layer's claim is backed by an artifact rather than by the agent's word for it"
+
+    command "document-usage" by="working-agent" asks="say how this capability is used, while building it"
+    event "UsageDocumented" from="document-usage" phase="ITERATE" \
+        means="usage prose is attached to the capability record as the work happens" \
+        note="ITERATE, not RELEASE. Writing guides at release time is the chore-beside-the-work \
+            pattern this frame exists to remove"
+
+    command "settle-claim" by="working-agent" asks="declare this claim met, against its evidence"
+    event "ClaimSettled" from="settle-claim" phase="ITERATE" \
+        means="a stated claim is now met or explicitly unmet — never silently absent"
+
+    command "raise-finding" by="working-agent" asks="record what was surprising"
+    event "FindingRaised" from="raise-finding" phase="ITERATE" \
+        means="a surprise is captured at the moment it cost something, not reconstructed later"
+
+    command "close-pass" by="working-agent" asks="finish this pass"
+    event "IterationClosed" from="close-pass" phase="ITERATE" pivotal=#true \
+        means="a pass ended with every claim settled or every shortfall carried forward as owed work"
+    event "CloseRefused" from="close-pass" phase="ITERATE" \
+        means="closing was refused because scope was about to be dropped in silence"
+
+    // ---- Release ----
+
+    command "bind" by="maintainer" asks="attach finished passes to a version"
+    event "WorkBound" from="bind" phase="RELEASE" \
+        means="a version now has a definite content"
+
+    command "cut-release" by="maintainer" asks="release the version"
+    event "ReleaseCut" from="cut-release" phase="RELEASE" pivotal=#true \
+        means="a point on the version line exists that documents and symptoms can both be pinned to"
+
+    command "declare-lifetime" by="maintainer" asks="does this view survive being frozen, or is its value being current?"
+    event "LifetimeDeclared" from="declare-lifetime" phase="DISCOVER" \
+        means="a view is marked publishable or on-demand, with the reason recorded. The published set is DERIVED from these, never listed by hand"
+
+    command "publish" by="maintainer" asks="regenerate every published document whole, for this release"
+    event "DocumentsProjected" from="publish" phase="RELEASE" \
+        means="the published set is composed from the record rather than edited toward it"
+    event "DocumentStamped" from="publish" phase="RELEASE" \
+        means="each document says which release it depicts — true for exactly one version, false for every other"
+
+    command "promote-truth" by="maintainer" asks="fold what shipped into what each capability says it is"
+    event "TruthPromoted" from="promote-truth" phase="RELEASE" \
+        means="current truth moved, in one place, as a consequence of a release rather than as a chore beside it"
+
+    command "verify-published" by="automation" asks="was any published document hand-edited after it was published?" \
+        amended-by="WALK.260820.01/W4" \
+        was="does the published tree still match what the record would produce for the release it claims? — unanswerable: regenerating a past release requires that release's rules, not just its data"
+    event "DriftDetected" from="verify-published" phase="RELEASE" \
+        means="a published document was hand-edited after the fact, and it has been named"
+
+    // ---- Learning ----
+
+    command "triage-finding" by="maintainer" asks="size it — owed work, or a problem in its own right?"
+    event "FindingTriaged" from="triage-finding" phase="LEARN" \
+        means="a surprise became either an obligation inside known work, or the seed of a frame"
+
+    command "resolve-symptom" by="maintainer" asks="mark this symptom resolved, by naming the release that did it"
+    event "SymptomResolved" from="resolve-symptom" phase="LEARN" pivotal=#true \
+        means="a frame gave up one of its symptoms to a specific version. This is the only way a frame ever shrinks"
+
+    command "reopen-frame" by="maintainer" asks="re-open, because the remaining symptoms need a different attempt"
+    event "FrameReopened" from="reopen-frame" phase="LEARN" \
+        means="the loop closed back to FRAME, with the previous attempt's ceiling recorded as why"
+
+    // ================================================================
+    // POLICIES — "whenever X, then Y". These are the invariants and the gate,
+    // discovered as reactions rather than legislated up front.
+    // ================================================================
+
+    policy "convergence-or-split" \
+        whenever="symptoms do not reduce to one cause" \
+        then="refuse the frame and record that it is more than one problem" \
+        attacks="S5"
+
+    policy "capability-must-trace" \
+        whenever="a capability is named" \
+        then="it must own a cluster of events from a storm, or it is an assertion" \
+        attacks="S2" \
+        note="the policy that makes this whole activity load-bearing rather than decorative"
+
+    policy "slice-shape" \
+        whenever="a slice is cut" \
+        then="it names exactly one command, one actor, at least one event, and the read model that command needs" \
+        attacks="S4" \
+        note="verticality becomes a checkable shape instead of an adjective the author applies to their own work"
+
+    policy "refusal-is-a-fact" \
+        whenever="the gate refuses a pick-up" \
+        then="record the refusal and the condition that failed" \
+        attacks="S3" \
+        note="without this, a gate that was never invoked and a gate that refused look identical afterwards"
+
+    policy "no-silent-drop" \
+        whenever="a pass is closed with an unsettled claim and no finding" \
+        then="refuse the close" \
+        attacks="S5"
+
+    policy "evidence-names-its-layer" \
+        whenever="evidence is attached" \
+        then="it names the layer it evidences, and the layer set came from the slice" \
+        attacks="S3"
+
+    policy "publish-only-what-survives-freezing" \
+        whenever="a view's lifetime is declared" \
+        then="it is publishable only if it is still useful when frozen. A view whose value is being CURRENT is projected on demand and never committed" \
+        attacks="S6" \
+        note="the test: if a reader finds this two years from now stamped with an old release, does it still do its job? A dashboard fails. A decision passes"
+
+    policy "guide-follows-promoted-truth" \
+        whenever="a usage guide is published for a release" \
+        then="refuse unless that release promoted the truth the guide describes" \
+        attacks="S6" \
+        note="otherwise a guide describes behaviour that never shipped, which is worse than no guide — \
+            it is a document that is confidently wrong"
+
+    policy "stamp-on-publish" \
+        whenever="a document is published" \
+        then="it states the release it depicts, and is never rewritten afterwards" \
+        attacks="S6"
+
+    policy "verify-against-the-claim" \
+        whenever="the published tree is verified" \
+        then="compare each release directory against the commit its release index names. Never re-render, and never compare against the current record" \
+        attacks="S6" \
+        note="comparing against the current record would fail continuously and correctly the moment work resumed, which trains everyone to ignore the gate"
+
+    policy "verify-on-push" \
+        whenever="git reports a push" \
+        then="issue verify-published against every document in the published tree" \
+        attacks="S6" \
+        note="the only command in this storm with no human behind it. Trust that depends on someone remembering to check is not trust"
+
+    policy "resolution-names-a-release" \
+        whenever="a symptom is marked resolved" \
+        then="it names a release that exists AND that bound at least one slice whose `attacks` names this symptom" \
+        strengthened-by="E26" \
+        attacks="S6"
+
+    // ================================================================
+    // READ MODELS — what an actor must SEE before they can issue a command.
+    // Each one is a projection, and each is the value half of some slice.
+    // ================================================================
+
+    read-model "the-problem-as-it-stands" needed-by="maintainer" before="converge" \
+        answers="what have we observed, and does it hang together yet?" \
+        publishable=#false \
+        because="a problem definition's value is being current. What we thought the problem was at 0.8.0 misleads more than it informs; the part worth freezing is which symptoms a release resolved, which the release record carries"
+
+    read-model "capabilities-and-what-they-own" needed-by="maintainer" before="cut-slice" \
+        answers="what must the system be able to do, and which events does each keep consistent?" \
+        publishable=#true \
+        because="what the system could do at 0.8.0 is exactly what a reader pinned to 0.8.0 needs, and it does not decay — it becomes history" \
+        publishes-to="docs/releases/<version>/capabilities/"
+
+    read-model "what-is-ready-to-pick-up" needed-by="working-agent" before="pick-up" \
+        answers="which slices could be started right now, and what would refuse each of them?" \
+        publishable=#false \
+        because="`right now` is in the question. Frozen it is not merely stale, it is wrong"
+
+    read-model "what-this-pass-claims-and-has-shown" needed-by="reviewer" before="close-pass" \
+        answers="what did it promise, what has it evidenced, and what is still open?" \
+        attacks="S2" \
+        publishable=#false \
+        because="a pass is transient. What survives it is what shipped, which the release record carries"
+
+    read-model "what-is-currently-true" needed-by="next-agent" before="pick-up" \
+        answers="what does this repository already know, so I do not re-derive it?" \
+        attacks="S7" \
+        publishable=#false \
+        because="`currently` is in the name. This is the content behind the dashboard, and the dashboard is the clearest case the publication test rejects"
+
+    read-model "the-published-set-for-a-release" needed-by="reader" \
+        answers="what shipped at version N, which symptoms it resolved, and what it left owed?" \
+        attacks="S6" \
+        publishable=#true \
+        because="it is the archival record by construction — a release note is useful only frozen" \
+        publishes-to="docs/releases/<version>/release-notes.md"
+
+    // ---- Found by applying the publication test. Both are published by Praxis today and
+    // ---- neither appeared anywhere in this storm.
+
+    read-model "the-decisions-that-shaped-this" needed-by="reader" "next-agent" \
+        answers="what was decided, what were the alternatives, and what tested it?" \
+        attacks="S2" "S7" \
+        publishable=#true \
+        because="a decision is frozen by nature. Reading it later is the entire point of writing it" \
+        publishes-to="docs/releases/<version>/decisions/" \
+        composes=#true \
+        content-owned-by="CAP.claim-settlement" "CAP.delivery-record" \
+        note="composite. claim-settlement carries the decision, its amendments and the findings \
+            that tested it; delivery-record carries the discovery options that were rejected. \
+            Together they are what an ADR has always been"
+
+    read-model "how-to-use-a-capability" needed-by="reader" \
+        answers="how do I use what this version can do?" \
+        publishable=#true \
+        because="someone pinned to 0.8.0 needs 0.8.0's guide, not the current one" \
+        publishes-to="docs/releases/<version>/guides/" \
+        content-owned-by="CAP.delivery-record"
+
+    // ================================================================
+    // CLUSTERS — events grouped by what must stay consistent together.
+    // Each is a CANDIDATE capability. DECOMPOSE applies the four gate tests
+    // (names a doing · fundable on own terms · slices deliver value
+    // independently · can say what it is not) and some of these will merge.
+    // ================================================================
+
+    cluster "problem-record" {
+        owns "IntentRaised" "SymptomRecorded" "RootCauseConverged" "ConvergenceRefused" "SymptomResolved" "FrameReopened"
+        doing "hold a problem as a durable entity and track its symptoms to individual resolution"
+        not "it does not decide what to build. It only says what is wrong and what stopped being wrong"
+    }
+
+    cluster "discovery-record" {
+        owns "StormHeld" "UseCaseIdentified" "PathWalked" "OptionRejected" "CapabilityNamed"
+        doing "derive capabilities from evidence, and keep the options that were not taken"
+        not "it does not plan work. Nothing here is schedulable"
+    }
+
+    cluster "work-decomposition" {
+        owns "SliceCut" "ClaimStated"
+        doing "cut capabilities into slices whose verticality is checkable, each carrying stated claims"
+        not "it does not admit work. Cutting costs nothing and commits to nothing"
+    }
+
+    cluster "iteration-control" {
+        owns "SliceVetted" "PickupRefused" "DependencyFrozen" "IterationClosed" "CloseRefused"
+        doing "admit work, refuse work, and record both — the one gate and its consequences"
+        not "it does not judge quality. It judges readiness and disjointness only"
+    }
+
+    cluster "evidence-and-settlement" {
+        owns "EvidenceAttached" "ClaimSettled" "FindingRaised" "FindingTriaged" "DecisionRecorded"
+        doing "settle every stated claim against an artifact, or carry the shortfall forward as owed work"
+        not "it does not produce the evidence. It refuses to let a claim close without it"
+    }
+
+    cluster "release-binding" {
+        owns "WorkBound" "ReleaseCut" "TruthPromoted"
+        doing "bind finished passes to a version and promote what shipped into current truth"
+        not "it does not write documents"
+    }
+
+    cluster "projection" {
+        owns "DocumentsProjected" "DocumentStamped" "DriftDetected"
+        also-owns-read-models "the-problem-as-it-stands" "capabilities-and-what-they-own" \
+            "what-is-ready-to-pick-up" "what-this-pass-claims-and-has-shown" \
+            "what-is-currently-true" "the-published-set-for-a-release"
+        doing "compose any view of the record as a whole document, and prove a published one still matches the release it claims"
+        not "it never mutates the record, and never edits a document toward a new state"
+    }
+
+    // ================================================================
+    // THE PROCESS — read off the pivotal events. Derived, not authored:
+    // this is what TS.260819.01 was trying to be, and it is not a use-case.
+    // ================================================================
+
+    process "delivery" {
+        grounded-in "User-Centered Design" "Lean Management" "Lean Agile"
+        phase "FRAME"     closes-on="RootCauseConverged" produces="a problem: symptoms, one cause, one principle, a baseline"
+        phase "DISCOVER"  closes-on="CapabilityNamed"    produces="one shaped solution, its rejected siblings, and the capabilities it requires"
+        phase "DECOMPOSE" closes-on="ClaimStated"        produces="slices, each vertical by shape, each with stated claims" gate="none — cutting is how you learn what a capability is"
+        phase "ITERATE"   opens-on="SliceVetted" closes-on="IterationClosed" produces="evidence, decisions, findings, and a slice closer to delivered" gate="the only gate"
+        phase "RELEASE"   closes-on="ReleaseCut"         produces="a version, truth promoted, and every published document regenerated for it"
+        phase "LEARN"     closes-on="SymptomResolved"    produces="obligations, corrections, and sometimes a new frame"
+        loops-to "FRAME" on="FrameReopened" when="a finding is a problem in its own right, or the remaining symptoms need a different attempt"
+    }
+
+    // ================================================================
+    // FINDINGS — what the storm changed about what we already had.
+    // ================================================================
+
+    finding "E1" \
+        text="TS.260819.01 is a process, not a thin-slice: three actors, phase-length steps, six of seven symptoms attacked, and it cannot be picked up so it can never reach the gate. It became a TS because discovery had no kind for a process. It is now derived from the pivotal events above" \
+        obliges="retire TS.260819.01"
+
+    finding "E2" \
+        text="a thin-slice has a testable definition: one command, one actor, the events it produces, and the read model that command needs. Verticality stops being an assertion by the author and becomes a shape a checker can refuse" \
+        obliges="restate the thin-slice schema against the command/event/read-model triple"
+
+    finding "E3" \
+        text="TS.260819.03 carries five commands (cut, publish, stamp, commit, verify) and is therefore not one slice. cut-release, publish and verify-published are separately useful and separately refusable" \
+        obliges="re-cut TS.260819.03"
+
+    finding "E4" \
+        text="TS.260819.02 produces no event at all — it is a read model with a lifetime. Some slices deliver a view rather than a fact, and the schema must permit that rather than force a fabricated event" \
+        obliges="allow a slice whose value is a read model"
+
+    finding "E5" \
+        text="the storm did not overturn the assertion-derived capabilities wholesale — `delivery-record` and `document-projection` both recur. What it did is sharper: it SPLIT the middle into three (admission, settlement, binding) where assertion had one vague mass, and DISSOLVED the enforcement capability entirely, because the ten policies distributed across all five rather than clustering. Enforcement is a property of each capability, not a capability beside them" \
+        obliges="retire CAP.plugin-conformance-and-validation-probes as wrong-shaped — a probe layer bolted beside the thing it checks is the current ceiling, not the way out of it" \
+        corrected="first recorded as `the cluster set barely overlaps the capabilities named by assertion`. Overstated: two of five recur. The real result is the three-way split and the dissolution"
+
+    finding "E7" \
+        text="reviewer, next-agent and reader issue no commands at all — they only consume read models. Every actor who has to TRUST the artifact is read-side and writes nothing. The trust-transfer problem is therefore a read-side problem, and `projection` is the cluster sitting closest to the frame's root cause rather than a convenience on top of it" \
+        obliges="none — carried into DECOMPOSE as an ordering argument"
+
+    finding "E8" \
+        text="S1 (agents improvise structure instead of following a method) is attacked by no policy here. It is `partially-resolved` and the remaining part is narrowed by doctrine and guardrails rather than by the record — correctly outside this storm's scope. Recorded so the absence is deliberate rather than missed" \
+        obliges="none"
+
+    finding "E9" \
+        text="drift verification does not split out of projection, even though the asymmetry test pointed that way (compose is useful without verify; verify is impossible without compose). It cannot state a boundary against projection because it IS projection plus a comparison — render, diff, fail. This adds a clause to the fundability test: A CANDIDATE THAT KEEPS NO STATE OF ITS OWN IS A SLICE, NOT A CAPABILITY. Derivable from this storm's own clustering principle, since clusters group by what must stay consistent together and verification keeps nothing consistent that projection does not already keep" \
+        obliges="carry the state-of-its-own clause into the capability gate tests"
+
+    finding "E10" \
+        text="projection is narrowed to MECHANISM and owns no read models at all. Each read model is owned by the capability whose decision it serves; the read-model declaration is the seam between them. The argument is coupling, not size — if projection owned what `ready to pick up` means, changing the vet rules would force a change in projection" \
+        falsifier="if projection ever needs a per-read-model code path, the split is fake and projection should re-absorb the read models" \
+        obliges="none — recorded as the decision's falsifier"
+
+    finding "E11" \
+        text="this storm cannot derive anything about distribution. It modelled work moving through a repository, not Praxis being installed, so the six install paths appear nowhere in it. CAP.multi-harness-distribution survives as an outsider to this frame rather than as something these clusters justify" \
+        obliges="a second storm, or an explicit out-of-scope declaration on this frame"
+
+    finding "E12" \
+        text="every record file now carries `<KIND>.<YYMMDD>.<NN>.<slug>.kdl`, the ADR version pattern applied to all record kinds. CAP is the deliberate exception: a capability is permanent and identified by what it DOES, so a date stamp would imply a later-dated capability supersedes it, which contradicts permanence. config.kdl is also exempt — it is a binding, not a record" \
+        obliges="no ADR declares this rule. It is applied but undeclared, and the checker may not enforce an invariant the record does not declare" \
+        note="the rule governs RECORD FILES. A container directory is named by its id alone — \
+            `frames/FRAME.260819.01/` — because the record file inside already carries the full \
+            name and repeating the slug on the directory says nothing the file does not"
+
+    finding "E13" \
+        text="a slice whose value is a read model has no command and produces no event (E4), so `one command` is not universal. A slice is one of two kinds: a COMMAND slice (actor issues a command, a policy may refuse it, an event results) or a VIEW slice (an actor needs to see something before they can act; a read model is declared and answered, nothing is written). Both are vertical — a view slice runs actor to query to graph to rendering — and both are atomic, because each names exactly one command or exactly one read model" \
+        obliges="carry the two-kind split into the thin-slice schema"
+
+    finding "E14" \
+        text="WALK.260820.01 tested E10's falsifier and it did not fire: two capabilities' views render through one code path with no per-view branch, because the seam is a typed RESULT the capability emits rather than a query projection runs. A query-based seam would have fired the falsifier immediately, since projection would have to evaluate admission predicates to answer it" \
+        obliges="record read-model@v1 as a seam contract" \
+        note="the split holds on one condition — cells carry values, never markup. Relax it and the split becomes fiction while still passing TS.260820.10 C3"
+
+    finding "E15" \
+        text="verification cannot mean re-render and compare. Regenerating a release-N document requires release-N's RULES, which change as the method learns, so re-rendering reports drift that did not occur — reintroducing the continuous-failure mode `verify-against-the-claim` exists to prevent. It must compare committed hashes and re-run only the pure, versioned result-to-document step" \
+        obliges="amend TS.260820.11 and narrow what verification claims to prove" \
+        note="render --check proves a published document was not hand-edited. It does NOT prove the document still agrees with the record, and it must not — an archival document is supposed to disagree with a record that has moved on"
+
+    finding "E16" \
+        text="the storm had a `publish` command and a published-set read model, but nothing decided MEMBERSHIP — the set was assumed into existence. The rule is the publication test: publish a document only if it is still useful when frozen. A view whose value is being CURRENT is projected on demand and never committed" \
+        obliges="none — now carried by publish-only-what-survives-freezing"
+
+    finding "E17" \
+        text="docs/product.md stops being published. A dashboard stamped 0.8.0 while 0.9.0 is in flight serves nobody: the maintainer wants where they are now, and an external reader wants what 0.8.0 DOES, which the capability records and release notes already carry. The dashboard has no external reader — a stronger argument than perishability alone" \
+        obliges="retire docs/product.md as a published artifact. It ships today, so this REMOVES a v0.6.0 feature rather than declining to build one"
+
+    finding "E18" \
+        text="applying the publication test exposed two views Praxis publishes today that appeared nowhere in this storm: decisions (docs/architecture/adr/) and user guides (docs/guides/). The storm swept the timeline of DOING work and missed the artifacts that outlive it" \
+        obliges="none — both are now read models" \
+        note="a breadth activity that missed two of four published artifact classes is worth remembering. Sweeping the timeline is not the same as sweeping the outputs"
+
+    finding "E19" \
+        text="a DOCUMENT may compose several read models; a read model still has exactly one content owner. The dashboard is what-is-currently-true plus what-is-ready-to-pick-up plus release history — three owners, one document. Without this, a composite view would need a cross-capability owner and the one-owner rule would break" \
+        obliges="document-projection composes an ordered list of results, not exactly one"
+
+    finding "E20" \
+        text="published documents live at versioned paths — docs/releases/<version>/ — with every publishable view under its own release directory. Each release directory is then independently verifiable against the commit its index node names, and verification is a git comparison rather than a re-render, so W4's rules-change problem never arises" \
+        obliges="amend TS.260820.09, .10 and .11, and WALK.260820.01/W4" \
+        supersedes="the one-path-per-document layout argued in WALK.260820.01, and the result-hash and renderer-version machinery proposed with it. Under one-path-per-document a past release exists only in history, so a working-tree comparison is meaningless — HEAD holds a different release at the same path. Versioned paths make every release independently checkable, which is what the earlier argument missed"
+
+    finding "E21" \
+        text="a release is recorded as an INDEX into git, never as a copy of what git holds: version, tag, commit, when it was cut, what it binds, what it resolves. One node per release, written once. A mirror of history in the graph would be a second clock, and ES.260819.01 already declares git as the only clock the record has — a KDL history whose fidelity to git is unverifiable-without-checking-git is this frame's root cause reproduced one level up" \
+        obliges="release index nodes at praxis/releases/RELEASE.<version>.kdl, written once and never edited"
+
+    finding "E22" \
+        text="the two publishable views found by E18 did not need publishing slices — publishing is generic over read models by construction (TS.260820.10 C3). What was missing is CONTENT: `record-decision` had a command in this storm and no slice, and documenting usage had no command at all" \
+        obliges="TS.260820.14 for record-decision, TS.260820.15 for document-usage" \
+        note="the gap was misread the first time as a publishing gap. Publishing being generic is exactly what makes a missing view a content problem rather than a rendering one"
+
+    finding "E23" \
+        text="`the-problem-as-it-stands` conflates two things with opposite perishability — where the problem stands NOW (perishable) and what discovery concluded, including the options it rejected (frozen by nature, and exactly what a reader wants two years later). The rejected options now reach a reader through the composite decision document rather than through a new read model" \
+        obliges="none — resolved by composition" \
+        note="the publication test is sharper than a per-view verdict: it can show that a single view is carrying two different lifetimes and should be read apart"
+
+    finding "E24" \
+        text="a command slice could declare the view it READS but had no way to declare the views its events FEED, so a read model populated by a slice but consumed by nobody looked unreachable. `feeds-read-model` closes the loop, and the pair (needs / feeds) makes the graph traversable in both directions — which is what lets a checker ask whether every publishable view has something keeping it current" \
+        obliges="carry needs-read-model and feeds-read-model into the thin-slice schema as a pair"
+
+    finding "E25" \
+        text="TS.260820.09 carried three commands — bind, cut-release and promote-truth — which the thin-slice schema's own atomicity rule forbids. Splitting it produced three slices and surfaced a fourth: `resolve-symptom` was buried as a step inside it and belongs to delivery-record, not release-binding" \
+        obliges="none — split into TS.260820.09, .16, .17 and .18" \
+        note="release-binding passed the independence gate test on three slices and had been written as one. The gate test was right and the slice was wrong, which is the argument for recording gate-test REASONING rather than only its verdict"
+
+    finding "E26" \
+        text="a symptom may be marked resolved only by a release that BOUND A SLICE WHOSE `attacks` NAMES IT. Resolution becomes computed from what shipped rather than asserted by whoever is closing the frame — the frame's own principle applied to the frame's own bookkeeping" \
+        obliges="resolution-names-a-release strengthened to require an attacking slice in the named release"
+
+    finding "E6" \
+        text="ConvergenceRefused, PickupRefused, CloseRefused and DriftDetected are all events. Refusals are facts about the run, and a method that records only its successes cannot show fidelity — it shows the absence of recorded failure, which is what the frame is about" \
+        obliges="none — carried into iteration-control and evidence-and-settlement"
+}

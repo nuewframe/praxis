@@ -1,6 +1,16 @@
 # ADR.260819.01: KDL State Architecture and Rust CLI Engine Consolidation
 
-- **Status:** Superseded by ADR.260819.02
+- **Status:** Accepted — partially superseded by ADR.260819.02
+
+> **Sealed legacy record, and a correction.** Supersession here is **partial**, not total.
+> ADR.260819.02 **replaces** this decision's state model, render semantics, and whole-document
+> synthesis, and **retains** its runtime, engine topology, KDL encoding, domain profiles, and
+> hard-failing gates. The Rust engine and the `praxis-core` / `praxis-cli` split decided here are
+> in force and govern every slice under the initiative.
+>
+> No longer a source: the decision lives in the delivery graph as
+> [`praxis/adr/ADR.260819.01.kdl`](../../../praxis/adr/ADR.260819.01.kdl), whose `body` node
+> carries this argument as KDL source. Pending archival.
 - **Date:** 2026-08-19
 - **Deciders:** Principal Engineer, Product Designer, Product Manager
 - **Capabilities Touched:** `CAP.plugin-conformance-and-validation-probes`, `CAP.method-spine-and-execution`, `CAP.multi-harness-distribution`

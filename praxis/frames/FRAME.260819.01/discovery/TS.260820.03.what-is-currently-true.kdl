@@ -1,0 +1,46 @@
+thin-slice "TS.260820.03" {
+    slug "what-is-currently-true"
+    title "Ask the record what this repository already knows"
+    kind "view"
+    realizes "CAP.delivery-record"
+    from-storm "ES.260819.01"
+
+    read-model "what-is-currently-true"
+    content-owned-by "CAP.delivery-record"
+    actor "next-agent"
+
+    trigger "an agent arrives with none of the previous one's context and is about to re-derive it"
+    outcome "it gets current truth as an answer instead of reconstructing it from prose"
+
+    scenario #"""
+        Given a repository whose state is typed
+        When the next agent asks what is currently true
+        Then it gets the frames still open, the capabilities and what each owns, what shipped
+             in which release, and what is owed — as an answer to a query, not as five
+             documents to read and reconcile.
+        """#
+
+    step "1" does="ask, with no ceremony and at any moment"
+    step "2" does="the record answers from state, not from prose that describes state"
+    step "3" does="the answer says what it does not cover, so silence is not read as absence"
+
+    excludes "rendering it as a document — that is document-projection's mechanism, and this \
+        slice proves the content stands on its own before anything renders it"
+    excludes "answering questions about work in flight. That is TS.260820.08"
+
+    layer "doctrine"    reaches="the skill tells an arriving agent to ask before deriving"
+    layer "enforcement" reaches="the query is a first-class command, so a stale hand-written summary cannot stand in for it"
+    layer "docs"        reaches="none — this slice is deliberately pre-projection"
+
+    claim "C1" text="the answer is computed from the record, never from a cached or written summary" \
+        settled-by="a test that mutates state and asserts the answer changes with no regeneration step"
+    claim "C2" text="an empty area answers 'nothing recorded' rather than returning nothing" \
+        settled-by="a test on a repository with no releases"
+
+    depends-on "TS.260820.01 and TS.260820.02 — there must be something true to report"
+
+    useful-alone "S7 stops being structural. An agent that can ask does not re-derive, even \
+        with no projection, no gate and no release machinery present"
+
+    attacks "S7"
+}

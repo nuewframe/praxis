@@ -1,0 +1,54 @@
+thin-slice "TS.260820.12" {
+    slug "declare-what-gets-published"
+    title "Decide what belongs in the published set, and refuse a choice made without a reason"
+    kind "command"
+    realizes "CAP.delivery-record"
+    from-storm "ES.260819.01"
+
+    command "declare-lifetime"
+    actor "maintainer"
+    produces-event "LifetimeDeclared"
+    needs-read-model "capabilities-and-what-they-own"
+    feeds-read-model "the-published-set-for-a-release"
+
+    trigger "a view exists and nobody has said whether it survives being frozen"
+    outcome "the published set is derived from declared lifetimes rather than listed by hand"
+
+    scenario #"""
+        Given a read model owned by some capability
+        When the maintainer declares its lifetime
+        Then it is publishable only if it is still useful when FROZEN — and the reason is
+             recorded, because the whole decision is a judgement about perishability and an
+             unjustified judgement is indistinguishable from an oversight.
+        """#
+
+    step "1" does="ask the test: if a reader finds this two years from now, stamped with an old release, does it still do its job?"
+    step "2" does="declare publishable, or on-demand"
+    step "3" does="record why. A declaration with no reason is refused"
+    step "4" does="publishable views also declare where under the release directory they land"
+    step "5" does="the published set is now derived. Nobody maintains a list"
+
+    excludes "generating anything. This decides membership; TS.260820.10 generates"
+    excludes "a repository-wide default. Every view is decided individually, because \
+        perishability is a property of the question, not of the file type"
+
+    layer "doctrine"    reaches="the skill teaches the publication test and its two outcomes"
+    layer "enforcement" reaches="publish-only-what-survives-freezing, refusing an undeclared or unjustified lifetime"
+    layer "docs"        reaches="the published set is derived from these declarations and from nothing else"
+
+    claim "C1" text="a read model with no declared lifetime is refused" \
+        settled-by="a negative test asserting non-zero exit and the read-model name in the diagnostic"
+    claim "C2" text="a publishable declaration with no reason is refused" \
+        settled-by="a negative test with publishable set and no because"
+    claim "C3" text="the published set equals exactly the publishable declarations — a hand-listed set is refused" \
+        settled-by="a test asserting the generated set matches the declarations, plus a negative test on a hand-edited list"
+
+    depends-on "TS.260820.02 — views belong to capabilities, so capabilities must exist"
+
+    useful-alone "the difference between a document worth freezing and a dashboard stops being \
+        decided per-release by whoever is publishing that day"
+
+    attacks "S6"
+    note "found by asking what `publish` actually publishes. The storm had the command and the \
+        published-set view but never decided membership (ES.260819.01/E16)"
+}

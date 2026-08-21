@@ -1,0 +1,52 @@
+thin-slice "TS.260820.02" {
+    slug "name-a-capability"
+    title "Name a capability only where a storm's events cluster"
+    kind "command"
+    realizes "CAP.delivery-record"
+    from-storm "ES.260819.01"
+
+    command "name-capability"
+    actor "maintainer"
+    produces-event "CapabilityNamed"
+    needs-read-model "the-problem-as-it-stands"
+    feeds-read-model "capabilities-and-what-they-own"
+
+    trigger "discovery has swept the domain and the events are grouped"
+    outcome "a capability exists that can show the events it owns, or it was refused as an assertion"
+
+    scenario #"""
+        Given a storm whose events have been clustered
+        When the maintainer names a capability
+        Then it is accepted only if it owns a cluster from that storm and states what it is
+             not — and a capability typed straight out of someone's head is refused, because
+             a capability asserted rather than derived is this frame's own root cause
+             reproduced inside the method that is meant to solve it.
+        """#
+
+    step "1" does="cluster the storm's events by what must stay consistent together"
+    step "2" does="name the doing the cluster performs"
+    step "3" does="state what it is not, as an exclusion something else covers — not as scope restated"
+    step "4" does="record the four gate tests with the reason each passes"
+    step "5" does="write it. A capability owning no cluster is refused"
+
+    excludes "deciding what order capabilities are built in — that is DECOMPOSE's argument"
+    excludes "merging or splitting clusters automatically. Judgement stays with the maintainer; only the trace is enforced"
+
+    layer "doctrine"    reaches="the skill that teaches clustering and the four gate tests"
+    layer "enforcement" reaches="capability-must-trace, failing closed on an untraced capability"
+    layer "docs"        reaches="the capability's own rendered record shows the cluster it came from"
+
+    claim "C1" text="a capability naming no storm cluster is refused" \
+        settled-by="a negative test asserting non-zero exit and the capability name in the diagnostic"
+    claim "C2" text="an event owned by two capabilities is refused" \
+        settled-by="a negative test with a duplicated event across two records"
+    claim "C3" text="an event owned by no capability is reported" \
+        settled-by="a test on a storm with one orphan event"
+
+    depends-on "TS.260820.01 — the record format for derived entities, frozen"
+
+    useful-alone "the step from problem to capability becomes a derivation with its work shown. \
+        Nothing downstream needs to exist for that to be worth having"
+
+    attacks "S2"
+}

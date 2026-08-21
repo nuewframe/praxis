@@ -1,8 +1,20 @@
 # INIT.kdl-state-and-rust-cli-consolidation: KDL State, Compiled Rust CLI Engine, and Deterministic Markdown Projections (Praxis `v0.8.0`)
 
-**Status:** ⚪ Proposed  
+**Status:** 🟢 Active — admission signed 2026-08-19  
 **Capabilities Touched:** `CAP.plugin-conformance-and-validation-probes`, `CAP.method-spine-and-execution`  
 **Target Horizon:** Praxis `v0.8.0` Release  
+
+> **Sealed legacy record.** This initiative was authored under the prose-Markdown practice that
+> [`ADR.260819.02`](../../architecture/adr/ADR.260819.02-delivery-graph-and-iteration-native-slices.md)
+> replaces, and it is kept as the record of how the intent was formed. It is **no longer a
+> source**: the initiative now lives in the delivery graph at
+> [`praxis/initiatives/kdl-state-and-rust-cli-consolidation/`](../../../praxis/initiatives/kdl-state-and-rust-cli-consolidation/),
+> with its educated theory in `hypothesis.md` and its admission evidence in `journey.md`.
+>
+> Two things here are **superseded rather than re-homed**: the `.praxis/` state layout (the
+> root is `praxis/`, visible and committed), and the thin-slice table below, which the ADR's
+> own journey walk found to be horizontal layers rather than vertical cuts. Neither carries
+> forward. Edit the graph, not this file. Pending archival.
 
 ---
 

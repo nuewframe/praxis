@@ -56,3 +56,7 @@ temp/
 __pycache__/
 *.py[cod]
 *$py.class
+
+# Praxis delivery graph — generated trees only; the rest of praxis/ is the record
+praxis/.render/
+praxis/.cache/
