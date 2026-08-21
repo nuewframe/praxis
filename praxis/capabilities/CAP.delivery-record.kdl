@@ -20,7 +20,8 @@ capability "delivery-record" {
     owns-event "IntentRaised" "SymptomRecorded" "RootCauseConverged" "ConvergenceRefused" \
         "SymptomResolved" "FrameReopened" \
         "StormHeld" "PathWalked" "OptionRejected" "CapabilityNamed" \
-        "SliceCut" "SliceCutRefused" "ClaimStated" "LifetimeDeclared" "UsageDocumented"
+        "SliceCut" "SliceCutRefused" "ClaimStated" "LifetimeDeclared" "UsageDocumented" \
+        "EntityDeclared" "EntityDeclarationRefused"
 
     owns-read-model "the-problem-as-it-stands" answers="what have we observed, and does it hang together yet?"
     owns-read-model "capabilities-and-what-they-own" answers="what must the system be able to do, and which events does each keep consistent?"

@@ -73,6 +73,14 @@ event-storm "ES.260819.01" {
     event "OptionRejected" from="reject-option" phase="DISCOVER" \
         means="a sibling of the chosen solution is preserved. A solution kept without its siblings was inherited, not chosen"
 
+    command "declare-entity" by="maintainer" asks="name a kind of thing the record must be able to hold, and the shape it must carry" \
+        added-by="E30"
+    event "EntityDeclared" from="declare-entity" phase="DISCOVER" \
+        means="the record can now hold and check a new kind of thing, and extending the vocabulary \
+            was an amendment to the architecture rather than an edit to the engine"
+    event "EntityDeclarationRefused" from="declare-entity" phase="DISCOVER" \
+        means="a record used a kind nothing declares, and it was named"
+
     command "name-capability" by="maintainer" asks="name what the system must be able to DO"
     event "CapabilityNamed" from="name-capability" phase="DISCOVER" pivotal=#true \
         means="the system's required doings are known, and each traces to the events it must keep consistent"
@@ -331,7 +339,8 @@ event-storm "ES.260819.01" {
     }
 
     cluster "discovery-record" {
-        owns "StormHeld" "PathWalked" "OptionRejected" "CapabilityNamed"
+        owns "StormHeld" "PathWalked" "OptionRejected" "CapabilityNamed" \
+            "EntityDeclared" "EntityDeclarationRefused"
         doing "derive capabilities from evidence, and keep the options that were not taken"
         not "it does not plan work. Nothing here is schedulable"
     }
@@ -543,6 +552,17 @@ event-storm "ES.260819.01" {
         note="refusal-is-a-fact was declared as a policy and violated by the storm that declared it. \
             It surfaced only when something tried to BUILD the command, which is the argument for \
             opening an iteration before the model feels finished"
+
+    finding "E30" \
+        text="the storm never modelled the model CHANGING. Every command moves work through the \
+            record and none extends what the record can hold — so `iteration`, `read-model` and \
+            `phase` were each used before anything declared them, and nothing could have objected. \
+            Discovery modelled the domain and forgot that the domain's own vocabulary grows" \
+        obliges="declare-entity, and TS.260821.01 to enforce it" \
+        note="the third instance is what made it a pattern rather than an oversight. A storm sweeps \
+            the timeline of DOING; extending the vocabulary is not on that timeline and will be \
+            missed by construction — which is an argument for cutting slices during discovery \
+            rather than after it"
 
     finding "E6" \
         text="ConvergenceRefused, PickupRefused, CloseRefused and DriftDetected are all events. Refusals are facts about the run, and a method that records only its successes cannot show fidelity — it shows the absence of recorded failure, which is what the frame is about" \
