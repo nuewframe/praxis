@@ -8,7 +8,7 @@
 use kdl::{KdlDocument, KdlNode};
 use miette::SourceSpan;
 
-use crate::schema::{FieldSpec, Schema, prop, string_arg, string_args};
+use crate::schema::{Schema, prop, string_arg, string_args};
 
 /// Whether a finding stops the work or merely tells the reader.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

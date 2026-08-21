@@ -5,14 +5,18 @@
 //! not state: ADR.260819.01/A4 forbids the engine encoding what the record declares,
 //! so every rule applied here arrives as data from `NA.260820.01/schema`.
 
+pub mod admission;
 pub mod check;
 pub mod schema;
+pub mod view;
 
 pub use check::{
     Known, Refusal, Severity, Violation, check_corpus, check_document, check_node, index_all,
     refused,
 };
+pub use admission::{Assessment, Condition, Conditions, Corpus, Verdict, assess, project};
 pub use schema::{Cardinality, EntitySpec, FieldSpec, Schema};
+pub use view::{Cell, ReadModel, Section};
 
 /// Parse KDL source, returning the document or the parse error unchanged — the codec
 /// refuses syntax and nothing else.

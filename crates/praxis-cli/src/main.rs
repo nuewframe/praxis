@@ -10,8 +10,11 @@ use std::process::ExitCode;
 use clap::{Parser, Subcommand};
 use miette::{Diagnostic, NamedSource, SourceSpan};
 use praxis_core::{
-    Known, Schema, Severity, Violation, check_corpus, check_document, index_all, parse,
+    Conditions, Corpus, Known, Schema, Severity, Violation, assess, check_corpus, check_document,
+    index_all, parse, project,
 };
+
+mod render;
 
 #[derive(Parser)]
 #[command(name = "praxis", version, about = "The delivery graph engine")]
@@ -24,6 +27,14 @@ struct Cli {
 enum Command {
     /// Refuse any entity that does not match the shape the record declares.
     Check {
+        /// The state root to read.
+        #[arg(default_value = "praxis")]
+        root: PathBuf,
+    },
+    /// Show which slices could be started right now, and what would refuse each of the rest.
+    ///
+    /// `right now` is in the question, so this is computed on demand and never committed.
+    Ready {
         /// The state root to read.
         #[arg(default_value = "praxis")]
         root: PathBuf,
@@ -68,24 +79,110 @@ fn main() -> ExitCode {
                 ExitCode::FAILURE
             }
         },
+        Command::Ready { root } => match ready(&root) {
+            Ok(()) => ExitCode::SUCCESS,
+            Err(report) => {
+                eprintln!("{report:?}");
+                ExitCode::FAILURE
+            }
+        },
     }
 }
 
-fn check(root: &Path) -> miette::Result<usize> {
+/// `TS.260820.04`. The conditions come from the record, the verdicts from the core, and
+/// the composition from a renderer that does not know what any of it means.
+fn ready(root: &Path) -> miette::Result<()> {
+    let sources = load(root)?;
+    let docs: Vec<_> = sources.iter().map(|(_, _, d)| d.clone()).collect();
+
+    let mut schema = Schema::default();
+    let mut conditions = Conditions::default();
+    for doc in &docs {
+        let found = Schema::from_document(doc);
+        if !found.is_empty() {
+            schema = found;
+        }
+        let declared = Conditions::from_document(doc);
+        if !declared.is_empty() {
+            conditions = declared;
+        }
+    }
+    if conditions.is_empty() {
+        miette::bail!(
+            "the record declares no admission conditions — there is nothing to evaluate, \
+             and an empty gate must not be reported as an open one"
+        );
+    }
+
+    let corpus = Corpus::from_documents(&docs, &schema);
+    let assessment = assess(&corpus, &conditions, &now());
+    let model = project(&assessment, &corpus);
+
+    // A result that breaks its own seam is a refusal like any other.
+    let flaws = model.flaws();
+    if !flaws.is_empty() {
+        for flaw in &flaws {
+            eprintln!("praxis: read-model@v1 violated — {flaw}");
+        }
+        miette::bail!("the result does not satisfy read-model@v1");
+    }
+
+    print!("{}", render::render(&model));
+    Ok(())
+}
+
+/// The moment, in UTC. A view whose value is being current must say when it was computed.
+fn now() -> String {
+    let secs = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .map_or(0, |d| d.as_secs());
+    let (days, rem) = ((secs / 86_400) as i64, secs % 86_400);
+    let (y, m, d) = civil_from_days(days);
+    format!(
+        "{y:04}-{m:02}-{d:02}T{:02}:{:02}:{:02}Z",
+        rem / 3600,
+        (rem % 3600) / 60,
+        rem % 60
+    )
+}
+
+/// Howard Hinnant's `civil_from_days`, era-based. Days since 1970-01-01 to a civil date.
+fn civil_from_days(z: i64) -> (i64, u32, u32) {
+    let z = z + 719_468;
+    let era = if z >= 0 { z } else { z - 146_096 } / 146_097;
+    let doe = (z - era * 146_097) as u64;
+    let yoe = (doe - doe / 1460 + doe / 36_524 - doe / 146_096) / 365;
+    let y = yoe as i64 + era * 400;
+    let doy = doe - (365 * yoe + yoe / 4 - yoe / 100);
+    let mp = (5 * doy + 2) / 153;
+    let d = (doy - (153 * mp + 2) / 5 + 1) as u32;
+    let m = if mp < 10 { mp + 3 } else { mp - 9 } as u32;
+    (if m <= 2 { y + 1 } else { y }, m, d)
+}
+
+/// Read every `.kdl` file under a root, parsed. The only place the engine touches a disk.
+type Source = (PathBuf, String, kdl::KdlDocument);
+
+fn load(root: &Path) -> miette::Result<Vec<Source>> {
     let files = kdl_files(root);
     if files.is_empty() {
         miette::bail!("no .kdl files under {}", root.display());
     }
-
-    // Two reads: the first learns what the record declares, the second judges against
-    // it. The schema cannot be applied while it is still being discovered.
     let mut sources = Vec::new();
     for path in files {
-        let text = fs::read_to_string(&path)
-            .map_err(|e| miette::miette!("{}: {e}", path.display()))?;
-        let doc = parse(&text).map_err(|e| miette::Report::new(e).context(path.display().to_string()))?;
+        let text =
+            fs::read_to_string(&path).map_err(|e| miette::miette!("{}: {e}", path.display()))?;
+        let doc = parse(&text)
+            .map_err(|e| miette::Report::new(e).context(path.display().to_string()))?;
         sources.push((path, text, doc));
     }
+    Ok(sources)
+}
+
+fn check(root: &Path) -> miette::Result<usize> {
+    // Two reads: the first learns what the record declares, the second judges against
+    // it. The schema cannot be applied while it is still being discovered.
+    let sources = load(root)?;
 
     let mut schema = Schema::default();
     let mut known = Known::default();

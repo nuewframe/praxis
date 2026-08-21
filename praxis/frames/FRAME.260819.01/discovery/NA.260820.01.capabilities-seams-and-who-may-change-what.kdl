@@ -121,6 +121,40 @@ notional-architecture "NA.260820.01" {
         owed "the iteration is one entity and this capability owns it end to end. `not` currently says \
             `and then it is finished`, which W8 falsifies. TS.260820.07 re-files here, and \
             no-silent-drop moves here with it (W8, W9)"
+
+        // The gate's conditions, declared rather than coded. A4 forbids the engine holding
+        // a rule the record does not state, and WHICH conditions decide admission is such a
+        // rule. The engine carries a check per name; a condition naming a check the engine
+        // does not have is REPORTED AS UNCOMPUTED, never quietly passed. That is the whole
+        // difference between `nothing blocks this` and `blocking was not computed`, which is
+        // read-model@v1's third constraint at the granularity of a single condition.
+        // Declared by ITER.260821.03, from ES.260819.01 `pick-up` and the iteration-control
+        // cluster's `it judges readiness and disjointness only`.
+        admits "an iteration on a slice" {
+            condition "slice-is-shaped" check="slice-is-shaped" \
+                because="a slice the checker refuses is not work waiting to start, it is a defect"
+            condition "dependencies-delivered" check="dependencies-delivered" \
+                because="an iteration standing on undelivered work is standing on nothing" \
+                caveat="P2 — every dependency in the tree today names a SLICE, which the schema \
+                    forbids in favour of a frozen seam. The check reads the id out of the prose \
+                    and says that it did, so the caveat is visible in the answer rather than \
+                    filed in a finding nobody reads"
+            condition "no-iteration-in-flight" check="no-iteration-in-flight" \
+                because="at most one open iteration per slice — the iteration entity's own constraint"
+            condition "nothing-left-to-admit" check="nothing-left-to-admit" \
+                because="a slice whose claims are all met and whose iteration is closed has nothing \
+                    to admit. It is not blocked; it is done, and the two must not look alike"
+            condition "work-is-disjoint" \
+                uncomputed="no seam manifest exists, so what two iterations would touch cannot be \
+                    compared. Disjointness is half of what this capability says it judges, and \
+                    half of what it judges is currently not computed at all" \
+                because="two iterations that overlap produce a merge, and a merge is where the \
+                    record and the tree stop agreeing"
+            condition "the-slice-is-the-best-available" judgement=#true \
+                because="selection is the maintainer's judgement and the tool does not rank. \
+                    Declared anyway, so the answer shows the reader which part of the gate it \
+                    did not decide for them"
+        }
     }
 
     capability-role "claim-settlement" {

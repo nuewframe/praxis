@@ -113,6 +113,7 @@ Load the `SKILL.md` of any skill you intend to follow.
 | | `name-a-capability` | Derive a capability from a cluster of events in a storm — consistency boundaries, the four gate tests with their reasons, and the exclusion that makes the boundary real |
 | | `cut-a-slice` | Cut an atomic vertical slice in a shape a checker can refuse — one command or one view, one actor, declared layers, claims naming their evidence |
 | | `declare-an-entity-kind` | Declare a kind the record must hold, and its shape, on the architecture's schema — an amendment to the record, never a change to the engine |
+| | `see-what-is-ready` | Ask which slices could be started right now, and what would refuse each of the rest — including the conditions the gate declares and nobody computed |
 | | `create-initiative` | Scaffold or refine a single-file growth initiative (`INIT.<initiative-name>.md`) |
 | | `create-capability-record` | Scaffold or update a living capability record (`CAP.<capability-name>.md`) |
 | | `create-wave` | Alias for `create-initiative` — single-file growth initiative on `docs/product.md` |
