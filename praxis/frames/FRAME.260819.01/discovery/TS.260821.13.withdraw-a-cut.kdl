@@ -1,0 +1,81 @@
+// Withdrawing 0.8.0 took three hand-edits across seven files: the release node, five
+// capability records whose promoted truth was derived from a release that no longer stood,
+// and the schema twice because `withdrawn` had to be declared in two places (AS6, AS7).
+//
+// That is not a marker. The index POINTS at a commit and never mirrors it — the record says
+// so at the top of every cut release — so taking the pointer back should cost what moving a
+// git branch costs. What makes it expensive is that `promote` writes derived truth into
+// other records, and nothing walks it back.
+
+thin-slice "TS.260821.13" {
+    slug "withdraw-a-cut"
+    title "Take back a cut in one command, including what it wrote elsewhere"
+    kind "command"
+    realizes "CAP.release-binding"
+    from-storm "ES.260819.01"
+
+    command "withdraw"
+    actor "a maintainer who cut a version and should not have"
+    produces-event "ReleaseWithdrawn" "WithdrawalRefused"
+    needs-read-model "what-is-currently-true"
+
+    trigger "a version was cut, and what it froze turned out not to be worth freezing"
+    outcome "one command takes the pointer back, unwinds what the cut wrote elsewhere, and leaves the withdrawal visible"
+
+    scenario #"""
+        Given a cut release whose promotion has been folded into several capability records
+        When it is withdrawn with a reason
+        Then the release returns to planned, the promoted truth it produced is recomputed away,
+             and the index of what WAS cut is kept — because a version withdrawn and a version
+             never cut must not read alike, and a withdrawal that leaves five records asserting
+             a release that no longer stands has moved the problem rather than undone it.
+        """#
+
+    step "1" does="the state goes to `withdrawn`, and the reason is required. A withdrawal nobody explained is a cut nobody can account for"
+    step "2" does="the index moves to `previously-cut`, so what WAS cut survives and re-cutting has something to carry forward"
+    step "3" does="promoted truth is recomputed from what is still cut — which for a withdrawn release means removed, in the same operation"
+    step "4" does="publish is unblocked, because the freeze belongs to a release that stands"
+    step "5" does="re-cutting a withdrawn version carries `previously-cut` forward, so the record holds every cut a version ever had"
+
+    excludes "deleting the release. A version that was cut and taken back is not a version that \
+        never existed, and the whole argument for recording refusals applies to a cut the same way"
+    excludes "withdrawing a release somebody has installed. Nothing here can know that — the \
+        command refuses on a version the config names as published, and beyond that it is the \
+        maintainer's judgement, which is where it belongs"
+    excludes "unwinding the BIND. Iterations stay bound: what they contributed did not stop being \
+        true because the pointer moved, and re-cutting the same version should not need them bound again"
+
+    layer "doctrine"    reaches="a cut is a pointer, and the skill says what taking it back costs and what it leaves behind"
+    layer "enforcement" reaches="a withdrawal with no reason is refused; a capability asserting a withdrawn release's truth is refused"
+    layer "docs"        reaches="`why is this version not cut any more` is answered by the release itself"
+
+    claim "C1" text="one command withdraws, and the record is coherent afterwards with no hand-edit" \
+        settled-by="a test cutting, promoting, withdrawing, then asserting praxis check is clean — which it was not when this was done by hand"
+    claim "C2" text="the promoted truth a withdrawn release produced is recomputed away in the same operation" \
+        settled-by="a test asserting the capability records carry no shipped entry naming the withdrawn version, and that entries from OTHER cut releases survive"
+    claim "C3" text="a withdrawal with no reason is refused" \
+        settled-by="a test withdrawing with no `--because`, asserting a refusal — a withdrawal nobody explained is a cut nobody can account for"
+    claim "C4" text="what was cut survives the withdrawal" \
+        settled-by="a test asserting `previously-cut` carries the commit and the date of the original cut, and that re-cutting keeps it"
+    claim "C5" text="the state vocabulary is declared once" \
+        settled-by="a rule reporting a kind whose `states=` and whose `state` field's `one-of=` disagree — AS7, which cost an edit that looked like the schema had not been picked up"
+
+    depends-on "TS.260820.09 — there is a cut to take back"
+
+    useful-alone "a cut stops being a one-way door. Today withdrawing one means editing seven files \
+        by hand and hoping praxis check agrees afterwards, which is the kind of operation nobody \
+        performs twice and everybody eventually performs wrong"
+
+    attacks "S5"
+
+    cut-from "WALK.260822.02/AS6 and AS7"
+
+    principle-note "the index points at a commit and never mirrors it, which is what makes a cut \
+        cheap. Promotion breaks that by writing derived truth into records the cut does not own — \
+        legitimate under `a derived field is recomputed by a rule`, and the cost lands on whoever \
+        moves the pointer back. A derived field is only as cheap as its recomputation"
+
+    proves "a cut can be taken back as easily as it was made"
+    does-not-prove "that it should be. Whether a version is worth withdrawing is a judgement, and \
+        making the operation cheap makes a bad withdrawal cheap too"
+}

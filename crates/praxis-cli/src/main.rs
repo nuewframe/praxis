@@ -19,6 +19,7 @@ use praxis_core::check::{Facts, check_corpus_given, decision_body};
 use praxis_core::schema::Extension;
 use praxis_core::invariant::{Enforcement, check_invariants};
 use praxis_core::surface::{audit, surfaces};
+use praxis_core::withdraw::{Withdrawal, withdraw};
 use praxis_core::cut::seal;
 
 mod render;
@@ -186,6 +187,20 @@ enum Command {
     /// to what the record says enforces each invariant.
     CheckInvariants {
         /// The state root to read.
+        #[arg(long, default_value = "praxis")]
+        root: PathBuf,
+    },
+    /// Take a cut release back, unwinding what the cut wrote elsewhere.
+    ///
+    /// A cut is a pointer into history. Moving it back should cost what moving it forward
+    /// cost — including the promoted truth it folded into capability records.
+    Withdraw {
+        /// The version to withdraw.
+        version: String,
+        /// Why. Required: a withdrawal nobody explained is a cut nobody can account for.
+        #[arg(long)]
+        because: Option<String>,
+        /// The state root to read and write.
         #[arg(long, default_value = "praxis")]
         root: PathBuf,
     },
@@ -412,6 +427,16 @@ fn main() -> ExitCode {
                 ExitCode::FAILURE
             }
         },
+        Command::Withdraw { version, because, root } => {
+            match withdrawing(&version, because.as_deref(), &root) {
+                Ok(true) => ExitCode::SUCCESS,
+                Ok(false) => ExitCode::FAILURE,
+                Err(report) => {
+                    eprintln!("{report:?}");
+                    ExitCode::FAILURE
+                }
+            }
+        }
         Command::Schema { print } => {
             let (schema, version) = Schema::method();
             if print {
@@ -1324,6 +1349,133 @@ fn auditing(root: &Path, from: &Path) -> miette::Result<bool> {
 }
 
 /// `TS.260821.05`. What this plugin guarantees, and what keeps each guarantee.
+/// `TS.260821.13`. The pointer and everything the cut wrote elsewhere move together.
+fn withdrawing(version: &str, because: Option<&str>, root: &Path) -> miette::Result<bool> {
+    let sources = load(root)?;
+    let docs: Vec<_> = sources.iter().map(|(_, _, d)| d.clone()).collect();
+    let (schema, _) = governing(docs.iter());
+    let corpus = Corpus::from_documents(&docs, &schema);
+
+    let taken = match withdraw(version, because, &corpus) {
+        Withdrawal::Refused(why) => {
+            eprintln!("praxis: withdrawal refused — {why}");
+            return Ok(false);
+        }
+        Withdrawal::Taken { unwound, .. } => unwound,
+    };
+    let because = because.unwrap_or_default();
+
+    // Both halves, or neither. A withdrawal that flips the marker and leaves capability
+    // records asserting the release has moved the problem rather than undone it.
+    let mut staged: Vec<(PathBuf, String)> = Vec::new();
+    for (path, text, doc) in &sources {
+        let holds_release = doc.nodes().iter().any(|n| {
+            n.name().value() == "release" && child_of(n, "version").as_deref() == Some(version)
+        });
+        if holds_release {
+            staged.push((path.clone(), mark_withdrawn(text, version, because)?));
+            continue;
+        }
+        let touched = doc.nodes().iter().any(|n| {
+            n.name().value() == "capability"
+                && string_id(n).is_some_and(|id| taken.iter().any(|t| t == &id))
+        });
+        if touched {
+            staged.push((path.clone(), unwind_promotion(text, version)));
+        }
+    }
+
+    for (path, text) in &staged {
+        write_once(path, text)?;
+    }
+
+    println!("praxis: {version} withdrawn — the pointer is back, and it says why");
+    if taken.is_empty() {
+        println!("praxis: nothing had been promoted from it");
+    } else {
+        println!("praxis: promoted truth recomputed away from {}", taken.join(" · "));
+    }
+    Ok(true)
+}
+
+/// Turn a cut release into a withdrawn one: the state, the reason, and the index kept as
+/// what WAS cut so that this and a version never cut do not read alike.
+fn mark_withdrawn(text: &str, version: &str, because: &str) -> miette::Result<String> {
+    let mut out = String::new();
+    let mut inside = false;
+    let mut depth = 0usize;
+    for line in text.lines() {
+        let trimmed = line.trim();
+        if trimmed.starts_with("release ") {
+            inside = true;
+        }
+        if inside {
+            depth += line.matches('{').count();
+            depth = depth.saturating_sub(line.matches('}').count());
+        }
+        if inside && trimmed == "state \"released\"" {
+            out.push_str("    state \"withdrawn\"\n");
+            out.push_str("    withdrawn-because #\"\"\"\n");
+            for sentence in because.split(". ") {
+                out.push_str(&format!("        {}\n", sentence.trim()));
+            }
+            out.push_str("        \"\"\"#\n");
+            continue;
+        }
+        // The index becomes what WAS cut. Re-cutting carries it forward.
+        if inside && trimmed == "index {" {
+            out.push_str(&line.replace("index {", "previously-cut {"));
+            out.push('\n');
+            continue;
+        }
+        // The seal covered a cut release's content, and there is no longer a cut to seal.
+        if inside && trimmed.starts_with("seal ") {
+            continue;
+        }
+        out.push_str(line);
+        out.push('\n');
+        if inside && depth == 0 && trimmed == "}" {
+            inside = false;
+        }
+    }
+    let _ = version;
+    Ok(out)
+}
+
+/// Recompute promoted truth away from a withdrawn release.
+///
+/// Line-oriented rather than a document rewrite, so the surrounding prose — which a human
+/// wrote and no rule derives — is left exactly as it is.
+fn unwind_promotion(text: &str, version: &str) -> String {
+    let marker = format!("shipped \"{version}\"");
+    let kept: Vec<&str> = text.lines().filter(|l| !l.trim_start().starts_with(&marker)).collect();
+    let mut out = kept.join("\n");
+    if !text.lines().any(|l| l.trim_start().starts_with("shipped \"")) || !out.contains("shipped \"")
+    {
+        // Nothing shipped any more, so the capability is sought again — promotion is what
+        // made it active, and it has been recomputed away.
+        out = out.replacen("    state \"active\"", "    state \"sought\"", 1);
+    }
+    if text.ends_with('\n') && !out.ends_with('\n') {
+        out.push('\n');
+    }
+    out
+}
+
+fn child_of(node: &kdl::KdlNode, field: &str) -> Option<String> {
+    node.children()?
+        .nodes()
+        .iter()
+        .find(|n| n.name().value() == field)
+        .and_then(|n| n.entries().first())
+        .and_then(|e| e.value().as_string())
+        .map(str::to_owned)
+}
+
+fn string_id(node: &kdl::KdlNode) -> Option<String> {
+    node.entries().first()?.value().as_string().map(str::to_owned)
+}
+
 fn invariants(root: &Path) -> miette::Result<()> {
     let sources = load(root)?;
     let (schema, _) = governing(sources.iter().map(|(_, _, d)| d));

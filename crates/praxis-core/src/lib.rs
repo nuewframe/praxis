@@ -22,6 +22,7 @@ pub mod schema;
 pub mod surface;
 pub mod truth;
 pub mod verify;
+pub mod withdraw;
 pub mod view;
 
 pub use check::{
