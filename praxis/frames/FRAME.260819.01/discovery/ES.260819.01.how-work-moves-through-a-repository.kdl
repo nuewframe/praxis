@@ -672,18 +672,38 @@ event-storm "ES.260819.01" {
     //
     // The consequence is visible in the published set: a release can tell a reader HOW,
     // because usage is in the record, and cannot tell them WHY, because purpose is not.
+    policy "strategy-anchors-the-work" {
+        rule "vision — the world if this succeeds. Not checked for truth; it is what truth is checked AGAINST"
+        rule "mission — what this product does to move toward it. Also not checked for truth"
+        rule "strategy — the ordered approach, high level. It says how we will GO ABOUT it and never how it is built"
+        because "vision and mission are not claims about delivery, they are the frame of reference \
+            claims are judged against. Excluding them for being unfalsifiable applies the record's \
+            discipline one layer too high — what is checkable is not whether a vision is true but \
+            whether anything traces to it"
+        note "the frame is the root today and it FLOATS: a problem with nothing above it. Every \
+            other edge in this record exists so nothing is orphaned — realizes, derived-from, \
+            from-storm, attacks — and the top of the graph has never had one"
+        note "strategy needs no falsifier because it is an ORDERING, and adherence to an order is \
+            computable. A frame written before any persona exists is out of sequence, and the \
+            record can say so"
+    }
+
     policy "discovery-names-the-person-before-the-system" {
-        rule "purpose first — what outcome this product exists to deliver, in one statement somebody can disagree with"
-        rule "then the audience — each persona: what they came for, what they do not care about, and how they judge whether they got it"
-        rule "then the frame — the problem, with every symptom naming which persona feels it and how"
-        rule "then the discovery data — storm, architecture, walkthrough. Breadth, structure, depth, in that order and about the SYSTEM"
-        rule "then the work — capabilities, slices, iterations, all of it downstream of a stated purpose and a named person"
-        rule "and on publish, the reader is told WHY and HOW. Not what was built, and never how it was built"
+        rule "purpose — what outcome this product exists to deliver, under the strategy it serves"
+        rule "audience — each persona: what they came for, what they do not care about, and how they judge whether they got it"
+        rule "frame — the problem, with every symptom naming which persona feels it and how"
+        rule "discovery data — four activities, not one: STORM the timeline, ARCHITECT the capabilities and their boundaries, STRUCTURE the data shapes, integrations and commands, and VALIDATE"
+        rule "validate is a category and the walkthrough is one activity in it, not the whole of it"
+        rule "work — capabilities, slices, iterations, all downstream of a stated purpose and a named person"
+        rule "publish — the reader is told WHY and HOW. Not what was built, and never how it was built"
         because "the two sides of this product want different halves. In development the question \
             is why, what, and the mechanics of how — and the record answers all three. In use the \
             question is why and how, and the record has never held the why at all"
-        note "this is the amendment that puts a person upstream of the system. Every judgement of \
-            value in this repository has been made in prose by whoever was reading, because the \
-            record made every fact about the SYSTEM checkable and held no fact about the reader"
+        note "notional-architecture holds BOTH what the capabilities are to each other and the \
+            schema — architect and structure, which this ordering separates. One document carrying \
+            two activities, the same shape as the method schema before TS.260821.10 moved it"
+        note "every judgement of value in this repository has been made in prose by whoever was \
+            reading, because the record made every fact about the SYSTEM checkable and held no \
+            fact about the reader"
     }
 }
