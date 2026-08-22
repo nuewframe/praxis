@@ -1,0 +1,95 @@
+// Discovery has three activities and none of them is about a person.
+//
+//     event-storm       breadth — the whole timeline, shallow
+//     notional-arch.    what the capabilities are to each other
+//     walkthrough       depth — one path, all the way down
+//
+// Every one is about the SYSTEM. The record can say what a capability owns, what a slice
+// claims, what a rule refuses — and cannot say who any of it is for.
+//
+// `needed-by="reader"` has been on every read model since the storm was written. It is a
+// label with nothing behind it: no statement of who a reader is, what they came for, what
+// they do not care about, or how they would know they got it. So a view can be correctly
+// labelled and still speak to nobody, and `useful-alone` — the field that literally says
+// "what you get" — never says who "you" is.
+//
+// The persona analysis that produced this slice was done in somebody's head and delivered as
+// prose. Nothing holds it, nothing checks it, and the next agent will do it again. That is
+// S7 with the product's own users as the thing being re-derived.
+
+thin-slice "TS.260821.15" {
+    slug "know-who-this-is-for"
+    title "Hold who the product is for, so value is claimed from their side"
+    kind "command"
+    realizes "CAP.delivery-record"
+    from-storm "ES.260819.01"
+
+    command "check"
+    actor "whoever is running discovery, before any capability is named"
+    produces-event "PersonaDeclared" "ValueUnattributed"
+    needs-read-model "the-problem-as-it-stands"
+
+    trigger "somebody asks who this is for and the answer is in a person's head"
+    outcome "the record holds each persona, and every claim of value names whose value it is"
+
+    scenario #"""
+        Given a frame with symptoms and a set of read models labelled `needed-by`
+        When a persona is declared — who they are, what they came for, what they do not care
+             about, and how they judge whether they got it
+        Then `needed-by` names something the record holds, and a slice's `useful-alone` says
+             whose — because value is not a property of a change, it is a judgement somebody
+             makes, and a record that states the change without the judge has recorded half of it.
+        """#
+
+    step "1" does="`persona` is a kind: who they are, what they came for, what they do not care about, and what would make them say it worked"
+    step "2" does="`needed-by` references it. A view for `reader` where no persona is named `reader` goes dangling, the way every other unresolved edge does"
+    step "3" does="a slice's `useful-alone` names whose. `what you get if this ships and nothing after it does` has always had an unstated subject"
+    step "4" does="a symptom names who feels it. S1 through S7 describe things that are wrong for SOMEBODY, and the frame has never said who"
+    step "5" does="discovery gains the activity. Storm, architecture and walkthrough are all about the system; naming the person comes before any of them"
+
+    excludes "market segments, demographics, or anything a persona document usually carries. \
+        What is needed here is what a reader came for and how they judge it — the rest is \
+        marketing research and the record cannot check a word of it"
+    excludes "one persona per role in the workflow. `reviewer` and `working-agent` are ROLES, \
+        which TS.260821.08 already made a kind. A role is what you may attest; a persona is what \
+        you came for, and one person occupies several roles across a week"
+    excludes "refusing a slice that names no persona. Half this record predates the kind, and a \
+        rule that fails closed on the day it lands names every slice ever cut — reported first, \
+        the way every enforcement in this frame has had to earn its severity"
+
+    layer "doctrine"    reaches="discovery names the person before it names the system, and the skill says what a persona must answer to be one"
+    layer "enforcement" reaches="needed-by references persona; a claim of value naming no persona is reported"
+    layer "docs"        reaches="`who is this for` is answerable from the record, and the published set can be ordered by a real reader instead of a label"
+
+    claim "C1" text="a persona is a record: who, what they came for, what they do not care about, how they judge it" \
+        settled-by="praxis check over declared personas, and a test that one missing `judges-by` is refused — a persona nobody can be wrong about is a description, not a persona"
+    claim "C2" text="needed-by names a persona the record holds, or it dangles" \
+        settled-by="a test declaring a view needed-by a persona nothing declares, asserting dangling-relationship refuses it without a second rule"
+    claim "C3" text="a claim of value names whose value it is" \
+        settled-by="a test asserting a slice whose useful-alone names no persona is REPORTED, and that the report is not a refusal because half the record predates the kind"
+    claim "C4" text="a symptom names who feels it" \
+        settled-by="a test asserting a symptom with no `felt-by` is reported, and the frame amended so S1 through S7 each name somebody"
+
+    depends-on "TS.260821.01 — a kind is declared on the schema before the record can hold one"
+
+    useful-alone "for whoever runs discovery: `who is this for` stops being answered from memory. \
+        The persona analysis that cut this slice took an afternoon, produced six paragraphs of \
+        prose, and left nothing behind that the next agent can check or contradict"
+
+    attacks "S7"
+
+    cut-from "the maintainer, on reading the published set as two personas" \
+        note="the prompt was a UCD review of the documents. The finding underneath it is that \
+            discovery never produced a user — so the review had to invent the personas in order \
+            to run, and inventing them again next time is guaranteed"
+
+    principle-note "this frame computes fidelity from the record and has never held the one fact \
+        every other fact is FOR. A capability is a permanent doing the system must have — for \
+        whom? A claim is what a slice makes true — worth what, to whom? The vocabulary is complete \
+        about the system and silent about the person, which is why every judgement about value in \
+        this repository has been made in prose by whoever happened to be reading"
+
+    proves "who the product is for is a fact the record holds, and value is claimed from their side"
+    does-not-prove "that the personas are RIGHT. It makes them checkable and contradictable, which \
+        is the most a record can do — a wrong persona stated is worth more than a right one assumed"
+}

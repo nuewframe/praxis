@@ -1,0 +1,90 @@
+// The record has said who each view is for since the storm was written.
+//
+//     read-model "what-is-ready-to-pick-up"  needed-by="working-agent"
+//     read-model "the-published-set…"        needed-by="reader" "adopter"
+//     read-model "capabilities-and-what…"    needed-by="maintainer"
+//
+// The published directory ignores every one of them. Seven files, alphabetical, no index —
+// so a reader who wants outcomes opens `architecture/` because it sorts first, and a reader
+// who wants the plumbing gets there by luck.
+//
+// The root cause is an ordering error in how these documents were built: what the record
+// could COMPUTE was published, and who it was for was asked afterwards. That is user-centred
+// design run backwards, and it produced six documents that are individually correct and
+// collectively unnavigable.
+
+thin-slice "TS.260821.14" {
+    slug "a-front-door-per-reader"
+    title "Order the published set by who each document is for"
+    kind "view"
+    realizes "CAP.document-projection"
+    from-storm "ES.260819.01"
+
+    read-model "where-to-start"
+    actor "somebody opening a release directory for the first time, with a reason"
+    needs-read-model "what-is-currently-true"
+
+    trigger "a reader opens a release directory and has to guess which of seven files is theirs"
+    outcome "the directory has an index that names each audience the record declares, and says which document answers what for them"
+
+    scenario #"""
+        Given a record whose read models each declare `needed-by`
+        When the set is published for a version
+        Then the directory opens with an index grouped by those audiences, each entry naming the
+             question that document answers — because a reader arrives with a reason, and seven
+             siblings in alphabetical order ask them to already know the answer in order to find it.
+        """#
+
+    step "1" does="the index is a view like any other, and is published first in the directory"
+    step "2" does="audiences come from the record's own `needed-by` values. The engine groups; it never decides that `reader` means consumer, because an adopting project's audiences are its own"
+    step "3" does="each entry carries the view's `answers` line, which is the question a reader is actually holding"
+    step "4" does="a view naming no audience is listed as unaddressed rather than hidden — a document nobody is for is a finding, not a tidy omission"
+    step "5" does="the glossary orders by dependency rather than alphabetically, so `frame` precedes `adr` and a newcomer can read down it"
+
+    excludes "deciding what an audience MEANS. `reader`, `adopter` and `maintainer` are the \
+        record's words; mapping them onto `consumer` and `engineer` would be the engine encoding \
+        a vocabulary no record handed it, and would be wrong for any project whose audiences differ"
+    excludes "writing a document per persona. The views exist and are declared; this orders them. \
+        Producing a consumer edition and an engineer edition of the same facts is two copies, and \
+        the second one goes stale"
+    excludes "tiering the glossary by audience. Which words a consumer needs is a real question \
+        this does not answer — ordering by dependency helps and does not solve it, and pretending \
+        otherwise would close a finding that should stay open"
+
+    layer "doctrine"    reaches="declaring a read model includes declaring who needs it, and that declaration now decides where it lands"
+    layer "enforcement" reaches="a publishable view with no `needed-by` is reported, because a document nobody is for is one nobody will read"
+    layer "docs"        reaches="the release directory answers `where do I start` before it answers anything else"
+
+    claim "C1" text="the directory opens with an index grouped by the audiences the record declares" \
+        settled-by="a test asserting the index names every distinct `needed-by` value in the corpus, and that a value the record does not use does not appear"
+    claim "C2" text="each entry carries the question that document answers, from the view's own `answers`" \
+        settled-by="a test asserting the index's text for a view equals that view's declared `answers`, verbatim"
+    claim "C3" text="a publishable view naming no audience is reported, not hidden" \
+        settled-by="a test declaring a publishable view with no `needed-by`, asserting it is named in the index as unaddressed and reported by the checker"
+    claim "C4" text="the glossary reads in dependency order" \
+        settled-by="a test asserting `frame` precedes `thin-slice` precedes `iteration`, and that a kind referenced by another follows it"
+
+    depends-on "TS.260821.12 — the documents exist and are worth ordering"
+
+    useful-alone "a reader opening a release directory is told which file is theirs and what it \
+        answers. Today they are told nothing, and the first thing they see is whichever folder \
+        sorts first"
+
+    attacks "S6"
+
+    cut-from "the maintainer reading the published set as two personas — a consumer who wants \
+        outcomes and an engineer who wants the plumbing" \
+        note="the personas were the prompt; the finding is that the record had already answered \
+            the question. `needed-by` has been on every read model since ES.260819.01 and no \
+            projection has ever read it"
+
+    principle-note "six documents individually correct and collectively unnavigable is what \
+        happens when derivability decides what gets built. Every one of them answers a real \
+        question; nothing decided which reader arrives with which question, because the record \
+        made all six equally computable and the format made all six equally a table"
+
+    proves "a reader is told where to start, in the record's own words about who they are"
+    does-not-prove "that each document is right for the audience it names. `needed-by` says who \
+        a view is FOR; whether the document serves them is what a walkthrough with a real reader \
+        would say, and nobody has done one"
+}
