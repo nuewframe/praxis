@@ -128,7 +128,87 @@ pub struct Rule {
     pub given_shipped: Vec<String>,
 }
 
+/// The method's own vocabulary, carried by the engine.
+///
+/// `TS.260821.10`. This is DATA, parsed through the same reader as any record — not a shape
+/// the engine knows. A4 (`ADR.260819.01`) forbids the engine encoding what the record
+/// declares, because an engine that does can diverge from it and nobody can tell. Carrying
+/// the record and knowing its contents are different things, and only the second is refused.
+///
+/// **One file, two carriers.** The plugin ships to six harnesses as a Markdown and scripts
+/// tree with no binary in it; the engine is a separate `cargo install`. So neither carrier
+/// alone reaches everybody:
+///
+/// - an agent with the plugin and no binary reads `praxis/method/DELIVERY-GRAPH.v1.kdl`
+/// - a binary installed with no plugin has it embedded, below, from that same file
+///
+/// `include_str!` points at the shipped file rather than at a copy beside this module, so
+/// there is nothing to keep in sync — the alternative is two files and a test that hopes.
+/// It is embedded rather than resolved at runtime because a path would move AK2 rather than
+/// close it: the binary would need the plugin tree beside it, and the two versions would
+/// skew independently.
+pub const METHOD: &str = include_str!("../../../praxis/method/DELIVERY-GRAPH.v1.kdl");
+
+/// What a repository's own schema did when composed onto the method.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum Extension {
+    /// A kind or rule the method does not name. Added.
+    Added(String),
+    /// A kind or rule the method already declares. REFUSED — a repository extends the
+    /// method and never redefines it, which is `may bind, and may never declare` one level
+    /// up. A method a repository can weaken locally reports whatever it wanted to hear.
+    Redefines(String),
+}
+
 impl Schema {
+    /// The method the engine carries, and its identity.
+    ///
+    /// Panics only if the embedded record does not parse, which a test catches before any
+    /// binary ships: an engine whose own method is malformed can check nothing at all, and
+    /// limping on with an empty vocabulary would report every record as fine.
+    pub fn method() -> (Self, String) {
+        let doc: KdlDocument = METHOD.parse().expect("the embedded method parses");
+        let version = doc
+            .nodes()
+            .iter()
+            .find(|n| n.name().value() == "method")
+            .and_then(|n| {
+                let id = n.entries().first()?.value().as_string()?.to_owned();
+                let v = n.children()?.get("version")?.entries().first()?.value().as_string()?;
+                Some(format!("{id}@v{v}"))
+            })
+            .unwrap_or_default();
+        (Self::from_document(&doc), version)
+    }
+
+    /// Compose a repository's own schema onto the method.
+    ///
+    /// Adds what the method does not name; refuses what it does. The returned list says
+    /// which happened for each, because a composition that silently kept one of two
+    /// definitions is the drift this whole slice exists to prevent — and before it, the
+    /// engine took the LAST schema it found, so a project declaring its own would have
+    /// replaced the method rather than extended it.
+    pub fn extend(&mut self, local: Self) -> Vec<Extension> {
+        let mut out = Vec::new();
+        for (name, spec) in local.entities {
+            if self.entities.contains_key(&name) {
+                out.push(Extension::Redefines(format!("entity {name}")));
+            } else {
+                out.push(Extension::Added(format!("entity {name}")));
+                self.entities.insert(name, spec);
+            }
+        }
+        for rule in local.rules {
+            if self.rules.iter().any(|r| r.name == rule.name) {
+                out.push(Extension::Redefines(format!("rule {}", rule.name)));
+            } else {
+                out.push(Extension::Added(format!("rule {}", rule.name)));
+                self.rules.push(rule);
+            }
+        }
+        out
+    }
+
     /// Read the schema out of a notional-architecture document.
     ///
     /// Returns an empty schema rather than an error when the document carries no

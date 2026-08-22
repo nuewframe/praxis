@@ -14,11 +14,18 @@ const ARCHITECTURE: &str = concat!(
     "NA.260820.01.capabilities-seams-and-who-may-change-what.kdl"
 );
 
+/// The method, extended by this repository's architecture — what every command composes
+/// since `TS.260821.10`.
+///
+/// `thin-slice` is the METHOD's kind: what a slice must carry is true of every repository
+/// using this method, not a fact about Praxis. Reading only the architecture gives a schema
+/// that no longer knows what a slice is.
 fn schema() -> Schema {
     let text = fs::read_to_string(ARCHITECTURE).expect("the architecture is readable");
     let doc = parse(&text).expect("the architecture parses");
-    let schema = Schema::from_document(&doc);
-    assert!(!schema.is_empty(), "the record must declare a schema");
+    let (mut schema, _) = Schema::method();
+    schema.extend(Schema::from_document(&doc));
+    assert!(!schema.is_empty(), "the method carries a vocabulary even if the record adds none");
     schema
 }
 

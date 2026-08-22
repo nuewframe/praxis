@@ -3,8 +3,8 @@
 // Three levels of ownership, and this file is the third:
 //
 //   argument   — why a decision was made        an adr's `body`
-//   normative  — what the decision made true    an adr's `normative` block
-//   binding    — how THIS repository applies it (here)
+//   normative  — what is true of every repository praxis/method/DELIVERY-GRAPH.v1.kdl
+//   binding    — how THIS repository applies it  (here)
 //
 // A fact true of every Praxis repository does not belong here. If it is here, some
 // other repository could legitimately choose differently.
@@ -12,11 +12,9 @@
 config {
     repository "nuewframe/praxis"
 
-    // governed-by — no target. This file may bind a normative schema; it may never declare
-    // one. The schema had been carried on ADR.260819.02, which is withdrawn: an ADR is a
-    // TECHNICAL decision, and what a frame or a slice or an invariant IS belongs to the
-    // record itself. The binding is restored when the schema has a home that is not a
-    // decision. See ADR.260819.01's `open`.
+    // The method this repository is governed by. `praxis check` refuses a version the
+    // engine does not carry. `praxis schema` prints what it means.
+    governed-by "delivery-graph@v1"
 
     // ====================================================================
     // Profile — which guardrails apply, and which layers a slice may declare.

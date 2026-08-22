@@ -1,0 +1,100 @@
+// AK2, the oldest open blocker, and the one that decides whether any of this is usable by
+// anyone else.
+//
+// A project that is not Praxis cannot run the engine without copying two disjoint blocks out
+// of THIS repository's discovery folder: a 946-line `schema` block, and an `admits` block
+// buried inside a capability-role. Neither has a home. Copying them means every repository
+// forks the method and drifts from it silently, which is the second-copy problem this frame
+// exists to attack, turned on the frame's own definition of itself.
+//
+// config.kdl already names the three levels and has done since it was written:
+//
+//     argument   — why a decision was made        an adr's body
+//     normative  — what the decision made true    (homeless)
+//     binding    — how THIS repository applies it config.kdl
+//
+// The schema is NORMATIVE. It was carried on ADR.260819.02, which was withdrawn because an
+// ADR is a technical decision and what a frame or a slice IS belongs to the record itself.
+// The withdrawal was right and it left the middle row empty. `governed-by` has pointed at
+// nothing ever since, and the comment beside it has been promising this slice for six days.
+
+thin-slice "TS.260821.10" {
+    slug "the-method-has-a-home"
+    title "Ship the method's vocabulary with the engine, so adopting is not forking"
+    kind "command"
+    realizes "CAP.delivery-record"
+    from-storm "ES.260819.01"
+
+    command "check"
+    actor "a project that has never seen this method"
+    produces-event "MethodBound" "SchemaExtended" "RedefinitionRefused"
+    needs-read-model "what-is-currently-true"
+
+    trigger "a new project runs praxis check and is told the record declares no schema"
+    outcome "the method's vocabulary and gate travel with the engine, a project extends them without copying them, and redefining one is refused"
+
+    scenario #"""
+        Given an empty repository with a config and a frame, and an engine installed from
+             nothing but `cargo install`
+        When it runs praxis check
+        Then the method's entity kinds, rules and admission conditions are already in force —
+             because a vocabulary an adopter has to copy is a vocabulary every adopter owns a
+             different version of, and nobody can say which repository is running the method
+             and which is running its own drift.
+        """#
+
+    step "1" does="the method's vocabulary becomes a record of its own — a `method` node the schema declares, so it describes itself"
+    step "2" does="the engine carries that record and parses it through the SAME reader as any other. It is data the engine ships, never a shape the engine knows"
+    step "3" does="a project's own architecture may EXTEND — add kinds and rules the method does not name"
+    step "4" does="a project redefining a kind the method declares is REFUSED. Extend, never redefine, which is `may bind and may never declare` one level up"
+    step "5" does="the admits block travels with it. The gate is method, not repository — a project that could rewrite its own admission conditions has no gate"
+    step "6" does="`governed-by` names the method and its version, and a config naming a method the engine does not carry is refused"
+    step "7" does="this repository's own doctrine-surface and invariant kinds stay behind as EXTENSIONS, because a project that ships no doctrine needs neither"
+
+    excludes "schema migration across versions. A v2 that renames a kind will need a story and \
+        this is not it — what this slice owes is that a config naming v2 against a v1 engine is \
+        refused rather than silently misread"
+    excludes "letting a project narrow the method. Extension adds; it never removes a kind, \
+        loosens a cardinality, or downgrades a rule from refuse to report. A method you can \
+        weaken locally is a method that reports whatever each repository wanted to hear"
+    excludes "a second adoption walk. W18 owes that separately, and proving this from inside the \
+        repository that built it is exactly the trap AK1 was found in"
+
+    layer "doctrine"    reaches="adopting means installing, and the skill says what a project may add and what it may not touch"
+    layer "enforcement" reaches="composition refuses a redefinition; governed-by refuses an unknown method"
+    layer "docs"        reaches="`what governs this repository` is answerable by a command rather than by reading someone else's discovery folder"
+
+    claim "C1" text="an engine installed with nothing copied has the method's kinds, rules and admission conditions in force" \
+        settled-by="a test building a corpus from a config and a frame ALONE — no schema document — and asserting check refuses a malformed frame and the gate has conditions"
+    claim "C2" text="a project extends the method by declaring kinds it does not name" \
+        settled-by="this repository's own record: doctrine-surface and invariant move out of the method and stay as extensions, and praxis check stays clean at 20 kinds"
+    claim "C3" text="a project redefining a kind the method declares is refused" \
+        settled-by="a test declaring `entity \"thin-slice\"` locally, asserting a refusal that names the collision — and one asserting a NEW kind is admitted, so the rule discriminates"
+    claim "C4" text="the shipped vocabulary is a record the engine parses, not a shape it knows" \
+        settled-by="a test that the embedded method parses through the same reader and passes praxis check's own rules, plus a test that the embedded copy is byte-identical to the file humans edit"
+    claim "C5" text="governed-by names the method and its version, and an unknown one is refused" \
+        settled-by="a test with governed-by naming a method the engine does not carry, asserting a refusal — and praxis/config.kdl's binding restored after six days pointing at nothing"
+
+    depends-on "TS.260821.01 — declaring a kind is an amendment to the record, and this is where the record it amends comes from"
+
+    useful-alone "a project can adopt the method without owning a copy of it. That is the whole of \
+        AK2, and until it is true every claim this frame makes about portability is a claim about \
+        one repository"
+
+    attacks "S1"
+
+    cut-from "ITER.260821.19/AK2, raised by WALK.260822.01 at step 3" \
+        note="the walk reached step 8 and found a SECOND disjoint block to copy. That is the tell: \
+            it was never `the schema needs a home`, it was `the method needs a home` — and the \
+            second thing to copy would not have been visible from inside this repository"
+
+    principle-note "the frame's own definition of itself is the last thing it applied its own \
+        standard to. Eighteen iterations built an engine that computes fidelity from a record, and \
+        the record describing what a record IS could only be obtained by copying it out of the \
+        author's working tree"
+
+    proves "the method is a thing a project can be governed BY rather than a thing it must contain"
+    does-not-prove "that adopting works. It removes the copy; whether the rest of the loop survives \
+        contact with a repository nobody here has seen is what W18 owes, and this slice \
+        deliberately does not claim it"
+}

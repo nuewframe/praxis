@@ -191,3 +191,15 @@ doctrine-surface "surface.agent.product-designer" {
     note "owns the design-ux phase and what a read model must answer before an actor can act. \
         A view nobody specified is a view whose emptiness means nothing"
 }
+
+doctrine-surface "surface.skill.adopt-the-method" {
+    path "skills/adopt-the-method/SKILL.md"
+    kind "skill"
+    serves "TS.260821.10"
+}
+
+doctrine-surface "surface.skill.write-durable-comments" {
+    path "skills/write-durable-comments/SKILL.md"
+    kind "skill"
+    serves "comments-state-meaning"
+}

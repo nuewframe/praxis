@@ -16,6 +16,7 @@ use praxis_core::{
     dashboard, guide_for, prove, review, unbind, verify, what_is_currently_true,
 };
 use praxis_core::check::{Facts, check_corpus_given, decision_body};
+use praxis_core::schema::Extension;
 use praxis_core::invariant::{Enforcement, check_invariants};
 use praxis_core::surface::{audit, surfaces};
 use praxis_core::cut::seal;
@@ -187,6 +188,15 @@ enum Command {
         /// The state root to read.
         #[arg(long, default_value = "praxis")]
         root: PathBuf,
+    },
+    /// Print the method this engine carries — its vocabulary, rules, and gate.
+    ///
+    /// The answer to "what governs this repository", without reading anyone else's
+    /// discovery folder.
+    Schema {
+        /// Write the method's record to stdout, whole.
+        #[arg(long)]
+        print: bool,
     },
     /// Seal every accepted decision and resolved symptom that carries no seal.
     ///
@@ -402,6 +412,25 @@ fn main() -> ExitCode {
                 ExitCode::FAILURE
             }
         },
+        Command::Schema { print } => {
+            let (schema, version) = Schema::method();
+            if print {
+                print!("{}", praxis_core::schema::METHOD);
+            } else {
+                println!("praxis: governed by {version}");
+                println!(
+                    "praxis: {} entity kinds · {} rules · carried by the engine and shipped at \
+                     praxis/method/",
+                    schema.kinds().count(),
+                    schema.rules().count()
+                );
+                println!(
+                    "praxis: a repository EXTENDS this by declaring kinds it does not name, and \
+                     may never redefine one. `praxis schema --print` writes it whole"
+                );
+            }
+            ExitCode::SUCCESS
+        }
         Command::Accept { root, dry_run } => match accepting(&root, dry_run) {
             Ok(()) => ExitCode::SUCCESS,
             Err(report) => {
@@ -425,18 +454,8 @@ fn pickup(slices: &[String], root: &Path, dry_run: bool) -> miette::Result<bool>
     let sources = load(root)?;
     let docs: Vec<_> = sources.iter().map(|(_, _, d)| d.clone()).collect();
 
-    let mut schema = Schema::default();
-    let mut conditions = Conditions::default();
-    for doc in &docs {
-        let found = Schema::from_document(doc);
-        if !found.is_empty() {
-            schema = found;
-        }
-        let declared = Conditions::from_document(doc);
-        if !declared.is_empty() {
-            conditions = declared;
-        }
-    }
+    let (schema, _) = governing(docs.iter());
+    let conditions = admission(docs.iter());
     if conditions.is_empty() {
         miette::bail!("the record declares no admission conditions — an empty gate is not an open one");
     }
@@ -521,13 +540,7 @@ fn close(
     let sources = load(root)?;
     let docs: Vec<_> = sources.iter().map(|(_, _, d)| d.clone()).collect();
 
-    let mut schema = Schema::default();
-    for doc in &docs {
-        let found = Schema::from_document(doc);
-        if !found.is_empty() {
-            schema = found;
-        }
-    }
+    let (schema, _) = governing(docs.iter());
     let corpus = Corpus::from_documents(&docs, &schema);
     let ask = Ask {
         signer: human()?,
@@ -698,13 +711,7 @@ fn apply_close(
 fn binding(iteration: &str, version: &str, root: &Path, undo: bool) -> miette::Result<bool> {
     let sources = load(root)?;
     let docs: Vec<_> = sources.iter().map(|(_, _, d)| d.clone()).collect();
-    let mut schema = Schema::default();
-    for doc in &docs {
-        let found = Schema::from_document(doc);
-        if !found.is_empty() {
-            schema = found;
-        }
-    }
+    let (schema, _) = governing(docs.iter());
     let corpus = Corpus::from_documents(&docs, &schema);
     let ask = Ask { signer: human()?, at: now(), by: "agent:praxis".to_owned(), attested_by: None };
     let taken = ids_in_use(&docs);
@@ -753,13 +760,7 @@ fn binding(iteration: &str, version: &str, root: &Path, undo: bool) -> miette::R
 fn cutting(version: &str, root: &Path, confirm: bool) -> miette::Result<bool> {
     let sources = load(root)?;
     let docs: Vec<_> = sources.iter().map(|(_, _, d)| d.clone()).collect();
-    let mut schema = Schema::default();
-    for doc in &docs {
-        let found = Schema::from_document(doc);
-        if !found.is_empty() {
-            schema = found;
-        }
-    }
+    let (schema, _) = governing(docs.iter());
     let corpus = Corpus::from_documents(&docs, &schema);
     let ask = Ask { signer: human()?, at: now(), by: "agent:praxis".to_owned(), attested_by: None };
     let commit = head_commit()?;
@@ -848,13 +849,7 @@ fn head_commit() -> miette::Result<String> {
 fn publishing(version: &str, root: &Path, dry_run: bool) -> miette::Result<bool> {
     let sources = load(root)?;
     let docs: Vec<_> = sources.iter().map(|(_, _, d)| d.clone()).collect();
-    let mut schema = Schema::default();
-    for doc in &docs {
-        let found = Schema::from_document(doc);
-        if !found.is_empty() {
-            schema = found;
-        }
-    }
+    let (schema, _) = governing(docs.iter());
     let corpus = Corpus::from_documents(&docs, &schema);
 
     match publish(version, &corpus) {
@@ -904,13 +899,7 @@ fn publishing(version: &str, root: &Path, dry_run: bool) -> miette::Result<bool>
 fn verifying(root: &Path) -> miette::Result<usize> {
     let sources = load(root)?;
     let docs: Vec<_> = sources.iter().map(|(_, _, d)| d.clone()).collect();
-    let mut schema = Schema::default();
-    for doc in &docs {
-        let found = Schema::from_document(doc);
-        if !found.is_empty() {
-            schema = found;
-        }
-    }
+    let (schema, _) = governing(docs.iter());
     let corpus = Corpus::from_documents(&docs, &schema);
 
     let cut_releases: Vec<_> = corpus.releases.iter().filter(|r| r.cut()).collect();
@@ -1016,13 +1005,7 @@ fn files_in_tree(dir: &str) -> Vec<Published> {
 fn promoting(version: &str, root: &Path, dry_run: bool) -> miette::Result<bool> {
     let sources = load(root)?;
     let docs: Vec<_> = sources.iter().map(|(_, _, d)| d.clone()).collect();
-    let mut schema = Schema::default();
-    for doc in &docs {
-        let found = Schema::from_document(doc);
-        if !found.is_empty() {
-            schema = found;
-        }
-    }
+    let (schema, _) = governing(docs.iter());
     let corpus = Corpus::from_documents(&docs, &schema);
 
     let changes = match promote(version, &corpus) {
@@ -1155,13 +1138,7 @@ fn apply_promotion(text: &str, change: &praxis_core::Change) -> miette::Result<S
 fn truth(root: &Path) -> miette::Result<()> {
     let sources = load(root)?;
     let docs: Vec<_> = sources.iter().map(|(_, _, d)| d.clone()).collect();
-    let mut schema = Schema::default();
-    for doc in &docs {
-        let found = Schema::from_document(doc);
-        if !found.is_empty() {
-            schema = found;
-        }
-    }
+    let (schema, _) = governing(docs.iter());
     let corpus = Corpus::from_documents(&docs, &schema);
     let model = what_is_currently_true(&corpus, &now());
 
@@ -1185,13 +1162,7 @@ fn truth(root: &Path) -> miette::Result<()> {
 fn reviewing(iteration: &str, root: &Path, markdown: bool) -> miette::Result<()> {
     let sources = load(root)?;
     let docs: Vec<_> = sources.iter().map(|(_, _, d)| d.clone()).collect();
-    let mut schema = Schema::default();
-    for doc in &docs {
-        let found = Schema::from_document(doc);
-        if !found.is_empty() {
-            schema = found;
-        }
-    }
+    let (schema, _) = governing(docs.iter());
     let corpus = Corpus::from_documents(&docs, &schema);
     let model = review(iteration, &corpus, &now())
         .ok_or_else(|| miette::miette!("{iteration} is no iteration the record holds"))?;
@@ -1225,13 +1196,7 @@ fn reviewing(iteration: &str, root: &Path, markdown: bool) -> miette::Result<()>
 fn guiding(capability: &str, version: &str, root: &Path) -> miette::Result<()> {
     let sources = load(root)?;
     let docs: Vec<_> = sources.iter().map(|(_, _, d)| d.clone()).collect();
-    let mut schema = Schema::default();
-    for doc in &docs {
-        let found = Schema::from_document(doc);
-        if !found.is_empty() {
-            schema = found;
-        }
-    }
+    let (schema, _) = governing(docs.iter());
     let corpus = Corpus::from_documents(&docs, &schema);
 
     match guide_for(capability, version, &corpus) {
@@ -1251,18 +1216,8 @@ fn guiding(capability: &str, version: &str, root: &Path) -> miette::Result<()> {
 fn dashboarding(root: &Path) -> miette::Result<()> {
     let sources = load(root)?;
     let docs: Vec<_> = sources.iter().map(|(_, _, d)| d.clone()).collect();
-    let mut schema = Schema::default();
-    let mut conditions = Conditions::default();
-    for doc in &docs {
-        let found = Schema::from_document(doc);
-        if !found.is_empty() {
-            schema = found;
-        }
-        let declared = Conditions::from_document(doc);
-        if !declared.is_empty() {
-            conditions = declared;
-        }
-    }
+    let (schema, _) = governing(docs.iter());
+    let conditions = admission(docs.iter());
     let corpus = Corpus::from_documents(&docs, &schema);
     let document = dashboard(&corpus, &conditions, &now());
 
@@ -1334,13 +1289,7 @@ fn shipped_doctrine(from: &Path) -> Vec<String> {
 /// `TS.260821.03`. Audit what the plugin ships against what the record declares.
 fn auditing(root: &Path, from: &Path) -> miette::Result<bool> {
     let sources = load(root)?;
-    let mut schema = Schema::default();
-    for (_, _, doc) in &sources {
-        let found = Schema::from_document(doc);
-        if !found.is_empty() {
-            schema = found;
-        }
-    }
+    let (schema, _) = governing(sources.iter().map(|(_, _, d)| d));
     if schema.is_empty() {
         miette::bail!("the record declares no schema, so nothing declares what a surface is");
     }
@@ -1377,13 +1326,7 @@ fn auditing(root: &Path, from: &Path) -> miette::Result<bool> {
 /// `TS.260821.05`. What this plugin guarantees, and what keeps each guarantee.
 fn invariants(root: &Path) -> miette::Result<()> {
     let sources = load(root)?;
-    let mut schema = Schema::default();
-    for (_, _, doc) in &sources {
-        let found = Schema::from_document(doc);
-        if !found.is_empty() {
-            schema = found;
-        }
-    }
+    let (schema, _) = governing(sources.iter().map(|(_, _, d)| d));
     if schema.is_empty() {
         miette::bail!("the record declares no schema, so nothing declares what an invariant is");
     }
@@ -1398,7 +1341,7 @@ fn invariants(root: &Path) -> miette::Result<()> {
     let corpus = Corpus::from_documents(&docs, &schema);
     let found = check_invariants(&corpus);
 
-    let (mut kept, mut omitted, mut unkept) = (0, 0, 0);
+    let (mut kept, mut taught, mut omitted, mut unkept) = (0, 0, 0, 0);
     for enforcement in &found {
         match enforcement {
             Enforcement::Kept { invariant, by } => {
@@ -1409,6 +1352,13 @@ fn invariants(root: &Path) -> miette::Result<()> {
                 omitted += 1;
                 println!("praxis: {invariant} — {because}, so it is not owed");
             }
+            Enforcement::Taught { invariant, by } => {
+                taught += 1;
+                println!(
+                    "praxis: {invariant} — TAUGHT by {}, and no probe checks it",
+                    by.join(" · ")
+                );
+            }
             Enforcement::Unkept { invariant } => {
                 unkept += 1;
                 println!("praxis: {invariant} — UNKEPT, nothing the record holds enforces it");
@@ -1416,8 +1366,8 @@ fn invariants(root: &Path) -> miette::Result<()> {
         }
     }
     println!(
-        "praxis: {kept} of {} declared invariants are kept · {omitted} omitted by this profile · \
-         {unkept} unkept",
+        "praxis: {kept} of {} declared invariants have a probe · {taught} taught and unchecked · \
+         {omitted} omitted by this profile · {unkept} neither",
         found.len()
     );
     Ok(())
@@ -1425,13 +1375,7 @@ fn invariants(root: &Path) -> miette::Result<()> {
 
 fn proving(root: &Path) -> miette::Result<usize> {
     let sources = load(root)?;
-    let mut schema = Schema::default();
-    for (_, _, doc) in &sources {
-        let found = Schema::from_document(doc);
-        if !found.is_empty() {
-            schema = found;
-        }
-    }
+    let (schema, _) = governing(sources.iter().map(|(_, _, d)| d));
     if schema.is_empty() {
         miette::bail!("the record declares no schema, so there are no rules to prove");
     }
@@ -1569,6 +1513,50 @@ fn ids_in_use(docs: &[kdl::KdlDocument]) -> Vec<String> {
 /// Whoever is asking. `human:<name>`, from the tree's own git identity — the record
 /// refuses a signature outside the human namespace, and there is no way to spell an
 /// agent's name here.
+/// The schema governing a tree: the method the engine carries, extended by whatever the
+/// repository declares.
+///
+/// `TS.260821.10`. Before this, every command took the LAST schema it found — so a project
+/// declaring its own would have REPLACED the method rather than extended it, and nothing
+/// would have said so. The method is the floor now, and it is not removable.
+fn governing<'a>(docs: impl Iterator<Item = &'a kdl::KdlDocument>) -> (Schema, Vec<Extension>) {
+    let (mut schema, _) = Schema::method();
+    let mut extensions = Vec::new();
+    for doc in docs {
+        // The method's own record is in the tree — it ships there, so an agent with the
+        // plugin and no binary can read it. Extending the method with itself would report
+        // every kind it declares as a redefinition of every kind it declares.
+        if doc.nodes().iter().any(|n| n.name().value() == "method") {
+            continue;
+        }
+        let local = Schema::from_document(doc);
+        if !local.is_empty() {
+            extensions.extend(schema.extend(local));
+        }
+    }
+    (schema, extensions)
+}
+
+/// The gate, from the method — and from the repository only if the method carries none.
+///
+/// Admission conditions are NORMATIVE: a repository that could rewrite its own has no gate.
+/// The fallback exists for a tree whose method predates TS.260821.10, not as a licence.
+fn admission<'a>(docs: impl Iterator<Item = &'a kdl::KdlDocument>) -> Conditions {
+    let method: kdl::KdlDocument = praxis_core::schema::METHOD.parse().expect("the method parses");
+    let from_method = Conditions::from_document(&method);
+    if !from_method.is_empty() {
+        return from_method;
+    }
+    let mut conditions = Conditions::default();
+    for doc in docs {
+        let declared = Conditions::from_document(doc);
+        if !declared.is_empty() {
+            conditions = declared;
+        }
+    }
+    conditions
+}
+
 fn human() -> miette::Result<String> {
     let out = std::process::Command::new("git")
         .args(["config", "user.email"])
@@ -1608,18 +1596,8 @@ fn ready(root: &Path) -> miette::Result<()> {
     let sources = load(root)?;
     let docs: Vec<_> = sources.iter().map(|(_, _, d)| d.clone()).collect();
 
-    let mut schema = Schema::default();
-    let mut conditions = Conditions::default();
-    for doc in &docs {
-        let found = Schema::from_document(doc);
-        if !found.is_empty() {
-            schema = found;
-        }
-        let declared = Conditions::from_document(doc);
-        if !declared.is_empty() {
-            conditions = declared;
-        }
-    }
+    let (schema, _) = governing(docs.iter());
+    let conditions = admission(docs.iter());
     if conditions.is_empty() {
         miette::bail!(
             "the record declares no admission conditions — there is nothing to evaluate, \
@@ -1697,14 +1675,24 @@ fn check(root: &Path) -> miette::Result<usize> {
     // it. The schema cannot be applied while it is still being discovered.
     let sources = load(root)?;
 
-    let mut schema = Schema::default();
+    let (schema, extensions) = governing(sources.iter().map(|(_, _, d)| d));
     let mut known = Known::default();
     for (_, _, doc) in &sources {
-        let found = Schema::from_document(doc);
-        if !found.is_empty() {
-            schema = found;
-        }
         index_all(doc, &mut known);
+    }
+    // A repository extends the method; it never redefines it. Reported here rather than
+    // inside `governing` because `check` is the command whose job is saying what is wrong,
+    // and a silent composition is how the engine used to take the LAST schema it found.
+    let mut redefinitions = 0;
+    for extension in &extensions {
+        if let Extension::Redefines(what) = extension {
+            redefinitions += 1;
+            eprintln!(
+                "praxis: {what} is declared by the method and redeclared here. A repository \
+                 EXTENDS the method and never redefines it — rename it, or drop it and use \
+                 what the method declares"
+            );
+        }
     }
     if schema.is_empty() {
         miette::bail!("the record declares no schema — nothing to check against");
@@ -1717,7 +1705,9 @@ fn check(root: &Path) -> miette::Result<usize> {
     let facts = Facts { shipped: shipped_doctrine(Path::new(".")) };
     let corpus = check_corpus_given(&docs, &schema, &facts);
 
-    let (mut refusals, mut reports) = (0, 0);
+    // Redefinitions count as refusals: a repository running a variant of the method is not
+    // running the method, and the whole of TS.260821.10 is that nobody could tell.
+    let (mut refusals, mut reports) = (redefinitions, 0);
     for (i, (path, text, doc)) in sources.iter().enumerate() {
         let mut found = check_document(doc, &schema, &known);
         let _ = i;

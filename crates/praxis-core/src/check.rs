@@ -65,6 +65,8 @@ pub enum Refusal {
     UnanchoredSurface { path: String },
     /// An invariant the config enables that no surface enforces.
     UnkeptInvariant { invariant: String, protects: String },
+    /// The config binds to a method this engine does not carry.
+    UnknownMethod { named: String, carried: String },
     /// A symptom resolved by a release the record does not hold.
     ResolvedByNothing { symptom: String, version: String },
     /// A symptom resolved by a release that bound no slice attacking it.
@@ -131,6 +133,7 @@ impl Refusal {
             }
             Self::UnanchoredSurface { .. } => "every-shipped-surface-is-anchored",
             Self::UnkeptInvariant { .. } => "an-enabled-invariant-is-enforced",
+            Self::UnknownMethod { .. } => "a-config-binds-a-method-the-engine-carries",
         }
     }
 
@@ -159,6 +162,7 @@ impl Refusal {
             | Self::RetiredSurfaceStillShips { .. }
             | Self::UnanchoredSurface { .. } => "path",
             Self::UnkeptInvariant { .. } => "protects",
+            Self::UnknownMethod { .. } => "governed-by",
             Self::UnjustifiedLifetime { missing, .. } => missing,
         }
     }
@@ -196,8 +200,10 @@ impl Refusal {
             }
             Self::UndeclaredKind { kind, within } => match within {
                 Some(parent) => format!(
-                    "`{kind}` inside `{parent}` is neither a field {parent} declares nor a kind the \
-                     schema knows — declare it on the architecture's schema block"
+                    "`{kind}` inside `{parent}` is neither a field {parent} declares nor a kind \
+                     the schema knows. If {parent} is the method's, `praxis schema --print` \
+                     shows what it takes; if it is yours, declare the field on your own schema \
+                     block — you may EXTEND the method and may not redefine it"
                 ),
                 None => format!(
                     "`{kind}` is not a kind the schema declares — declare it on the architecture's \
@@ -253,6 +259,12 @@ impl Refusal {
             Self::UnkeptInvariant { invariant, protects } => format!(
                 "`{invariant}` is enabled and nothing enforces it — the plugin guarantees that \
                  {protects}, and no shipped surface keeps it"
+            ),
+            Self::UnknownMethod { named, carried } => format!(
+                "`governed-by` names {named}, and this engine carries {carried}. A binding to \
+                 a method the engine does not have is a repository being checked against \
+                 rules nobody can see — install the engine that carries {named}, or bind to \
+                 what this one has"
             ),
             Self::UnwitnessedRule { rule, why } => format!(
                 "{rule} is declared and {why}. A rule that has never been shown to refuse is \
@@ -816,6 +828,32 @@ pub fn check_corpus_given(
 
     out.extend(check_surfaces(docs, schema, facts));
     out.extend(check_invariants(docs, schema));
+    out.extend(check_binding(docs));
+    out
+}
+
+/// `TS.260821.10`/C5. The config binds to a method, and the engine carries one.
+///
+/// `governed-by` has pointed at nothing since ADR.260819.02 was withdrawn, because the thing
+/// it should have named had no home. Now it does, and a binding to a method the engine does
+/// not carry is a repository being checked against rules nobody can see — which is worse
+/// than no binding at all, because it reads as one.
+fn check_binding(docs: &[KdlDocument]) -> Vec<Violation> {
+    let (_, carried) = Schema::method();
+    let mut out = Vec::new();
+    for doc in docs {
+        for node in doc.nodes().iter().filter(|n| n.name().value() == "config") {
+            let Some(named) = child_arg(node, "governed-by") else { continue };
+            if named != carried {
+                out.push(Violation {
+                    entity_kind: "config".to_owned(),
+                    entity_id: string_arg(node),
+                    refusal: Refusal::UnknownMethod { named, carried: carried.clone() },
+                    span: field_span(node, "governed-by").unwrap_or_else(|| node.span()),
+                });
+            }
+        }
+    }
     out
 }
 

@@ -21,29 +21,48 @@ fn architecture() -> KdlDocument {
 }
 
 /// The schema as it would have stood before `kind` was ever declared.
+/// The schema with one kind taken out, so a record using it becomes refusable.
+///
+/// Since `TS.260821.10` the vocabulary comes from two documents: the method the engine
+/// carries, and this repository's own extensions. The kind is removed from whichever
+/// declares it — `iteration` and `phase` are the method's; `doctrine-surface` is ours.
 fn schema_without(kind: &str) -> Schema {
-    let mut doc = architecture();
-    let entities = doc
-        .nodes_mut()
-        .iter_mut()
-        .find(|n| n.name().value() == "notional-architecture")
-        .and_then(|n| n.children_mut().as_mut())
-        .and_then(|c| c.nodes_mut().iter_mut().find(|n| n.name().value() == "schema"))
-        .and_then(|s| s.children_mut().as_mut())
-        .expect("the architecture carries a schema block");
-    entities
-        .nodes_mut()
-        .retain(|n| !(n.name().value() == "entity" && n.entries().first().and_then(|e| e.value().as_string()) == Some(kind)));
-    let schema = Schema::from_document(&doc);
+    fn strip(doc: &mut kdl::KdlDocument, root: &str, kind: &str) {
+        if let Some(entities) = doc
+            .nodes_mut()
+            .iter_mut()
+            .find(|n| n.name().value() == root)
+            .and_then(|n| n.children_mut().as_mut())
+            .and_then(|c| c.nodes_mut().iter_mut().find(|n| n.name().value() == "schema"))
+            .and_then(|s| s.children_mut().as_mut())
+        {
+            entities.nodes_mut().retain(|n| {
+                !(n.name().value() == "entity"
+                    && n.entries().first().and_then(|e| e.value().as_string()) == Some(kind))
+            });
+        }
+    }
+
+    let mut method = parse(praxis_core::schema::METHOD).expect("the method parses");
+    strip(&mut method, "method", kind);
+    let mut architecture = architecture();
+    strip(&mut architecture, "notional-architecture", kind);
+
+    let mut schema = Schema::from_document(&method);
+    schema.extend(Schema::from_document(&architecture));
     assert!(
         schema.entity(kind).is_none(),
-        "`{kind}` should have been removed from the schema"
+        "`{kind}` should have been removed from whichever document declares it"
     );
     schema
 }
 
+/// The method, extended by this repository — what every command composes since
+/// `TS.260821.10`. Reading only the architecture gives a schema missing the method's half.
 fn schema() -> Schema {
-    Schema::from_document(&architecture())
+    let (mut schema, _) = Schema::method();
+    schema.extend(Schema::from_document(&architecture()));
+    schema
 }
 
 fn check(source: &str, schema: &Schema) -> Vec<Refusal> {

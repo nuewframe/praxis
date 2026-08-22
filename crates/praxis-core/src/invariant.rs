@@ -36,8 +36,13 @@ impl Invariant {
 /// What the check concluded about one invariant.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Enforcement {
-    /// Enabled by the config, and a surface enforces it.
+    /// A probe enforces it.
     Kept { invariant: String, by: Vec<String> },
+    /// Doctrine teaches it and no probe checks it. Not kept: a skill that explains an
+    /// invariant and a probe that fails a build are different kinds of thing, and calling
+    /// both "kept" is describing a gate as stronger than it is — which this repository's own
+    /// README already names as a failure.
+    Taught { invariant: String, by: Vec<String> },
     /// Enabled, and nothing enforces it. The plugin guarantees something nothing keeps.
     Unkept { invariant: String },
     /// Omitted by this repository's profile. Not a failure — a binding, and the record has
@@ -49,6 +54,7 @@ impl Enforcement {
     pub fn invariant(&self) -> &str {
         match self {
             Self::Kept { invariant, .. }
+            | Self::Taught { invariant, .. }
             | Self::Unkept { invariant }
             | Self::Omitted { invariant, .. } => invariant,
         }
@@ -76,16 +82,22 @@ pub fn check_invariants(corpus: &Corpus) -> Vec<Enforcement> {
                     because: "omitted by this repository's profile".to_owned(),
                 };
             }
-            let by: Vec<String> = corpus
+            let serving: Vec<&crate::surface::Surface> = corpus
                 .surfaces
                 .iter()
                 .filter(|s| !s.retired() && s.serves.iter().any(|t| t == &invariant.id))
-                .map(|s| s.path.clone())
                 .collect();
-            if by.is_empty() {
+            let probes: Vec<String> =
+                serving.iter().filter(|s| s.kind == "probe").map(|s| s.path.clone()).collect();
+            if !probes.is_empty() {
+                Enforcement::Kept { invariant: invariant.id.clone(), by: probes }
+            } else if serving.is_empty() {
                 Enforcement::Unkept { invariant: invariant.id.clone() }
             } else {
-                Enforcement::Kept { invariant: invariant.id.clone(), by }
+                Enforcement::Taught {
+                    invariant: invariant.id.clone(),
+                    by: serving.iter().map(|s| s.path.clone()).collect(),
+                }
             }
         })
         .collect()

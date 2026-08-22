@@ -132,3 +132,16 @@ invariant "escape-hatch-visibility" {
     note "explicitly NOT a gate, and the only invariant here that says so in its own header. An escape hatch nobody can see is the thing being escaped"
 }
 
+invariant "comments-state-meaning" {
+    protects "no comment narrates history the record already holds — a comment says what a thing is or why it must be so, and stays true as long as the code does"
+    severity "report"
+    note "declared with no probe, deliberately. Whether a sentence states meaning or narrates \
+        change is a judgement, and a grep for `used to` would catch the honest ones and miss \
+        every paraphrase. an-enabled-invariant-is-enforced REPORTS this as unkept, which is the \
+        accurate thing to say: the guarantee is stated and nothing keeps it"
+    note "the failure is specific. A comment that says WHEN something changed is invalidated by \
+        the next change and nobody re-reads it, so it decays into a confident false statement. A \
+        comment that says WHAT a thing means is invalidated only by the thing changing, which is \
+        the edit that would make you read it. Found by ITER.260822.07/AR3, on a comment written \
+        in this repository within the hour"
+}

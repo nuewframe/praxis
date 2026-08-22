@@ -14,9 +14,18 @@ const ARCHITECTURE: &str = concat!(
     "NA.260820.01.capabilities-seams-and-who-may-change-what.kdl"
 );
 
+/// The method, extended by this repository's own architecture — which is what every command
+/// does since `TS.260821.10`.
+///
+/// This used to read the architecture as THE schema, because the method's vocabulary lived
+/// inside it. `capability`, `event-storm` and the rest are the method's now; what stays in
+/// the architecture is what this repository adds. Reading only one of the two gives a schema
+/// missing whichever half you did not read.
 fn schema() -> Schema {
     let text = fs::read_to_string(ARCHITECTURE).expect("readable");
-    Schema::from_document(&parse(&text).expect("parses"))
+    let (mut schema, _) = Schema::method();
+    schema.extend(Schema::from_document(&parse(&text).expect("parses")));
+    schema
 }
 
 /// A storm holding one cluster and two events, so a capability has something real to

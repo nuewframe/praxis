@@ -36,6 +36,8 @@ what doctrine did this version ship, what asked for each piece, and which guaran
 | agents/principal-engineer.agent.md | agent | principal-engineer | not derivable from what it serves |
 | agents/product-manager.agent.md | agent | product-manager | not derivable from what it serves |
 | agents/product-designer.agent.md | agent | product-designer | not derivable from what it serves |
+| skills/adopt-the-method/SKILL.md | skill | TS.260821.10 | not derivable from what it serves |
+| skills/write-durable-comments/SKILL.md | skill | comments-state-meaning | not derivable from what it serves |
 | skills/define-seam-contract/SKILL.md | skill | seam-contract-parity | not derivable from what it serves |
 | skills/design-capability-layout/SKILL.md | skill | no-dumping-grounds · port-adapter-parity | not derivable from what it serves |
 | skills/implement-with-defensive-patterns/SKILL.md | skill | resilient-boundary · http-observability | not derivable from what it serves |
@@ -72,6 +74,7 @@ what doctrine did this version ship, what asked for each piece, and which guaran
 | port-adapter-parity | fails closed | scripts/check-port-adapter-parity.sh | every language — it reads structure, not text |
 | seam-contract-parity | fails closed | scripts/check-seam-contract-parity.sh | every language — it reads structure, not text |
 | escape-hatch-visibility | reports | scripts/check-escape-hatch-usage.sh | every language — it reads structure, not text |
+| comments-state-meaning | reports | nothing — this guarantee has no keeper | not declared |
 
 ## retired, and where it still stands
 
