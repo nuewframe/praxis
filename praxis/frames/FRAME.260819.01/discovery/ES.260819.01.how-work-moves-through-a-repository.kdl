@@ -688,6 +688,27 @@ event-storm "ES.260819.01" {
             record can say so"
     }
 
+    policy "prior-work-is-evidence-and-never-record" {
+        rule "on a repository that already shipped, the record is built NEW. What is already there is discovery data"
+        rule "existing docs, ADRs and release history are STORMED, walked and argued with — they enter as evidence and leave as whatever survives"
+        rule "a claim transcribed is a claim imported without its evidence. The record then looks checked from its first commit, which is worth less than an empty one"
+        rule "provenance is recorded and is not traceability. `informed-by` says where something came from and is deliberately not an edge the checker follows"
+        because "an artifact looks identical whether somebody reasoned hard or pattern-matched a \
+            template — that is S2, and a transcription is the same sentence about a whole \
+            repository. The record looks identical whether it was derived or copied, and the \
+            copy is faster, easier, and refuses nothing because everything in it was already agreed"
+        note "this repository ran the experiment on itself by accident. TS.260821.06 ported three \
+            Markdown capability records: two ported and GAINED four gate tests and a \
+            keeps-consistent each, neither of which the originals declared. The third did not \
+            port — CAP.method-spine-and-execution had been hollow since the graph replaced the \
+            spine, and nothing had said so for two versions. The port was slower than a \
+            transcription and it found a dead capability"
+        note "the record already resists a blind copy without a rule being added: a transcribed \
+            capability has no cluster, no gate tests and no exclusion, and the shape check refuses \
+            it. The doctrine exists because somebody who does not know that will invent the \
+            transcription anyway, and the tool cannot tell them why it hurts"
+    }
+
     policy "the-work-informs-the-strategy" {
         rule "the arrow runs both ways: a strategy anchors the work, and the work within a frame informs the strategy"
         rule "the same is true of the audience. One persona is named upfront and the work within the frame identifies the rest"

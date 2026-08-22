@@ -91,6 +91,58 @@ method's, because they describe a repository that ships instruction and `acme/ch
 
 ---
 
+---
+
+## Adopting on a repository that already shipped
+
+**Build the record new. What is already there is evidence, not record.**
+
+This is the one instruction that decides whether a brownfield adoption is worth anything, and
+it is the one that sounds like extra work.
+
+The obvious move is to transcribe: capability docs become capability records, ADRs become
+decisions, release history becomes releases. Every one of those artifacts makes claims, and
+transcribing them **imports the claims without their evidence** — so the record looks checked
+from its first commit and is not.
+
+That is `S2` — *an artifact looks identical whether the agent reasoned hard or pattern-matched
+a template* — said about a whole repository at once. A transcribed graph refuses nothing,
+because everything in it was already agreed before it arrived.
+
+### What to do instead
+
+| Artifact | What it is | What to do with it |
+|---|---|---|
+| capability / architecture docs | somebody's claims, unchecked | storm the events behind them; derive capabilities from clusters |
+| ADRs | real decisions, real arguments | read them; record the ones that still bind, with what they rejected |
+| release history | what shipped, and what was claimed about it | bind what the record can compute; **withdraw** what it cannot |
+| tickets, RFCs, READMEs | discovery data | walk one path through them and see what survives |
+
+Record where something came from with `informed-by`. That is **provenance, and deliberately
+not an edge the checker follows** — it points outside the record at a file that may be deleted
+or rewritten. `W16` is thirty-four citations into unfollowable Markdown; this must not be the
+thirty-fifth.
+
+### The evidence, from this repository
+
+`TS.260821.06` ported three Markdown capability records without meaning to run an experiment:
+
+- **two ported and gained** four gate tests and a `keeps-consistent` each — neither of which
+  the Markdown originals declared, because a Markdown capability record declares no gate test
+  it can fail
+- **one did not port at all.** `CAP.method-spine-and-execution` had been hollow since the
+  delivery graph replaced the spine, and nothing said so for two versions
+
+The port was slower than a transcription would have been, and it found a dead capability.
+
+### You do not need a rule for this
+
+A transcribed capability has no cluster, no gate tests and no exclusion — the shape check
+refuses it already. The doctrine exists because somebody who has not read it will invent the
+transcription anyway, and a refusal cannot explain why the faster path was the wrong one.
+
+---
+
 ## What this does not give you
 
 That adopting **works**. This removes the copying. Whether the rest of the loop survives contact

@@ -1,0 +1,92 @@
+// Adopting on a repository that already shipped.
+//
+// The obvious move is to transcribe: the capability docs become capability records, the
+// release history becomes releases, the ADRs become decisions. Every one of those artifacts
+// makes claims, and transcribing them imports the claims WITHOUT their evidence — so the
+// record looks checked from its first commit and is not. That is the trust-transfer problem
+// arriving through the front door of the tool built to close it.
+//
+// This repository ran the experiment on itself and did not mean to. TS.260821.06 ported
+// three Markdown capability records:
+//
+//   two ported, and GAINED four gate tests and a keeps-consistent each — neither of which
+//     the Markdown originals declared, because a Markdown capability record declares no
+//     gate test it can fail
+//   one did not port at all. CAP.method-spine-and-execution had been hollow since the graph
+//     replaced the spine, and nothing said so for two versions
+//
+// The port was slower than a transcription and it found a dead capability. That is the whole
+// argument, and it was made by accident.
+
+thin-slice "TS.260821.17" {
+    slug "adopt-without-transcribing"
+    title "Take an existing repository's work as evidence, never as record"
+    kind "command"
+    realizes "CAP.delivery-record"
+    from-storm "ES.260819.01"
+
+    command "check"
+    actor "somebody putting this method on a repository that already shipped"
+    produces-event "ProvenanceDeclared" "TranscriptionRefused"
+    needs-read-model "the-problem-as-it-stands"
+
+    trigger "a repository with years of docs adopts the method, and the docs look like records"
+    outcome "prior work informs the record and never becomes it, and where it informed something is visible"
+
+    scenario #"""
+        Given a repository holding capability documents, ADRs and release history
+        When the method is adopted
+        Then those artifacts are DISCOVERY DATA — stormed, walked, argued with — and the record
+             is built new from what survives, because a claim transcribed is a claim imported
+             without its evidence, and a record that looks checked from its first commit is
+             worth less than an empty one.
+        """#
+
+    step "1" does="prior artifacts enter as evidence: a storm reads them, a walkthrough tests one path through them, and what survives is written fresh"
+    step "2" does="`informed-by` records WHERE something came from — provenance, and deliberately not an edge the checker follows"
+    step "3" does="a capability still passes its four gate tests on its own terms. A transcription cannot: the tests are what the source document never had"
+    step "4" does="release history is read for what it CLAIMS and bound only where the record can compute it. S1 was withdrawn for exactly this and is the precedent"
+    step "5" does="a record with no `informed-by` on a brownfield adoption is not wrong — it means nothing prior informed it, which is a fact worth being able to state"
+
+    excludes "a migration tool. Anything that reads an existing tree and writes records is a \
+        transcription with better manners, and the artifact it produces is indistinguishable from \
+        one somebody thought about"
+    excludes "making `informed-by` a checked edge. It points OUTSIDE the record, at a file that may \
+        be deleted or rewritten — W16 is thirty-four citations into unfollowable Markdown, and this \
+        must not be the thirty-fifth. It is provenance, and it says so"
+    excludes "refusing an adoption that transcribes. The record already resists it — a copied \
+        capability has no cluster, no gate tests and no exclusion, and the shape check says so. \
+        A second rule would be enforcing what the schema already enforces"
+
+    layer "doctrine"    reaches="adopt-the-method says what to do with what is already there, which is the first question a brownfield adopter has"
+    layer "enforcement" reaches="`informed-by` is declared as provenance and explicitly not traceability, so nobody mistakes it for a checked edge"
+    layer "docs"        reaches="`what did this come from` is answerable for a record built on prior work"
+
+    claim "C1" text="prior work can be recorded as provenance without becoming a citation the checker cannot follow" \
+        settled-by="a test asserting `informed-by` holds free text, is not treated as a reference, and that a record carrying one still passes every rule that applies to it"
+    claim "C2" text="a transcribed capability fails the shape check on its own, with no rule added" \
+        settled-by="a test declaring a capability with a doing and a name and nothing else — the shape a Markdown record transcribes to — asserting it is refused for the cluster, the gate tests and the exclusion it does not have"
+    claim "C3" text="the doctrine says what to do with what is already there" \
+        settled-by="skills/adopt-the-method gains the brownfield half, and this repository's own port is the worked example — two capabilities that gained gate tests, and one that turned out to be hollow"
+
+    depends-on "TS.260821.10 — adoption is possible before there is doctrine about adopting badly"
+
+    useful-alone "a brownfield adopter is told the one thing that decides whether their record is \
+        worth having. Every other instruction can be learned by running the tool; this one is \
+        learned by having built a record nobody can trust and not knowing why"
+    useful-to "the-adopter"
+
+    attacks "S2"
+
+    cut-from "the maintainer, on adopting Praxis on an existing project"
+
+    principle-note "an artifact looks identical whether the agent reasoned hard or pattern-matched \
+        a template — that is S2, and it is the reason this frame exists. A transcription is the \
+        same sentence about a whole repository: the record looks identical whether somebody \
+        derived it or copied it, and the second one is faster, easier, and produces a graph that \
+        refuses nothing because everything in it was already agreed"
+
+    proves "prior work informs the record and is visible as having informed it"
+    does-not-prove "that anybody will do it. Transcribing is faster and the result looks better \
+        sooner, and nothing here can stop somebody choosing that — only make the difference legible"
+}
