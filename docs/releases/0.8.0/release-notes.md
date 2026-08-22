@@ -29,6 +29,13 @@ what shipped at 0.8.0, which symptoms it resolved, and what it left owed
 | ITER.260821.17 | TS.260820.18 — resolve-a-symptom | slice-outcome-added |
 | ITER.260821.18 | TS.260820.13 — project-the-dashboard-on-demand | slice-outcome-added |
 | ITER.260821.19 | TS.260821.02 — prove-every-rule-can-refuse · TS.260820.18 — resolve-a-symptom | not declared |
+| ITER.260822.01 | TS.260821.03 — anchor-every-shipped-surface | not declared |
+| ITER.260822.02 | TS.260821.04 — retire-the-pre-graph-spine | not declared |
+| ITER.260822.03 | TS.260821.05 — model-the-engineering-invariant · TS.260821.06 — hold-the-products-own-capabilities | not declared |
+| ITER.260822.04 | TS.260821.04 — retire-the-pre-graph-spine · TS.260821.07 — publish-what-this-version-shipped | not declared |
+| ITER.260822.05 | TS.260821.08 — hold-who-may-attest-what | not declared |
+| ITER.260822.06 | TS.260821.09 — an-attestation-the-tool-does-not-supply | not declared |
+| ITER.260822.07 | TS.260821.10 — the-method-has-a-home | not declared |
 
 ## symptoms it resolved
 
@@ -137,4 +144,27 @@ _Nothing here — no symptom names this version as what resolved it._
 | ITER.260821.19 | AJ6 | — |
 | ITER.260821.19 | AJ5 | — |
 | ITER.260821.19 | AJ4 | — |
+| ITER.260822.01 | AL1 | — |
+| ITER.260822.01 | AL2 | — |
+| ITER.260822.01 | AL3 | — |
+| ITER.260822.01 | AL4 | — |
+| ITER.260822.02 | AM1 | C1 |
+| ITER.260822.02 | AM4 | C3 |
+| ITER.260822.02 | AM2 | — |
+| ITER.260822.02 | AM3 | — |
+| ITER.260822.03 | AN1 | — |
+| ITER.260822.03 | AN2 | — |
+| ITER.260822.03 | AN3 | — |
+| ITER.260822.03 | AN4 | — |
+| ITER.260822.04 | AO1 | — |
+| ITER.260822.04 | AO2 | — |
+| ITER.260822.05 | AP1 | — |
+| ITER.260822.05 | AP3 | — |
+| ITER.260822.05 | AP2 | — |
+| ITER.260822.06 | AQ1 | — |
+| ITER.260822.06 | AQ2 | — |
+| ITER.260822.07 | AR1 | — |
+| ITER.260822.07 | AR2 | — |
+| ITER.260822.07 | AR4 | — |
+| ITER.260822.07 | AR3 | — |
 
