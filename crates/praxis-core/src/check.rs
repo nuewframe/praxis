@@ -173,8 +173,6 @@ impl Refusal {
             Self::ShapelessKind { .. }
             | Self::UnclaimedValue { .. }
             | Self::UnwitnessedRule { .. }
-            // Reported, not refused, until TS.260821.04 takes the count to zero. A rule that
-            // fails closed on its first run names twenty-five files and is unadoptable.
             // An invariant declared before its probe is written is a legitimate order of
             // work. What is not legitimate is nobody knowing which.
             | Self::UnkeptInvariant { .. }

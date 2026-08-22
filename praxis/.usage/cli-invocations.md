@@ -214,3 +214,47 @@ Stated as observations, not requirements — the point of the log is to see whet
 4. **The chain has an order, and only refusals teach it.** `bind → publish → commit →
    cut → verify → promote → resolve`. Two of the five refusals above were the tool teaching
    the sequence, which is good — but nothing states it up front.
+
+---
+
+## 2026-08-22, later — the release chain, end to end
+
+First run of `bind → publish → commit → cut → verify → promote`. Walked as
+`WALK.260822.02`.
+
+| Invocation | The question | Outcome |
+|---|---|---|
+| `bind ITER.x 0.8.0` × 7 | attach today's work to the version | each re-proposed the bump |
+| `cut-release 0.8.0` | cut it | **refused** — published set uncommitted |
+| `cut-release 0.8.0` | again, after committing | **refused** — nobody confirmed the bump |
+| `cut-release 0.8.0 --confirm` | with the decision made | cut at `8ddfd00` |
+| `check` | did the cut hold together? | 6 refusals — 5 of them the next command |
+| `promote 0.8.0` | fold what shipped into what each capability is | 5 capabilities, sought → active |
+| `verify-published` | was anything hand-edited? | verified, and see AS3 |
+
+### What was done with the output
+
+`praxis check` immediately after the cut returned six refusals, and **five of them were the
+tool naming the next step** — `promoted-truth-is-derived`, once per capability. That is the
+only time in this log where a refusal list was read as an instruction rather than as a defect.
+Consumption shape: `first(refusals)` was wrong here; the *shape* of the list was the signal.
+
+The two `cut-release` refusals taught the sequence. Nothing states it up front, and both were
+read in full and acted on immediately — consistent with every other refusal in this log.
+
+### The traversal that was grepped again
+
+```
+for f in ITER.*.kdl; do
+  grep -q 'state "closed"' $f && ! grep -q "$id" REL.0.8.0.kdl && echo $id
+done
+```
+
+Closed iterations no release binds. Same anti-join as the first entry, wanted again within the
+hour. `TS.260821.11` names it as C4.
+
+### New: a question with no command at all
+
+*"Which symptoms could 0.8.0 resolve?"* — every symptom has attacking slices, and answering it
+meant seven greps over `attacks`. There is no `resolve` command in `--help`; symptom resolution
+is a record edit plus `accept`. **The chain's last step is the one with no interface.**

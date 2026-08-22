@@ -253,13 +253,13 @@ pub struct Release {
     pub version: String,
     pub state: String,
     pub binds: Vec<String>,
-    /// What the configured rules PROPOSED, as distinct from what the maintainer confirmed.
+    /// What the configured rules proposed, as distinct from what the maintainer confirmed
+    /// at the cut.
     ///
-    /// Read here because the cut composes the index node whole, and a field the corpus does
-    /// not hold is a field the cut cannot carry. It was dropped on every cut until the
-    /// release chain ran end to end for the first time (ITER.260822.08/AS1) — and the two
-    /// facts matter separately: a confirmed bump that differs from the proposed one is a
-    /// maintainer overriding the rules, which is legitimate and worth being able to see.
+    /// Both are kept: a confirmed bump differing from the proposed one is a maintainer
+    /// overriding the rules, which is legitimate and worth being able to see. Read into the
+    /// corpus because the cut composes the index node whole, and a field the corpus does not
+    /// hold is one the cut drops (`AS1`).
     pub proposed_bump: String,
 }
 
