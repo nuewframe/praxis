@@ -688,6 +688,28 @@ event-storm "ES.260819.01" {
             record can say so"
     }
 
+    policy "the-record-matures-forward" {
+        rule "an iteration does one of three things to the record: ADDS a value, REMOVES a value that did not work, or CHANGES a value for a better one"
+        rule "all three must leave a trace. A value removed without one is indistinguishable from a value that never existed, which is the same argument that makes a refusal a fact"
+        rule "durability is what makes this possible: a record that points outside itself cannot mature, because the thing it points at moves on its own schedule"
+        rule "maturing forward is not versioning the record. It is the record carrying its own corrections, so a reader sees what changed and what taught it"
+        because "products behave this way and records usually do not. A document is rewritten and \
+            the previous sentence is gone; a record that matures carries what it used to say, so \
+            `we changed our mind` and `we were always right` stop looking identical"
+        note "two of the three moves are covered today, and the third is not. REMOVAL is strong — \
+            twenty-six retired surfaces name the tag they still stand at, a withdrawn symptom \
+            carries why, a withdrawn release keeps `previously-cut`. ADDITION is trivially visible: \
+            a new node is a new node"
+        note "CHANGE is the weak one. One decision amendment and ten `amended-by` edges against at \
+            least two values rewritten in place with only prose behind them — \
+            every-shipped-surface-is-anchored flipped from report to refuse and left a note, and \
+            CAP.conformance-probes was narrowed on port with its prior claim gone. Both changes \
+            were right and neither is a record"
+        note "the shape that would close it is one vocabulary for all three: what it was, what it \
+            became, why, and what taught it — which `amendment`, `withdrawn-because`, \
+            `previously-cut` and `stands-at` are each half of, in four different spellings"
+    }
+
     policy "prior-work-is-evidence-and-never-record" {
         rule "on a repository that already shipped, the record is built NEW. What is already there is discovery data"
         rule "existing docs, ADRs and release history are STORMED, walked and argued with — they enter as evidence and leave as whatever survives"

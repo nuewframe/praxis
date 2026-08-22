@@ -20,7 +20,7 @@
 
 thin-slice "TS.260821.17" {
     slug "adopt-without-transcribing"
-    title "Take an existing repository's work as evidence, never as record"
+    title "The record contains what it relies on, and cites nothing it does not"
     kind "command"
     realizes "CAP.delivery-record"
     from-storm "ES.260819.01"
@@ -43,17 +43,24 @@ thin-slice "TS.260821.17" {
         """#
 
     step "1" does="prior artifacts enter as evidence: a storm reads them, a walkthrough tests one path through them, and what survives is written fresh"
-    step "2" does="`informed-by` records WHERE something came from — provenance, and deliberately not an edge the checker follows"
+    step "2" does="what prior work TAUGHT is restated in the record's own words. Where it lived is not recorded at all — that pointer is guaranteed to rot, and a dead pointer outlives the file as a confident lie"
     step "3" does="a capability still passes its four gate tests on its own terms. A transcription cannot: the tests are what the source document never had"
     step "4" does="release history is read for what it CLAIMS and bound only where the record can compute it. S1 was withdrawn for exactly this and is the precedent"
-    step "5" does="a record with no `informed-by` on a brownfield adoption is not wrong — it means nothing prior informed it, which is a fact worth being able to state"
+    step "5" does="the same rule applies inward. An `evidence=` naming a test function is a citation the record cannot follow, and there are a hundred and thirty-five of them"
+    step "6" does="a claim's evidence states WHAT was shown, not where. A renamed test then cannot silently orphan a claim, and the record says what it proved rather than where somebody can go to see it"
 
     excludes "a migration tool. Anything that reads an existing tree and writes records is a \
         transcription with better manners, and the artifact it produces is indistinguishable from \
         one somebody thought about"
-    excludes "making `informed-by` a checked edge. It points OUTSIDE the record, at a file that may \
-        be deleted or rewritten — W16 is thirty-four citations into unfollowable Markdown, and this \
-        must not be the thirty-fifth. It is provenance, and it says so"
+    excludes "`informed-by` in any form. A path rots; a path marked as provenance rots while \
+        looking deliberate. The substance is restated into the record and where it came from is \
+        not recorded, because that is the half guaranteed not to survive"
+    excludes "the record's VERIFIED assertions about the world. `doctrine-surface.path` names a \
+        file and `a-declared-surface-ships` REFUSES when it is absent; `release.index.commit` \
+        names a commit and the seal covers it; `publishes-to` is where the record WRITES rather \
+        than what it reads. None of the three can rot silently, which is the property that makes a \
+        citation dangerous. If that distinction is wrong the seventy-eight surfaces and the release \
+        index are the next thing to rework, and this exclusion is where to argue with it"
     excludes "refusing an adoption that transcribes. The record already resists it — a copied \
         capability has no cluster, no gate tests and no exclusion, and the shape check says so. \
         A second rule would be enforcing what the schema already enforces"
@@ -62,10 +69,12 @@ thin-slice "TS.260821.17" {
     layer "enforcement" reaches="`informed-by` is declared as provenance and explicitly not traceability, so nobody mistakes it for a checked edge"
     layer "docs"        reaches="`what did this come from` is answerable for a record built on prior work"
 
-    claim "C1" text="prior work can be recorded as provenance without becoming a citation the checker cannot follow" \
-        settled-by="a test asserting `informed-by` holds free text, is not treated as a reference, and that a record carrying one still passes every rule that applies to it"
+    claim "C1" text="no record cites a path the checker cannot follow" \
+        settled-by="a rule reporting any field whose value names a file outside the record, exercised over the whole tree — and the count taken to zero before it flips"
     claim "C2" text="a transcribed capability fails the shape check on its own, with no rule added" \
         settled-by="a test declaring a capability with a doing and a name and nothing else — the shape a Markdown record transcribes to — asserting it is refused for the cluster, the gate tests and the exclusion it does not have"
+    claim "C4" text="a claim's evidence states what was shown, not where to look" \
+        settled-by="the hundred and thirty-five evidence strings rewritten to say what each test demonstrates, and a rule reporting one that names a path"
     claim "C3" text="the doctrine says what to do with what is already there" \
         settled-by="skills/adopt-the-method gains the brownfield half, and this repository's own port is the worked example — two capabilities that gained gate tests, and one that turned out to be hollow"
 
@@ -86,7 +95,7 @@ thin-slice "TS.260821.17" {
         derived it or copied it, and the second one is faster, easier, and produces a graph that \
         refuses nothing because everything in it was already agreed"
 
-    proves "prior work informs the record and is visible as having informed it"
+    proves "the record contains what it relies on"
     does-not-prove "that anybody will do it. Transcribing is faster and the result looks better \
         sooner, and nothing here can stop somebody choosing that — only make the difference legible"
 }
