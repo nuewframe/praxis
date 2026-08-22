@@ -209,3 +209,9 @@ doctrine-surface "surface.skill.name-a-persona" {
     kind "skill"
     serves "TS.260821.15"
 }
+
+doctrine-surface "surface.skill.ask-the-record" {
+    path "skills/ask-the-record/SKILL.md"
+    kind "skill"
+    serves "TS.260821.11"
+}

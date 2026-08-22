@@ -37,6 +37,10 @@ fn every_subcommand_can_be_built() {
         "accept",
         "ready",
         "audit-surfaces",
+        "check-invariants",
+        "withdraw",
+        "schema",
+        "ask",
     ] {
         let out = run(&[command, "--help"]);
         assert!(

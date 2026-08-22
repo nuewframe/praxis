@@ -19,6 +19,8 @@ use praxis_core::check::{Facts, check_corpus_given, decision_body};
 use praxis_core::schema::Extension;
 use praxis_core::invariant::{Enforcement, check_invariants};
 use praxis_core::surface::{audit, surfaces};
+use praxis_core::ask::{Answer, Question, ask};
+use praxis_core::view::{ReadModel, Section};
 use praxis_core::withdraw::{Withdrawal, withdraw};
 use praxis_core::cut::seal;
 
@@ -201,6 +203,30 @@ enum Command {
         #[arg(long)]
         because: Option<String>,
         /// The state root to read and write.
+        #[arg(long, default_value = "praxis")]
+        root: PathBuf,
+    },
+    /// Answer a question about the record — any declared kind, filtered and projected.
+    ///
+    /// Generic by necessity: a command that knew what an `iteration` was would be the engine
+    /// encoding what the record declares, and would answer nothing in a repository whose
+    /// kinds are `cohort` and `experiment`.
+    Ask {
+        /// The kind to ask about.
+        kind: String,
+        /// Keep only records where this field has this value. Repeatable; all must hold.
+        #[arg(long = "where", value_name = "FIELD=VALUE")]
+        wheres: Vec<String>,
+        /// Fields to show beside the identity. Comma-separated.
+        #[arg(long, value_name = "FIELDS")]
+        show: Option<String>,
+        /// Print the count alone, for a loop rather than a reader.
+        #[arg(long)]
+        count: bool,
+        /// Keep only records nothing points at, through a declared edge: `kind.field`.
+        #[arg(long, value_name = "KIND.FIELD")]
+        unreferenced_by: Option<String>,
+        /// The state root to read.
         #[arg(long, default_value = "praxis")]
         root: PathBuf,
     },
@@ -429,6 +455,17 @@ fn main() -> ExitCode {
         },
         Command::Withdraw { version, because, root } => {
             match withdrawing(&version, because.as_deref(), &root) {
+                Ok(true) => ExitCode::SUCCESS,
+                Ok(false) => ExitCode::FAILURE,
+                Err(report) => {
+                    eprintln!("{report:?}");
+                    ExitCode::FAILURE
+                }
+            }
+        }
+        Command::Ask { kind, wheres, show, count, unreferenced_by, root } => {
+            match asking(&kind, &wheres, show.as_deref(), count, unreferenced_by.as_deref(), &root)
+            {
                 Ok(true) => ExitCode::SUCCESS,
                 Ok(false) => ExitCode::FAILURE,
                 Err(report) => {
@@ -1480,6 +1517,70 @@ fn child_of(node: &kdl::KdlNode, field: &str) -> Option<String> {
 
 fn string_id(node: &kdl::KdlNode) -> Option<String> {
     node.entries().first()?.value().as_string().map(str::to_owned)
+}
+
+/// `TS.260821.11`. Ask the record a question and print the answer.
+fn asking(
+    kind: &str,
+    wheres: &[String],
+    show: Option<&str>,
+    count: bool,
+    unreferenced_by: Option<&str>,
+    root: &Path,
+) -> miette::Result<bool> {
+    let sources = load(root)?;
+    let docs: Vec<_> = sources.into_iter().map(|(_, _, doc)| doc).collect();
+    let (schema, _) = governing(docs.iter());
+
+    let mut question = Question {
+        kind: kind.to_owned(),
+        show: show
+            .map(|s| s.split(',').map(str::trim).filter(|s| !s.is_empty()).map(str::to_owned).collect())
+            .unwrap_or_default(),
+        ..Question::default()
+    };
+    for predicate in wheres {
+        let Some((field, value)) = predicate.split_once('=') else {
+            eprintln!("praxis: `{predicate}` is not a predicate — it reads `--where field=value`");
+            return Ok(false);
+        };
+        question.where_.push((field.trim().to_owned(), value.trim().to_owned()));
+    }
+    if let Some(edge) = unreferenced_by {
+        let Some((k, f)) = edge.split_once('.') else {
+            eprintln!("praxis: `{edge}` is not an edge — it reads `--unreferenced-by kind.field`");
+            return Ok(false);
+        };
+        question.unreferenced_by = Some((k.to_owned(), f.to_owned()));
+    }
+
+    match ask(&docs, &schema, &question) {
+        Answer::Refused(why) => {
+            eprintln!("praxis: {why}");
+            Ok(false)
+        }
+        // The count alone, on stdout, with no prose around it. The usage log says four
+        // commands were run twenty-five times to read four integers, and two of them had
+        // their framing stripped by `sed` on the way past.
+        Answer::Rows { rows, .. } if count => {
+            println!("{}", rows.len());
+            Ok(true)
+        }
+        Answer::Rows { columns, rows } => {
+            let model = ReadModel::new(
+                format!("{kind}s the record holds"),
+                format!("which {kind} records match?"),
+                &now(),
+            );
+            let mut section = Section::new(kind, &columns.iter().map(String::as_str).collect::<Vec<_>>())
+                .empty_because("no record of that kind matches — which is an answer, not a gap");
+            for row in rows {
+                section.push(row);
+            }
+            print!("{}", render::render(&model.section(section)));
+            Ok(true)
+        }
+    }
 }
 
 fn invariants(root: &Path) -> miette::Result<()> {

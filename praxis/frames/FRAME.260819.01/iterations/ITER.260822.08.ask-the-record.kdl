@@ -6,7 +6,7 @@
 iteration "ITER.260822.08" {
     slug "ask-the-record"
     on-slice "TS.260821.11"
-    state "open"
+    state "closed"
     opened-at "2026-08-22T09:42:27Z"
     opened-by "agent:praxis"
 
@@ -34,13 +34,84 @@ iteration "ITER.260822.08" {
     // Frozen at open, from the slices. Removing one from a slice now
     // does not remove it from here — it makes the two disagree, and that is
     // refused.
-    claim "C1" from-slice="TS.260821.11" state="pending"
-    claim "C2" from-slice="TS.260821.11" state="pending"
-    claim "C3" from-slice="TS.260821.11" state="pending"
-    claim "C4" from-slice="TS.260821.11" state="pending"
-    claim "C5" from-slice="TS.260821.11" state="pending"
+    claim "C1" from-slice="TS.260821.11" state="met" \
+        evidence="tests/asking.rs::it_answers_over_a_vocabulary_this_repository_does_not_have — \
+            the fixture's kinds are `cohort`, `experiment` and `receipt`, none of which this \
+            engine has ever heard of, and the same code path answers"
+    claim "C2" from-slice="TS.260821.11" state="met" \
+        evidence="tests/asking.rs::an_undeclared_kind_or_field_is_refused_and_names_what_is_declared \
+            — refused rather than answered empty, because a filter on a field that does not exist \
+            matches nothing and looks exactly like a filter that matched nothing"
+    claim "C3" from-slice="TS.260821.11" state="met" \
+        evidence="tests/asking.rs::the_count_is_the_rows_of_the_same_question — the integer alone \
+            on stdout, no prose. Four commands were run twenty-five times to read four integers, \
+            two with their framing stripped by sed"
+    claim "C4" from-slice="TS.260821.11" state="met" \
+        evidence="tests/asking.rs::unreferenced_by_follows_a_declared_edge, and live: \
+            `praxis ask iteration --where state=closed --unreferenced-by release.binds` is the \
+            `for f in ITER.*.kdl` pipeline that produced this slice"
+    claim "C5" from-slice="TS.260821.11" state="met" \
+        evidence="ask() takes documents and a schema and returns an Answer — there is no path in \
+            the signature, so there is nowhere to write. The CLI reads with load() and prints"
+
+    layer "doctrine"    state="evidenced" \
+        evidence="skills/ask-the-record/SKILL.md, anchored and registered. 52 of 52 anchored" \
+        reaches="asking the record is the first move in a repository you did not set up"
+    layer "enforcement" state="evidenced" \
+        evidence="an undeclared kind or field refuses; an undeclared edge refuses; a kind that is \
+            only ever nested refuses rather than answering zero. Every target passes" \
+        reaches="a question that would silently answer nothing cannot be asked"
+    layer "docs"        state="evidenced" \
+        evidence="the eight questions this session answered with grep are one command each" \
+        reaches="the answer does not need sed"
+
+    phase "design-ux" state="complete" required-by="docs" worked-by="agent:principal-engineer" \
+        produced="`--count` prints the integer and nothing else, because the log says the output \
+            was consumed as a scalar and the prose was actively removed"
+    phase "design-system" state="complete" required-by="enforcement" worked-by="agent:principal-engineer" \
+        produced="A4 forbade the obvious design — a set of named questions — and left only the \
+            portable one. The same constraint that made adoption possible makes this generic"
+    phase "implement" state="complete" required-by="enforcement · docs" worked-by="agent:principal-engineer" \
+        produced="ask.rs, the ask command, and the nested-kind refusal"
+    phase "learn" state="complete" required-by="always" worked-by="agent:principal-engineer" \
+        produced="AW1 — an exclusion that produced a wrong-looking answer rather than a refusal"
+    phase "teach" state="complete" required-by="doctrine" worked-by="agent:principal-engineer" \
+        produced="skills/ask-the-record/SKILL.md"
+
+    finding "AW1" state="open" size="observation" \
+        text="the slice excluded nested entities by name, and the exclusion produced `0` — \
+            `praxis ask symptom --where state=present --count` answered zero while seven symptoms \
+            existed, because they are nested in the frame" \
+        note="excluding a capability is not the same as being honest about the exclusion. The \
+            first is a scope decision and the second is a separate obligation, and only the first \
+            was written down. A refusal now says `cannot see them` rather than answering a number \
+            that reads as the truth — which is the same argument the slice already made about \
+            refusing an undeclared field, applied to its own excludes"
+
+    finding "AW2" state="open" size="observation" \
+        text="`praxis ready`'s blocked section is the one output no filter expresses. Everything \
+            else in this session's usage log reduces to a count or a filter; `what would refuse \
+            each slice, and why` does not" \
+        note="worth knowing before the next composed view is replaced by a query. A view earns \
+            its length when the question has no scalar form, and that one did — it surfaced a \
+            dependency cycle no amount of reading the files would have shown"
+    closed-at "2026-08-22T21:18:58Z"
+    outcome "continue"
+
+    close {
+        claims-settled "C1" how="met"
+        claims-settled "C2" how="met"
+        claims-settled "C3" how="met"
+        claims-settled "C4" how="met"
+        claims-settled "C5" how="met"
+        all-met #true
+        attested-by "human:waelrabadi"
+        note "the accounting above was computed at close, not asserted. It says every claim is either met or carried by a finding that names it, and nothing about whether the work is any good"
+    }
 
     trail {
+        entry at="2026-08-22T21:18:58Z" by="agent:praxis" action="state-changed" from="open" to="closed" note="closed by `praxis close`. The accounting was computed; the conclusion is not the machine's to draw"
+
         entry at="2026-08-22T09:42:27Z" by="agent:praxis" action="created" \
             note="opened by the gate, on the ask of human:wael"
     }
