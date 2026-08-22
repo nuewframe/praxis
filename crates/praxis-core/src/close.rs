@@ -34,7 +34,9 @@ pub enum Closing {
 /// Why one claim was not accounted for.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Unaccounted {
-    /// The closer worked a phase their own role may not attest.
+    /// Nobody named an attester. A default is not an attestation.
+    Unattested,
+    /// The attester worked a phase their own role may not attest.
     SelfAttested { phase: String, identity: String, role: String },
     /// Not met, and no finding carries it. This is the silent drop.
     NeitherMetNorCarried { claim: String, state: String },
@@ -53,10 +55,17 @@ impl Unaccounted {
             // Not about a claim at all: the whole close is refused, before any claim is
             // examined. Naming a phase here would make it read as a claim id.
             Self::SelfAttested { phase, .. } => phase,
+            Self::Unattested => "",
         }
     }
 
     pub fn message(&self) -> String {
+        if let Self::Unattested = self {
+            return "nobody attested this close. Name who is accountable for it with \
+                    `--attested-by <identity>` — a default would prove that the tool ran, \
+                    which nobody doubted"
+                .to_owned();
+        }
         if let Self::SelfAttested { phase, identity, role } = self {
             return format!(
                 "{identity} worked the {phase} phase and is closing this iteration. The \
@@ -81,7 +90,7 @@ impl Unaccounted {
                  refuse"
             ),
             // Handled above, before any claim is examined.
-            Self::SelfAttested { .. } => unreachable!("returned early"),
+            Self::SelfAttested { .. } | Self::Unattested => unreachable!("returned early"),
         }
     }
 }
@@ -96,19 +105,31 @@ impl Unaccounted {
 /// recorded, and refusing on absence would make every iteration written before TS.260821.08
 /// unclosable, which is punishing history for not having anticipated a rule.
 fn self_attested(attempt: &Attempt, corpus: &Corpus, ask: &Ask) -> Option<Unaccounted> {
-    let closer = &ask.by;
+    // A close nobody attested. `TS.260821.09`: this is checked FIRST, because the previous
+    // version compared `ask.by` — the tool, always `agent:praxis` — against the identity
+    // that worked a phase, which are two things that can never be equal. The rule passed
+    // four tests and could not fire (ITER.260822.05/AP3).
+    let Some(attester) = ask.attested_by.as_deref() else {
+        return Some(Unaccounted::Unattested);
+    };
+
     // Identity is compared for equality and nothing more. An engine that adjudicates whether
     // two names are one person is an engine with an opinion about employment.
-    let role = corpus.roles.iter().find(|r| r.occupied_by(closer))?;
+    let role = corpus.roles.iter().find(|r| r.occupied_by(attester));
 
     attempt.phases.iter().find_map(|phase| {
         let worker = phase.worked_by.as_deref()?;
-        (worker == closer && role.never_for_own.iter().any(|p| p == &phase.kind)).then(|| {
-            Unaccounted::SelfAttested {
-                phase: phase.kind.clone(),
-                identity: closer.clone(),
-                role: role.id.clone(),
-            }
+        if worker != attester {
+            return None;
+        }
+        // With a role, the role decides which phases it may not attest for its own work.
+        // WITHOUT one, every phase counts: an identity that occupies no declared role gets
+        // no licence to vouch for itself, because the licence is what a role IS.
+        let reserved = role.is_none_or(|r| r.never_for_own.iter().any(|p| p == &phase.kind));
+        reserved.then(|| Unaccounted::SelfAttested {
+            phase: phase.kind.clone(),
+            identity: attester.to_owned(),
+            role: role.map_or_else(|| "no declared".to_owned(), |r| r.id.clone()),
         })
     })
 }
@@ -146,7 +167,15 @@ pub fn close_iteration(iteration_id: &str, corpus: &Corpus, ask: &Ask, taken: &[
                 &[conflict.clone()],
             ),
             id,
-            failed: vec![("an-attestation-is-not-self-issued".to_owned(), conflict.message())],
+            failed: vec![(
+                if matches!(conflict, Unaccounted::Unattested) {
+                    "a-close-names-its-attester"
+                } else {
+                    "an-attestation-is-not-self-issued"
+                }
+                .to_owned(),
+                conflict.message(),
+            )],
         });
     }
 

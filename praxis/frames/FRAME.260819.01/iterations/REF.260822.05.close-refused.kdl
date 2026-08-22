@@ -1,0 +1,17 @@
+// Written by `praxis close`, which refused. The iteration stays open, and
+// every claim it could not account for is named below. Nothing was closed.
+
+refusal "REF.260822.05" {
+    on-slice "TS.260821.09"
+    at "2026-08-22T05:31:47Z"
+    by "agent:praxis"
+    asked-by "human:wael"
+    on-iteration "ITER.260822.06"
+    condition "claim-design-system-is-unaccounted" failed=#true \
+        found="agent:principal-engineer worked the design-system phase and is closing this iteration. The principal-engineer role may not attest its own design-system — an artifact looks identical whether the reviewer was a different mind or the same one wearing a second hat, which is what the review is for. Hand off, or record who did review it"
+
+    trail {
+        entry at="2026-08-22T05:31:47Z" by="agent:praxis" action="created" \
+            note="the close was refused. The iteration stays open"
+    }
+}

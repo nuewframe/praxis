@@ -38,7 +38,7 @@ fn ask() -> Ask {
     Ask {
         signer: "human:someone".to_owned(),
         at: "2026-08-21T09:00:00Z".to_owned(),
-        by: "agent:praxis".to_owned(),
+        by: "agent:praxis".to_owned(), attested_by: None,
     }
 }
 

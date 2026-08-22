@@ -46,7 +46,7 @@ thin-slice "TS.900" {
 }
 "#;
 
-fn closing(iteration: &str, by: &str) -> Closing {
+fn closing(iteration: &str, attested_by: &str) -> Closing {
     let schema_doc = parse(SCHEMA).expect("schema parses");
     let record_doc = parse(&format!("{ROLES}\n{iteration}")).expect("record parses");
     let schema = Schema::from_document(&schema_doc);
@@ -54,7 +54,9 @@ fn closing(iteration: &str, by: &str) -> Closing {
     let ask = Ask {
         signer: "human:someone".to_owned(),
         at: "2026-08-22T00:00:00Z".to_owned(),
-        by: by.to_owned(),
+        by: "agent:praxis".to_owned(),
+        // The ATTESTER, not the tool. TS.260821.08 compared `by` and could never fire.
+        attested_by: Some(attested_by.to_owned()),
     };
     close_iteration("ITER.900", &corpus, &ask, &[])
 }

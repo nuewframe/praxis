@@ -38,8 +38,9 @@ Load the persona's full file before acting in that role.
 **The same engineer cannot self-approve — and since `TS.260821.08`, `praxis close` refuses it.**
 
 Each persona names a `role` in the record, and a role declares which phases it may not attest
-when it did the work itself. A phase records `worked-by`. If the identity closing an iteration
-worked a phase its role reserves, the close is refused and nothing closes.
+when it did the work itself. A phase records `worked-by`, and `praxis close` requires
+`--attested-by <identity>` with **no default**. If the named attester worked a phase its role
+reserves, the close is refused and nothing closes.
 
 Working two phases is normal and often better. **Attesting your own work is the act refused** —
 hand off, or record who did review it. Note what this does not claim: it refuses the one case

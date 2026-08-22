@@ -124,6 +124,14 @@ iteration "ITER.260822.05" {
         claims-settled "C4" how="met"
         all-met #true
         note "the accounting above was computed at close, not asserted. It says every claim is either met or carried by a finding that names it, and nothing about whether the work is any good"
+        attested-by "none — this close predates TS.260821.09"
+        unattested #true \
+            because="this iteration closed through a `praxis close` that had no attester to \
+                supply, and it closed CLEANLY when its own rule should have refused it: every \
+                phase is worked-by agent:principal-engineer, and that role reserves `implement`. \
+                Marked rather than reversed — a closed iteration is history, and rewriting one to \
+                look compliant is precisely the move this frame exists to make impossible \
+                (TS.260821.09/C4)"
     }
 
     trail {

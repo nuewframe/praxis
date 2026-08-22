@@ -61,6 +61,12 @@ enum Command {
         /// What this iteration concluded.
         #[arg(long, default_value = "continue")]
         outcome: String,
+        /// Who attests this close. Required, and deliberately without a default.
+        ///
+        /// A close is something somebody does. An identity the tool supplied would prove the
+        /// tool ran, which nobody doubted — see TS.260821.09 and ITER.260822.05/AP3.
+        #[arg(long)]
+        attested_by: Option<String>,
         /// The state root to read and write.
         #[arg(default_value = "praxis")]
         root: PathBuf,
@@ -254,7 +260,8 @@ fn main() -> ExitCode {
                 ExitCode::FAILURE
             }
         },
-        Command::Close { iteration, outcome, root } => match close(&iteration, &outcome, &root) {
+        Command::Close { iteration, outcome, attested_by, root } =>
+            match close(&iteration, &outcome, attested_by.as_deref(), &root) {
             Ok(closed) => {
                 if closed {
                     ExitCode::SUCCESS
@@ -442,6 +449,8 @@ fn pickup(slices: &[String], root: &Path, dry_run: bool) -> miette::Result<bool>
         signer,
         at: now(),
         by: "agent:praxis".to_owned(),
+        // Pick-up is not an attestation. Whoever asks for work is not thereby vouching for it.
+        attested_by: None,
     };
 
     let corpus = Corpus::from_documents(&docs, &schema);
@@ -503,7 +512,12 @@ fn pickup(slices: &[String], root: &Path, dry_run: bool) -> miette::Result<bool>
 /// not close. This is the first command that CHANGES a record rather than adding one, so
 /// it rewrites the file whole: the document model preserves what it did not touch, and a
 /// failed write leaves the original exactly as it was.
-fn close(iteration: &str, outcome: &str, root: &Path) -> miette::Result<bool> {
+fn close(
+    iteration: &str,
+    outcome: &str,
+    attested_by: Option<&str>,
+    root: &Path,
+) -> miette::Result<bool> {
     let sources = load(root)?;
     let docs: Vec<_> = sources.iter().map(|(_, _, d)| d.clone()).collect();
 
@@ -515,7 +529,14 @@ fn close(iteration: &str, outcome: &str, root: &Path) -> miette::Result<bool> {
         }
     }
     let corpus = Corpus::from_documents(&docs, &schema);
-    let ask = Ask { signer: human()?, at: now(), by: "agent:praxis".to_owned() };
+    let ask = Ask {
+        signer: human()?,
+        at: now(),
+        // What RAN and who ATTESTED are different facts. The trail keeps recording the tool;
+        // the attestation carries the identity somebody typed (TS.260821.09/C3).
+        by: "agent:praxis".to_owned(),
+        attested_by: attested_by.map(str::to_owned),
+    };
     let taken = ids_in_use(&docs);
 
     match close_iteration(iteration, &corpus, &ask, &taken) {
@@ -620,8 +641,12 @@ fn apply_close(
         "either met or carried by a finding that names it, and nothing about whether the ",
         "work is any good"
     );
+    // The attester is written as its own fact, beside the accounting and separate from the
+    // trail's `by`. What RAN and who ATTESTED are different things, and conflating them is
+    // the defect this records the fix for (TS.260821.09/C3).
+    let attester = ask.attested_by.as_deref().unwrap_or_default();
     let closing: kdl::KdlDocument = format!(
-        "    closed-at {:?}\n    outcome {outcome:?}\n\n    close {{\n{settled}        all-met #{all_met}\n        note {note:?}\n    }}\n",
+        "    closed-at {:?}\n    outcome {outcome:?}\n\n    close {{\n{settled}        all-met #{all_met}\n        attested-by {attester:?}\n        note {note:?}\n    }}\n",
         ask.at
     )
     .parse()
@@ -681,7 +706,7 @@ fn binding(iteration: &str, version: &str, root: &Path, undo: bool) -> miette::R
         }
     }
     let corpus = Corpus::from_documents(&docs, &schema);
-    let ask = Ask { signer: human()?, at: now(), by: "agent:praxis".to_owned() };
+    let ask = Ask { signer: human()?, at: now(), by: "agent:praxis".to_owned(), attested_by: None };
     let taken = ids_in_use(&docs);
 
     let outcome = if undo {
@@ -736,7 +761,7 @@ fn cutting(version: &str, root: &Path, confirm: bool) -> miette::Result<bool> {
         }
     }
     let corpus = Corpus::from_documents(&docs, &schema);
-    let ask = Ask { signer: human()?, at: now(), by: "agent:praxis".to_owned() };
+    let ask = Ask { signer: human()?, at: now(), by: "agent:praxis".to_owned(), attested_by: None };
     let commit = head_commit()?;
 
     // TS.260820.09/C3: the recorded commit must CONTAIN this release's published

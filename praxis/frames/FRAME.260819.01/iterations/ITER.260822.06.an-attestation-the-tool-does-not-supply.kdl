@@ -1,0 +1,105 @@
+// Opened by `praxis pick-up`. Every condition below was evaluated against the
+// tree as it stood at 2026-08-22T05:26:24Z, and the verdicts are recorded
+// rather than summarised: a gate whose reasoning is not on the record is a gate
+// you have to trust.
+
+iteration "ITER.260822.06" {
+    slug "an-attestation-the-tool-does-not-supply"
+    on-slice "TS.260821.09"
+    state "working"
+    opened-at "2026-08-22T05:26:24Z"
+    opened-by "agent:praxis"
+
+    approval "admission" {
+        status "signed"
+        signer "human:wael"
+        at "2026-08-22T05:26:24Z"
+        signed-by "the ask to pick up this slice"
+    }
+
+    vet "create" state="done" at="2026-08-22T05:26:24Z" on-slice="TS.260821.09" {
+        condition "slice-is-shaped" verdict="passed"
+        condition "dependencies-delivered" verdict="passed"
+        condition "no-iteration-in-flight" verdict="passed"
+        condition "nothing-left-to-admit" verdict="passed"
+        condition "work-is-disjoint" verdict="not-computed" \
+            found="no seam manifest exists, so what two iterations would touch cannot be compared. Disjointness is half of what this capability says it judges, and half of what it judges is currently not computed at all"
+        condition "the-slice-is-the-best-available" verdict="left-to-the-maintainer"
+    }
+
+    // 2 of the declared conditions were not decided by the gate. They are
+    // recorded above rather than omitted: an admission that does not say what
+    // it left undecided claims more than it checked.
+
+    // Frozen at open, from the slices. Removing one from a slice now
+    // does not remove it from here — it makes the two disagree, and that is
+    // refused.
+    claim "C1" from-slice="TS.260821.09" state="met" \
+        evidence="praxis-cli/tests/the_close_is_attested.rs::a_close_nobody_attested_is_refused — \
+            through the BINARY, and asserting the refusal says `--attested-by` rather than naming \
+            a rule. `--attested-by` has no clap default"
+    claim "C2" from-slice="TS.260821.09" state="met" \
+        evidence="::an_agent_attesting_its_own_work_is_refused and ::a_distinct_attester_closes, \
+            both through the binary. This is the claim TS.260821.08 could not make: it compared \
+            `by` — the tool — against a phase worker, and those can never be equal"
+    claim "C3" from-slice="TS.260821.09" state="met" \
+        evidence="::a_distinct_attester_closes asserts the written record carries \
+            `attested-by \"human:someone-else\"` in the close block AND `by=\"agent:praxis\"` in the \
+            trail. Two facts, never compared to each other"
+    claim "C4" from-slice="TS.260821.09" state="met" \
+        evidence="ITER.260822.05's close block now carries `unattested #true` with the reason. \
+            Marked, not reversed — a closed iteration is history, and rewriting one to look \
+            compliant is the move this frame exists to make impossible"
+
+    layer "doctrine"    state="evidenced" \
+        evidence="skills/close-an-iteration/SKILL.md documents both refusals and states plainly \
+            that this is not forgery-proof; the router's self-approval paragraph says --attested-by \
+            has no default" \
+        reaches="closing is something somebody does, and the skill says who"
+    layer "enforcement" state="evidenced" \
+        evidence="a-close-names-its-attester refuses; an-attestation-is-not-self-issued is \
+            REACHABLE and refuses through the binary; an identity occupying no role gets no \
+            licence to vouch for itself. 220 tests pass" \
+        reaches="the rule has a path"
+    layer "docs"        state="evidenced" \
+        evidence="the refusal says `name who is accountable with --attested-by` rather than \
+            naming the rule that fired" \
+        reaches="`who attested this` is answered with a name somebody chose to write"
+
+    phase "design-ux" state="complete" required-by="docs" worked-by="agent:principal-engineer" \
+        produced="the refusal tells you the flag, not the rule id"
+    phase "design-system" state="complete" required-by="enforcement" worked-by="agent:principal-engineer" \
+        produced="what RAN and who ATTESTED are separate fields. The defect was one field doing \
+            two jobs, and the fix is two fields that are never compared to each other"
+    phase "implement" state="complete" required-by="enforcement · docs" worked-by="agent:principal-engineer" \
+        produced="Ask::attested_by, the Unattested refusal, the roleless-identity case, and an \
+            end-to-end suite that runs the binary"
+    phase "learn" state="complete" required-by="always" worked-by="agent:principal-engineer" \
+        produced="two findings, one of them about the test harness itself"
+    phase "teach" state="complete" required-by="doctrine" worked-by="agent:principal-engineer" \
+        produced="skills/close-an-iteration/SKILL.md, rewritten around who attests"
+
+    finding "AQ1" state="open" size="frame-sized" \
+        text="four test files had `attested_by: None, attested_by: None` — a duplicated struct \
+            field, which does not compile. `cargo test -q` printed 30 passing targets and the \
+            broken ones simply did not appear in the output at all" \
+        obliges="a verify step that fails on a target that did not build, not only on a test that \
+            did not pass" \
+        note="the fourth time this session a green run has hidden something, and the same shape \
+            every time: AK1 (a binary that could not start under 185 passing tests), AG1 and AL2 \
+            (refusals computed and dropped on the way out), AP3 (a rule with no reachable path). \
+            This record keeps proving that ABSENCE is what it cannot see, and every instrument it \
+            has counts presences"
+
+    finding "AQ2" state="open" size="observation" \
+        text="an identity occupying no declared role may not attest its own work at all — every \
+            phase counts, not none. Chosen deliberately: the licence to vouch for yourself is what \
+            a role IS, so its absence cannot be permission" \
+        note="the opposite default would have been the natural reading of `role not found, nothing \
+            to check`, and would have made the rule trivially avoidable by not declaring a role"
+
+    trail {
+        entry at="2026-08-22T05:26:24Z" by="agent:praxis" action="created" \
+            note="opened by the gate, on the ask of human:wael"
+    }
+}

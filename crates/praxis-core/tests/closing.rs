@@ -28,7 +28,10 @@ fn ask() -> Ask {
     Ask {
         signer: "human:someone".to_owned(),
         at: "2026-08-21T09:00:00Z".to_owned(),
-        by: "agent:praxis".to_owned(),
+        by: "agent:praxis".to_owned(), // These tests are about claim ACCOUNTING. A close still needs somebody
+        // accountable for it, and `human:reviewer` is nobody's phase worker here, so
+        // an-attestation-is-not-self-issued has nothing to fire on (TS.260821.09).
+        attested_by: Some("human:reviewer".to_owned()),
     }
 }
 

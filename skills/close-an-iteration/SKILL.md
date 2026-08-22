@@ -14,8 +14,31 @@ tools: [read_file, file_search, grep_search, replace_string_in_file, run_in_term
 **Audience:** Working agent. **Phase:** `ITERATE`, at the end.
 
 ```
-praxis close <ITER-ID> [--outcome continue|pivot|stop]
+praxis close <ITERATION> --attested-by <identity> [--outcome continue|pivot|stop]
 ```
+
+## Who attests
+
+`--attested-by` is **required and has no default**. Name the identity that is accountable for
+this close.
+
+A default would prove that the tool ran, which nobody doubted. `TS.260821.08` shipped a rule
+refusing self-attestation, it passed four tests, and it could not fire for a single day —
+because the close compared `agent:praxis`, the tool, against the identity that worked a phase,
+and those can never be equal (`ITER.260822.05/AP3`).
+
+Two refusals now stand between an iteration and a close nobody made:
+
+- **`a-close-names-its-attester`** — nobody was named.
+- **`an-attestation-is-not-self-issued`** — the named attester worked a phase its role reserves.
+  Record `worked-by` on each phase as you complete it; that is what the rule reads.
+
+Working two phases is normal and often better. **Attesting your own work is the act refused** —
+hand off, or record who did review it.
+
+**This is not forgery-proof and does not claim to be.** An agent can type a human's name. What
+changed is that doing so is an act rather than a default, which is the whole difference between
+`S3` and a gate. Anything stronger would need something the record cannot currently hold.
 
 ---
 

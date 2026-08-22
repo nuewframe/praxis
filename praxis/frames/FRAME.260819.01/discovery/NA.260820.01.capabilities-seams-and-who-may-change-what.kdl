@@ -1067,6 +1067,15 @@ field "owns-read-model"  each="1..n"
             note="reported rather than refused: a rule declared today for a shape the record does \
                 not hold yet is legitimate. What is not legitimate is nobody knowing which"
 
+        rule "a-close-names-its-attester"             refuses="a close with no attester named by whoever ran it" \
+            because="a default is not an attestation. An identity the tool supplied proves that \
+                the tool ran, which nobody doubted — and it is what made \
+                an-attestation-is-not-self-issued unreachable for the whole of its first day" \
+            found-by="ITER.260822.05/AP3" \
+            note="this cannot make attestation unforgeable and does not claim to. An agent can \
+                type a human's name. What changes is that doing so is an ACT rather than a \
+                default, which is the whole difference between S3 and a gate"
+
         rule "an-attestation-is-not-self-issued"      refuses="a closed iteration attested by the identity that worked a phase the attestation covers" \
             because="an artifact looks identical whether the reviewer was a different mind or the \
                 same one wearing a second hat. That is S2, and `the same engineer cannot \

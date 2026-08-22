@@ -40,7 +40,18 @@ pub struct Record {
 pub struct Ask {
     pub signer: String,
     pub at: String,
+    /// What RAN. The tool, always — `agent:praxis`.
     pub by: String,
+    /// Who ATTESTS, named by whoever ran the command and never defaulted (`TS.260821.09`).
+    ///
+    /// `by` and this are different facts, and conflating them is the defect that shipped:
+    /// `an-attestation-is-not-self-issued` compared `by` — the tool — against the identity
+    /// that worked a phase, which are two things that can never be equal. The rule passed
+    /// four tests and could not fire (ITER.260822.05/AP3).
+    ///
+    /// `None` is a close nobody attested, and is refused. A default here would prove that
+    /// the tool ran, which nobody doubted.
+    pub attested_by: Option<String>,
 }
 
 /// Evaluate the gate for one slice and compose whichever record it produced.
