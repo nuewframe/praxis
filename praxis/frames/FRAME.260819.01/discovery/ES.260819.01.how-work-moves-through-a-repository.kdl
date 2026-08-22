@@ -688,6 +688,25 @@ event-storm "ES.260819.01" {
             record can say so"
     }
 
+    policy "a-phase-produces-something" {
+        rule "design-ux — what the actor must see and decide before acting, and what they will not read"
+        rule "design-system — the APPROACH: what will be built and what it was chosen over. Produced BEFORE implement, or it is a description of what was built"
+        rule "implement — the thing itself, naming the approach it followed"
+        rule "learn — what the work taught, including where the approach turned out wrong"
+        rule "teach — what the END USER reads. The version's docs, telling them the feature's why and how"
+        because "the phase that exists to derive a better approach can only do that BEFORE the \
+            code exists. Written afterwards it is a summary, and a summary cannot be argued with \
+            while there is still time to change what gets built"
+        note "teach and the doctrine LAYER are different things and this record collapsed them. A \
+            skill is instruction for an AGENT; teach is for the reader of a release. Every \
+            iteration in this frame named a skill under both, one artifact counted twice, and the \
+            end user was served by the teach phase zero times"
+        note "the evidence is this frame's own record. Every design-system entry is a past-tense \
+            summary written at close by whoever built the thing. ITER.260822.13's said `only the \
+            head of a chain is checked` — a decision made during implementation, attested as a \
+            design phase, and wrong in exactly the way a design phase exists to catch"
+    }
+
     policy "the-record-matures-forward" {
         rule "an iteration does one of three things to the record: ADDS a value, REMOVES a value that did not work, or CHANGES a value for a better one"
         rule "all three must leave a trace. A value removed without one is indistinguishable from a value that never existed, which is the same argument that makes a refusal a fact"

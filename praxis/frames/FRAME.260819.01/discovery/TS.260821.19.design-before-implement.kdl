@@ -1,0 +1,92 @@
+// A phase is attested and nothing is checked.
+//
+// `phase` declares `kinds="design-ux · design-system · implement · learn · teach"` as a PROSE
+// STRING and carries no fields. So every phase in this record is a `produced=` sentence
+// written by whoever closed the iteration, at close, about work already finished.
+//
+// Read them and the pattern is unmistakable: every `design-system` in this frame is a
+// past-tense summary of what was built. ITER.260822.13's said "only the head of a chain is
+// checked" — a decision made DURING implementation, attested as a design phase, and wrong.
+// The better approach existed and arrived in conversation after the code shipped.
+//
+// And every `teach` names a skill. A skill is doctrine for an AGENT. The reader of a release
+// — who wants the feature's why and how — has been served by the teach phase zero times,
+// while the same skill file was counted again as the doctrine LAYER in the same iteration.
+
+thin-slice "TS.260821.19" {
+    slug "design-before-implement"
+    title "Make a phase produce something, before the next one may start"
+    kind "command"
+    realizes "CAP.claim-settlement"
+    from-storm "ES.260819.01"
+
+    command "close"
+    actor "whoever works an iteration, at the moment they reach for the editor"
+    produces-event "PlanRecorded" "UnplannedImplementRefused"
+    needs-read-model "what-this-iteration-claims-and-has-shown"
+
+    trigger "an iteration starts implementing, and the approach is being decided in the code"
+    outcome "design-system produces an approach that exists before implement starts, and teach produces what an end user reads"
+
+    scenario #"""
+        Given an iteration whose design-system phase is marked complete
+        When implement is marked complete
+        Then the record holds the approach design-system produced, what it was chosen OVER, and
+             the implement phase names it — because deriving the better approach is what the
+             phase is for, and an approach written at close is a description of what was built
+             rather than a choice that shaped it.
+        """#
+
+    step "1" does="`phase` gets a shape. Its kinds become a checked vocabulary rather than a prose string, which is the fifth decorative declaration this session"
+    step "2" does="design-system produces an `approach` — what will be built, and what it was chosen OVER. The alternative is the half that proves a choice was made"
+    step "3" does="implement names the approach it followed. An implement complete against a design-system with no approach is REFUSED"
+    step "4" does="an approach may be superseded mid-iteration, by maturing it. Discovering the design was wrong while building is the normal case and must stay cheap"
+    step "5" does="teach produces what the END USER reads — the version's docs, the feature's why and how. A skill is the doctrine LAYER, and counting one artifact as both is what hid this"
+
+    excludes "a separate design document. The approach lives in the iteration, beside the claims \
+        it will settle. A file elsewhere is a second thing to keep in step, and the record already \
+        holds thirty-four slices whose scenario and steps are exactly this shape"
+    excludes "an approval gate between design and implement. The same agent may do both — what is \
+        refused is implementing with NO approach recorded, not implementing without permission. \
+        Self-approval is TS.260821.08's subject and it is a different rule"
+    excludes "forcing design-system on every slice. A slice whose layers do not need it skips it, \
+        with a reason — skipped-phase-without-rationale already exists and is unwitnessed"
+
+    layer "doctrine"    reaches="the phases say what each must produce, and teach says for whom"
+    layer "enforcement" reaches="implement complete with no approach is refused; a teach naming only a skill is reported"
+    layer "docs"        reaches="`what did they consider, and why this` is answerable per iteration"
+
+    claim "C1" text="design-system produces an approach naming what it was chosen over" \
+        settled-by="a test asserting an approach with no alternative is refused — a choice with nothing rejected is a description of the only thing anybody thought of"
+    claim "C2" text="implement complete against a design-system with no approach is refused" \
+        settled-by="a test marking implement complete with the approach absent, asserting a refusal that names the phase rather than the rule"
+    claim "C3" text="an approach can be superseded while the iteration is open" \
+        settled-by="a test maturing an approach mid-iteration and asserting the close accepts it — discovering the design was wrong while building is the normal case, and a rule that punishes it teaches people to write the approach afterwards"
+    claim "C4" text="teach produces what an end user reads, and a skill alone does not satisfy it" \
+        settled-by="a test asserting a teach phase producing only a path under skills/ is reported, and one naming the version's published set is not"
+    claim "C5" text="the phase vocabulary is checked rather than described" \
+        settled-by="a test asserting a phase of an undeclared kind is refused — `kinds=` has been a prose string for the whole life of the record"
+
+    depends-on "TS.260821.18 — an approach that turns out wrong is matured, not overwritten"
+
+    useful-alone "the phase that exists to derive a better approach starts producing one. Every \
+        design-system in this record is a past-tense summary of what was built, written at close \
+        by whoever built it, and one of them was wrong in a way the phase existed to catch"
+
+    attacks "S3"
+
+    useful-to "the-team-building-a-digital-product" "the-reader-of-a-release"
+
+    cut-from "the maintainer, on ADR.260819.02's phase list: a thin-slice needs an implementation \
+        plan so the better approach is derived before it is implemented"
+
+    principle-note "how much process a unit of work received is declared by the agent that received \
+        it — that is S3, and the phases are where this record has been doing it to itself. Five \
+        phases, attested complete on every iteration, with nothing checked about any of them. The \
+        one that was wrong was wrong in exactly the way a design phase exists to prevent"
+
+    proves "an approach existed before the code did, and says what it was chosen over"
+    does-not-prove "that the approach was good. It makes the choice visible and contradictable — \
+        a bad approach recorded beats a better one nobody wrote down, because only the first can \
+        be argued with before it ships"
+}
