@@ -642,7 +642,11 @@ notional-architecture "NA.260820.01" {
                 policy produces had no shape, so nothing could hold one. It sits in iterations/ \
                 because an admission and a refusal are the two outcomes of ONE command, and a \
                 container is named for what its contents are to the owner" {
-            field "on-slice"     each="0..1" references="thin-slice"
+            field "on-slice"     each="0..n" references="thin-slice" \
+                because="a refusal is about the COMMITMENT that was asked for, and an ask over four \
+                    slices refused on one of them is still one refusal. Left at 0..1 by the \
+                    commitment rewire, which changed `iteration` and not the record of the same \
+                    ask being turned down (ITER.260822.01/AL1)"
             field "on-iteration" each="0..1" references="iteration" \
                 because="a close is refused about an ITERATION, not about the slice under it"
             field "on-version"   each="0..1" \
@@ -725,6 +729,35 @@ notional-architecture "NA.260820.01" {
 
         entity "read-model" is="a view an actor must see before acting, owned by exactly one capability" \
             note="already load-bearing in every slice's needs/feeds edges and never declared"
+
+        entity "doctrine-surface" is="one file this plugin SHIPS as instruction — a skill, a guardrail, an agent, or a probe" \
+            states="current retired" \
+            owned-by="delivery-record" \
+            note="declared by TS.260821.03. The record described the work and never the DOCTRINE \
+                shipped to do the work, so twenty-five of forty-seven skills could stop \
+                corresponding to anything without a single edge going dangling. A surface names \
+                what asks for it; an unanchored one is instruction on the plugin's authority alone" {
+            field "path"        each="1" because="the anchor is to a file, so an absent file is a broken promise rather than an untidy one"
+            field "kind"        each="1" one-of="skill" "guardrail" "agent" "probe"
+            field "serves"      each="1..n" references="thin-slice capability read-model frame event-storm" \
+                because="a surface serving nothing is doctrine nobody asked for, which is the whole \
+                    rule. It references five kinds, so a surface whose reason was withdrawn is \
+                    already caught by dangling-relationship rather than by a second rule" \
+                note="widened from three kinds to five after the rule refused the router and the \
+                    storming skill on their first declaration. Widening a reference set to stop a \
+                    refusal is the move this frame refuses everywhere else, so the argument is \
+                    stated rather than assumed: `serves` means WHAT THE INSTRUCTION EXISTS TO \
+                    PRODUCE OR OPERATE, and event-storming produces a storm the way cut-a-slice \
+                    produces a slice. using-praxis serves the FRAME because the router exists for \
+                    the method this frame defines — when the frame closes, its justification \
+                    changes, which is the dependency worth being able to see. What must not be \
+                    added is a sixth kind chosen because something failed"
+            field "state"       each="0..1" one-of="current" "retired"
+            field "retired-at"  each="0..1" when-state="retired"
+            field "stands-at"   each="0..1" when-state="retired" because="a retirement names where the file still stands, so removal is recoverable by name"
+            field "because"     each="0..1"
+            field "note"        each="0..n"
+        }
 
         relates "realizes"      from="thin-slice" to="capability" each="1" \
             because="a slice with no capability is unfunded work"
@@ -959,6 +992,41 @@ notional-architecture "NA.260820.01" {
                 by a rule firing, never by a test" \
             note="reported rather than refused: a rule declared today for a shape the record does \
                 not hold yet is legitimate. What is not legitimate is nobody knowing which"
+
+        rule "a-declared-surface-ships"            refuses="a doctrine-surface naming a path the plugin does not ship" \
+            because="a surface declared for an absent file is a promise the record makes on the \
+                plugin's behalf and cannot keep. This is the direction that fails closed, because \
+                unlike the reverse it can never be a legitimate work-in-progress" \
+            witness=#"""
+                doctrine-surface "surface-for-a-file-that-is-not-there" {
+                    path "skills/no-such-skill/SKILL.md"
+                    kind "skill"
+                    serves "TS.260821.03"
+                }
+                """#
+
+        rule "every-shipped-surface-is-anchored"   reports="a shipped skill, guardrail, agent or probe that no doctrine-surface declares" \
+            because="doctrine an agent follows on the plugin's authority alone is exactly S1 — \
+                improvisation the method MANDATED. Twenty-five of forty-seven skills described a \
+                workflow that had been replaced, and nothing objected because the record never held \
+                the shipped surface at all" \
+            found-by="ITER.260821.19/AK3, read as `nothing knows which door is which` rather than \
+                as `one file is stale`" \
+            given-shipped="skills/no-such-skill/SKILL.md" \
+            witness=#"""
+                doctrine-surface "witness-anchoring-something-else" {
+                    path "skills/using-praxis/SKILL.md"
+                    kind "skill"
+                    serves "TS.260821.03"
+                }
+                """# \
+            note="reported rather than refused, on the day it lands: a rule that fails closed on its \
+                first run names twenty-five files and is one nobody can adopt. TS.260821.04 flips it \
+                when the count is zero, and the flip is that slice's C3" \
+            note="the first rule in this schema whose witness needs a WORLD. `given-shipped` \
+                declares the tree the witness assumes, beside the rule, for the same reason the \
+                witness itself lives here — a world supplied by the engine would be the engine \
+                deciding what the rule is about"
 
         rule "resolution-names-a-release"          refuses="a symptom resolved by a release the record does not hold, or by one that bound no slice attacking it" \
             because="a frame shrinks by a RELEASE, never by an opinion. Resolution computed from \

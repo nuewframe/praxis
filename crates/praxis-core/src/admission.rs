@@ -297,6 +297,8 @@ pub struct Corpus {
     pub views: Vec<View>,
     pub decisions: Vec<Decision>,
     pub config: Config,
+    /// The doctrine this plugin ships, as the record declares it (TS.260821.03).
+    pub surfaces: Vec<crate::surface::Surface>,
     /// Ids the shape check refuses. A slice the checker refuses is not work waiting.
     pub refused: Vec<String>,
 }
@@ -406,6 +408,21 @@ impl Corpus {
                             }
                         }
                     }
+                    "doctrine-surface" => corpus.surfaces.push(crate::surface::Surface {
+                        id: string_arg(node).unwrap_or_default(),
+                        path: child_arg(node, "path").unwrap_or_default(),
+                        kind: child_arg(node, "kind").unwrap_or_default(),
+                        // Every value of every node: `serves "A" "B"` is one node carrying
+                        // two, and reading the first of each is AB1 (ITER.260821.12).
+                        serves: node
+                            .iter_children()
+                            .filter(|c| c.name().value() == "serves")
+                            .flat_map(string_args)
+                            .collect(),
+                        state: child_arg(node, "state")
+                            .unwrap_or_else(|| "current".to_owned()),
+                        stands_at: child_arg(node, "stands-at"),
+                    }),
                     "config" => corpus.config = config_from(node),
                     _ => {}
                 }

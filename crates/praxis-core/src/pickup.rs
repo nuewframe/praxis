@@ -121,7 +121,7 @@ pub fn pick_up(
         Pickup::Opened(Record { file: format!("iterations/{id}.{name}.kdl"), id, kdl, failed })
     } else {
         let id = next_id("REF", &ask.at, taken);
-        let kdl = refusal_kdl(&id, &slice_ids.join(" "), ask, &failed, &undecided);
+        let kdl = refusal_kdl(&id, slice_ids, ask, &failed, &undecided);
         Pickup::Refused(Record { file: format!("iterations/{id}.{name}.kdl"), id, kdl, failed })
     }
 }
@@ -235,7 +235,7 @@ fn iteration_kdl(
 
 fn refusal_kdl(
     id: &str,
-    slice_id: &str,
+    slice_ids: &[String],
     ask: &Ask,
     failed: &[(String, String)],
     undecided: &[(String, String)],
@@ -247,7 +247,13 @@ fn refusal_kdl(
          // named for what its contents ARE to the owner (ADR.260819.01). Nothing was opened.\n\n",
     );
     out.push_str(&format!("refusal {id:?} {{\n"));
-    out.push_str(&format!("    on-slice {slice_id:?}\n"));
+    // One node per slice. Joining them into a single value made `on-slice` name a
+    // thin-slice the record does not hold — the refusal path had never been run with more
+    // than one slice, which is AK1's family: the commitment rewire touched every admission
+    // site and the refusal writer beside it kept compiling.
+    for slice_id in slice_ids {
+        out.push_str(&format!("    on-slice {slice_id:?}\n"));
+    }
     out.push_str(&format!("    at {:?}\n", ask.at));
     out.push_str(&format!("    by {:?}\n", ask.by));
     out.push_str(&format!("    asked-by {:?}\n", ask.signer));

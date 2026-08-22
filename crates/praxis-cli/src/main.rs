@@ -11,11 +11,12 @@ use clap::{Parser, Subcommand};
 use miette::{Diagnostic, NamedSource, SourceSpan};
 use praxis_core::{
     Ask, Binding, Closing, Conditions, Corpus, Known, Pickup, Schema, Severity, Violation,
-    Cut, Promotion, Publication, Published, Verified, assess, bind, check_corpus,
+    Cut, Promotion, Publication, Published, Verified, assess, bind,
     check_document, close_iteration, cut, index_all, parse, pick_up, project, promote, publish,
     dashboard, guide_for, prove, review, unbind, verify, what_is_currently_true,
 };
-use praxis_core::check::decision_body;
+use praxis_core::check::{Facts, check_corpus_given, decision_body};
+use praxis_core::surface::{audit, surfaces};
 use praxis_core::cut::seal;
 
 mod render;
@@ -158,6 +159,18 @@ enum Command {
         /// The state root to read.
         #[arg(default_value = "praxis")]
         root: PathBuf,
+    },
+    /// Report any doctrine this plugin ships that no record entity justifies.
+    ///
+    /// A skill nobody can trace to a capability, a slice or a read model is instruction an
+    /// agent follows on the plugin's authority alone.
+    AuditSurfaces {
+        /// The state root to read.
+        #[arg(long, default_value = "praxis")]
+        root: PathBuf,
+        /// The tree whose shipped doctrine is audited.
+        #[arg(long, default_value = ".")]
+        from: PathBuf,
     },
     /// Seal every accepted decision and resolved symptom that carries no seal.
     ///
@@ -347,6 +360,19 @@ fn main() -> ExitCode {
         Command::Prove { root } => match proving(&root) {
             Ok(0) => ExitCode::SUCCESS,
             Ok(_) => ExitCode::SUCCESS,
+            Err(report) => {
+                eprintln!("{report:?}");
+                ExitCode::FAILURE
+            }
+        },
+        Command::AuditSurfaces { root, from } => match auditing(&root, &from) {
+            Ok(clean) => {
+                if clean {
+                    ExitCode::SUCCESS
+                } else {
+                    ExitCode::SUCCESS
+                }
+            }
             Err(report) => {
                 eprintln!("{report:?}");
                 ExitCode::FAILURE
@@ -1218,6 +1244,94 @@ fn dashboarding(root: &Path) -> miette::Result<()> {
 }
 
 /// `TS.260821.02`. Which of our gates has never fired.
+/// Every instruction file this plugin ships, as the shell finds them.
+///
+/// This is the ONE place the tree is read. `TS.260821.03`/C4: the audit is pure and total
+/// over its input, so what ships is a fact handed in — a core that walked a directory would
+/// give a different answer depending on where it ran.
+///
+/// The four shapes are the four things this plugin ships as instruction. A file outside them
+/// is not doctrine: `scripts/gen-*.sh` generates, `hooks/` wires, and neither tells an agent
+/// what to do.
+fn shipped_doctrine(from: &Path) -> Vec<String> {
+    let mut out = Vec::new();
+
+    let mut push = |path: PathBuf| {
+        if let Ok(rel) = path.strip_prefix(from) {
+            out.push(rel.to_string_lossy().replace('\\', "/"));
+        }
+    };
+
+    if let Ok(entries) = fs::read_dir(from.join("skills")) {
+        for entry in entries.flatten() {
+            let skill = entry.path().join("SKILL.md");
+            if skill.is_file() {
+                push(skill);
+            }
+        }
+    }
+    for (dir, suffix) in
+        [("instructions", ".instructions.md"), ("agents", ".agent.md"), ("scripts", ".sh")]
+    {
+        let Ok(entries) = fs::read_dir(from.join(dir)) else { continue };
+        for entry in entries.flatten() {
+            let path = entry.path();
+            let name = entry.file_name().to_string_lossy().into_owned();
+            // Probes only, out of scripts/. A generator is not doctrine.
+            let is_probe = dir != "scripts" || name.starts_with("check-");
+            if path.is_file() && name.ends_with(suffix) && is_probe {
+                push(path);
+            }
+        }
+    }
+
+    out.sort();
+    out
+}
+
+/// `TS.260821.03`. Audit what the plugin ships against what the record declares.
+fn auditing(root: &Path, from: &Path) -> miette::Result<bool> {
+    let sources = load(root)?;
+    let mut schema = Schema::default();
+    for (_, _, doc) in &sources {
+        let found = Schema::from_document(doc);
+        if !found.is_empty() {
+            schema = found;
+        }
+    }
+    if schema.is_empty() {
+        miette::bail!("the record declares no schema, so nothing declares what a surface is");
+    }
+    if schema.entity("doctrine-surface").is_none() {
+        miette::bail!(
+            "the record does not declare `doctrine-surface`, so it has no way to say what this \
+             plugin ships. See TS.260821.03"
+        );
+    }
+
+    let docs: Vec<_> = sources.into_iter().map(|(_, _, doc)| doc).collect();
+    let corpus = Corpus::from_documents(&docs, &schema);
+    let shipped = shipped_doctrine(from);
+    let audit = audit(surfaces(&corpus), &shipped);
+
+    for (id, path) in &audit.absent {
+        println!("praxis: {id} declares {path} — REFUSED, the plugin does not ship it");
+    }
+    for (id, path) in &audit.still_shipped {
+        println!("praxis: {id} is retired and {path} is still in the tree — REFUSED");
+    }
+    for path in &audit.unanchored {
+        println!("praxis: {path} — UNANCHORED, no doctrine-surface declares it");
+    }
+
+    println!(
+        "praxis: {} of {} shipped surfaces are anchored",
+        audit.anchored.len(),
+        shipped.len()
+    );
+    Ok(audit.clean())
+}
+
 fn proving(root: &Path) -> miette::Result<usize> {
     let sources = load(root)?;
     let mut schema = Schema::default();
@@ -1508,7 +1622,9 @@ fn check(root: &Path) -> miette::Result<usize> {
     // Rules that need the whole record at once — uniqueness and coverage — are decided
     // over the corpus and attributed back to the file that raised them.
     let docs: Vec<_> = sources.iter().map(|(_, _, d)| d.clone()).collect();
-    let corpus = check_corpus(&docs, &schema);
+    // What the tree holds, for the rules the record alone cannot decide (TS.260821.03).
+    let facts = Facts { shipped: shipped_doctrine(Path::new(".")) };
+    let corpus = check_corpus_given(&docs, &schema, &facts);
 
     let (mut refusals, mut reports) = (0, 0);
     for (i, (path, text, doc)) in sources.iter().enumerate() {
@@ -1522,6 +1638,18 @@ fn check(root: &Path) -> miette::Result<usize> {
             }
             eprintln!("{:?}", report(path, text, &violation));
         }
+    }
+
+    // Corpus violations that belong to no document. A rule about what is ABSENT from the
+    // record — or absent from the tree — has no file to be attributed to, and the per-file
+    // loop above would drop it silently. That is AG1 exactly: a correct rule computing a
+    // refusal that never reaches the output (ITER.260821.17).
+    for violation in corpus.iter().filter(|v| !docs.iter().any(|d| belongs(v, d))) {
+        match violation.severity() {
+            Severity::Refuse => refusals += 1,
+            Severity::Report => reports += 1,
+        }
+        eprintln!("praxis: {} — {}", violation.refusal.rule(), violation.refusal.message());
     }
 
     let noted = if reports > 0 { format!(" · {reports} report(s)") } else { String::new() };

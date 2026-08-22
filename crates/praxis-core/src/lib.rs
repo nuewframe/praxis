@@ -18,6 +18,7 @@ pub mod prove;
 pub mod publish;
 pub mod review;
 pub mod schema;
+pub mod surface;
 pub mod truth;
 pub mod verify;
 pub mod view;

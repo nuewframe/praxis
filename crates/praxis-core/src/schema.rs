@@ -118,6 +118,14 @@ pub struct Schema {
 pub struct Rule {
     pub name: String,
     pub witness: Option<String>,
+    /// The world the witness assumes, for a rule the record alone cannot decide.
+    ///
+    /// Every rule before `TS.260821.03` was decidable from the record, so a witness was a
+    /// record and nothing else. A rule about what the plugin SHIPS needs a tree to be about,
+    /// and the honest place to declare that tree is beside the rule — written by whoever
+    /// declares the rule, which is what keeps a witness evidence rather than a second
+    /// implementation of the same check.
+    pub given_shipped: Vec<String>,
 }
 
 impl Schema {
@@ -147,7 +155,16 @@ impl Schema {
             }
             for rule in body.nodes().iter().filter(|n| n.name().value() == "rule") {
                 if let Some(name) = string_arg(rule) {
-                    rules.push(Rule { name, witness: prop(rule, "witness") });
+                    rules.push(Rule {
+                        name,
+                        witness: prop(rule, "witness"),
+                        given_shipped: rule
+                            .entries()
+                            .iter()
+                            .filter(|e| e.name().map(|n| n.value()) == Some("given-shipped"))
+                            .filter_map(|e| e.value().as_string().map(str::to_owned))
+                            .collect(),
+                    });
                 }
             }
         }

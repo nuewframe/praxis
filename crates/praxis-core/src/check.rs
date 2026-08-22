@@ -57,6 +57,12 @@ pub enum Refusal {
     ClaimNotCarried { claim: String, slice: String },
     /// A declared rule that nothing demonstrates refusing.
     UnwitnessedRule { rule: String, why: &'static str },
+    /// A doctrine-surface names a path the plugin does not ship.
+    SurfaceDoesNotShip { path: String },
+    /// A surface declared retired whose file is still in the tree.
+    RetiredSurfaceStillShips { path: String },
+    /// A shipped instruction file no doctrine-surface declares.
+    UnanchoredSurface { path: String },
     /// A symptom resolved by a release the record does not hold.
     ResolvedByNothing { symptom: String, version: String },
     /// A symptom resolved by a release that bound no slice attacking it.
@@ -118,6 +124,10 @@ impl Refusal {
                 "resolution-names-a-release"
             }
             Self::UnwitnessedRule { .. } => "a-rule-has-a-witness",
+            Self::SurfaceDoesNotShip { .. } | Self::RetiredSurfaceStillShips { .. } => {
+                "a-declared-surface-ships"
+            }
+            Self::UnanchoredSurface { .. } => "every-shipped-surface-is-anchored",
         }
     }
 
@@ -142,6 +152,9 @@ impl Refusal {
             Self::DuplicateClaim { claim, .. } | Self::ClaimNotCarried { claim, .. } => claim,
             Self::Unsealed { .. } => "seal",
             Self::UnwitnessedRule { .. } => "witness",
+            Self::SurfaceDoesNotShip { .. }
+            | Self::RetiredSurfaceStillShips { .. }
+            | Self::UnanchoredSurface { .. } => "path",
             Self::UnjustifiedLifetime { missing, .. } => missing,
         }
     }
@@ -152,6 +165,9 @@ impl Refusal {
             Self::ShapelessKind { .. }
             | Self::UnclaimedValue { .. }
             | Self::UnwitnessedRule { .. }
+            // Reported, not refused, until TS.260821.04 takes the count to zero. A rule that
+            // fails closed on its first run names twenty-five files and is unadoptable.
+            | Self::UnanchoredSurface { .. }
             | Self::UnevidencedLayer { .. } => Severity::Report,
             _ => Severity::Refuse,
         }
@@ -213,6 +229,18 @@ impl Refusal {
                 "{id} is a {kind} in state {state:?} and carries no seal. Append-only that nothing \
                  seals is append-only nobody has: the rules that check a seal check it ONLY WHEN \
                  PRESENT, so an unsealed record is protected by nothing"
+            ),
+            Self::SurfaceDoesNotShip { path } => format!(
+                "declares `{path}`, which the plugin does not ship — a surface anchored to an \
+                 absent file is a promise the record cannot keep"
+            ),
+            Self::RetiredSurfaceStillShips { path } => format!(
+                "is retired and `{path}` is still in the tree — the retirement was recorded and \
+                 never carried out"
+            ),
+            Self::UnanchoredSurface { path } => format!(
+                "`{path}` ships and no doctrine-surface declares it — instruction an agent \
+                 follows on the plugin's authority alone"
             ),
             Self::UnwitnessedRule { rule, why } => format!(
                 "{rule} is declared and {why}. A rule that has never been shown to refuse is \
@@ -384,8 +412,16 @@ pub fn check_node(node: &KdlNode, schema: &Schema, known: &Known) -> Vec<Violati
         }
         if let Some(target) = &field.references {
             let names = value.trim_start_matches("CAP.").to_owned();
-            if known.knows_kind(target) && !known.holds(target, &names) && !known.holds(target, &value)
-            {
+            // A field may reference one of SEVERAL kinds: `doctrine-surface.serves` names a
+            // slice, a capability, or a read model, and splitting that into three fields
+            // would make the schema describe the checker's convenience rather than the
+            // thing. Dangling only when some named kind is known and none of them holds it.
+            let targets: Vec<&str> = target.split_whitespace().collect();
+            let any_known = targets.iter().any(|t| known.knows_kind(t));
+            let held = targets
+                .iter()
+                .any(|t| known.holds(t, &names) || known.holds(t, &value));
+            if any_known && !held {
                 out.push(Violation {
                     entity_kind: kind.clone(),
                     entity_id: id.clone(),
@@ -505,9 +541,32 @@ fn field_span(node: &KdlNode, field: &str) -> Option<SourceSpan> {
         .map(|n| n.span())
 }
 
+/// What the world outside the record looked like when the check ran.
+///
+/// Every rule before `TS.260821.03` was decidable from the record alone. The surface rules
+/// are the first that are not: whether a file ships is not something the record can hold
+/// without duplicating the tree. So the world is handed IN — the core still reads nothing,
+/// and a rule about the world is witnessed by a rule that declares the world it assumes.
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
+pub struct Facts {
+    /// Every instruction file the plugin ships, as the shell found them.
+    pub shipped: Vec<String>,
+}
+
 /// Rules that can only be decided by looking at the whole record at once: whether two
 /// entities contest one value, and whether a value nothing claims exists.
+///
+/// Facts default to empty. A caller with a real tree wants `check_corpus_given`.
 pub fn check_corpus(docs: &[KdlDocument], schema: &Schema) -> Vec<Violation> {
+    check_corpus_given(docs, schema, &Facts::default())
+}
+
+/// As `check_corpus`, with what the shell observed outside the record.
+pub fn check_corpus_given(
+    docs: &[KdlDocument],
+    schema: &Schema,
+    facts: &Facts,
+) -> Vec<Violation> {
     let mut out = Vec::new();
     let mut claimed: Vec<(String, String, String)> = Vec::new(); // kind.field, value, owner
 
@@ -742,6 +801,66 @@ pub fn check_corpus(docs: &[KdlDocument], schema: &Schema) -> Vec<Violation> {
             }
         }
     }
+
+    out.extend(check_surfaces(docs, schema, facts));
+    out
+}
+
+/// `TS.260821.03`: the record's doctrine against the tree's.
+///
+/// Both directions, because they mean opposite things. A declared surface that does not ship
+/// REFUSES — it can never be legitimate work-in-progress, because the record made a promise
+/// about a file. A shipped file nothing declares is REPORTED — on the day this lands there
+/// are twenty-five of them, and a rule that fails closed on its first run is one nobody can
+/// adopt.
+fn check_surfaces(docs: &[KdlDocument], schema: &Schema, facts: &Facts) -> Vec<Violation> {
+    // The engine does not carry its own list of what a doctrine-surface is. If the schema
+    // does not declare the kind, this record is not using the rule, and silence is the
+    // answer — not a refusal about a vocabulary the record never adopted.
+    if schema.entity("doctrine-surface").is_none() {
+        return Vec::new();
+    }
+
+    let mut out = Vec::new();
+    let mut declared: Vec<(String, &KdlNode)> = Vec::new();
+
+    for doc in docs {
+        for node in doc.nodes().iter().filter(|n| n.name().value() == "doctrine-surface") {
+            let Some(path) = child_arg(node, "path") else { continue };
+            let retired = child_arg(node, "state").as_deref() == Some("retired");
+            let ships = facts.shipped.iter().any(|p| p == &path);
+            declared.push((path.clone(), node));
+
+            let refusal = match (retired, ships) {
+                (false, false) => Some(Refusal::SurfaceDoesNotShip { path }),
+                (true, true) => Some(Refusal::RetiredSurfaceStillShips { path }),
+                _ => None,
+            };
+            if let Some(refusal) = refusal {
+                out.push(Violation {
+                    entity_kind: "doctrine-surface".to_owned(),
+                    entity_id: string_arg(node),
+                    refusal,
+                    span: field_span(node, "path").unwrap_or_else(|| node.span()),
+                });
+            }
+        }
+    }
+
+    // The reverse sweep. Anchored to the whole declared set, retired included: a file the
+    // record retired and left in the tree is already refused above, and reporting it a
+    // second time as unanchored would name one fault twice.
+    for path in &facts.shipped {
+        if !declared.iter().any(|(p, _)| p == path) {
+            out.push(Violation {
+                entity_kind: "doctrine-surface".to_owned(),
+                entity_id: None,
+                refusal: Refusal::UnanchoredSurface { path: path.clone() },
+                span: SourceSpan::from(0..0),
+            });
+        }
+    }
+
     out
 }
 

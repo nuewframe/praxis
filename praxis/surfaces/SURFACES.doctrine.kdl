@@ -1,0 +1,152 @@
+// What this plugin ships as instruction, and what in the record asks for it.
+//
+// Declared by TS.260821.03. Before this file, the record described the WORK — slices,
+// commitments, claims, releases — and never the doctrine shipped to do the work. Twenty-two
+// of the forty-seven skills correspond to a slice this frame delivered; the rest correspond
+// to nothing, and could not be shown to, because there was no node to hang the edge on.
+//
+// This file holds only the anchored half. Deciding the rest is TS.260821.04, and keeping the
+// two apart is what makes `unanchored` a measurement rather than a list produced by whoever
+// did the deleting.
+
+doctrine-surface "surface.skill.using-praxis" {
+    path "skills/using-praxis/SKILL.md"
+    kind "skill"
+    serves "FRAME.260819.01"
+    note "serves the frame rather than a slice. It is the front door to the whole method, and \
+        pinning it to one slice would make the entry point a detail of one piece of work"
+}
+
+doctrine-surface "surface.skill.event-storming" {
+    path "skills/event-storming/SKILL.md"
+    kind "skill"
+    serves "ES.260819.01"
+}
+
+doctrine-surface "surface.skill.ask-what-is-true" {
+    path "skills/ask-what-is-true/SKILL.md"
+    kind "skill"
+    serves "TS.260820.03"
+}
+
+doctrine-surface "surface.skill.name-a-capability" {
+    path "skills/name-a-capability/SKILL.md"
+    kind "skill"
+    serves "TS.260820.02"
+}
+
+doctrine-surface "surface.skill.cut-a-slice" {
+    path "skills/cut-a-slice/SKILL.md"
+    kind "skill"
+    serves "TS.260820.01"
+}
+
+doctrine-surface "surface.skill.see-what-is-ready" {
+    path "skills/see-what-is-ready/SKILL.md"
+    kind "skill"
+    serves "TS.260820.04"
+}
+
+doctrine-surface "surface.skill.pick-up-a-slice" {
+    path "skills/pick-up-a-slice/SKILL.md"
+    kind "skill"
+    serves "TS.260820.05"
+}
+
+doctrine-surface "surface.skill.attach-evidence" {
+    path "skills/attach-evidence/SKILL.md"
+    kind "skill"
+    serves "TS.260820.06"
+}
+
+doctrine-surface "surface.skill.close-an-iteration" {
+    path "skills/close-an-iteration/SKILL.md"
+    kind "skill"
+    serves "TS.260820.07"
+}
+
+doctrine-surface "surface.skill.review-in-flight" {
+    path "skills/review-in-flight/SKILL.md"
+    kind "skill"
+    serves "TS.260820.08"
+}
+
+doctrine-surface "surface.skill.cut-the-version" {
+    path "skills/cut-the-version/SKILL.md"
+    kind "skill"
+    serves "TS.260820.09"
+}
+
+doctrine-surface "surface.skill.publish-the-release-set" {
+    path "skills/publish-the-release-set/SKILL.md"
+    kind "skill"
+    serves "TS.260820.10"
+}
+
+doctrine-surface "surface.skill.verify-the-published-tree" {
+    path "skills/verify-the-published-tree/SKILL.md"
+    kind "skill"
+    serves "TS.260820.11"
+}
+
+doctrine-surface "surface.skill.declare-a-lifetime" {
+    path "skills/declare-a-lifetime/SKILL.md"
+    kind "skill"
+    serves "TS.260820.12"
+}
+
+doctrine-surface "surface.skill.see-the-dashboard" {
+    path "skills/see-the-dashboard/SKILL.md"
+    kind "skill"
+    serves "TS.260820.13"
+}
+
+doctrine-surface "surface.skill.record-a-decision" {
+    path "skills/record-a-decision/SKILL.md"
+    kind "skill"
+    serves "TS.260820.14"
+}
+
+doctrine-surface "surface.skill.document-usage" {
+    path "skills/document-usage/SKILL.md"
+    kind "skill"
+    serves "TS.260820.15"
+}
+
+doctrine-surface "surface.skill.bind-work-to-a-version" {
+    path "skills/bind-work-to-a-version/SKILL.md"
+    kind "skill"
+    serves "TS.260820.16"
+}
+
+doctrine-surface "surface.skill.promote-what-shipped" {
+    path "skills/promote-what-shipped/SKILL.md"
+    kind "skill"
+    serves "TS.260820.17"
+}
+
+doctrine-surface "surface.skill.resolve-a-symptom" {
+    path "skills/resolve-a-symptom/SKILL.md"
+    kind "skill"
+    serves "TS.260820.18"
+}
+
+doctrine-surface "surface.skill.declare-an-entity-kind" {
+    path "skills/declare-an-entity-kind/SKILL.md"
+    kind "skill"
+    serves "TS.260821.01"
+}
+
+doctrine-surface "surface.skill.witness-a-rule" {
+    path "skills/witness-a-rule/SKILL.md"
+    kind "skill"
+    serves "TS.260821.02"
+}
+
+// The surface this slice itself ships. A slice that adds a rule about shipped instruction
+// and then ships its own instruction unanchored would be the first thing the rule catches.
+doctrine-surface "surface.skill.anchor-a-doctrine-surface" {
+    path "skills/anchor-a-doctrine-surface/SKILL.md"
+    kind "skill"
+    serves "TS.260821.03"
+}

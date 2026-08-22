@@ -13,7 +13,7 @@
 
 use kdl::KdlDocument;
 
-use crate::check::{Known, check_corpus, check_document, index_all};
+use crate::check::{Facts, Known, check_corpus_given, check_document, index_all};
 use crate::schema::Schema;
 
 /// What proving one rule concluded.
@@ -64,7 +64,8 @@ pub fn prove(schema: &Schema) -> Vec<Proof> {
                 };
             };
 
-            let refusals = refusals_enforcing(&rule.name, &witness, schema);
+            let facts = Facts { shipped: rule.given_shipped.clone() };
+            let refusals = refusals_enforcing(&rule.name, &witness, schema, &facts);
             if refusals == 0 {
                 Proof::Unwitnessed { rule: rule.name.clone(), why: WITNESS_REFUSED_NOTHING }
             } else {
@@ -75,12 +76,17 @@ pub fn prove(schema: &Schema) -> Vec<Proof> {
 }
 
 /// How many refusals enforcing this rule the witness produces, through the real checker.
-fn refusals_enforcing(rule: &str, witness: &KdlDocument, schema: &Schema) -> usize {
+fn refusals_enforcing(
+    rule: &str,
+    witness: &KdlDocument,
+    schema: &Schema,
+    facts: &Facts,
+) -> usize {
     let mut known = Known::default();
     index_all(witness, &mut known);
 
     let mut found = check_document(witness, schema, &known);
-    found.extend(check_corpus(std::slice::from_ref(witness), schema));
+    found.extend(check_corpus_given(std::slice::from_ref(witness), schema, facts));
     found.into_iter().filter(|v| v.refusal.rule() == rule).count()
 }
 

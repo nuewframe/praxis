@@ -77,6 +77,23 @@ pub fn what_is_currently_true(corpus: &Corpus, as_of: &str) -> ReadModel {
         }
     }
 
+    // What this plugin ships as instruction, and what asks for it. The next agent's first
+    // question is "which of these skills is still the method?" — and before TS.260821.03
+    // the only way to answer it was to open forty-seven files and guess.
+    let mut doctrine = Section::new("doctrine shipped", &["surface", "kind", "serves", "state"])
+        .empty_because(
+            "nothing recorded — this record declares no doctrine-surface, so what the plugin \
+             ships is not something it can be asked about",
+        );
+    for surface in &corpus.surfaces {
+        doctrine.push(vec![
+            surface.path.clone(),
+            surface.kind.clone(),
+            surface.serves.join(" · "),
+            surface.state.clone(),
+        ]);
+    }
+
     // A view that does not say what it leaves out is one a reader will over-trust. This
     // section is the difference between an answer and an impression.
     let mut excluded = Section::new("not covered by this answer", &["question", "ask instead"])
@@ -93,6 +110,13 @@ pub fn what_is_currently_true(corpus: &Corpus, as_of: &str) -> ReadModel {
         "why any of it was decided".to_owned(),
         "the decisions the record holds, which this does not summarise".to_owned(),
     ]);
+    excluded.push(vec![
+        "which shipped files have NO anchor".to_owned(),
+        "`praxis audit-surfaces` — this lists what the record declares, never what the tree \
+         holds, because a read model that reads a directory answers a different question \
+         depending on where it ran"
+            .to_owned(),
+    ]);
 
     ReadModel::new(
         "what-is-currently-true",
@@ -104,5 +128,6 @@ pub fn what_is_currently_true(corpus: &Corpus, as_of: &str) -> ReadModel {
     .section(delivered)
     .section(outstanding)
     .section(owed)
+    .section(doctrine)
     .section(excluded)
 }

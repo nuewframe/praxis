@@ -36,6 +36,7 @@ fn every_subcommand_can_be_built() {
         "prove",
         "accept",
         "ready",
+        "audit-surfaces",
     ] {
         let out = run(&[command, "--help"]);
         assert!(
@@ -54,6 +55,18 @@ fn the_top_level_help_lists_every_command() {
     for command in ["check", "pick-up", "prove", "accept", "dashboard"] {
         assert!(text.contains(command), "`{command}` is missing from the help");
     }
+}
+
+/// `TS.260821.03`. The audit reads TWO trees — the state root and the tree whose doctrine
+/// is being audited — and they are not the same directory. Conflating them would audit
+/// `praxis/skills/`, which does not exist, and report zero shipped surfaces: a clean answer
+/// to the wrong question.
+#[test]
+fn audit_surfaces_separates_the_record_from_the_tree() {
+    let out = run(&["audit-surfaces", "--help"]);
+    let text = String::from_utf8_lossy(&out.stdout);
+    assert!(text.contains("--root"), "the state root is a flag: {text}");
+    assert!(text.contains("--from"), "and the audited tree is a separate one: {text}");
 }
 
 #[test]
