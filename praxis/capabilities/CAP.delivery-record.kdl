@@ -9,7 +9,7 @@
 capability "delivery-record" {
     doing "hold everything the method produces — problems, discoveries, capabilities, slices and claims — as typed, queryable, trailed facts"
     not "it enforces nothing about DOING the work. It refuses a malformed fact, never a bad decision"
-    state "active"
+    state "sought"
     facet "engine"
 
     derived-from "ES.260819.01"
@@ -58,20 +58,6 @@ capability "delivery-record" {
     usage "`praxis check [root]` — refuse any record that does not match the shape the record itself declares."
     usage "`praxis truth` — what this repository already knows, so an arriving agent does not re-derive it. Read the last section: it names what the answer does not cover."
 
-    shipped "0.8.0" by="ITER.260820.01" slice="TS.260820.01"
-    shipped "0.8.0" by="ITER.260821.01" slice="TS.260821.01"
-    shipped "0.8.0" by="ITER.260821.02" slice="TS.260820.02"
-    shipped "0.8.0" by="ITER.260821.12" slice="TS.260820.03"
-    shipped "0.8.0" by="ITER.260821.14" slice="TS.260820.12"
-    shipped "0.8.0" by="ITER.260821.16" slice="TS.260820.15"
-    shipped "0.8.0" by="ITER.260821.17" slice="TS.260820.18"
-    shipped "0.8.0" by="ITER.260821.19" slice="TS.260820.18"
-    shipped "0.8.0" by="ITER.260821.19" slice="TS.260821.02"
-    shipped "0.8.0" by="ITER.260822.01" slice="TS.260821.03"
-    shipped "0.8.0" by="ITER.260822.02" slice="TS.260821.04"
-    shipped "0.8.0" by="ITER.260822.03" slice="TS.260821.05"
-    shipped "0.8.0" by="ITER.260822.04" slice="TS.260821.04"
-    shipped "0.8.0" by="ITER.260822.07" slice="TS.260821.10"
 
     trail {
         entry at="2026-08-20T00:00:00-05:00" by="agent:principal-engineer" action="created" \

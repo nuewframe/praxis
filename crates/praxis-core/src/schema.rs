@@ -121,6 +121,9 @@ impl FieldSpec {
 /// What one entity kind must look like.
 #[derive(Debug, Clone, Default)]
 pub struct EntitySpec {
+    /// What this kind IS, in the words the schema uses. A sentence written for a person,
+    /// and the glossary a release publishes.
+    pub is: Option<String>,
     pub fields: Vec<FieldSpec>,
 }
 
@@ -251,7 +254,7 @@ impl Schema {
                 let Some(name) = string_arg(entity) else {
                     continue;
                 };
-                entities.insert(name, EntitySpec { fields: fields_of(entity) });
+                entities.insert(name, EntitySpec { is: prop(entity, "is"), fields: fields_of(entity) });
             }
             for rule in body.nodes().iter().filter(|n| n.name().value() == "rule") {
                 if let Some(name) = string_arg(rule) {

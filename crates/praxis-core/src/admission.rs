@@ -128,6 +128,20 @@ pub struct Slice {
     pub attacks: Vec<String>,
     /// What the record SAYS its state is — which may disagree with what the iterations show.
     pub declared_state: Option<String>,
+
+    // The half a reader wants. Every slice declares these by hand, in sentences, and until
+    // TS.260821.12 nothing carried them out of the file — so the published set listed ids.
+    /// One line saying what this slice makes true.
+    pub title: String,
+    /// The moment that calls for it.
+    pub trigger: String,
+    /// What is true afterwards.
+    pub outcome: String,
+    /// What you get if this ships and nothing after it does. Written for a reader deciding
+    /// whether a version is worth having, which is what a release note is.
+    pub useful_alone: Option<String>,
+    /// The command this slice adds, if it adds one. How somebody starts.
+    pub command: Option<String>,
 }
 
 /// One claim, as an iteration settled it. `from` is the slice that declared it, which
@@ -163,6 +177,9 @@ pub struct Decision {
 /// scope dropped in silence.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Carried {
+    /// What the shortfall IS, in the words whoever hit it used. A finding published as an
+    /// id tells a reader nothing they can act on.
+    pub text: String,
     pub id: String,
     pub carries: Option<String>,
     /// A decision this finding tested, where it tested one.
@@ -197,6 +214,9 @@ pub struct Symptom {
     /// must have bound a slice that attacks this symptom.
     pub resolved_by: Option<String>,
     pub seal: Option<String>,
+    /// What is observably wrong, in the words whoever saw it used. A symptom published as
+    /// an id tells a reader nothing.
+    pub text: String,
 }
 
 impl Symptom {
@@ -234,6 +254,13 @@ pub struct Capability {
     /// Usage prose, written while the capability is built and stored IN the record. Not a
     /// file the record points at — a pointer is a second thing to keep in step.
     pub usage: Vec<String>,
+    /// What this capability does, in a sentence.
+    pub doing: String,
+    /// What it refuses to do. Published beside `doing`, because a description that omits
+    /// what a thing cannot do is the artifact this frame distrusts.
+    pub not: String,
+    /// The invariants it holds — what would be wrong if two of its facts disagreed.
+    pub keeps_consistent: Vec<String>,
 }
 
 impl Capability {
@@ -282,6 +309,15 @@ pub struct Config {
     /// failure — Praxis has no HTTP surface — and the record holds both so that "we do not
     /// need this" and "we did not do this" cannot read alike (TS.260821.05).
     pub omitted: Vec<String>,
+}
+
+/// A problem, as the record states it.
+#[derive(Debug, Clone, PartialEq, Eq, Default)]
+pub struct Frame {
+    pub id: String,
+    pub title: String,
+    pub root_cause: String,
+    pub principle: String,
 }
 
 /// A position a human or an agent occupies. Never a person.
@@ -355,6 +391,12 @@ pub struct Corpus {
     pub invariants: Vec<crate::invariant::Invariant>,
     /// Who may attest what (TS.260821.08).
     pub roles: Vec<Role>,
+    /// The problems this repository is working on.
+    pub frames: Vec<Frame>,
+    /// Kind → what it means, from the schema's own `is=`. Carried on the corpus so a
+    /// projection can publish a glossary without the schema being threaded through every
+    /// composer, and so a kind an adopting project declares appears in ITS glossary.
+    pub vocabulary: Vec<(String, String)>,
     /// Ids the shape check refuses. A slice the checker refuses is not work waiting.
     pub refused: Vec<String>,
 }
@@ -437,6 +479,13 @@ impl Corpus {
                             .filter(|c| c.name().value() == "usage")
                             .filter_map(string_arg)
                             .collect(),
+                        doing: child_arg(node, "doing").unwrap_or_default(),
+                        not: child_arg(node, "not").unwrap_or_default(),
+                        keeps_consistent: node
+                            .iter_children()
+                            .filter(|c| c.name().value() == "keeps-consistent")
+                            .flat_map(string_args)
+                            .collect(),
                     }),
                     "event-storm" => {
                         for child in node.iter_children() {
@@ -456,6 +505,12 @@ impl Corpus {
                         }
                     }
                     "frame" => {
+                        corpus.frames.push(Frame {
+                            id: string_arg(node).unwrap_or_default(),
+                            title: child_arg(node, "title").unwrap_or_default(),
+                            root_cause: child_arg(node, "root-cause").unwrap_or_default(),
+                            principle: child_arg(node, "principle").unwrap_or_default(),
+                        });
                         for child in node.iter_children().filter(|c| c.name().value() == "symptom")
                         {
                             if let Some(id) = string_arg(child) {
@@ -463,6 +518,7 @@ impl Corpus {
                                     id,
                                     state: prop(child, "state").unwrap_or_default(),
                                     resolved_by: prop(child, "resolved-by"),
+                                    text: prop(child, "text").unwrap_or_default(),
                                     seal: prop(child, "seal"),
                                 });
                             }
@@ -513,6 +569,12 @@ impl Corpus {
             }
         }
         corpus.slices.sort_by(|a, b| a.id.cmp(&b.id));
+        corpus.vocabulary = schema
+            .kinds()
+            .filter_map(|kind| {
+                schema.entity(kind).and_then(|s| s.is.clone()).map(|is| (kind.to_owned(), is))
+            })
+            .collect();
         corpus
     }
 
@@ -571,6 +633,11 @@ fn slice_from(node: &KdlNode) -> Slice {
             .flat_map(string_args)
             .collect(),
         declared_state: child_arg(node, "state"),
+        title: child_arg(node, "title").unwrap_or_default(),
+        trigger: child_arg(node, "trigger").unwrap_or_default(),
+        outcome: child_arg(node, "outcome").unwrap_or_default(),
+        useful_alone: child_arg(node, "useful-alone"),
+        command: child_arg(node, "command"),
     }
 }
 
@@ -615,6 +682,7 @@ fn attempt_from(node: &KdlNode) -> Attempt {
             .filter(|c| c.name().value() == "finding")
             .map(|c| Carried {
                 id: string_arg(c).unwrap_or_default(),
+                text: prop(c, "text").unwrap_or_default(),
                 carries: prop(c, "carries"),
                 tests: prop(c, "tests"),
             })

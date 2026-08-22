@@ -231,16 +231,20 @@ method "delivery-graph" {
             field "open"       each="0..n"
         }
         entity "release" is="an index into history — what it binds, what it resolves" \
-            states="planned released" \
+            states="planned released withdrawn" \
             owned-by="release-binding" \
             note="machine-owned. Every field is derived from what was bound, so the record is \
                 composed whole on each bind rather than edited — there is nothing in it a human \
                 wrote that a rewrite could lose. Declared with fields by ITER.260821.07" {
             field "version"      each="1"
-            field "state"        each="1" one-of="planned" "released"
+            field "state"        each="1" one-of="planned" "released" "withdrawn"
             field "binds"        each="0..n" references="iteration" \
                 because="a version with no content and a version nobody has computed are not the \
                     same thing, so an empty one says so rather than being absent"
+            field "withdrawn-because" each="1" when-state="withdrawn" \
+                because="a cut that is taken back says why, in the same place it said what it cut. \
+                    A release quietly returned to `planned` and one that was never cut look \
+                    identical afterwards, which is S3 applied to the release chain"
             field "proposed-bump" each="1" when-state="planned" \
                 because="the record PROPOSES from the configured rules. Confirming is the \
                     maintainer's, at cut — so the proposal is what a PLANNED release carries, and \

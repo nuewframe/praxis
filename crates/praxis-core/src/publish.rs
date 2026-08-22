@@ -78,6 +78,8 @@ pub fn publish(version: &str, corpus: &Corpus) -> Publication {
             "the-decisions-that-shaped-this" => decisions(version, corpus),
             "how-to-use-a-capability" => crate::guide::guides(version, corpus),
             "what-this-plugin-ships" => shipped_doctrine(version, corpus),
+            "what-this-product-means" => concepts(version, corpus),
+            "how-it-fits-together" => architecture(version, corpus),
             other => {
                 uncomposable.push(format!(
                     "{other} is declared publishable and the engine has no composer for it. The \
@@ -171,40 +173,83 @@ fn landing(declared: &str, version: &str, view: &str) -> String {
 /// resolved, and what it left owed.
 pub(crate) fn published_set(version: &str, corpus: &Corpus) -> ReadModel {
     let release = corpus.release(version);
-    let mut shipped = Section::new("what shipped", &["iteration", "slice", "contributes"])
-        .empty_because("this version binds nothing");
-    let mut owed = Section::new("what it left owed", &["iteration", "finding", "carries"])
-        .empty_because("no bound iteration carried a finding");
+    let bound: Vec<&crate::admission::Attempt> = release
+        .map(|r| r.binds.as_slice())
+        .unwrap_or_default()
+        .iter()
+        .filter_map(|id| corpus.attempts.iter().find(|a| &a.id == id))
+        .collect();
 
-    for id in release.map(|r| r.binds.as_slice()).unwrap_or_default() {
-        let Some(attempt) = corpus.attempts.iter().find(|a| &a.id == id) else {
-            continue;
-        };
-        let slug = attempt
-            .on_slices
-            .iter()
-            .map(|id| corpus.slice(id).map_or_else(|| id.clone(), |s| format!("{id} — {}", s.slug)))
-            .collect::<Vec<_>>()
-            .join(" · ");
-        shipped.push(vec![
-            attempt.id.clone(),
-            slug,
-            if attempt.contributes.is_empty() {
-                "not declared".to_owned()
-            } else {
-                attempt.contributes.join(" · ")
-            },
-        ]);
-        for finding in &attempt.findings {
-            owed.push(vec![
-                attempt.id.clone(),
-                finding.id.clone(),
-                finding.carries.clone().unwrap_or_else(|| "—".to_owned()),
-            ]);
+    // Every slice this version shipped, once, in the words the slice itself uses. A slice
+    // worked by two iterations is one thing a reader gained, not two.
+    let mut slices: Vec<&crate::admission::Slice> = Vec::new();
+    for attempt in &bound {
+        for id in &attempt.on_slices {
+            if let Some(slice) = corpus.slice(id)
+                && !slices.iter().any(|s| s.id == slice.id)
+            {
+                slices.push(slice);
+            }
         }
     }
 
-    let mut resolved = Section::new("symptoms it resolved", &["symptom"])
+    // The first question. `useful-alone` is written as "what you get if this ships and
+    // nothing after it does", which is a release note line already.
+    // One column, and the sentence looked up beside it. `read-model@v1` constraint 2: prose
+    // is REFERENCED, not inlined — a row names the thing and the paragraph a human wrote
+    // about it is defined by name. Inlining it would also mean sanitising the record's own
+    // words to fit a cell, and a publisher that edits its source is a second author.
+    let mut gained = Section::new("what you can do now", &["what changed"])
+        .empty_because("this version binds no slice, so nothing about what you can do changed");
+    let mut why: Vec<(String, String)> = Vec::new();
+    for slice in &slices {
+        let heading =
+            if slice.title.is_empty() { slice.slug.clone() } else { slice.title.clone() };
+        gained.push(vec![heading.clone()]);
+        let prose = slice.useful_alone.clone().unwrap_or_else(|| slice.outcome.clone());
+        if !prose.is_empty() {
+            why.push((heading, prose));
+        }
+    }
+
+    // The second question. A command is how somebody starts, and the record knows which
+    // slices added one.
+    let mut commands = Section::new("how to start", &["command", "when you reach for it"])
+        .empty_because(
+            "this version added no command — every slice it bound is a view, which changes what \
+             you can SEE rather than what you can do",
+        );
+    for slice in slices.iter().filter(|s| s.command.is_some()) {
+        commands.push(vec![
+            format!("praxis {}", slice.command.clone().unwrap_or_default()),
+            slice.trigger.clone(),
+        ]);
+    }
+
+    // The third question, and the one a release is usually silent about. A finding that
+    // carries a claim is a shortfall somebody wrote down rather than a bug nobody found.
+    let mut owed = Section::new("what is known to be missing", &["finding", "against claim"])
+        .empty_because("no bound iteration recorded a shortfall — which is worth doubting");
+    for attempt in &bound {
+        for finding in attempt.findings.iter().filter(|f| f.carries.is_some()) {
+            owed.push(vec![
+                finding.id.clone(),
+                finding.carries.clone().unwrap_or_default(),
+            ]);
+            if !finding.text.is_empty() {
+                why.push((finding.id.clone(), finding.text.clone()));
+            }
+        }
+    }
+
+    // The accounting. Kept, and last: it is what an auditor wants after the reader has gone.
+    let mut ledger = Section::new("appendix — what bound to this version", &["iteration", "slice"])
+        .empty_because("this version binds nothing");
+    for attempt in &bound {
+        ledger.push(vec![attempt.id.clone(), attempt.on_slices.join(" · ")]);
+    }
+
+    let mut resolved = Section::new("problems this version attacked", &["symptom"])
         .empty_because("no symptom names this version as what resolved it");
     for symptom in corpus.resolved_by(version) {
         resolved.push(vec![symptom.to_owned()]);
@@ -212,12 +257,112 @@ pub(crate) fn published_set(version: &str, corpus: &Corpus) -> ReadModel {
 
     let mut model = ReadModel::new(
         "the-published-set-for-a-release",
-        format!("what shipped at {version}, which symptoms it resolved, and what it left owed"),
+        format!("what can you do at {version} that you could not before, and what is still missing?"),
         // The "moment" of an archival result is the version it depicts.
         version,
     );
     model.publishable = true;
-    model.section(shipped).section(resolved).section(owed)
+    // Order is the argument: what you gained, how to begin, what is missing, what it
+    // attacked — then the ledger. A reader who stops after the first section has the answer
+    // they came for.
+    let mut model = model
+        .section(gained)
+        .section(commands)
+        .section(owed)
+        .section(resolved)
+        .section(ledger);
+    for (name, prose) in why {
+        model = model.define(name, prose);
+    }
+    model
+}
+
+/// `what-this-product-means` — the problem this exists for, and what every word means.
+///
+/// First in the directory, because a reader who does not know what a slice IS cannot use a
+/// changelog about slices. Every sentence here was written by hand, for people, and sat in
+/// the record unpublished: the frame states its own problem and principle, and the schema
+/// says what each kind is in a clause beginning `is=`.
+///
+/// The glossary is generated from whatever the schema declares, so a kind an adopting
+/// project adds appears in ITS release notes without this function being touched.
+fn concepts(version: &str, corpus: &Corpus) -> ReadModel {
+    let mut problem = Section::new("the problem this exists for", &["", ""])
+        .empty_because("the record holds no frame, so this product states no problem");
+    if let Some(frame) = corpus.frames.first() {
+        problem.push(vec!["what is wrong".to_owned(), frame.title.clone()]);
+        if !frame.root_cause.is_empty() {
+            problem.push(vec!["why it is wrong".to_owned(), frame.root_cause.clone()]);
+        }
+        if !frame.principle.is_empty() {
+            problem.push(vec!["what follows from that".to_owned(), frame.principle.clone()]);
+        }
+    }
+
+    let mut symptoms = Section::new("how it shows up", &["", "still present?"])
+        .empty_because("the record names no symptom");
+    for symptom in &corpus.symptoms {
+        symptoms.push(vec![
+            symptom.text.clone(),
+            match symptom.resolved_by.as_deref() {
+                Some(v) => format!("resolved at {v}"),
+                None => "yes".to_owned(),
+            },
+        ]);
+    }
+
+    let mut glossary = Section::new("what the words mean", &["term", "meaning"])
+        .empty_because("the schema describes no kind, so nothing here can be defined");
+    for (kind, means) in &corpus.vocabulary {
+        glossary.push(vec![kind.clone(), means.clone()]);
+    }
+
+    let mut model = ReadModel::new(
+        "what-this-product-means",
+        "what problem does this exist for, and what does every word mean?",
+        version,
+    );
+    model.publishable = true;
+    model.section(problem).section(symptoms).section(glossary).define("depicts", version)
+}
+
+/// `how-it-fits-together` — what each capability does, refuses, and holds true.
+///
+/// Published beside what it CAN do: a description omitting what a thing cannot do is the
+/// artifact this frame distrusts, and `not` is a field every capability already declares.
+fn architecture(version: &str, corpus: &Corpus) -> ReadModel {
+    let mut product = Section::new("what it does", &["capability", "does", "refuses to do"])
+        .empty_because("no capability declares itself part of the product");
+    let mut engine = Section::new("how it is built", &["capability", "does", "refuses to do"])
+        .empty_because("no capability describes the engine");
+    for capability in &corpus.capabilities {
+        let row = vec![capability.id.clone(), capability.doing.clone(), capability.not.clone()];
+        if capability.facet == "product" { product.push(row) } else { engine.push(row) }
+    }
+
+    // What would be WRONG if two of its facts disagreed. The sharpest thing a capability
+    // record says, and the published set has never carried it.
+    let mut holds = Section::new("what each keeps true", &["capability", "invariant"])
+        .empty_because("no capability declares what it keeps consistent");
+    for capability in &corpus.capabilities {
+        for invariant in &capability.keeps_consistent {
+            holds.push(vec![capability.id.clone(), invariant.clone()]);
+        }
+    }
+
+    let mut decided = Section::new("decisions behind it", &["decision", "chosen over"])
+        .empty_because("no decision was recorded");
+    for decision in &corpus.decisions {
+        decided.push(vec![decision.title.clone(), decision.over.join(" · ")]);
+    }
+
+    let mut model = ReadModel::new(
+        "how-it-fits-together",
+        "what does each part do, what does it refuse to do, and what does it keep true?",
+        version,
+    );
+    model.publishable = true;
+    model.section(product).section(engine).section(holds).section(decided).define("depicts", version)
 }
 
 /// `what-this-plugin-ships` — the doctrine a version shipped, what asked for each piece, and

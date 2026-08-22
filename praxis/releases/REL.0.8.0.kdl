@@ -6,7 +6,25 @@
 
 release "REL.0.8.0" {
     version "0.8.0"
-    state "released"
+    state "withdrawn"
+    withdrawn-because #"""
+        Cut to exercise the chain, which had never run end to end (AA4, AF2, WALK.260822.02).
+        It ran, and found two defects and a product judgement.
+
+        The judgement is why this is withdrawn rather than kept: the four documents this cut
+        froze are correct and not worth reading (AS4). release-notes.md is a hundred and
+        seventy lines of iteration ids; the guide says nothing shipped while five capabilities
+        are active. Archival immutability would make that the permanent record of what 0.8.0
+        was, and 0.8.0 has been tagged for nobody.
+
+        Withdrawn rather than bypassed. A flag to republish over a cut release would be a
+        permanent escape hatch bought to solve a development problem, and the record already
+        has the right move for a claim that should not stand — S1 was withdrawn, not
+        grandfathered. The index below is what WAS cut, kept so that this and a version never
+        cut at all do not read alike.
+
+        Re-cut when TS.260821.12 has landed and the published set is worth opening.
+        """#
     binds "ITER.260820.01"
     binds "ITER.260821.01"
     binds "ITER.260821.02"

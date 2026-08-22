@@ -360,6 +360,28 @@ event-storm "ES.260819.01" {
     // ---- Found by applying the publication test. Both are published by Praxis today and
     // ---- neither appeared anywhere in this storm.
 
+    read-model "what-this-product-means" needed-by="reader" "next-agent" \
+        answers="what problem does this exist for, and what does every word mean?" \
+        attacks="S7" \
+        publishable=#true \
+        because="a reader who does not know what a slice IS cannot use a changelog about slices, \
+            and the sentences are already written — the frame states its own problem and \
+            principle, and the schema says what each kind is" \
+        publishes-to="docs/releases/<version>/concepts/" \
+        content-owned-by="CAP.delivery-record" \
+        note="the glossary is generated from whatever the schema declares, so a kind an adopting \
+            project adds appears in ITS release without the publisher being touched"
+
+    read-model "how-it-fits-together" needed-by="reader" "next-agent" \
+        answers="what does each part do, what does it refuse to do, and what does it keep true?" \
+        attacks="S7" \
+        publishable=#true \
+        because="`not` and `keeps-consistent` are the sharpest things a capability record says and \
+            the published set has never carried either. A description that omits what a thing \
+            cannot do is the artifact this frame distrusts" \
+        publishes-to="docs/releases/<version>/architecture/" \
+        content-owned-by="CAP.delivery-record" "CAP.document-projection"
+
     read-model "what-this-plugin-ships" needed-by="reader" "adopter" \
         answers="what doctrine did this version ship, what asked for each piece, and which guarantees fail closed?" \
         attacks="S6" \
