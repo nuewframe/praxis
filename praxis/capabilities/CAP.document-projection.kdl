@@ -8,7 +8,7 @@
 capability "document-projection" {
     doing "compose any declared read model as a whole document, mark what lifetime it has, and prove a published one still matches the release it claims"
     not "it never mutates the record, never edits a document toward a new state, and does not decide what any view CONTAINS — only how a view becomes a document"
-    state "sought"
+    state "active"
     facet "engine"
 
     derived-from "ES.260819.01"
@@ -58,6 +58,12 @@ capability "document-projection" {
 
     usage "`praxis publish <VERSION> [--dry-run]` — regenerate the published set whole, before the cut. Membership comes from the lifetime declarations and the paths come with it."
     usage "`praxis verify-published` — prove no published document was hand-edited, comparing each release's directory against the commit its index names."
+
+    shipped "0.8.0" by="ITER.260821.09" slice="TS.260820.10"
+    shipped "0.8.0" by="ITER.260821.10" slice="TS.260820.11"
+    shipped "0.8.0" by="ITER.260821.18" slice="TS.260820.13"
+    shipped "0.8.0" by="ITER.260822.03" slice="TS.260821.06"
+    shipped "0.8.0" by="ITER.260822.04" slice="TS.260821.07"
 
     trail {
         entry at="2026-08-20T00:00:00-05:00" by="agent:principal-engineer" action="created" \

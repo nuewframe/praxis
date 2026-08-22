@@ -241,9 +241,12 @@ method "delivery-graph" {
             field "binds"        each="0..n" references="iteration" \
                 because="a version with no content and a version nobody has computed are not the \
                     same thing, so an empty one says so rather than being absent"
-            field "proposed-bump" each="1" \
+            field "proposed-bump" each="1" when-state="planned" \
                 because="the record PROPOSES from the configured rules. Confirming is the \
-                    maintainer's, at cut"
+                    maintainer's, at cut — so the proposal is what a PLANNED release carries, and \
+                    once cut the index's `confirmed-bump` holds what was decided. Both are kept: \
+                    a confirmed bump that differs from the proposed one is a maintainer overriding \
+                    the rules, which is legitimate and worth being able to see"
             field "proposal-incomplete-for" each="0..n" \
                 because="an iteration that declares no `contributes` informed the proposal with \
                     nothing, and a proposal computed from half the work is not a proposal"

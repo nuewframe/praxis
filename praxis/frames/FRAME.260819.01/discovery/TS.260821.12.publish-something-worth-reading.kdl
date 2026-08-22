@@ -1,0 +1,106 @@
+// The record is more human-readable than its own projection.
+//
+// Every slice declares `title`, `outcome`, `trigger` and `useful-alone` — sentences written
+// by hand, for people. `useful-alone` is literally "what you get if this ships and nothing
+// after it does", which is a release-note line. Every capability declares `doing`, `not`,
+// and `usage`.
+//
+// The Slice the corpus builds holds id, slug, kind, realizes, layers, depends-on, claims and
+// attacks. All accounting, none of the prose. So docs/releases/0.8.0/release-notes.md is a
+// hundred and seventy lines of `ITER.260821.19 | TS.260821.02 — prove-every-rule-can-refuse
+// | slice-outcome-added`, with the last column identical on all twenty-seven rows.
+//
+// The publisher is not short of material. It is reading the wrong half of the record.
+
+thin-slice "TS.260821.12" {
+    slug "publish-something-worth-reading"
+    title "Publish what a version lets somebody do, in the words the record already holds"
+    kind "view"
+    realizes "CAP.document-projection"
+    from-storm "ES.260819.01"
+
+    read-model "the-published-set-for-a-release"
+    read-model "what-this-product-means"
+    read-model "how-it-fits-together"
+    actor "a human or an agent meeting this product at a version, having read nothing else"
+    needs-read-model "what-is-currently-true"
+
+    trigger "somebody opens a release directory to find out what the product does"
+    outcome "the published set answers what this can do, how to start, what changed and what is known broken — in sentences, from the record"
+
+    scenario #"""
+        Given a record whose slices declare `outcome` and `useful-alone`, and whose capabilities
+             declare `doing`, `not` and `usage`
+        When the set is published for a version
+        Then a reader is told what the product does and how to begin — because a document that
+             lists iteration ids and one repeated bump category answers "what does the record
+             contain", and nobody has ever opened a release directory to ask that.
+        """#
+
+    step "1" does="the corpus carries the prose. Slice gains title, trigger, outcome, useful-alone and command; Capability already has doing, not and usage and they go unread"
+    step "2" does="what a version lets you do comes from `useful-alone` and `outcome`, not from the slice's slug"
+    step "3" does="how to start comes from the commands the shipped slices declare, which is a fact the record holds and the published set has never mentioned"
+    step "4" does="what is known broken comes from open findings that carry a claim. A release that names its own shortfalls is the one worth trusting"
+    step "5" does="the iteration-to-slice table stays, at the BOTTOM, as an appendix. It is accounting, and accounting is what an auditor wants after the reader has gone"
+    step "6" does="the CONCEPTS are published — the frame's problem, root cause and principle, and the vocabulary from the schema's own `is=` sentences. `a frame is a problem: symptoms, one root cause, one principle` is a glossary entry somebody already wrote"
+    step "7" does="the ARCHITECTURE is published — what each capability does and refuses, what it keeps consistent, the seams between them, and the decisions that shaped it"
+    step "8" does="concepts come FIRST in the directory. A reader who does not know what a slice is cannot use a changelog about slices"
+
+    excludes "writing prose the record does not hold. If a slice's `useful-alone` is bad, the fix \
+        is the slice — a publisher that improves on its source is a second author, and the second \
+        copy is the one that goes stale"
+    excludes "a marketing register. `not` and `does-not-prove` are published beside `doing`, and a \
+        release set that omits what a thing cannot do is the artifact this whole frame distrusts"
+    excludes "explaining the RUST. The engine is an implementation of the architecture and not the \
+        architecture; a reader who needs the crate layout is reading the code, and publishing it \
+        would put a second description of the codebase somewhere nothing checks it"
+    excludes "changing what verify-published compares. It proves nobody hand-edited the tree, \
+        which is a different guarantee from `this is still true` — conflating them is AO2 and \
+        belongs to that finding"
+
+    layer "doctrine"    reaches="a slice's `outcome` and `useful-alone` are written knowing they will be published, which changes how they get written"
+    layer "enforcement" reaches="a slice whose outcome or useful-alone is missing is already refused by the shape check; this makes the refusal earn its keep"
+    layer "docs"        reaches="docs/releases/<version>/ is the first thing to hand somebody, rather than the last thing anybody opens"
+
+    claim "C1" text="the published set says what the version lets somebody do, in the record's own sentences" \
+        settled-by="a test asserting a slice's `useful-alone` and `outcome` appear in the published document, and that its ITERATION id does not appear above them"
+    claim "C2" text="how to start is published — the commands the shipped slices declare" \
+        settled-by="a test asserting every `command` a bound slice declares is listed, and that a version binding no command slice says so rather than showing an empty table"
+    claim "C3" text="what a capability cannot do is published beside what it can" \
+        settled-by="a test asserting `not` and `usage` both reach the document, and that a capability with usage prose is never described as having no shipped surface"
+    claim "C4" text="what is known broken is published — open findings that carry a claim" \
+        settled-by="a test asserting a carried finding reaches the released set, because a release that hides its shortfalls is the artifact this frame exists to distrust"
+    claim "C5" text="the accounting survives, as an appendix" \
+        settled-by="a test asserting the iteration-to-slice table is still present and is the LAST section"
+    claim "C6" text="the concepts are published — the problem, the principle, and what each kind MEANS" \
+        settled-by="a test asserting every kind the schema declares reaches the glossary with its `is=` sentence, so a kind added by an adopting project appears without the publisher being changed"
+    claim "C7" text="the architecture is published — what each capability owns, what it refuses, and the seams between them" \
+        settled-by="a test asserting a capability's `not` and its `keeps-consistent` both reach the document, and that a seam declared in the record appears with both ends named"
+
+    depends-on "TS.260820.10 — the publisher exists; what it reads is what this changes"
+
+    useful-alone "docs/releases/<version>/ becomes the thing you hand somebody who has read \
+        nothing — concepts, then architecture, then what changed, then how to start. Today it is a hundred and seventy lines that answer a question nobody asked, and \
+        one document that says nothing shipped while five capabilities are active"
+
+    attacks "S6"
+
+    cut-from "the maintainer reading docs/releases/0.8.0 as a product artifact, minutes after it was cut" \
+        note="found by asking what the artifact OFFERS rather than whether it is correct. It is \
+            correct. Every row is true, the seal verifies, and nobody would read it twice"
+
+    note "widened after the cut, on the maintainer's reading: the release must explain the \
+        product's CONCEPTS and its ARCHITECTURE, not only what changed and how to use it. Kept as \
+        one slice rather than split, because the deliverable is a directory a cold reader can \
+        open — and splitting it would mean that becomes true only after two slices land"
+
+    principle-note "the published set was built to prove a document could be regenerated whole \
+        from state rather than spliced by regex, and it proves that. Being the right MECHANISM was \
+        allowed to stand in for being worth reading, for four slices and a release — and the \
+        material it needed was in the record the whole time, in fields written by hand for people"
+
+    proves "a release directory is worth opening"
+    does-not-prove "that the prose in the record is good. It publishes what the slices say; a \
+        badly written `useful-alone` becomes a badly written release note, and that is the correct \
+        failure — it puts the fix where the sentence is"
+}

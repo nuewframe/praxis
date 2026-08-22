@@ -384,10 +384,13 @@ pub fn check_node(node: &KdlNode, schema: &Schema, known: &Known) -> Vec<Violati
     };
     let id = string_arg(node);
     let declared_kind = child_arg(node, "kind");
+    let declared_state = child_arg(node, "state");
 
     let mut out = Vec::new();
     for field in &spec.fields {
-        if !field.applies_to(declared_kind.as_deref()) {
+        if !field.applies_to(declared_kind.as_deref())
+            || !field.applies_in(declared_state.as_deref())
+        {
             continue;
         }
         let found = count_of(node, &field.name);

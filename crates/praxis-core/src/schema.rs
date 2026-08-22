@@ -59,6 +59,14 @@ pub struct FieldSpec {
     pub each: Cardinality,
     /// Only required when the entity's `kind` matches.
     pub when_kind: Option<String>,
+    /// The state this field applies in. A field whose purpose is discharged by a transition
+    /// is not missing afterwards — `release.proposed-bump` matters while a version is being
+    /// PLANNED, and once cut the index's `confirmed-bump` is what the maintainer decided.
+    ///
+    /// Declared in the schema and unenforced until `ITER.260822.08/AS2`, which is the shape
+    /// `a-rule-has-a-witness` exists to catch one level down: a property nothing reads looks
+    /// exactly like one that is honoured.
+    pub when_state: Option<String>,
     /// The entity kind this field's value must name.
     pub references: Option<String>,
     /// No two records of this kind may claim the same value for this field.
@@ -81,7 +89,19 @@ pub struct FieldSpec {
 impl FieldSpec {
     /// Whether this field applies to an entity declaring `kind`.
     pub fn applies_to(&self, kind: Option<&str>) -> bool {
-        match (&self.when_kind, kind) {
+        Self::matches(&self.when_kind, kind)
+    }
+
+    /// Whether this field applies to an entity in `state`.
+    pub fn applies_in(&self, state: Option<&str>) -> bool {
+        Self::matches(&self.when_state, state)
+    }
+
+    /// A gate is satisfied when it is not declared, or when it matches what the record says.
+    /// An undeclared value against a declared gate does NOT match: a record that does not say
+    /// which state it is in has not earned the exemption the gate grants.
+    fn matches(want: &Option<String>, have: Option<&str>) -> bool {
+        match (want, have) {
             (None, _) => true,
             (Some(want), Some(have)) => want == have,
             (Some(_), None) => false,
@@ -291,6 +311,7 @@ fn fields_of(entity: &KdlNode) -> Vec<FieldSpec> {
                 name,
                 each,
                 when_kind: prop(field, "when-kind"),
+                when_state: prop(field, "when-state"),
                 references: prop(field, "references"),
                 holds: prop(field, "holds"),
                 unique_in: prop(field, "unique-in"),

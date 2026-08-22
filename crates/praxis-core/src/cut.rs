@@ -175,6 +175,14 @@ fn release_kdl(
     out.push_str(&format!("release {:?} {{\n", release.id));
     out.push_str(&format!("    version {version:?}\n"));
     out.push_str("    state \"released\"\n");
+    // Carried, not recomputed. The cut composes the index node whole, so a field the
+    // release already declared is dropped unless it is written here — and `proposed-bump`
+    // was, silently, until the release chain ran end to end for the first time
+    // (ITER.260822.08/AS1). What the record proposed and what the maintainer confirmed are
+    // two facts, and a cut that keeps only the second cannot be asked whether they agreed.
+    if !release.proposed_bump.is_empty() {
+        out.push_str(&format!("    proposed-bump {:?}\n", release.proposed_bump));
+    }
     for iteration in &release.binds {
         out.push_str(&format!("    binds {iteration:?}\n"));
     }

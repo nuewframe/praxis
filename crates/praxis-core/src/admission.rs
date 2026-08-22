@@ -253,6 +253,14 @@ pub struct Release {
     pub version: String,
     pub state: String,
     pub binds: Vec<String>,
+    /// What the configured rules PROPOSED, as distinct from what the maintainer confirmed.
+    ///
+    /// Read here because the cut composes the index node whole, and a field the corpus does
+    /// not hold is a field the cut cannot carry. It was dropped on every cut until the
+    /// release chain ran end to end for the first time (ITER.260822.08/AS1) — and the two
+    /// facts matter separately: a confirmed bump that differs from the proposed one is a
+    /// maintainer overriding the rules, which is legitimate and worth being able to see.
+    pub proposed_bump: String,
 }
 
 impl Release {
@@ -620,6 +628,7 @@ fn release_from(node: &KdlNode) -> Release {
         version: child_arg(node, "version").unwrap_or_default(),
         state: child_arg(node, "state").unwrap_or_default(),
         binds: child_args(node, "binds"),
+        proposed_bump: child_arg(node, "proposed-bump").unwrap_or_default(),
     }
 }
 

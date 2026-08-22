@@ -1,7 +1,7 @@
 capability "work-admission" {
     doing "decide whether a slice may be started right now, and record the decision either way"
     not "it does not judge whether the work was done well. It judges readiness and disjointness, at one moment, and then it is finished"
-    state "sought"
+    state "active"
     facet "engine"
 
     derived-from "ES.260819.01"
@@ -39,6 +39,9 @@ capability "work-admission" {
 
     usage "`praxis ready` — which slices could be started right now, and what would refuse each of the rest. Read the `not decided for you` section first: it names the conditions the gate declares and did not compute."
     usage "`praxis pick-up <SLICE>` — take a slice through the one gate. Either an iteration opens, or a refusal record is written naming the condition that failed. Selection is the commitment."
+
+    shipped "0.8.0" by="ITER.260821.03" slice="TS.260820.04"
+    shipped "0.8.0" by="ITER.260821.04" slice="TS.260820.05"
 
     trail {
         entry at="2026-08-20T00:00:00-05:00" by="agent:principal-engineer" action="created"

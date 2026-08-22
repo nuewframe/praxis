@@ -1,11 +1,12 @@
-// Machine-owned. Every field here is derived from what is bound, so this file
-// is composed whole on each bind rather than edited — there is nothing in it a
-// human wrote that a rewrite could lose. An index into history, never a copy
-// of it.
+// CUT. This record is immutable: nothing rebinds to a cut release and the index
+// node is never edited. The `seal` below is computed from the content — change
+// any of it and `praxis check` says so.
+//
+// The index POINTS at a commit. It never mirrors what git already holds.
 
 release "REL.0.8.0" {
     version "0.8.0"
-    state "planned"
+    state "released"
     binds "ITER.260820.01"
     binds "ITER.260821.01"
     binds "ITER.260821.02"
@@ -34,15 +35,21 @@ release "REL.0.8.0" {
     binds "ITER.260822.06"
     binds "ITER.260822.07"
 
-    proposed-bump "minor" \
-        because="slice-outcome-added (ITER.260820.01)"
-    proposal-incomplete-for "ITER.260821.19" "ITER.260822.01" "ITER.260822.02" "ITER.260822.03" "ITER.260822.04" "ITER.260822.05" "ITER.260822.06" "ITER.260822.07" \
-        because="these declare no `contributes`, so they informed the proposal with nothing"
-    confirmation "required" by="human" \
-        note="the record PROPOSES. Choosing the version is the maintainer's, at cut"
+    // Resolves nothing. Stated rather than omitted: a release that fixed
+    // no symptom and one nobody checked are not the same thing.
+
+    index {
+        tag "v0.8.0"
+        commit "8ddfd001d4ba36a351074fbff58de8ce6d566c1a"
+        cut-at "2026-08-22T09:37:05Z"
+        cut-by "human:wael"
+        confirmed-bump "minor"
+    }
+    seal "fnv1a64:6de035a844ca494c" \
+        note="computed over version, commit, what it binds and what it resolves. It makes an edit visible; it is not a signature"
 
     trail {
-        entry at="2026-08-22T09:27:33Z" by="agent:praxis" action="bound" \
-            note="composed from what is bound. Rewritten whole on every bind"
+        entry at="2026-08-22T09:37:05Z" by="agent:praxis" action="cut" \
+            note="the release and its index written in one operation. Neither exists without the other"
     }
 }
