@@ -40,13 +40,26 @@ Initiatives (waves) represent growth vectors delivered as transient, single-file
 
 ### Living Capability Records (`CAP.`)
 
-Durable, current-state truth per domain homed in `docs/capabilities/`:
+Capability records are held in the record, not in prose: `praxis/capabilities/*.kdl`, checked
+by `praxis check` and published per version to `docs/releases/<version>/capabilities/`.
 
-| Capability Record | Bounded Context & Domain Scope | Status | Seam Contract |
-| ----------------- | ------------------------------ | ------ | ------------- |
-| [`CAP.method-spine-and-execution`](capabilities/CAP.method-spine-and-execution.md) | Delivery spine (`PLAN->TRIAGE->BUILD->LEARN->TEACH`), thin-slice lifecycle, sprint bridge, tier routing. | Active | `method-spine@v1` |
-| [`CAP.multi-harness-distribution`](capabilities/CAP.multi-harness-distribution.md) | 6 harness reach (Claude Code, Codex, Cursor, Gemini, OpenCode, Copilot), session hooks, overlay provisioning. | Active | `harness-distribution@v1` |
-| [`CAP.plugin-conformance-and-validation-probes`](capabilities/CAP.plugin-conformance-and-validation-probes.md) | 15 automated quality probes, single-source version audit, cross-reference scanners, test-suite fixtures. | Active | `validation-probes@v1` |
+| Capability | Facet | What it does |
+| ---------- | ----- | ------------ |
+| `multi-harness-distribution` | product | One tree to six harnesses, injected at session start |
+| `conformance-probes` | product | Every guarantee paired with something that keeps it, at a severity an adopter can read |
+| `work-admission` | engine | The one gate: admit or refuse, in writing |
+| `claim-settlement` | engine | Evidence, findings, and closing without dropping scope in silence |
+| `release-binding` | engine | Closed work attached to a version, and the version cut |
+| `delivery-record` | engine | What is true, and what the record is allowed to hold |
+| `document-projection` | engine | A view becomes a document, stamped and verifiable |
+
+The three Markdown records that used to sit here were retired by `TS.260821.06`. Two were
+ported — gaining four gate tests and a `keeps-consistent` each, neither of which the Markdown
+originals declared. `CAP.method-spine-and-execution` was **not**: its subject was the
+`PLAN→TRIAGE→BUILD` spine, tier routing and the sprint bridge, all retired by `TS.260821.04`.
+It had been hollow since the graph replaced the spine, and nothing said so because a Markdown
+capability record declares no gate test it could fail.
+
 
 ---
 
@@ -138,7 +151,6 @@ docs/
 - [`bump-version.sh`](../scripts/bump-version.sh)
 - [`check-anti-dumping.sh`](../scripts/check-anti-dumping.sh)
 - [`check-config-externalized.sh`](../scripts/check-config-externalized.sh)
-- [`check-contract-freshness.sh`](../scripts/check-contract-freshness.sh)
 - [`check-escape-hatch-usage.sh`](../scripts/check-escape-hatch-usage.sh)
 - [`check-no-skipped-tests.sh`](../scripts/check-no-skipped-tests.sh)
 - [`check-no-sleep-waits.sh`](../scripts/check-no-sleep-waits.sh)
@@ -148,11 +160,8 @@ docs/
 - [`check-seam-contract-parity.sh`](../scripts/check-seam-contract-parity.sh)
 - [`check-stateless-request-path.sh`](../scripts/check-stateless-request-path.sh)
 - [`citation_scan.py`](../scripts/citation_scan.py)
-- [`gen-coverage-matrix.sh`](../scripts/gen-coverage-matrix.sh)
-- [`gen-doctrine-index.sh`](../scripts/gen-doctrine-index.sh)
 - [`test-citation-scan.sh`](../scripts/test-citation-scan.sh)
 - [`test-probes.sh`](../scripts/test-probes.sh)
-- [`test-sprint-coordination.sh`](../scripts/test-sprint-coordination.sh)
 - [`validate-plugin.sh`](../scripts/validate-plugin.sh)
 
 ---
@@ -194,6 +203,7 @@ Every skill below is anchored in the record (`praxis audit-surfaces`); each corr
 - [`skills/declare-an-entity-kind/`](../skills/declare-an-entity-kind/SKILL.md) — Declare a kind the record must hold, and its shape, on the architecture's schema. An amendment to the record, never a change to the engine.
 - [`skills/witness-a-rule/`](../skills/witness-a-rule/SKILL.md) — Declare a rule together with the record that demonstrates it refusing. A rule never shown to refuse is indistinguishable from one that cannot.
 - [`skills/anchor-a-doctrine-surface/`](../skills/anchor-a-doctrine-surface/SKILL.md) — Declare what a shipped skill, guardrail, agent or probe exists to serve. Instruction the record cannot trace is doctrine on the plugin's authority alone.
+- [`skills/declare-an-invariant/`](../skills/declare-an-invariant/SKILL.md) — Declare what this plugin guarantees about code it is loaded into, and anchor the probe that keeps it.
 - [`skills/see-what-is-ready/`](../skills/see-what-is-ready/SKILL.md) — Which slices could be started right now, and what would refuse each of the rest — including the conditions the gate declares and nobody computed.
 - [`skills/see-the-dashboard/`](../skills/see-the-dashboard/SKILL.md) — Where the product stands right now: several views composed on demand, each still singly owned, never committed.
 - [`skills/pick-up-a-slice/`](../skills/pick-up-a-slice/SKILL.md) — Take one or more slices through the one gate, as one commitment. Refusals are recorded as facts; an override is recorded beside the refusal it overrides.

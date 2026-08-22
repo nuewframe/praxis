@@ -1074,7 +1074,7 @@ field "owns-read-model"  each="1..n"
                 }
                 """#
 
-        rule "every-shipped-surface-is-anchored"   reports="a shipped skill, guardrail, agent or probe that no doctrine-surface declares" \
+        rule "every-shipped-surface-is-anchored"   refuses="a shipped skill, guardrail, agent or probe that no doctrine-surface declares" \
             because="doctrine an agent follows on the plugin's authority alone is exactly S1 — \
                 improvisation the method MANDATED. Twenty-five of forty-seven skills described a \
                 workflow that had been replaced, and nothing objected because the record never held \
@@ -1089,9 +1089,11 @@ field "owns-read-model"  each="1..n"
                     serves "TS.260821.03"
                 }
                 """# \
-            note="reported rather than refused, on the day it lands: a rule that fails closed on its \
-                first run names twenty-five files and is one nobody can adopt. TS.260821.04 flips it \
-                when the count is zero, and the flip is that slice's C3" \
+            note="reported rather than refused on the day it landed: it named forty-five files, and \
+                a rule that fails closed on its first run is one nobody can adopt. FLIPPED to refuse \
+                by ITER.260822.04 when the count reached zero — 48 of 48 anchored. Twenty surfaces \
+                retired, twenty-eight anchored, and the twenty-five that AM1 said had nowhere to go \
+                went somewhere the moment TS.260821.05 gave the record a word for what they do" \
             note="the first rule in this schema whose witness needs a WORLD. `given-shipped` \
                 declares the tree the witness assumes, beside the rule, for the same reason the \
                 witness itself lives here — a world supplied by the engine would be the engine \

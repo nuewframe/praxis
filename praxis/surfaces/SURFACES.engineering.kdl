@@ -1,0 +1,91 @@
+// The engineering half, anchored to what it serves (TS.260821.04, completing what AM1
+// carried).
+//
+// These twenty-five surfaces could not be anchored when TS.260821.04 closed, because the
+// record had no vocabulary for what they are about. TS.260821.05 gave it one: an invariant
+// is what a probe is FOR, and a skill that teaches an invariant serves the same thing the
+// probe that checks it serves.
+//
+// That is the whole answer to AM1. Not "find a place to put them" — the places existed once
+// the record could say what the places were.
+
+doctrine-surface "surface.skill.define-seam-contract" {
+    path "skills/define-seam-contract/SKILL.md"
+    kind "skill"
+    serves "seam-contract-parity"
+    note "the skill writes the contract the probe checks. A seam declared in prose and a seam \
+        with a machine-readable shape are the difference between the probe having something to \
+        compare and having nothing"
+}
+
+doctrine-surface "surface.skill.design-capability-layout" {
+    path "skills/design-capability-layout/SKILL.md"
+    kind "skill"
+    serves "no-dumping-grounds" "port-adapter-parity"
+    note "the layout IS the invariant. Deciding where a thing goes is deciding whether it lands \
+        in a dumping ground, and declaring a port is what gives parity something to check"
+}
+
+doctrine-surface "surface.skill.implement-with-defensive-patterns" {
+    path "skills/implement-with-defensive-patterns/SKILL.md"
+    kind "skill"
+    serves "resilient-boundary" "http-observability"
+    note "timeout, retry, fallback, breaker, and structured telemetry at every cross-process \
+        path. The skill teaches what the two probes then verify"
+}
+
+doctrine-surface "surface.skill.design-system-architecture" {
+    path "skills/design-system-architecture/SKILL.md"
+    kind "skill"
+    serves "remote-config-externalization" "stateless-request-path" "resilient-boundary"
+    note "topology, persistence and resilience are where all three are decided or lost. A \
+        stateless request path is not something a probe can add afterwards"
+}
+
+doctrine-surface "surface.skill.refactor-layered-to-capability" {
+    path "skills/refactor-layered-to-capability/SKILL.md"
+    kind "skill"
+    serves "no-dumping-grounds"
+    note "the migration's whole subject is controllers/ services/ utils/ becoming vertical \
+        slices, which is the anti-dumping invariant applied to an existing tree"
+}
+
+doctrine-surface "surface.skill.test-by-ownership" {
+    path "skills/test-by-ownership/SKILL.md"
+    kind "skill"
+    serves "no-skipped-tests"
+    note "one property of a behaviour, one layer. A test at the wrong layer is the one that gets \
+        skipped when it turns flaky, which is what the probe then finds"
+}
+
+doctrine-surface "surface.skill.prepare-project-for-ast" {
+    path "skills/prepare-project-for-ast/SKILL.md"
+    kind "skill"
+    serves "port-adapter-parity" "seam-contract-parity"
+    note "both probes have been AST-backed since v0.7.0, and both fall back to filename matching \
+        without a parser. This skill is what gives them a parse tree to read"
+}
+
+doctrine-surface "surface.skill.bootstrap-project" {
+    path "skills/bootstrap-project/SKILL.md"
+    kind "skill"
+    serves "multi-harness-distribution"
+    note "scaffolds the .github/ and .claude/ trees a harness reads. multi-harness-distribution \
+        owns OverlayProvisioned; this is the greenfield half of producing one"
+}
+
+doctrine-surface "surface.skill.provision-project-overlay" {
+    path "skills/provision-project-overlay/SKILL.md"
+    kind "skill"
+    serves "multi-harness-distribution"
+    note "the brownfield half of the same event, on a repository that already has a shape"
+}
+
+doctrine-surface "surface.skill.ingest-operational-feedback" {
+    path "skills/ingest-operational-feedback/SKILL.md"
+    kind "skill"
+    serves "conformance-probes"
+    note "an incident is where an invariant comes FROM. The skill is how operational reality \
+        becomes a guarantee the record holds, which is the capability's own input side"
+}
+

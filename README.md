@@ -1,6 +1,6 @@
 # Praxis
 
-A portable agent plugin that fuses **lean wave-based product delivery** with **Principal Engineer discipline** into a single composable method. Language-, framework-, and runtime-agnostic in doctrine (static enforcement is best-effort per language — see [docs/coverage-matrix.md](docs/coverage-matrix.md)); installable into Claude Code, Codex (CLI and App), Cursor, Gemini CLI, OpenCode, and GitHub Copilot (CLI and VS Code).
+A portable agent plugin that fuses **lean wave-based product delivery** with **Principal Engineer discipline** into a single composable method. Language-, framework-, and runtime-agnostic in doctrine (static enforcement is best-effort per language — see [docs/releases/<version>/doctrine/](docs/releases/<version>/doctrine/)); installable into Claude Code, Codex (CLI and App), Cursor, Gemini CLI, OpenCode, and GitHub Copilot (CLI and VS Code).
 
 Praxis is universal: it does not assume any stack. Project-specific rules belong in the project's own `.github/` and `.claude/` files and override anything here.
 
@@ -60,6 +60,7 @@ anchor.
 | `skills/declare-an-entity-kind/` | Declare a kind the record must hold, and its shape, on the architecture's schema. An amendment to the record, never a change to the engine. |
 | `skills/witness-a-rule/` | Declare a rule together with the record that demonstrates it refusing. A rule never shown to refuse is indistinguishable from one that cannot. |
 | `skills/anchor-a-doctrine-surface/` | Declare what a shipped skill, guardrail, agent or probe exists to serve. Instruction the record cannot trace is doctrine on the plugin's authority alone. |
+| `skills/declare-an-invariant/` | Declare what this plugin guarantees about code it is loaded into, and anchor the probe that keeps it. `enabled` and `enforced` are different facts. |
 | `skills/see-what-is-ready/` | Which slices could be started right now, and what would refuse each of the rest — including the conditions the gate declares and nobody computed. |
 | `skills/see-the-dashboard/` | Where the product stands right now: several views composed on demand, each still singly owned, never committed. |
 | `skills/pick-up-a-slice/` | Take one or more slices through the one gate, as one commitment. Refusals are recorded as facts; an override is recorded beside the refusal it overrides. |
@@ -119,8 +120,6 @@ These scripts check **shape and presence** — a file exists, a pattern matches,
 | `scripts/test-citation-scan.sh`        | Self-test for `scripts/citation_scan.py`, the shared citation-vs-assertion implementation both literal scanners consume: asserts that a literal inside a fence, blockquote, or code span is a citation, that a long fence is not closed early by a shorter inner one, and that an inline marker without a reason fails. |
 | `scripts/check-contract-freshness.sh`  | Fails when a sprint depends on a seam contract that moved or vanished since its bridge froze, and flags a `baseRevision` that is not an ancestor of HEAD. Warn-first via `.sprint-coordination.json`. |
 | `scripts/test-sprint-coordination.sh`  | Self-test for both concurrency probes, using fixtures taken from the first real concurrent dispatch rather than invented ones. |
-| `scripts/gen-doctrine-index.sh`        | Generates each guardrail's `applyTo` scope table in `using-praxis` from the instruction files' own frontmatter. `--check` in CI fails on a hand-edit, so the one verbatim-duplicated doctrine fact cannot drift. |
-| `scripts/gen-coverage-matrix.sh`       | Generates / checks `docs/coverage-matrix.md` from each probe's `--include` list, so the language-coverage claim cannot drift from reality. |
 
 ## How the two halves compose
 

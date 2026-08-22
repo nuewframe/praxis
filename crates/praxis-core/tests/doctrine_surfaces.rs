@@ -50,9 +50,13 @@ doctrine-surface "surface.one" {
 }
 "#;
 
-/// C1 — a shipped file that no declared surface names is reported, by path.
+/// C1 — a shipped file that no declared surface names is named, by path.
+///
+/// It landed at REPORT severity, naming forty-five files. `ITER.260822.04` flipped it to
+/// refuse once the count reached zero (48 of 48 anchored), which is `TS.260821.04`/C3. The
+/// assertion below is on the SEVERITY as it stands, so a silent flip back would fail here.
 #[test]
-fn a_shipped_file_nobody_declared_is_reported_by_path() {
+fn a_shipped_file_nobody_declared_is_named_by_path() {
     let found = violations(ANCHORED, &["skills/anchored/SKILL.md", "skills/nobody-asked/SKILL.md"]);
 
     assert_eq!(rules(&found), ["every-shipped-surface-is-anchored"]);
@@ -61,9 +65,10 @@ fn a_shipped_file_nobody_declared_is_reported_by_path() {
         "the report must name the PATH — a count of unanchored files is not actionable: {}",
         found[0].refusal.message()
     );
-    // Reported, not refused. TS.260821.04 flips it once the count is zero; a rule that fails
-    // closed on its first run names forty-five files and is one nobody can adopt.
-    assert_eq!(found[0].severity(), Severity::Report);
+    // Refuses, since ITER.260822.04. The count is zero and the rule is what keeps it there:
+    // adding an unanchored surface now fails the check rather than being noted in a list
+    // nobody reads to the bottom of.
+    assert_eq!(found[0].severity(), Severity::Refuse);
 }
 
 /// C2 — a declared surface whose path does not ship refuses. The opposite direction from

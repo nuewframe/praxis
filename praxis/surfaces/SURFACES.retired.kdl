@@ -259,3 +259,37 @@ doctrine-surface "surface.retired.cap-conformance-md" {
     because "ported and NARROWED to praxis/capabilities/CAP.conformance-probes.kdl. The Markdown \
         record claimed five script families, which is a list rather than a consistency boundary"
 }
+
+// The regex half, retired by TS.260821.07.
+//
+// Both learned what this plugin contains by matching a pattern against the working tree.
+// The fragile thing about that was never the pattern: it was that the prose WAS the state,
+// so the pattern was the only reader, and the only way to find out it had stopped matching
+// was for somebody to notice the output looked wrong.
+//
+// Neither is a doctrine-surface by kind — a generator is not instruction — but both are
+// recorded here because retiring them is what TS.260821.07 DID, and a removal nobody wrote
+// down is indistinguishable from a removal nobody made.
+doctrine-surface "surface.retired.gen-coverage-matrix" {
+    path "scripts/gen-coverage-matrix.sh"
+    kind "probe"
+    serves "TS.260821.07"
+    state "retired"
+    retired-at "2026-08-22"
+    stands-at "v0.7.1"
+    because "it derived docs/coverage-matrix.md by grepping every probe's --include list. Language \
+        coverage is now a field on the invariant, declared by whoever writes the probe, and a \
+        structural probe SAYS so instead of being listed against nine languages it does not scan"
+}
+
+doctrine-surface "surface.retired.gen-doctrine-index" {
+    path "scripts/gen-doctrine-index.sh"
+    kind "probe"
+    serves "TS.260821.07"
+    state "retired"
+    retired-at "2026-08-22"
+    stands-at "v0.7.1"
+    because "it scraped instructions/*.instructions.md frontmatter into a table inside generated \
+        markers, and CI failed on a hand-edit within them. It kept one table honest about a set \
+        of files nothing else could describe at all"
+}

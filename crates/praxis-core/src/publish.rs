@@ -77,6 +77,7 @@ pub fn publish(version: &str, corpus: &Corpus) -> Publication {
             "capabilities-and-what-they-own" => capabilities(version, corpus),
             "the-decisions-that-shaped-this" => decisions(version, corpus),
             "how-to-use-a-capability" => crate::guide::guides(version, corpus),
+            "what-this-plugin-ships" => shipped_doctrine(version, corpus),
             other => {
                 uncomposable.push(format!(
                     "{other} is declared publishable and the engine has no composer for it. The \
@@ -217,6 +218,130 @@ pub(crate) fn published_set(version: &str, corpus: &Corpus) -> ReadModel {
     );
     model.publishable = true;
     model.section(shipped).section(resolved).section(owed)
+}
+
+/// `what-this-plugin-ships` — the doctrine a version shipped, what asked for each piece, and
+/// which of the plugin's guarantees actually fail closed (`TS.260821.07`).
+///
+/// Every fact here is DERIVED. Which version shipped a surface is not stored on the surface:
+/// it comes from what the surface serves, through the iteration that delivered that slice,
+/// to the release the iteration bound to. Storing it would be a second copy of a fact the
+/// record already holds, and the first thing that would go stale.
+///
+/// This replaces `gen-coverage-matrix.sh` and `gen-doctrine-index.sh`, both of which learned
+/// what the plugin contains by matching a pattern against the working tree. The fragile
+/// thing about that was never the pattern. It was that the prose WAS the state, so the
+/// pattern was the only reader, and the only way to find out it had stopped matching was for
+/// somebody to notice the output looked wrong.
+fn shipped_doctrine(version: &str, corpus: &Corpus) -> ReadModel {
+    let mut shipped = Section::new(
+        "doctrine shipped",
+        &["surface", "kind", "serves", "shipped in"],
+    )
+    .empty_because("the record declares no doctrine-surface, so what this plugin ships is not \
+                    something it can be asked about");
+    for surface in corpus.surfaces.iter().filter(|s| !s.retired()) {
+        shipped.push(vec![
+            surface.path.clone(),
+            surface.kind.clone(),
+            surface.serves.join(" · "),
+            shipped_in(surface, corpus),
+        ]);
+    }
+
+    let mut retired = Section::new("retired, and where it still stands", &["surface", "stands at"])
+        .empty_because("no surface has been retired");
+    for surface in corpus.surfaces.iter().filter(|s| s.retired()) {
+        retired.push(vec![
+            surface.path.clone(),
+            surface.stands_at.clone().unwrap_or_else(|| "not recorded".to_owned()),
+        ]);
+    }
+
+    // What the plugin guarantees, and — the part an adopter actually needs — whether each
+    // one is a gate or a notice.
+    let mut guarantees =
+        Section::new("what it guarantees", &["invariant", "severity", "kept by", "languages"])
+            .empty_because("the record declares no invariant");
+    for invariant in &corpus.invariants {
+        let keepers: Vec<&str> = corpus
+            .surfaces
+            .iter()
+            .filter(|s| !s.retired() && s.serves.iter().any(|t| t == &invariant.id))
+            .filter(|s| s.kind == "probe")
+            .map(|s| s.path.as_str())
+            .collect();
+        let coverage = if invariant.structural.is_some() {
+            "every language — it reads structure, not text".to_owned()
+        } else if invariant.languages.is_empty() {
+            "not declared".to_owned()
+        } else {
+            invariant.languages.join(" · ")
+        };
+        guarantees.push(vec![
+            invariant.id.clone(),
+            if invariant.fails_closed() { "fails closed".to_owned() } else { "reports".to_owned() },
+            if keepers.is_empty() {
+                "nothing — this guarantee has no keeper".to_owned()
+            } else {
+                keepers.join(" · ")
+            },
+            coverage,
+        ]);
+    }
+
+    let mut excluded = Section::new("not covered by this answer", &["question", "ask instead"])
+        .empty_because("this answer covers everything the record holds");
+    excluded.push(vec![
+        "whether a probe WORKS".to_owned(),
+        "`praxis prove` — this says a guarantee has a keeper, never that the keeper keeps it"
+            .to_owned(),
+    ]);
+    excluded.push(vec![
+        "surfaces whose `shipped in` reads `not derivable`".to_owned(),
+        "they serve an invariant, a capability or the frame rather than a slice, and no chain \
+         runs from those to a release. Storing a version on the surface would fix the column \
+         and break the fact"
+            .to_owned(),
+    ]);
+
+    let mut model = ReadModel::new(
+        "what-this-plugin-ships",
+        "what doctrine did this version ship, what asked for each piece, and which guarantees \
+         fail closed?",
+        version,
+    );
+    model.publishable = true;
+    model
+        .section(shipped)
+        .section(guarantees)
+        .section(retired)
+        .section(excluded)
+        .define("depicts", version)
+}
+
+/// Which release shipped this surface, derived rather than stored.
+///
+/// `serves` names a slice → some iteration covers that slice → that iteration bound to a
+/// release. A surface serving an invariant or the frame has no such chain, and says so
+/// instead of guessing: a column that reads "0.8.0" because the tool had nothing better is
+/// worse than one that admits it.
+fn shipped_in(surface: &crate::surface::Surface, corpus: &Corpus) -> String {
+    let mut versions: Vec<String> = Vec::new();
+    for target in &surface.serves {
+        for attempt in corpus.attempts.iter().filter(|a| a.covers(target)) {
+            if let Some(release) = corpus.bound_to(&attempt.id)
+                && !versions.contains(&release.version)
+            {
+                versions.push(release.version.clone());
+            }
+        }
+    }
+    if versions.is_empty() {
+        "not derivable from what it serves".to_owned()
+    } else {
+        versions.join(" · ")
+    }
 }
 
 /// `capabilities-and-what-they-own` — what the system must be able to do, and which events

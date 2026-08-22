@@ -360,6 +360,24 @@ event-storm "ES.260819.01" {
     // ---- Found by applying the publication test. Both are published by Praxis today and
     // ---- neither appeared anywhere in this storm.
 
+    read-model "what-this-plugin-ships" needed-by="reader" "adopter" \
+        answers="what doctrine did this version ship, what asked for each piece, and which guarantees fail closed?" \
+        attacks="S6" \
+        publishable=#true \
+        because="an adopter decides whether to install a version, and an existing adopter decides \
+            whether to upgrade. Both questions are about a VERSION, and every answer available \
+            before TS.260821.07 described the working tree — which is a different question wearing \
+            the same words" \
+        publishes-to="docs/releases/<version>/doctrine/" \
+        composes=#true \
+        content-owned-by="CAP.delivery-record" "CAP.conformance-probes" \
+        note="composite, and the second one matters: delivery-record holds what ships and what \
+            asked for it, conformance-probes holds what is guaranteed and what keeps each \
+            guarantee. Which release shipped a surface is DERIVED — serves names a slice, an \
+            iteration covers that slice, that iteration bound to a release. Storing a version on \
+            the surface would be a second copy of a fact the record already holds, and the first \
+            thing to go stale"
+
     read-model "the-decisions-that-shaped-this" needed-by="reader" "next-agent" \
         answers="what was decided, what were the alternatives, and what tested it?" \
         attacks="S2" "S7" \

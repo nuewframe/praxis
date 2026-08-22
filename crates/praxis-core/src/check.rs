@@ -171,7 +171,6 @@ impl Refusal {
             | Self::UnwitnessedRule { .. }
             // Reported, not refused, until TS.260821.04 takes the count to zero. A rule that
             // fails closed on its first run names twenty-five files and is unadoptable.
-            | Self::UnanchoredSurface { .. }
             // An invariant declared before its probe is written is a legitimate order of
             // work. What is not legitimate is nobody knowing which.
             | Self::UnkeptInvariant { .. }
@@ -247,7 +246,9 @@ impl Refusal {
             ),
             Self::UnanchoredSurface { path } => format!(
                 "`{path}` ships and no doctrine-surface declares it — instruction an agent \
-                 follows on the plugin's authority alone"
+                 follows on the plugin's authority alone. Anchor it (`anchor-a-doctrine-surface`) \
+                 or retire it; the count reached zero at 0.8.0 and this rule fails closed to keep \
+                 it there"
             ),
             Self::UnkeptInvariant { invariant, protects } => format!(
                 "`{invariant}` is enabled and nothing enforces it — the plugin guarantees that \

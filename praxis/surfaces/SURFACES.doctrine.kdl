@@ -156,3 +156,35 @@ doctrine-surface "surface.skill.declare-an-invariant" {
     kind "skill"
     serves "TS.260821.05"
 }
+
+// The three personas. Anchored to the FRAME, which is the weakest anchor in the vocabulary
+// and was chosen deliberately — see the decision "what a persona serves" on ITER.260822.04.
+//
+// A persona is not a capability, not an invariant and not a slice. It is a statement about
+// WHO may attest what, and the reason this plugin has personas at all is the trust-transfer
+// problem: the same engineer cannot self-approve, because an artifact looks identical
+// whether the reviewer was a different mind or the same one wearing a second hat. That is
+// S2, and it is the frame's own subject.
+doctrine-surface "surface.agent.principal-engineer" {
+    path "agents/principal-engineer.agent.md"
+    kind "agent"
+    serves "FRAME.260819.01"
+    note "three modes — architect, implementer, reviewer — never two at once. The mode split \
+        exists so that `who checked this` has an answer that is not `the person who wrote it`"
+}
+
+doctrine-surface "surface.agent.product-manager" {
+    path "agents/product-manager.agent.md"
+    kind "agent"
+    serves "FRAME.260819.01"
+    note "signs the admission. The gate refuses an agent-signed approval outright, so this \
+        persona is the human half of a rule the engine enforces"
+}
+
+doctrine-surface "surface.agent.product-designer" {
+    path "agents/product-designer.agent.md"
+    kind "agent"
+    serves "FRAME.260819.01"
+    note "owns the design-ux phase and what a read model must answer before an actor can act. \
+        A view nobody specified is a view whose emptiness means nothing"
+}

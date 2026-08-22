@@ -16,6 +16,7 @@ what was decided, what were the alternatives, and what tested it?
 | the seal covers the body and not the amendments | ITER.260821.15 | compute the seal over title, chose, over, because and falsified-by only | an amendment that contradicts the body rather than extending it. If that happens the split is wrong, because a contradiction would pass unsealed |
 | prose written before its truth ships is named, not dropped | ITER.260821.16 | a `written, not yet shipped` section listing usage whose release has not promoted it | that section growing large enough that nobody reads it — at which point it is a backlog wearing a document's clothes, and belongs somewhere that tracks backlogs |
 | the unverifiable claim is withdrawn, not grandfathered | ITER.260821.17 | move S1 to `present` and record previously-claimed and withdrawn-because | a frame where withdrawing pre-record claims loses so much true history that readers start keeping it somewhere else — at which point the record has made itself less useful than the prose it replaced |
+| what a persona serves | ITER.260822.04 | anchor the three personas to FRAME.260819.01, the weakest anchor in the vocabulary | a fourth persona, or a persona that needs to say something the frame cannot hold — at which point three surfaces pointing at one frame stops being an argument and becomes the dumping ground it currently resembles |
 
 ## what it rejected
 
@@ -28,6 +29,7 @@ what was decided, what were the alternatives, and what tested it?
 | the seal covers the body and not the amendments | sealing the whole node, amendments included |
 | prose written before its truth ships is named, not dropped | omitting it, which is what `only publish what shipped` literally implies |
 | the unverifiable claim is withdrawn, not grandfathered | a grandfather clause exempting claims made before the delivery graph existed |
+| what a persona serves | a `persona` entity kind, so a persona could serve the phases it owns |
 
 ## what tested it
 
