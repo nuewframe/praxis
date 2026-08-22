@@ -181,8 +181,8 @@ pub struct Attempt {
     pub findings: Vec<Carried>,
     /// Layers this iteration says it reached: name, state, and the evidence named.
     pub layers: Vec<(String, String, String)>,
-    /// Phases: kind, state, and what each produced.
-    pub phases: Vec<(String, String, String)>,
+    /// The stages of the attempt, and who worked each.
+    pub phases: Vec<Phase>,
     /// Which of the configured bump rules this iteration's work matches. Declared by the
     /// iteration, because only whoever did the work knows what kind of change it was.
     pub contributes: Vec<String>,
@@ -276,6 +276,44 @@ pub struct Config {
     pub omitted: Vec<String>,
 }
 
+/// A position a human or an agent occupies. Never a person.
+#[derive(Debug, Clone, PartialEq, Eq, Default)]
+pub struct Role {
+    pub id: String,
+    pub owns_phase: Vec<String>,
+    /// The phases this role may not attest when it did the work. The field the kind exists
+    /// for — everything else about a role is describable in prose, and this is not.
+    pub never_for_own: Vec<String>,
+}
+
+impl Role {
+    /// Whether an identity occupies this role.
+    ///
+    /// `agent:principal-engineer` occupies `principal-engineer`. A human identity carries no
+    /// role in the record, and gets none here: the rule is about an agent attesting its own
+    /// work, and a human closing an iteration an agent worked is exactly the handoff the
+    /// rule exists to require.
+    pub fn occupied_by(&self, identity: &str) -> bool {
+        identity.strip_prefix("agent:").is_some_and(|name| name == self.id)
+    }
+}
+
+/// One stage of an attempt, and who worked it.
+///
+/// `worked_by` is what makes `an-attestation-is-not-self-issued` computable. Before
+/// TS.260821.08 a phase recorded what it PRODUCED and never who produced it, so "the same
+/// engineer cannot self-approve" had nothing to compare.
+#[derive(Debug, Clone, PartialEq, Eq, Default)]
+pub struct Phase {
+    pub kind: String,
+    pub state: String,
+    pub produced: String,
+    /// Absent on every phase written before this was declared. Absent is not a violation —
+    /// it is a phase whose worker nobody recorded, and refusing on it would make every
+    /// historical iteration unclosable.
+    pub worked_by: Option<String>,
+}
+
 impl Attempt {
     /// Whether this commitment covers a given slice.
     pub fn covers(&self, slice: &str) -> bool {
@@ -307,6 +345,8 @@ pub struct Corpus {
     pub surfaces: Vec<crate::surface::Surface>,
     /// What the plugin guarantees about code it is loaded into (TS.260821.05).
     pub invariants: Vec<crate::invariant::Invariant>,
+    /// Who may attest what (TS.260821.08).
+    pub roles: Vec<Role>,
     /// Ids the shape check refuses. A slice the checker refuses is not work waiting.
     pub refused: Vec<String>,
 }
@@ -446,6 +486,19 @@ impl Corpus {
                             .collect(),
                         structural: child_arg(node, "structural"),
                     }),
+                    "role" => corpus.roles.push(Role {
+                        id: string_arg(node).unwrap_or_default(),
+                        owns_phase: node
+                            .iter_children()
+                            .filter(|c| c.name().value() == "owns-phase")
+                            .flat_map(string_args)
+                            .collect(),
+                        never_for_own: node
+                            .iter_children()
+                            .filter(|c| c.name().value() == "never-for-own")
+                            .flat_map(string_args)
+                            .collect(),
+                    }),
                     "config" => corpus.config = config_from(node),
                     _ => {}
                 }
@@ -542,12 +595,11 @@ fn attempt_from(node: &KdlNode) -> Attempt {
         phases: node
             .iter_children()
             .filter(|c| c.name().value() == "phase")
-            .map(|c| {
-                (
-                    string_arg(c).unwrap_or_default(),
-                    prop(c, "state").unwrap_or_default(),
-                    prop(c, "produced").or_else(|| prop(c, "because")).unwrap_or_default(),
-                )
+            .map(|c| Phase {
+                kind: string_arg(c).unwrap_or_default(),
+                state: prop(c, "state").unwrap_or_default(),
+                produced: prop(c, "produced").or_else(|| prop(c, "because")).unwrap_or_default(),
+                worked_by: prop(c, "worked-by"),
             })
             .collect(),
         findings: node

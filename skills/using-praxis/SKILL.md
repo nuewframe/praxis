@@ -35,7 +35,15 @@ Load the persona's full file before acting in that role.
 | **Product Designer** | User value, the `design-ux` phase, a slice's scenario and claims; owns what a read model must answer before an actor can act | `agents/product-designer.agent.md` |
 | **Principal Engineer** | Capability-driven architecture, refactoring, cross-cutting decisions; operates in three modes — architect, implementer, reviewer — never two at once | `agents/principal-engineer.agent.md` |
 
-**The same engineer cannot self-approve.** If you are the implementer, you cannot also be the reviewer in the same session — switch personas explicitly or hand off.
+**The same engineer cannot self-approve — and since `TS.260821.08`, `praxis close` refuses it.**
+
+Each persona names a `role` in the record, and a role declares which phases it may not attest
+when it did the work itself. A phase records `worked-by`. If the identity closing an iteration
+worked a phase its role reserves, the close is refused and nothing closes.
+
+Working two phases is normal and often better. **Attesting your own work is the act refused** —
+hand off, or record who did review it. Note what this does not claim: it refuses the one case
+that is definitionally not a review. A different mind rubber-stamping is still a rubber stamp.
 
 The three persona files describe roles the method still has, and their prose still carries
 sprint-era vocabulary in places. That is tracked, not hidden: they are among the surfaces

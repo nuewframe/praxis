@@ -8,6 +8,7 @@ tools:
   - read_file
   - create_file
   - replace_string_in_file
+praxis-role: product-designer
 ---
 
 # Product Designer

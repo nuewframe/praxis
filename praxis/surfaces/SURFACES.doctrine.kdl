@@ -12,9 +12,11 @@
 doctrine-surface "surface.skill.using-praxis" {
     path "skills/using-praxis/SKILL.md"
     kind "skill"
-    serves "FRAME.260819.01"
-    note "serves the frame rather than a slice. It is the front door to the whole method, and \
-        pinning it to one slice would make the entry point a detail of one piece of work"
+    serves "multi-harness-distribution"
+    note "corrected by TS.260821.08. It served the FRAME, which is the root: every surface \
+        descends from it, so the anchor discriminated nothing. The real owner was in the record \
+        the whole time — multi-harness-distribution owns the event RouterInjected, and this file \
+        is the artifact that event injects"
 }
 
 doctrine-surface "surface.skill.event-storming" {
@@ -157,18 +159,19 @@ doctrine-surface "surface.skill.declare-an-invariant" {
     serves "TS.260821.05"
 }
 
-// The three personas. Anchored to the FRAME, which is the weakest anchor in the vocabulary
-// and was chosen deliberately — see the decision "what a persona serves" on ITER.260822.04.
+// The three personas, anchored to the roles they describe (TS.260821.08).
 //
-// A persona is not a capability, not an invariant and not a slice. It is a statement about
-// WHO may attest what, and the reason this plugin has personas at all is the trust-transfer
-// problem: the same engineer cannot self-approve, because an artifact looks identical
-// whether the reviewer was a different mind or the same one wearing a second hat. That is
-// S2, and it is the frame's own subject.
+// They were anchored to the FRAME by ITER.260822.04, which was a dumping ground: the frame is
+// the root, so the anchor was true by construction and discriminated nothing. The decision
+// recorded there predicted the falsifier would be a fourth persona. It was not — it was the
+// count going from one to four in a single iteration, which is a structural tell rather than
+// a numeric one.
+//
+// A persona is a statement about WHO may attest what, and the record now has a word for that.
 doctrine-surface "surface.agent.principal-engineer" {
     path "agents/principal-engineer.agent.md"
     kind "agent"
-    serves "FRAME.260819.01"
+    serves "principal-engineer"
     note "three modes — architect, implementer, reviewer — never two at once. The mode split \
         exists so that `who checked this` has an answer that is not `the person who wrote it`"
 }
@@ -176,7 +179,7 @@ doctrine-surface "surface.agent.principal-engineer" {
 doctrine-surface "surface.agent.product-manager" {
     path "agents/product-manager.agent.md"
     kind "agent"
-    serves "FRAME.260819.01"
+    serves "product-manager"
     note "signs the admission. The gate refuses an agent-signed approval outright, so this \
         persona is the human half of a rule the engine enforces"
 }
@@ -184,7 +187,7 @@ doctrine-surface "surface.agent.product-manager" {
 doctrine-surface "surface.agent.product-designer" {
     path "agents/product-designer.agent.md"
     kind "agent"
-    serves "FRAME.260819.01"
+    serves "product-designer"
     note "owns the design-ux phase and what a read model must answer before an actor can act. \
         A view nobody specified is a view whose emptiness means nothing"
 }

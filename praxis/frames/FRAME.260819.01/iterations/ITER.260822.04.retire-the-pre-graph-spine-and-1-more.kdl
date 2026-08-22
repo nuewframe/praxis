@@ -125,7 +125,33 @@ iteration "ITER.260822.04" {
             rejected because a persona does not enforce anything" \
         falsified-by="a fourth persona, or a persona that needs to say something the frame cannot \
             hold — at which point three surfaces pointing at one frame stops being an argument and \
-            becomes the dumping ground it currently resembles" seal=fnv1a64:997fb5b9e20e1e74
+            becomes the dumping ground it currently resembles" \
+        seal="fnv1a64:997fb5b9e20e1e74" {
+        amendment "the falsifier fired, and not the way it was written" at="2026-08-22T00:00:00Z" \
+            by="agent:principal-engineer" \
+            note=#"""
+                TS.260821.08 reverses the conclusion and keeps the reasoning.
+
+                The prediction was a FOURTH persona. What happened is that the frame went from
+                one surface to four inside the same iteration, and the tell is structural rather
+                than numeric. The frame is the ROOT — every surface descends from it by
+                construction — so `serves` naming it is true of everything and discriminates
+                nothing. A target true by construction cannot discriminate, and a field that
+                cannot discriminate is a dumping ground when it holds ONE thing. It was already
+                wrong at one.
+
+                The rejected alternative "a persona entity kind" was rejected for being three
+                records' worth of vocabulary for three records. That was the mistake. `role` earns
+                its place not by anchoring three files but by making "the same engineer cannot
+                self-approve" computable — the rule this plugin states most confidently and, until
+                now, enforced least.
+
+                `frame` is removed from the serves vocabulary. The fix is not a rule that detects
+                the pile: no-dumping-grounds forbids the NAMES utils, helpers, common, and never
+                measures whether a folder became a junk drawer. Anti-dumping works by making the
+                dumping ground unnameable.
+                """#
+    }
 
     finding "AO1" state="open" size="observation" \
         text="the count reached zero because the record gained a WORD, not because anything was \

@@ -748,6 +748,24 @@ field "owns-read-model"  each="1..n"
         entity "read-model" is="a view an actor must see before acting, owned by exactly one capability" \
             note="already load-bearing in every slice's needs/feeds edges and never declared"
 
+        entity "role" is="who may attest what — a position a human or an agent occupies, not a person" \
+            owned-by="claim-settlement" \
+            note="declared by TS.260821.08. `The same engineer cannot self-approve` has been in the \
+                router and in the engineer persona since before the delivery graph, and it is the \
+                single rule this plugin states most confidently and enforces least. It sat in the \
+                bottom row of the enforcement table — agent-attested, trusted, not compelled — \
+                which is S2 exactly: an artifact looks identical whether the reviewer was a \
+                different mind or the same one wearing a second hat" {
+            field "is"            each="1" because="what the role is for, in a sentence"
+            field "owns-phase"    each="1..n" because="which stage of an attempt this role is answerable for. A role owning no phase is a title"
+            field "may-sign"      each="0..n" because="which approval kinds this role may put a signature against"
+            field "never-for-own" each="0..n" \
+                because="the phases whose work this role may not attest when it did the work \
+                    itself. This is the field the whole kind exists for — everything else about a \
+                    role is describable in prose, and this is not"
+            field "note"          each="0..n"
+        }
+
         entity "invariant" is="one property the plugin GUARANTEES about code it is loaded into" \
             states="enforced advisory" \
             owned-by="delivery-record" \
@@ -778,7 +796,7 @@ field "owns-read-model"  each="1..n"
                 what asks for it; an unanchored one is instruction on the plugin's authority alone" {
             field "path"        each="1" because="the anchor is to a file, so an absent file is a broken promise rather than an untidy one"
             field "kind"        each="1" one-of="skill" "guardrail" "agent" "probe"
-            field "serves"      each="1..n" references="thin-slice capability read-model frame event-storm invariant" \
+            field "serves"      each="1..n" references="thin-slice capability read-model event-storm invariant role" \
                 because="a surface serving nothing is doctrine nobody asked for, which is the whole \
                     rule. It references five kinds, so a surface whose reason was withdrawn is \
                     already caught by dangling-relationship rather than by a second rule" \
@@ -791,6 +809,15 @@ field "owns-read-model"  each="1..n"
                     the method this frame defines — when the frame closes, its justification \
                     changes, which is the dependency worth being able to see. What must not be \
                     added is a sixth kind chosen because something failed" \
+                note="`frame` was REMOVED from this list by TS.260821.08, and role added in its \
+                    place. The frame is the ROOT: every surface descends from it by construction, \
+                    so `serves \"FRAME.260819.01\"` is true of everything and discriminates nothing. \
+                    A target true by construction cannot discriminate, and a field that cannot \
+                    discriminate IS a dumping ground — the count going from one to four revealed \
+                    it, but it was already one when it was one. The fix is not a rule that detects \
+                    the pile: no-dumping-grounds forbids the NAMES utils, helpers, common, and \
+                    never measures whether a folder became a junk drawer. Anti-dumping works by \
+                    making the dumping ground unnameable, and the same move applies to an edge" \
                 note="`invariant` was added as the sixth by TS.260821.05, and the note above is the \
                     reason it has to be argued rather than noted. It is not the forbidden move: the \
                     forbidden move is widening the set to silence a refusal about a surface that \
@@ -1039,6 +1066,28 @@ field "owns-read-model"  each="1..n"
                 by a rule firing, never by a test" \
             note="reported rather than refused: a rule declared today for a shape the record does \
                 not hold yet is legitimate. What is not legitimate is nobody knowing which"
+
+        rule "an-attestation-is-not-self-issued"      refuses="a closed iteration attested by the identity that worked a phase the attestation covers" \
+            because="an artifact looks identical whether the reviewer was a different mind or the \
+                same one wearing a second hat. That is S2, and `the same engineer cannot \
+                self-approve` has been stated in the router and in the engineer persona since \
+                before the delivery graph while being enforced by nothing at all" \
+            found-by="ITER.260822.04's decision `what a persona serves`, which anchored three \
+                personas to the root because the record had no word for who may attest what" \
+            witness=#"""
+                iteration "ITER.witness" {
+                    on-slice "TS.witness"
+                    state "closed"
+                    phase "implement" state="complete" worked-by="agent:one"
+                    attestation "close" by="agent:one"
+                }
+                """# \
+            note="what is refused is ATTESTING your own work. Working two phases is normal and \
+                often better; signing off on what you built is the act this rule exists for"
+
+        rule "a-role-owns-a-declared-phase"           reports="a role owning a phase the record does not name" \
+            because="a role owning no recognisable phase is a title, and a title in a record is a \
+                dumping ground with a job description"
 
         rule "an-enabled-invariant-is-enforced"    reports="an invariant the config enables that no doctrine-surface enforces" \
             because="`enable-all-fail-closed #true` has been a claim about fourteen shell scripts \

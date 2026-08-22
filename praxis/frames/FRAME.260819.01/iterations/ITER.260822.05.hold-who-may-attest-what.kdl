@@ -1,0 +1,135 @@
+// Opened by `praxis pick-up`. Every condition below was evaluated against the
+// tree as it stood at 2026-08-22T05:14:38Z, and the verdicts are recorded
+// rather than summarised: a gate whose reasoning is not on the record is a gate
+// you have to trust.
+
+iteration "ITER.260822.05" {
+    slug "hold-who-may-attest-what"
+    on-slice "TS.260821.08"
+    state "closed"
+    opened-at "2026-08-22T05:14:38Z"
+    opened-by "agent:praxis"
+
+    approval "admission" {
+        status "signed"
+        signer "human:wael"
+        at "2026-08-22T05:14:38Z"
+        signed-by "the ask to pick up this slice"
+    }
+
+    vet "create" state="done" at="2026-08-22T05:14:38Z" on-slice="TS.260821.08" {
+        condition "slice-is-shaped" verdict="passed"
+        condition "dependencies-delivered" verdict="passed"
+        condition "no-iteration-in-flight" verdict="passed"
+        condition "nothing-left-to-admit" verdict="passed"
+        condition "work-is-disjoint" verdict="not-computed" \
+            found="no seam manifest exists, so what two iterations would touch cannot be compared. Disjointness is half of what this capability says it judges, and half of what it judges is currently not computed at all"
+        condition "the-slice-is-the-best-available" verdict="left-to-the-maintainer"
+    }
+
+    // 2 of the declared conditions were not decided by the gate. They are
+    // recorded above rather than omitted: an admission that does not say what
+    // it left undecided claims more than it checked.
+
+    // Frozen at open, from the slices. Removing one from a slice now
+    // does not remove it from here — it makes the two disagree, and that is
+    // refused.
+    claim "C1" from-slice="TS.260821.08" state="met" \
+        evidence="tests/attestation.rs::an_agent_closing_work_it_did_itself_is_refused — and it \
+            refuses BEFORE any claim is examined, because an iteration whose accounting is \
+            perfect and whose reviewer is its author is not a review that came out clean"
+    claim "C2" from-slice="TS.260821.08" state="met" \
+        evidence="tests/attestation.rs::a_different_identity_closing_the_same_work_is_accepted, \
+            ::a_phase_the_role_does_not_reserve_is_not_refused, and \
+            ::a_phase_whose_worker_nobody_recorded_does_not_refuse — absence is not a violation, \
+            or every iteration written before this rule would be unclosable"
+    claim "C3" from-slice="TS.260821.08" state="met" \
+        evidence="tests/doctrine_surfaces.rs::a_surface_cannot_anchor_to_the_root — the frame is \
+            IN the record and a surface still cannot anchor to it, because the vocabulary does not \
+            admit it. praxis check clean at 48 of 48 with no surface naming the frame"
+    claim "C4" from-slice="TS.260821.08" state="met" \
+        evidence="praxis/roles/ROLES.who-may-attest-what.kdl — three roles, each naming the phases \
+            it owns and the phases it may not attest for its own work; three persona files \
+            carrying praxis-role in their frontmatter and anchored to those roles"
+
+    layer "doctrine"    state="evidenced" \
+        evidence="the router's self-approval paragraph now says what refuses and what does not; \
+            agents/principal-engineer.agent.md says `this is no longer on your honour` and names \
+            its own never-for-own phases" \
+        reaches="a persona file says which role it is, and the role says what that means to the engine"
+    layer "enforcement" state="evidenced" \
+        evidence="an-attestation-is-not-self-issued refuses in praxis close; `frame` is out of the \
+            serves vocabulary; 20 entity kinds; 216 tests pass" \
+        reaches="close refuses a self-attested iteration, and serves can no longer name the root"
+    layer "docs"        state="evidenced" \
+        evidence="the refusal names the PHASE and the ROLE, so the fix is `hand off, or record who \
+            did review it` rather than a rule number" \
+        reaches="`who checked this` has an answer that is not `the person who wrote it`"
+
+    phase "design-ux" state="complete" required-by="docs" worked-by="agent:principal-engineer" \
+        produced="the refusal says what to DO — hand off, or record who reviewed — rather than \
+            naming the rule it broke"
+    phase "design-system" state="complete" required-by="enforcement" worked-by="agent:principal-engineer" \
+        produced="the fix is the VOCABULARY, not a rule. no-dumping-grounds forbids the names \
+            utils, helpers, common; it never measures whether a folder became a junk drawer. \
+            Removing `frame` from serves makes dumping impossible rather than detected"
+    phase "implement" state="complete" required-by="enforcement · docs" worked-by="agent:principal-engineer" \
+        produced="the role kind, three roles, Phase::worked_by, self_attested in close, and the \
+            four re-anchored surfaces"
+    phase "learn" state="complete" required-by="always" worked-by="agent:principal-engineer" \
+        produced="two findings and an amendment to a sealed decision"
+    phase "teach" state="complete" required-by="doctrine" worked-by="agent:principal-engineer" \
+        produced="the router and the engineer persona both now describe a rule that refuses"
+
+    finding "AP1" state="open" size="frame-sized" \
+        text="this iteration cannot legitimately close itself. Every phase above is worked-by \
+            agent:principal-engineer, and that role declares never-for-own implement — so the \
+            rule the slice built refuses the close of the slice that built it" \
+        note="the strongest evidence the rule works, and it arrived by accident. It is also the \
+            general shape of self-application: a gate you build for others is a gate you are \
+            standing behind" \
+        note="APPENDED after the close, which SUCCEEDED. The prediction above was wrong and the \
+            reason matters more than the rule. `praxis close` records `by=\"agent:praxis\"` — the \
+            TOOL — and the signer is the git identity, `human:wael`. Neither is the agent that \
+            worked the phases, so self_attested found no role for the closer and returned early. \
+            The rule is correct and unreachable through the only path anyone uses. See AP3"
+
+    finding "AP3" state="open" size="frame-sized" \
+        text="an-attestation-is-not-self-issued cannot fire through the CLI. The closing identity \
+            is `agent:praxis` (the tool) or the git email (a human), and never the agent that did \
+            the work — so the comparison the rule makes is between two identities that can never \
+            be equal" \
+        obliges="TS.260821.09 — an attestation the tool does not supply" \
+        note="this is AK1's family: a correct rule with no reachable path, shipped green. It is \
+            also the trust-transfer problem appearing at the exact point meant to close it — the \
+            tool cannot distinguish a human running it from an agent running it under that \
+            human's git identity, and every signature in this record rests on that distinction. \
+            Nothing here is forgery-proof and nothing can be; what is available is making the \
+            forgery an ACT rather than a default, which is the whole difference between S3 and a gate"
+
+    finding "AP2" state="open" size="observation" \
+        text="the seal on ITER.260822.04's decision survived the amendment untouched, because \
+            decision_body covers title, choice, alternatives, reason and falsifier and excludes \
+            amendments" \
+        note="checked rather than assumed, because it is the load-bearing property of \
+            append-only: if an amendment broke the seal, correcting a decision and tampering \
+            with one would be indistinguishable, and nobody would amend anything"
+    closed-at "2026-08-22T05:21:31Z"
+    outcome "continue"
+
+    close {
+        claims-settled "C1" how="met"
+        claims-settled "C2" how="met"
+        claims-settled "C3" how="met"
+        claims-settled "C4" how="met"
+        all-met #true
+        note "the accounting above was computed at close, not asserted. It says every claim is either met or carried by a finding that names it, and nothing about whether the work is any good"
+    }
+
+    trail {
+        entry at="2026-08-22T05:21:31Z" by="agent:praxis" action="state-changed" from="open" to="closed" note="closed by `praxis close`. The accounting was computed; the conclusion is not the machine's to draw"
+
+        entry at="2026-08-22T05:14:38Z" by="agent:praxis" action="created" \
+            note="opened by the gate, on the ask of human:wael"
+    }
+}

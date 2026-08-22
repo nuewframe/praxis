@@ -187,3 +187,70 @@ fn the_audit_is_pure_and_total_over_its_input() {
     // And nothing declared, nothing shipped, is clean.
     assert!(audit(&[], &[]).clean());
 }
+
+/// `TS.260821.08`/C3 — the root is not a `serves` target.
+///
+/// `ITER.260822.04` anchored three personas to `FRAME.260819.01`, and the decision recorded
+/// there predicted the falsifier would be a fourth persona. It was not. The frame is the
+/// ROOT: every surface descends from it by construction, so `serves "FRAME..."` is true of
+/// everything and discriminates nothing — and a field that cannot discriminate is a dumping
+/// ground whether it holds one thing or forty.
+///
+/// The fix is not a rule that measures the pile. `no-dumping-grounds` forbids the NAMES
+/// `utils`, `helpers`, `common`; it never checks whether a folder became a junk drawer.
+/// Anti-dumping works by making the dumping ground unnameable, and this is the same move
+/// applied to an edge.
+#[test]
+fn a_surface_cannot_anchor_to_the_root() {
+    const WITH_FRAME: &str = r##"
+notional-architecture "NA.test" {
+    schema {
+        entity "frame" {
+            field "title" each="1"
+        }
+        entity "thin-slice" {
+            field "slug" each="1"
+        }
+        entity "doctrine-surface" {
+            field "path"   each="1"
+            field "kind"   each="1"
+            field "serves" each="1..n" references="thin-slice"
+        }
+    }
+}
+"##;
+    let record = r#"
+frame "FRAME.test" {
+    title "a problem"
+}
+thin-slice "TS.900" {
+    slug "a-slice"
+}
+doctrine-surface "surface.dumped" {
+    path "agents/someone.agent.md"
+    kind "agent"
+    serves "FRAME.test"
+}
+"#;
+    let schema_doc = parse(WITH_FRAME).expect("schema parses");
+    let record_doc = parse(record).expect("record parses");
+    let schema = Schema::from_document(&schema_doc);
+    let mut known = praxis_core::Known::default();
+    praxis_core::index_all(&schema_doc, &mut known);
+    praxis_core::index_all(&record_doc, &mut known);
+
+    let found: Vec<_> = record_doc
+        .nodes()
+        .iter()
+        .flat_map(|n| praxis_core::check_node(n, &schema, &known))
+        .filter(|v| v.refusal.rule() == "dangling-relationship")
+        .collect();
+
+    assert_eq!(
+        found.len(),
+        1,
+        "the frame is in the record and the surface still cannot anchor to it — because the \
+         vocabulary does not admit it, which is a stronger guarantee than a rule that would \
+         have to decide how much is too much"
+    );
+}

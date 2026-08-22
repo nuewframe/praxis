@@ -10,7 +10,7 @@
 //! from the slice afterwards does not remove it from the iteration, it makes the two
 //! disagree, and the disagreement is refused.
 
-use crate::admission::Corpus;
+use crate::admission::{Attempt, Corpus};
 use crate::pickup::{Ask, Record};
 
 /// What an ask to close produced.
@@ -34,6 +34,8 @@ pub enum Closing {
 /// Why one claim was not accounted for.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Unaccounted {
+    /// The closer worked a phase their own role may not attest.
+    SelfAttested { phase: String, identity: String, role: String },
     /// Not met, and no finding carries it. This is the silent drop.
     NeitherMetNorCarried { claim: String, state: String },
     /// Carried by a finding the iteration does not hold.
@@ -48,10 +50,21 @@ impl Unaccounted {
             Self::NeitherMetNorCarried { claim, .. }
             | Self::CarriedByNothing { claim, .. }
             | Self::DroppedFromTheSlice { claim, .. } => claim,
+            // Not about a claim at all: the whole close is refused, before any claim is
+            // examined. Naming a phase here would make it read as a claim id.
+            Self::SelfAttested { phase, .. } => phase,
         }
     }
 
     pub fn message(&self) -> String {
+        if let Self::SelfAttested { phase, identity, role } = self {
+            return format!(
+                "{identity} worked the {phase} phase and is closing this iteration. The \
+                 {role} role may not attest its own {phase} — an artifact looks identical \
+                 whether the reviewer was a different mind or the same one wearing a second \
+                 hat, which is what the review is for. Hand off, or record who did review it"
+            );
+        }
         match self {
             Self::NeitherMetNorCarried { claim, state } => format!(
                 "{claim} is {} and no finding carries it — record a finding that names it, or \
@@ -67,12 +80,39 @@ impl Unaccounted {
                  Deleting a claim is not a way to settle it — that is the edit this rule exists to \
                  refuse"
             ),
+            // Handled above, before any claim is examined.
+            Self::SelfAttested { .. } => unreachable!("returned early"),
         }
     }
 }
 
 /// Evaluate the ask to close. Pure: it reads the corpus and composes whichever record the
 /// answer calls for, and writes nothing.
+/// Whether the identity closing this iteration worked a phase its own role may not attest.
+///
+/// Three facts have to line up, and all three come from the record: which role the closer
+/// occupies, which phases that role may not attest for its own work, and who worked each
+/// phase. A phase with no `worked-by` is not a violation — it is a phase whose worker nobody
+/// recorded, and refusing on absence would make every iteration written before TS.260821.08
+/// unclosable, which is punishing history for not having anticipated a rule.
+fn self_attested(attempt: &Attempt, corpus: &Corpus, ask: &Ask) -> Option<Unaccounted> {
+    let closer = &ask.by;
+    // Identity is compared for equality and nothing more. An engine that adjudicates whether
+    // two names are one person is an engine with an opinion about employment.
+    let role = corpus.roles.iter().find(|r| r.occupied_by(closer))?;
+
+    attempt.phases.iter().find_map(|phase| {
+        let worker = phase.worked_by.as_deref()?;
+        (worker == closer && role.never_for_own.iter().any(|p| p == &phase.kind)).then(|| {
+            Unaccounted::SelfAttested {
+                phase: phase.kind.clone(),
+                identity: closer.clone(),
+                role: role.id.clone(),
+            }
+        })
+    })
+}
+
 pub fn close_iteration(iteration_id: &str, corpus: &Corpus, ask: &Ask, taken: &[String]) -> Closing {
     let Some(attempt) = corpus.attempts.iter().find(|a| a.id == iteration_id) else {
         return Closing::NoSuchIteration(format!(
@@ -85,6 +125,29 @@ pub fn close_iteration(iteration_id: &str, corpus: &Corpus, ask: &Ask, taken: &[
              iteration, never a reopening",
             attempt.state
         ));
+    }
+
+    // Self-attestation, before any accounting. An iteration whose closer worked a phase the
+    // close attests is not a review that came out clean — it is not a review.
+    //
+    // `TS.260821.08`. `The same engineer cannot self-approve` has been in the router and in
+    // the engineer persona since before the delivery graph, enforced by nothing. It sat in
+    // the bottom row of the enforcement table, which is S2: an artifact looks identical
+    // whether the reviewer was a different mind or the same one wearing a second hat.
+    if let Some(conflict) = self_attested(attempt, corpus, ask) {
+        let id = crate::pickup::next_id("REF", &ask.at, taken);
+        return Closing::Refused(Record {
+            file: format!("iterations/{id}.close-refused.kdl"),
+            kdl: refusal_kdl(
+                &id,
+                iteration_id,
+                attempt.on_slices.first().map_or("", String::as_str),
+                ask,
+                &[conflict.clone()],
+            ),
+            id,
+            failed: vec![("an-attestation-is-not-self-issued".to_owned(), conflict.message())],
+        });
     }
 
     // The union across every slice the commitment covers. A claim belongs to the

@@ -10,6 +10,7 @@
 //! by document-projection. If rendering this needs a code path specific to this view, the
 //! capability split is fake.
 
+use crate::admission::Phase;
 use crate::admission::Corpus;
 use crate::view::{ReadModel, Section};
 
@@ -82,7 +83,7 @@ pub fn review(iteration_id: &str, corpus: &Corpus, as_of: &str) -> Option<ReadMo
 
     let mut phases = Section::new("how far it has got", &["phase", "state", "produced"])
         .empty_because("nothing recorded — no phase has been opened");
-    for (kind, state, produced) in &attempt.phases {
+    for Phase { kind, state, produced, .. } in &attempt.phases {
         phases.push(vec![
             kind.clone(),
             state.clone(),

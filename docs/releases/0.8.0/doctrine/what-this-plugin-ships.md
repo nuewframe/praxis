@@ -9,7 +9,7 @@ what doctrine did this version ship, what asked for each piece, and which guaran
 
 | surface | kind | serves | shipped in |
 | --- | --- | --- | --- |
-| skills/using-praxis/SKILL.md | skill | FRAME.260819.01 | not derivable from what it serves |
+| skills/using-praxis/SKILL.md | skill | multi-harness-distribution | not derivable from what it serves |
 | skills/event-storming/SKILL.md | skill | ES.260819.01 | not derivable from what it serves |
 | skills/ask-what-is-true/SKILL.md | skill | TS.260820.03 | 0.8.0 |
 | skills/name-a-capability/SKILL.md | skill | TS.260820.02 | 0.8.0 |
@@ -33,9 +33,9 @@ what doctrine did this version ship, what asked for each piece, and which guaran
 | skills/witness-a-rule/SKILL.md | skill | TS.260821.02 | 0.8.0 |
 | skills/anchor-a-doctrine-surface/SKILL.md | skill | TS.260821.03 | not derivable from what it serves |
 | skills/declare-an-invariant/SKILL.md | skill | TS.260821.05 | not derivable from what it serves |
-| agents/principal-engineer.agent.md | agent | FRAME.260819.01 | not derivable from what it serves |
-| agents/product-manager.agent.md | agent | FRAME.260819.01 | not derivable from what it serves |
-| agents/product-designer.agent.md | agent | FRAME.260819.01 | not derivable from what it serves |
+| agents/principal-engineer.agent.md | agent | principal-engineer | not derivable from what it serves |
+| agents/product-manager.agent.md | agent | product-manager | not derivable from what it serves |
+| agents/product-designer.agent.md | agent | product-designer | not derivable from what it serves |
 | skills/define-seam-contract/SKILL.md | skill | seam-contract-parity | not derivable from what it serves |
 | skills/design-capability-layout/SKILL.md | skill | no-dumping-grounds · port-adapter-parity | not derivable from what it serves |
 | skills/implement-with-defensive-patterns/SKILL.md | skill | resilient-boundary · http-observability | not derivable from what it serves |

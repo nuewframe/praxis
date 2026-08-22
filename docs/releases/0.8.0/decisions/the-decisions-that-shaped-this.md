@@ -39,5 +39,7 @@ what was decided, what were the alternatives, and what tested it?
 
 ## corrections
 
-_Nothing here — nothing recorded — no decision has been amended._
+| decision | amendment |
+| --- | --- |
+| what a persona serves | the falsifier fired, and not the way it was written |
 
