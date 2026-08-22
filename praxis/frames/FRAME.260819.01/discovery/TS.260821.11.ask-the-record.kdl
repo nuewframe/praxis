@@ -1,0 +1,94 @@
+// Cut from praxis/.usage/cli-invocations.md, one session's worth of evidence.
+//
+// Eight questions were asked with grep because the CLI could not answer them, and every one
+// was a traversal of a graph the engine already holds in memory. Four commands were run
+// twenty-five times to read four integers, and two of those had their prose stripped with
+// sed on the way past. No read model was ever consumed whole.
+//
+// The constraint that shapes this is A4, not preference. `praxis unbound-iterations` and
+// `praxis symptoms` would each encode a kind and a field the record declares — the engine
+// enforcing a vocabulary no record handed it — and both would be useless to a project whose
+// kinds are `cohort` and `experiment`. The only clean design is generic over what the schema
+// declares, and that turns out to be the portable one too.
+
+thin-slice "TS.260821.11" {
+    slug "ask-the-record"
+    title "Answer a question about the record without knowing what the record is about"
+    kind "command"
+    realizes "CAP.delivery-record"
+    from-storm "ES.260819.01"
+
+    command "ask"
+    actor "an agent mid-task, and the loop it is running in"
+    produces-event "QuestionAnswered" "QuestionUnanswerable"
+    needs-read-model "what-is-currently-true"
+
+    trigger "somebody wants a subset of the record and reaches for grep"
+    outcome "a question about any declared kind is answered from the record, in a shape a loop can consume"
+
+    scenario #"""
+        Given a record whose schema declares kinds, fields, and the edges between them
+        When a question names a kind, a predicate over its fields, and what to show
+        Then the answer comes from the corpus — and the engine never learns what the kind MEANS,
+             because a command that knows what an `iteration` is would be the engine encoding
+             what the record declares, and would answer nothing at all in a repository whose
+             kinds are `cohort` and `experiment`.
+        """#
+
+    step "1" does="the kind comes from the schema. A kind the record does not declare is refused, naming what IS declared"
+    step "2" does="`--where field=value` filters on any field that kind declares, and a field it does not is refused rather than silently matching nothing"
+    step "3" does="`--show a,b` projects. Absent, it shows the identity and nothing else — the log says no projection was ever consumed whole"
+    step "4" does="`--count` returns the integer. Four commands are run twenty-five times to read four integers, and this is that shape"
+    step "5" does="`--unreferenced-by kind.field` answers the anti-join: what nothing of that kind points at, through an edge THE SCHEMA declares"
+
+    excludes "a query language. The log evidences a counter, a filter, and one anti-join. A DSL \
+        would be inventing requirements from a sample of one session, and the excludes are what \
+        stop a query surface growing without ever being wrong"
+    excludes "nested entities. `finding` lives inside an iteration and `condition` inside a \
+        refusal, and reaching them needs a path syntax this does not have. Named because it was \
+        one of the eight grepped questions and this slice does NOT answer it"
+    excludes "joins beyond the declared edge. `--unreferenced-by` works because `references=` is \
+        in the schema. Anything the record does not declare as an edge is not a traversal, it is \
+        the engine guessing what relates to what"
+    excludes "writing. Every answer is computed and nothing is recorded — an `ask` that changed \
+        the record would be a command wearing a question's clothes"
+
+    layer "doctrine"    reaches="asking the record is the first move in a repository you did not set up, and the skill says how"
+    layer "enforcement" reaches="an undeclared kind or field is refused, so a question that would silently answer nothing cannot be asked"
+    layer "docs"        reaches="the eight questions asked with grep this session are answerable, and the answer does not need sed"
+
+    claim "C1" text="a question over any declared kind is answered, and the engine holds no knowledge of what that kind means" \
+        settled-by="a test asking over a schema whose kinds are `cohort` and `experiment` — nothing this repository declares — asserting the same code path answers"
+    claim "C2" text="an undeclared kind or field is refused, naming what is declared" \
+        settled-by="a test asking over a kind the schema does not hold, and one filtering on a field the kind does not declare, asserting both refuse rather than returning empty"
+    claim "C3" text="`--count` returns the integer alone, so a loop consumes it without parsing prose" \
+        settled-by="a test asserting the count output is the number and nothing else, and that it equals the row count of the same question without --count"
+    claim "C4" text="`--unreferenced-by` answers the anti-join through an edge the schema declares" \
+        settled-by="a test reproducing this session's own grep — closed iterations no release binds — and asserting it matches what the shell pipeline found"
+    claim "C5" text="nothing is written. The record is byte-identical after any question" \
+        settled-by="a test hashing the state root before and after a run of every question shape"
+
+    depends-on "TS.260821.10 — the kinds come from the method a repository is governed by, and before that there was no method to be generic over"
+
+    useful-alone "the eight questions this session answered with grep become one command each, and \
+        the four progress meters become one. Worth having with nothing else changed, because the \
+        alternative is that every agent writes its own traversal of a graph the engine already holds"
+
+    attacks "S7"
+
+    cut-from "praxis/.usage/cli-invocations.md" \
+        note="cut from a usage log rather than from the storm or a finding, which is a third source \
+            this frame has not used before. The log is one session and says so; what makes it \
+            cuttable is that its findings are structural — `four processes to print four integers` \
+            does not need a second observer to confirm"
+
+    principle-note "A4 says the engine may not encode the schema in its own types, and it was \
+        written about validation. Applied to a query surface it forbids the obvious design and \
+        leaves only the portable one — the same constraint that made adoption possible in \
+        TS.260821.10 makes this generic. A rule that keeps producing the better answer in \
+        situations it was not written for is worth trusting further than its original argument"
+
+    proves "the record can be asked about without the asker knowing what it holds"
+    does-not-prove "that these are the right questions. The log is one agent doing one kind of \
+        work for one day, and a second session disagreeing with it is a finding rather than a defect"
+}
