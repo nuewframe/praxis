@@ -662,4 +662,28 @@ event-storm "ES.260819.01" {
     finding "E6" \
         text="ConvergenceRefused, PickupRefused, CloseRefused and DriftDetected are all events. Refusals are facts about the run, and a method that records only its successes cannot show fidelity — it shows the absence of recorded failure, which is what the frame is about" \
         obliges="none — carried into iteration-control and evidence-and-settlement"
+
+    // ---- The shape of discovery. Amended by TS.260821.16. ----
+    //
+    // The storm, the notional architecture and the walkthrough are all about the SYSTEM.
+    // Everything this record holds descends from a frame, and a frame is a problem — so the
+    // record begins at "something is wrong" and has never held what the product is FOR, or
+    // for whom. `root-cause` says why the problem exists; nothing says why the product does.
+    //
+    // The consequence is visible in the published set: a release can tell a reader HOW,
+    // because usage is in the record, and cannot tell them WHY, because purpose is not.
+    policy "discovery-names-the-person-before-the-system" {
+        rule "purpose first — what outcome this product exists to deliver, in one statement somebody can disagree with"
+        rule "then the audience — each persona: what they came for, what they do not care about, and how they judge whether they got it"
+        rule "then the frame — the problem, with every symptom naming which persona feels it and how"
+        rule "then the discovery data — storm, architecture, walkthrough. Breadth, structure, depth, in that order and about the SYSTEM"
+        rule "then the work — capabilities, slices, iterations, all of it downstream of a stated purpose and a named person"
+        rule "and on publish, the reader is told WHY and HOW. Not what was built, and never how it was built"
+        because "the two sides of this product want different halves. In development the question \
+            is why, what, and the mechanics of how — and the record answers all three. In use the \
+            question is why and how, and the record has never held the why at all"
+        note "this is the amendment that puts a person upstream of the system. Every judgement of \
+            value in this repository has been made in prose by whoever was reading, because the \
+            record made every fact about the SYSTEM checkable and held no fact about the reader"
+    }
 }

@@ -35,7 +35,7 @@ thin-slice "TS.260821.14" {
              siblings in alphabetical order ask them to already know the answer in order to find it.
         """#
 
-    step "1" does="a release becomes ONE document with an order: what this is, what it can do, how to start, what changed, what is known missing"
+    step "1" does="a release becomes ONE document with an order: WHY this exists, what it can do, HOW to start, what changed, what is known missing"
     step "2" does="the engineering views stop being publishable. decisions, architecture and the shipped-doctrine inventory are declared `working` — they live in the record, and `praxis` answers them"
     step "3" does="the ordering is a property of the document, not of a directory listing. A reader who stops after the first section has the answer they came for"
     step "4" does="the glossary carries only the words the story uses, in dependency order. The full vocabulary is `praxis schema --print`, for whoever wants it"
@@ -70,6 +70,7 @@ thin-slice "TS.260821.14" {
         settled-by="a test asserting decisions, architecture and the doctrine inventory are not in the published set, and that each is reachable from the corpus — publishing them was a lifetime decision and this reverses it"
 
     depends-on "TS.260821.12 — the documents exist and are worth ordering"
+    depends-on "TS.260821.16 — the story opens with why, and the record has to hold one"
 
     useful-alone "a reader opening a release directory is told which file is theirs and what it \
         answers. Today they are told nothing, and the first thing they see is whichever folder \
