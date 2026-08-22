@@ -71,7 +71,9 @@ what must the system be able to do, and which events does each keep consistent?
 | work-admission | IterationStarted |
 | work-admission | StartRefused |
 
-## Notes
+## In detail
 
-**depicts** — 0.8.0
+### depicts
+
+0.8.0
 

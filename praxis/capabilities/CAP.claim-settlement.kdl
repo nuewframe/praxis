@@ -43,6 +43,7 @@ capability "claim-settlement" {
     usage "`praxis review <ITER> [--markdown]` — preview what an iteration promised against what it has shown, at any moment, writing nothing. Layers the slice declared and nothing reached are listed, not omitted."
 
 
+
     trail {
         entry at="2026-08-20T00:00:00-05:00" by="agent:principal-engineer" action="created"
     }

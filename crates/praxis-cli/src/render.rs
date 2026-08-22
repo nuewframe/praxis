@@ -54,10 +54,16 @@ pub fn render_markdown(model: &ReadModel, stamp: &str) -> String {
         out.push('\n');
     }
 
+    // Prose a human wrote, printed where it was referenced from. Paragraph breaks in the
+    // source are kept: a capability's usage is several invocations, and squashing them into
+    // one line makes a reference page unreadable — which is `TS.260821.12` in miniature.
     if !model.defines.is_empty() {
-        out.push_str("## Notes\n\n");
+        out.push_str("## In detail\n\n");
         for (name, prose) in &model.defines {
-            out.push_str(&format!("**{name}** — {}\n\n", squash(prose)));
+            out.push_str(&format!("### {name}\n\n"));
+            for paragraph in prose.split("\n\n") {
+                out.push_str(&format!("{}\n\n", squash(paragraph)));
+            }
         }
     }
     out

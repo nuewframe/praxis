@@ -6,7 +6,11 @@
 
 release "REL.0.8.0" {
     version "0.8.0"
-    state "planned"
+    state "withdrawn"
+    withdrawn-because #"""
+        the artifacts it froze are correct and not worth reading (AS4)
+        Re-cut when TS.260821.12 has landed and the published set is worth opening
+        """#
     proposed-bump "minor"
     binds "ITER.260820.01"
     binds "ITER.260821.01"
@@ -39,18 +43,16 @@ release "REL.0.8.0" {
     // Resolves nothing. Stated rather than omitted: a release that fixed
     // no symptom and one nobody checked are not the same thing.
 
-    index {
+    previously-cut {
         tag "v0.8.0"
-        commit "8ddfd001d4ba36a351074fbff58de8ce6d566c1a"
-        cut-at "2026-08-22T09:37:05Z"
+        commit "9ca9a394a93301a453180246d0454496fc68810c"
+        cut-at "2026-08-22T13:08:35Z"
         cut-by "human:wael"
         confirmed-bump "minor"
     }
-    seal "fnv1a64:6de035a844ca494c" \
-        note="computed over version, commit, what it binds and what it resolves. It makes an edit visible; it is not a signature"
 
     trail {
-        entry at="2026-08-22T09:37:05Z" by="agent:praxis" action="cut" \
+        entry at="2026-08-22T13:08:35Z" by="agent:praxis" action="cut" \
             note="the release and its index written in one operation. Neither exists without the other"
     }
 }

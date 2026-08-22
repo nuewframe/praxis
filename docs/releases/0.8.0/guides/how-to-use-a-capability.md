@@ -7,20 +7,55 @@ how do I use what 0.8.0 can do?
 
 ## how to use what shipped
 
-_Nothing here — nothing recorded — this release promoted no capability's truth, so there is no shipped surface to describe._
+| capability |
+| --- |
+| claim-settlement |
+| delivery-record |
+| document-projection |
+| release-binding |
+| work-admission |
 
 ## shipped without a guide
 
-_Nothing here — every capability this release promoted carries usage prose._
+_Nothing here — every capability this version bound work for carries usage prose._
 
 ## written, not yet shipped
 
 | capability | why it is not here |
 | --- | --- |
-| claim-settlement | 0.8.0 did not promote its truth |
-| conformance-probes | 0.8.0 did not promote its truth |
-| delivery-record | 0.8.0 did not promote its truth |
-| document-projection | 0.8.0 did not promote its truth |
-| release-binding | 0.8.0 did not promote its truth |
-| work-admission | 0.8.0 did not promote its truth |
+| conformance-probes | 0.8.0 bound no slice realizing it |
+
+## In detail
+
+### claim-settlement
+
+`praxis close <ITER> --outcome continue|pivot|stop` — every claim settled, or every shortfall carried by a finding that NAMES it, or the close is refused.
+
+`praxis review <ITER> [--markdown]` — preview what an iteration promised against what it has shown, at any moment, writing nothing. Layers the slice declared and nothing reached are listed, not omitted.
+
+### delivery-record
+
+`praxis check [root]` — refuse any record that does not match the shape the record itself declares.
+
+`praxis truth` — what this repository already knows, so an arriving agent does not re-derive it. Read the last section: it names what the answer does not cover.
+
+### document-projection
+
+`praxis publish <VERSION> [--dry-run]` — regenerate the published set whole, before the cut. Membership comes from the lifetime declarations and the paths come with it.
+
+`praxis verify-published` — prove no published document was hand-edited, comparing each release's directory against the commit its index names.
+
+### release-binding
+
+`praxis bind <ITER> <VERSION> [--undo]` — attach closed work to a version. Only closed iterations bind, each binds once, and a cut release does not change.
+
+`praxis cut-release <VERSION> --confirm` — cut the version and write its index node in one record. Refused until the published set exists and is committed.
+
+`praxis promote <VERSION>` — fold what a cut release shipped into what each capability says it is. Derived from bound work and recomputed by a rule.
+
+### work-admission
+
+`praxis ready` — which slices could be started right now, and what would refuse each of the rest. Read the `not decided for you` section first: it names the conditions the gate declares and did not compute.
+
+`praxis pick-up <SLICE>` — take a slice through the one gate. Either an iteration opens, or a refusal record is written naming the condition that failed. Selection is the commitment.
 

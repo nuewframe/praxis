@@ -111,73 +111,141 @@ _Nothing here — no symptom names this version as what resolved it._
 | ITER.260822.06 | TS.260821.09 |
 | ITER.260822.07 | TS.260821.10 |
 
-## Notes
+## In detail
 
-**Cut a slice whose verticality can be refused rather than asserted** — verticality stops being a word the author applies to their own work. That is S4 answered, with nothing else in this frame delivered
+### Cut a slice whose verticality can be refused rather than asserted
 
-**Refuse a record whose kind nothing declares, and say what to declare** — the record stops being able to grow a kind of thing in silence. Nothing else in this frame needs to ship for that to be worth having
+verticality stops being a word the author applies to their own work. That is S4 answered, with nothing else in this frame delivered
 
-**Name a capability only where a storm's events cluster** — the step from problem to capability becomes a derivation with its work shown. Nothing downstream needs to exist for that to be worth having
+### Refuse a record whose kind nothing declares, and say what to declare
 
-**See which slices could be started right now, and what would refuse each of the rest** — an agent stops choosing work by reading prose and guessing. Useful with no gate implemented at all, because the answer is already true
+the record stops being able to grow a kind of thing in silence. Nothing else in this frame needs to ship for that to be worth having
 
-**Take a slice, and have the refusal recorded when it is refused** — the amount of process a unit of work received stops being the receiving agent's own account of it
+### Name a capability only where a storm's events cluster
 
-**Back a layer's claim with an artifact instead of the agent's word for it** — how much of a slice was actually reached becomes readable off the record, with nothing else about closing or releasing in place
+the step from problem to capability becomes a derivation with its work shown. Nothing downstream needs to exist for that to be worth having
 
-**Refuse to close an iteration that is about to drop scope in silence** — scope stops drifting silently. This is S5 closed on its own, and it is the symptom with the most day-to-day cost
+### See which slices could be started right now, and what would refuse each of the rest
 
-**Attach finished iterations to a version, and refuse anything that did not close** — what is queued for the next version stops being a hand-kept list, and that is useful with nothing ever cut
+an agent stops choosing work by reading prose and guessing. Useful with no gate implemented at all, because the answer is already true
 
-**Cut the version, and record the index that points into git** — there is a point on the version line that everything else can be pinned to. Nothing in publishing, verification or symptom resolution is possible before it
+### Take a slice, and have the refusal recorded when it is refused
 
-**Regenerate every published document whole, each stating the release it depicts** — the regex ceiling is gone for published output, and every document becomes true for exactly one version and false for every other
+the amount of process a unit of work received stops being the receiving agent's own account of it
 
-**Prove a published document was never hand-edited after the fact** — a reader asking 'was this ever true?' gets a date rather than a shrug. S6 fully closed
+### Back a layer's claim with an artifact instead of the agent's word for it
 
-**Fold what shipped into what each capability says it is, in one operation** — current truth stops being maintained by hand. This is the difference between the record being a by-product of the work and a chore performed beside it, and the frame says that difference is what makes the chore get skipped when the work is late
+how much of a slice was actually reached becomes readable off the record, with nothing else about closing or releasing in place
 
-**Ask the record what this repository already knows** — S7 stops being structural. An agent that can ask does not re-derive, even with no projection, no gate and no release machinery present
+### Refuse to close an iteration that is about to drop scope in silence
 
-**Review what an iteration has actually shown, writing nothing to the published record** — a reviewer stops judging an artifact by how finished it looks. That is S2, and it needs no release machinery
+scope stops drifting silently. This is S5 closed on its own, and it is the symptom with the most day-to-day cost
 
-**Decide what belongs in the published set, and refuse a choice made without a reason** — the difference between a document worth freezing and a dashboard stops being decided per-release by whoever is publishing that day
+### Attach finished iterations to a version, and refuse anything that did not close
 
-**Bind a decision to the work that forced it, and correct it only by appending** — a reader stops asking why something is the way it is and getting an answer reconstructed from memory. Worth having with nothing published at all
+what is queued for the next version stops being a hand-kept list, and that is useful with nothing ever cut
 
-**Write usage while building, and refuse to publish a guide for truth that never shipped** — usage stops being written from memory at release time, which is when it is least accurate and most rushed
+### Cut the version, and record the index that points into git
 
-**Close a symptom by naming a release that demonstrably attacked it** — `resolved-by` becomes checkable. Every frame in the repository can be audited against what actually shipped, with no projection and no publishing
+there is a point on the version line that everything else can be pinned to. Nothing in publishing, verification or symptom resolution is possible before it
 
-**See where the product stands right now, without committing a document that ages** — docs/product.md can be retired without losing anything, because the answer it was approximating is now available whenever anyone asks for it
+### Regenerate every published document whole, each stating the release it depicts
 
-**Report any declared rule that nothing in the record demonstrates refusing** — `which of our gates has never fired` becomes answerable. Worth having with nothing else changed, because the answer today is that nobody knows
+the regex ceiling is gone for published output, and every document becomes true for exactly one version and false for every other
 
-**Report any doctrine this plugin ships that no record entity justifies** — `which of the things we ship does the record still ask for` becomes answerable, and the answer on the first run is that twenty-five of forty-seven skills have no anchor. Worth having with nothing deleted, because today that number cannot be produced at all
+### Prove a published document was never hand-edited after the fact
 
-**Take the unanchored count to zero, and close the rule behind it** — the front door stops contradicting the house. An arriving agent reads a spine it can execute, which is the first thing every session does and currently the first thing that misleads it
+a reader asking 'was this ever true?' gets a date rather than a shrug. S6 fully closed
 
-**Hold the engineering invariant as a record kind, so a probe can name what it enforces** — `what does this plugin guarantee, and what enforces it` becomes answerable. Today `enable-all-fail-closed #true` is a claim about fourteen shell scripts that nothing has ever checked
+### Fold what shipped into what each capability says it is, in one operation
 
-**Publish a capability set that describes what the reader installed** — `what can this version of Praxis do` becomes answerable from the record. Today the answer is in three Markdown files nothing checks, and the published set answers a different question confidently
+current truth stops being maintained by hand. This is the difference between the record being a by-product of the work and a chore performed beside it, and the frame says that difference is what makes the chore get skipped when the work is late
 
-**Publish the shipped doctrine for a version, derived from the record rather than scraped** — `what did 0.8.0 ship, and what of it fails closed` becomes answerable from the record, for any version, at any time. Today it is answerable only for the working tree and only by running four scripts
+### Ask the record what this repository already knows
 
-**Refuse a close whose reviewer is the agent that did the work** — `the same engineer cannot self-approve` moves from agent-attested doctrine, the bottom row of the enforcement table, to record-enforced, the top. It is the single rule this plugin states most confidently and enforces least
+S7 stops being structural. An agent that can ask does not re-derive, even with no projection, no gate and no release machinery present
 
-**Refuse a close whose attester the tool supplied rather than a person** — the one gate this plugin describes as its strongest becomes reachable. It is currently a rule that passes its tests and cannot fire in production, which is worse than not having it: it reads as a guarantee
+### Review what an iteration has actually shown, writing nothing to the published record
 
-**Ship the method's vocabulary with the engine, so adopting is not forking** — a project can adopt the method without owning a copy of it. That is the whole of AK2, and until it is true every claim this frame makes about portability is a claim about one repository
+a reviewer stops judging an artifact by how finished it looks. That is S2, and it needs no release machinery
 
-**S1** — C1 cannot be settled by the slice that owns it. It asks for a property test against the GATE, and the gate is TS.260820.05, which depends on TS.260820.04. The settlement is circular in the cut, and neither the cut nor three iterations of vetting noticed
+### Decide what belongs in the published set, and refuse a choice made without a reason
 
-**X1** — C3's second half — that the recorded commit CONTAINS the release's published directory — cannot be settled here. Publishing is TS.260820.10, which depends on this slice
+the difference between a document worth freezing and a dashboard stops being decided per-release by whoever is publishing that day
 
-**Y2** — the archival documents first carried a `Generated at <clock>` line, so two publishes of an unchanged record produced different bytes. Verification of a published tree is a COMPARISON, so that document could never have been verified
+### Bind a decision to the work that forced it, and correct it only by appending
 
-**AG3** — nothing refuses a SILENT revert. A symptom edited from resolved back to present with no `previously-claimed` passes, because the check has no memory of what the record said before
+a reader stops asking why something is the way it is and getting an answer reconstructed from memory. Worth having with nothing published at all
 
-**AM1** — the count did not reach zero and cannot yet. Twenty of the forty-five unanchored surfaces retired; the other twenty-five are Principal-Engineer doctrine the record has no vocabulary for — fourteen probes, one guardrail, three personas, seven engineering skills. There is no node for `a probe enforces an invariant`, so there is nothing for a probe to serve
+### Write usage while building, and refuse to publish a guide for truth that never shipped
 
-**AM4** — the rule stays at REPORT. Flipping every-shipped-surface-is-anchored to refuse requires the count to be zero, and AM1 is why it is not
+usage stops being written from memory at release time, which is when it is least accurate and most rushed
+
+### Close a symptom by naming a release that demonstrably attacked it
+
+`resolved-by` becomes checkable. Every frame in the repository can be audited against what actually shipped, with no projection and no publishing
+
+### See where the product stands right now, without committing a document that ages
+
+docs/product.md can be retired without losing anything, because the answer it was approximating is now available whenever anyone asks for it
+
+### Report any declared rule that nothing in the record demonstrates refusing
+
+`which of our gates has never fired` becomes answerable. Worth having with nothing else changed, because the answer today is that nobody knows
+
+### Report any doctrine this plugin ships that no record entity justifies
+
+`which of the things we ship does the record still ask for` becomes answerable, and the answer on the first run is that twenty-five of forty-seven skills have no anchor. Worth having with nothing deleted, because today that number cannot be produced at all
+
+### Take the unanchored count to zero, and close the rule behind it
+
+the front door stops contradicting the house. An arriving agent reads a spine it can execute, which is the first thing every session does and currently the first thing that misleads it
+
+### Hold the engineering invariant as a record kind, so a probe can name what it enforces
+
+`what does this plugin guarantee, and what enforces it` becomes answerable. Today `enable-all-fail-closed #true` is a claim about fourteen shell scripts that nothing has ever checked
+
+### Publish a capability set that describes what the reader installed
+
+`what can this version of Praxis do` becomes answerable from the record. Today the answer is in three Markdown files nothing checks, and the published set answers a different question confidently
+
+### Publish the shipped doctrine for a version, derived from the record rather than scraped
+
+`what did 0.8.0 ship, and what of it fails closed` becomes answerable from the record, for any version, at any time. Today it is answerable only for the working tree and only by running four scripts
+
+### Refuse a close whose reviewer is the agent that did the work
+
+`the same engineer cannot self-approve` moves from agent-attested doctrine, the bottom row of the enforcement table, to record-enforced, the top. It is the single rule this plugin states most confidently and enforces least
+
+### Refuse a close whose attester the tool supplied rather than a person
+
+the one gate this plugin describes as its strongest becomes reachable. It is currently a rule that passes its tests and cannot fire in production, which is worse than not having it: it reads as a guarantee
+
+### Ship the method's vocabulary with the engine, so adopting is not forking
+
+a project can adopt the method without owning a copy of it. That is the whole of AK2, and until it is true every claim this frame makes about portability is a claim about one repository
+
+### S1
+
+C1 cannot be settled by the slice that owns it. It asks for a property test against the GATE, and the gate is TS.260820.05, which depends on TS.260820.04. The settlement is circular in the cut, and neither the cut nor three iterations of vetting noticed
+
+### X1
+
+C3's second half — that the recorded commit CONTAINS the release's published directory — cannot be settled here. Publishing is TS.260820.10, which depends on this slice
+
+### Y2
+
+the archival documents first carried a `Generated at <clock>` line, so two publishes of an unchanged record produced different bytes. Verification of a published tree is a COMPARISON, so that document could never have been verified
+
+### AG3
+
+nothing refuses a SILENT revert. A symptom edited from resolved back to present with no `previously-claimed` passes, because the check has no memory of what the record said before
+
+### AM1
+
+the count did not reach zero and cannot yet. Twenty of the forty-five unanchored surfaces retired; the other twenty-five are Principal-Engineer doctrine the record has no vocabulary for — fourteen probes, one guardrail, three personas, seven engineering skills. There is no node for `a probe enforces an invariant`, so there is nothing for a probe to serve
+
+### AM4
+
+the rule stays at REPORT. Flipping every-shipped-surface-is-anchored to refuse requires the count to be zero, and AM1 is why it is not
 

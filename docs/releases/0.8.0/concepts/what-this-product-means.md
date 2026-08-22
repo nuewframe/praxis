@@ -51,7 +51,9 @@ what problem does this exist for, and what does every word mean?
 | thin-slice | an atomic vertical slice — one command or one read model, cut so it can exercise a capability |
 | walkthrough | one path through the record, walked all the way down — discovery's DEPTH activity |
 
-## Notes
+## In detail
 
-**depicts** — 0.8.0
+### depicts
+
+0.8.0
 

@@ -204,13 +204,16 @@ fn what_shipped_carries_the_findings_the_bound_work_left_owed() {
         .find(|d| d.model.view == "the-published-set-for-a-release")
         .map(|d| &d.model)
         .expect("the release notes");
+    // A release that hides its shortfalls is the artifact this frame distrusts, so a
+    // carried finding reaches the reader — by id in the row, with what it SAYS defined
+    // beside it (TS.260821.12).
     let owed = shipped
         .sections
         .iter()
-        .find(|s| s.name == "what it left owed")
+        .find(|s| s.name == "what is known to be missing")
         .expect("a section for what is owed");
     assert_eq!(owed.rows.len(), 1);
-    assert_eq!(owed.rows[0], vec!["ITER.1", "F1", "C2"]);
+    assert_eq!(owed.rows[0], vec!["F1", "C2"]);
 }
 
 #[test]
@@ -223,7 +226,7 @@ fn an_empty_section_in_a_published_document_still_says_why() {
         .model
         .sections
         .iter()
-        .find(|s| s.name == "symptoms it resolved")
+        .find(|s| s.name == "problems this version attacked")
         .expect("a section");
     assert!(resolved.is_empty());
     assert!(resolved.empty_because.is_some(), "archival or not, silence is not an answer");

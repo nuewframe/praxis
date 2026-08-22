@@ -114,7 +114,9 @@ what doctrine did this version ship, what asked for each piece, and which guaran
 | whether a probe WORKS | `praxis prove` — this says a guarantee has a keeper, never that the keeper keeps it |
 | surfaces whose `shipped in` reads `not derivable` | they serve an invariant, a capability or the frame rather than a slice, and no chain runs from those to a release. Storing a version on the surface would fix the column and break the fact |
 
-## Notes
+## In detail
 
-**depicts** — 0.8.0
+### depicts
+
+0.8.0
 

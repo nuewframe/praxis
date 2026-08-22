@@ -58,7 +58,9 @@ what does each part do, what does it refuse to do, and what does it keep true?
 | the unverifiable claim is withdrawn, not grandfathered | a grandfather clause exempting claims made before the delivery graph existed |
 | what a persona serves | a `persona` entity kind, so a persona could serve the phases it owns |
 
-## Notes
+## In detail
 
-**depicts** — 0.8.0
+### depicts
+
+0.8.0
 

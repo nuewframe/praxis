@@ -241,6 +241,11 @@ method "delivery-graph" {
             field "binds"        each="0..n" references="iteration" \
                 because="a version with no content and a version nobody has computed are not the \
                     same thing, so an empty one says so rather than being absent"
+            field "previously-cut" each="0..n" when-state="withdrawn" \
+                because="what a withdrawn version WAS cut at, kept so that a release taken back \
+                    and one never cut do not read alike. Many, because a version may be cut, \
+                    withdrawn and cut again — and a record holding only the latest cannot be asked \
+                    how many times somebody changed their mind"
             field "withdrawn-because" each="1" when-state="withdrawn" \
                 because="a cut that is taken back says why, in the same place it said what it cut. \
                     A release quietly returned to `planned` and one that was never cut look \

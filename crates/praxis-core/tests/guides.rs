@@ -14,6 +14,19 @@ notional-architecture "NA.test" {
             field "usage"   each="0..n"
             field "shipped" each="0..n"
         }
+        entity "thin-slice" {
+            field "slug"     each="1"
+            field "realizes" each="1"
+        }
+        entity "iteration" {
+            field "on-slice" each="1..n"
+            field "state"    each="1"
+        }
+        entity "release" {
+            field "version" each="1"
+            field "state"   each="1"
+            field "binds"   each="0..n"
+        }
     }
 }
 "##;
@@ -25,7 +38,34 @@ fn corpus_of(record: &str) -> Corpus {
     Corpus::from_documents(&[schema_doc, record_doc], &schema)
 }
 
+/// What a version BINDS, which is what the composed guide reads.
+///
+/// It used to read promoted truth, and publishing happens BEFORE the cut while promotion
+/// happens after it — so the guide was empty on every release ever published, by
+/// construction (`WALK.260822.02/AS8`). These fixtures asserted that behaviour and passed.
 const RECORD: &str = r##"
+thin-slice "TS.a" {
+    slug "does-the-thing"
+    realizes "CAP.shipped-and-documented"
+}
+thin-slice "TS.b" {
+    slug "does-another-thing"
+    realizes "CAP.shipped-and-undocumented"
+}
+iteration "ITER.1" {
+    on-slice "TS.a"
+    state "closed"
+}
+iteration "ITER.2" {
+    on-slice "TS.b"
+    state "closed"
+}
+release "REL.0.1.0" {
+    version "0.1.0"
+    state "released"
+    binds "ITER.1"
+    binds "ITER.2"
+}
 capability "shipped-and-documented" {
     state "active"
     usage "`praxis do-the-thing` — does the thing"
@@ -81,7 +121,7 @@ fn c1_prose_written_before_its_truth_shipped_is_named_as_timing_not_dropped() {
     let waiting = section(&model, "written, not yet shipped");
     assert_eq!(waiting.rows.len(), 1);
     assert_eq!(waiting.rows[0][0], "documented-but-not-shipped");
-    assert!(waiting.rows[0][1].contains("did not promote its truth"));
+    assert!(waiting.rows[0][1].contains("bound no slice realizing it"));
 }
 
 #[test]
@@ -90,7 +130,19 @@ fn c2_usage_prose_comes_from_the_record_and_nowhere_else() {
     // there is nowhere to read a file from — the prose is data, not a pointer to data.
     let model = guides("0.1.0", &corpus_of(RECORD));
     let written = section(&model, "how to use what shipped");
-    assert_eq!(written.rows[0][1], "`praxis do-the-thing` — does the thing");
+    // The row NAMES the capability and the invocation is defined beside it: a usage line is
+    // `praxis bind <ITER> <VERSION>`, which read-model@v1 counts as markup in a cell.
+    // Inlining it would mean rewriting the record's words to fit a table.
+    assert_eq!(written.rows[0][0], "shipped-and-documented");
+    assert!(
+        model
+            .defines
+            .iter()
+            .any(|(k, v)| k == "shipped-and-documented"
+                && v == "`praxis do-the-thing` — does the thing"),
+        "the prose is referenced, verbatim: {:?}",
+        model.defines
+    );
     for row in &written.rows {
         for cell in row {
             assert!(!cell.contains(".md"), "no cell points at a file: {cell}");
@@ -127,7 +179,7 @@ fn a_release_that_promoted_nothing_says_so_rather_than_publishing_an_empty_guide
     let written = section(&model, "how to use what shipped");
     assert!(written.is_empty());
     assert!(
-        written.empty_because.as_deref().is_some_and(|w| w.contains("no shipped surface")),
+        written.empty_because.as_deref().is_some_and(|w| w.contains("binds no slice")),
         "an empty guide states why it is empty"
     );
 }

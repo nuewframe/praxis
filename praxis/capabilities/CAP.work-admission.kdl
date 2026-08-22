@@ -41,6 +41,7 @@ capability "work-admission" {
     usage "`praxis pick-up <SLICE>` — take a slice through the one gate. Either an iteration opens, or a refusal record is written naming the condition that failed. Selection is the commitment."
 
 
+
     trail {
         entry at="2026-08-20T00:00:00-05:00" by="agent:principal-engineer" action="created"
     }

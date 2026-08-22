@@ -37,6 +37,7 @@ capability "release-binding" {
     usage "`praxis promote <VERSION>` — fold what a cut release shipped into what each capability says it is. Derived from bound work and recomputed by a rule."
 
 
+
     trail {
         entry at="2026-08-20T00:00:00-05:00" by="agent:principal-engineer" action="created"
     }

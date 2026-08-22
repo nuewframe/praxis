@@ -59,6 +59,7 @@ capability "delivery-record" {
     usage "`praxis truth` — what this repository already knows, so an arriving agent does not re-derive it. Read the last section: it names what the answer does not cover."
 
 
+
     trail {
         entry at="2026-08-20T00:00:00-05:00" by="agent:principal-engineer" action="created" \
             note="derived from ES.260819.01 by clustering, not named off the frame"
