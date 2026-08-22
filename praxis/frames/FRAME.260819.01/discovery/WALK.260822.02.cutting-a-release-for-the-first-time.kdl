@@ -113,6 +113,15 @@ walkthrough "WALK.260822.02" {
             `states=` and whose `state` field's `one-of=` differ is a record that refuses \
             something it also permits"
 
+    finding "AS9" state="open" size="observation" \
+        text="`audit_excludes` in scripts/bump-version.sh was defined and never called, so the \
+            exclude list in .version-bump.json read to nothing. Adding an entry to it changed \
+            no behaviour, which looked like the entry being wrong" \
+        note="third instance today of a declaration nothing reads — `when-state` on schema fields \
+            (AS2), `needed-by` on read models, and now an audit exclude list. Each looks honoured \
+            from the file that declares it, and only fails when somebody adds an entry expecting \
+            it to work. A config key nothing reads is the enforcement version of an unwitnessed rule"
+
     proves "the release chain runs end to end, and refuses in the right places when it should not"
     does-not-prove "that a release is worth having. Four documents were produced and the walk's \
         strongest finding is that nobody would read them twice"

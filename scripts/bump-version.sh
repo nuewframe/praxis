@@ -164,6 +164,18 @@ cmd_audit() {
     for dp in "${declared_paths[@]}"; do
       [[ "$rel_path" == "$dp" ]] && skip=1 && break
     done
+
+    # And paths the config excludes. `audit_excludes` was defined and never called, so the
+    # exclude list in .version-bump.json read to nothing — a config key that looks honoured
+    # and is not. Prefix match, so a directory excludes what is under it: a GENERATED release
+    # document names the version it depicts, which is the whole point of it.
+    if [[ "$skip" -eq 0 ]]; then
+      local ex
+      while IFS= read -r ex; do
+        [[ -z "$ex" ]] && continue
+        [[ "$rel_path" == "$ex" || "$rel_path" == "$ex"/* ]] && skip=1 && break
+      done < <(audit_excludes)
+    fi
     local lineno="${rest%%:*}"
     if [[ "$skip" -eq 0 ]]; then
       # Declared exceptions (ADR.260725): a literal inside a fence, blockquote,
