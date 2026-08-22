@@ -690,6 +690,29 @@ method "delivery-graph" {
             because="a role owning no recognisable phase is a title, and a title in a record is a \
                 dumping ground with a job description"
 
+        rule "a-state-vocabulary-is-declared-once"    refuses="a kind whose `states=` and whose `state` field's `one-of=` disagree" \
+            because="`withdrawn` had to be added to `release` in two places, and the first edit \
+                alone changed nothing — because `states=` was declared and never read. A kind that \
+                refuses what it also permits is a vocabulary nobody can trust, and an attribute \
+                nothing consults is indistinguishable from one that is honoured" \
+            found-by="WALK.260822.02/AS7" \
+            witness=#"""
+                notional-architecture "NA.witness" {
+                    slug "split-vocabulary"
+                    title "a kind declaring its states twice"
+                    frame "FRAME.260819.01"
+                    state "held"
+                    trail {
+                        entry at="2026-08-22T00:00:00Z" by="human:witness" action="created"
+                    }
+                    schema {
+                        entity "witness-kind" states="one two" {
+                            field "state" each="1" one-of="one" "three"
+                        }
+                    }
+                }
+                """#
+
         rule "a-config-binds-a-method-the-engine-carries" refuses="a config naming a method this engine does not carry" \
             because="`governed-by` pointed at nothing from the withdrawal of ADR.260819.02 until \
                 TS.260821.10, because the thing it should have named had no home. A binding to a \

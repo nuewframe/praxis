@@ -67,6 +67,8 @@ pub enum Refusal {
     UnkeptInvariant { invariant: String, protects: String },
     /// The config binds to a method this engine does not carry.
     UnknownMethod { named: String, carried: String },
+    /// A kind whose `states=` and whose `state` field's `one-of=` disagree.
+    SplitStateVocabulary { kind: String, only_in_states: Vec<String>, only_in_field: Vec<String> },
     /// A symptom resolved by a release the record does not hold.
     ResolvedByNothing { symptom: String, version: String },
     /// A symptom resolved by a release that bound no slice attacking it.
@@ -134,6 +136,7 @@ impl Refusal {
             Self::UnanchoredSurface { .. } => "every-shipped-surface-is-anchored",
             Self::UnkeptInvariant { .. } => "an-enabled-invariant-is-enforced",
             Self::UnknownMethod { .. } => "a-config-binds-a-method-the-engine-carries",
+            Self::SplitStateVocabulary { .. } => "a-state-vocabulary-is-declared-once",
         }
     }
 
@@ -163,6 +166,7 @@ impl Refusal {
             | Self::UnanchoredSurface { .. } => "path",
             Self::UnkeptInvariant { .. } => "protects",
             Self::UnknownMethod { .. } => "governed-by",
+            Self::SplitStateVocabulary { .. } => "states",
             Self::UnjustifiedLifetime { missing, .. } => missing,
         }
     }
@@ -257,6 +261,13 @@ impl Refusal {
             Self::UnkeptInvariant { invariant, protects } => format!(
                 "`{invariant}` is enabled and nothing enforces it — the plugin guarantees that \
                  {protects}, and no shipped surface keeps it"
+            ),
+            Self::SplitStateVocabulary { kind, only_in_states, only_in_field } => format!(
+                "`{kind}` declares its states twice and the two disagree — {} only in `states=`, \
+                 {} only in the `state` field's `one-of=`. A kind refuses what it also permits, \
+                 and adding a state to one of them changes nothing visible",
+                if only_in_states.is_empty() { "nothing".to_owned() } else { only_in_states.join(" · ") },
+                if only_in_field.is_empty() { "nothing".to_owned() } else { only_in_field.join(" · ") }
             ),
             Self::UnknownMethod { named, carried } => format!(
                 "`governed-by` names {named}, and this engine carries {carried}. A binding to \
@@ -830,6 +841,63 @@ pub fn check_corpus_given(
     out.extend(check_surfaces(docs, schema, facts));
     out.extend(check_invariants(docs, schema));
     out.extend(check_binding(docs));
+    // The composed schema, and any schema a document declares. A rule about the SCHEMA
+    // cannot be witnessed by a record unless the witness's own declarations are checked —
+    // and a repository's extension block deserves the same rule as the method's.
+    // Deduplicated by kind: the composed schema and the document that declared it are the
+    // same schema when a repository has one document, and a kind reported twice reads as two
+    // faults.
+    let mut split = check_state_vocabulary(schema);
+    for doc in docs {
+        let declared = Schema::from_document(doc);
+        if !declared.is_empty() {
+            split.extend(check_state_vocabulary(&declared));
+        }
+    }
+    let mut seen: Vec<String> = Vec::new();
+    split.retain(|v| match &v.entity_id {
+        Some(kind) if seen.contains(kind) => false,
+        Some(kind) => {
+            seen.push(kind.clone());
+            true
+        }
+        None => true,
+    });
+    out.extend(split);
+    out
+}
+
+/// `TS.260821.13`/C5. A kind declares its states once, or it refuses what it also permits.
+///
+/// `withdrawn` had to be added to `release` in two places — `states=` on the kind and
+/// `one-of=` on its `state` field — and the first edit alone changed nothing, which reads as
+/// the schema not having been picked up (`WALK.260822.02/AS7`).
+fn check_state_vocabulary(schema: &Schema) -> Vec<Violation> {
+    let mut out = Vec::new();
+    for kind in schema.kinds() {
+        let Some(spec) = schema.entity(kind) else { continue };
+        let Some(field) = spec.fields.iter().find(|f| f.name == "state") else { continue };
+        if spec.states.is_empty() || field.one_of.is_empty() {
+            continue;
+        }
+        let only_in_states: Vec<String> =
+            spec.states.iter().filter(|s| !field.one_of.contains(s)).cloned().collect();
+        let only_in_field: Vec<String> =
+            field.one_of.iter().filter(|s| !spec.states.contains(s)).cloned().collect();
+        if only_in_states.is_empty() && only_in_field.is_empty() {
+            continue;
+        }
+        out.push(Violation {
+            entity_kind: kind.to_owned(),
+            entity_id: Some(kind.to_owned()),
+            refusal: Refusal::SplitStateVocabulary {
+                kind: kind.to_owned(),
+                only_in_states,
+                only_in_field,
+            },
+            span: SourceSpan::from(0..0),
+        });
+    }
     out
 }
 

@@ -124,6 +124,11 @@ pub struct EntitySpec {
     /// What this kind IS, in the words the schema uses. A sentence written for a person,
     /// and the glossary a release publishes.
     pub is: Option<String>,
+    /// The states this kind declares on itself. Read since `TS.260821.13`: `undeclared-state`
+    /// works off the `state` field's `one-of=`, so a kind could declare `states=` and have
+    /// nothing consult it — adding a state there changed no behaviour, which reads as the
+    /// schema not being picked up (`WALK.260822.02/AS7`).
+    pub states: Vec<String>,
     pub fields: Vec<FieldSpec>,
 }
 
@@ -254,7 +259,16 @@ impl Schema {
                 let Some(name) = string_arg(entity) else {
                     continue;
                 };
-                entities.insert(name, EntitySpec { is: prop(entity, "is"), fields: fields_of(entity) });
+                entities.insert(
+                    name,
+                    EntitySpec {
+                        is: prop(entity, "is"),
+                        states: prop(entity, "states")
+                            .map(|s| s.split_whitespace().map(str::to_owned).collect())
+                            .unwrap_or_default(),
+                        fields: fields_of(entity),
+                    },
+                );
             }
             for rule in body.nodes().iter().filter(|n| n.name().value() == "rule") {
                 if let Some(name) = string_arg(rule) {

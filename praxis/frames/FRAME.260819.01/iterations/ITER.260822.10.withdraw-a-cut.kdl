@@ -6,7 +6,7 @@
 iteration "ITER.260822.10" {
     slug "withdraw-a-cut"
     on-slice "TS.260821.13"
-    state "open"
+    state "closed"
     opened-at "2026-08-22T13:05:15Z"
     opened-by "agent:praxis"
 
@@ -34,13 +34,86 @@ iteration "ITER.260822.10" {
     // Frozen at open, from the slices. Removing one from a slice now
     // does not remove it from here — it makes the two disagree, and that is
     // refused.
-    claim "C1" from-slice="TS.260821.13" state="pending"
-    claim "C2" from-slice="TS.260821.13" state="pending"
-    claim "C3" from-slice="TS.260821.13" state="pending"
-    claim "C4" from-slice="TS.260821.13" state="pending"
-    claim "C5" from-slice="TS.260821.13" state="pending"
+    claim "C1" from-slice="TS.260821.13" state="met" \
+        evidence="exercised end to end on this repository: cut 0.8.0, promoted into five \
+            capability records, then `praxis withdraw 0.8.0 --because ...` — and `praxis check` \
+            clean afterwards with no hand-edit. Doing it by hand had cost three edits across \
+            seven files with check inconsistent in between"
+    claim "C2" from-slice="TS.260821.13" state="met" \
+        evidence="tests/withdrawing.rs::withdrawing_unwinds_only_its_own_promotion — entries from \
+            OTHER cut releases survive, or withdrawing one version rewrites the history of every other"
+    claim "C3" from-slice="TS.260821.13" state="met" \
+        evidence="tests/withdrawing.rs::a_withdrawal_with_no_reason_is_refused, over None, empty \
+            and whitespace; the refusal names `--because` rather than a rule. Refused live before \
+            the test existed"
+    claim "C4" from-slice="TS.260821.13" state="met" \
+        evidence="praxis/releases/REL.0.8.0.kdl carries `previously-cut` with the tag, commit, \
+            cut-at and confirmed-bump of what WAS cut; `previously-cut` is 0..n so a version cut, \
+            withdrawn and cut again keeps every one"
+    claim "C5" from-slice="TS.260821.13" state="met" \
+        evidence="a-state-vocabulary-is-declared-once refuses and is WITNESSED (21 of 49). \
+            tests/withdrawing.rs::a_kind_declaring_its_states_twice_differently_is_refused asserts \
+            the message names what is only in each, and that agreement is silent"
+
+    layer "doctrine"    state="evidenced" \
+        evidence="skills/cut-the-version and the release node's own header say a cut is a pointer; \
+            `praxis withdraw --help` says what taking it back does" \
+        reaches="a cut is a pointer, and the skill says what taking it back costs"
+    layer "enforcement" state="evidenced" \
+        evidence="a withdrawal with no reason is refused; a-state-vocabulary-is-declared-once \
+            refuses and is witnessed; 33 test targets pass" \
+        reaches="a withdrawal with no reason is refused; a capability asserting a withdrawn release's truth is recomputed away"
+    layer "docs"        state="evidenced" \
+        evidence="REL.0.8.0's `withdrawn-because` carries the reason in full, and \
+            praxis/.usage/baseline/ holds what the withdrawn cut had frozen" \
+        reaches="`why is this version not cut any more` is answered by the release itself"
+
+    phase "design-ux" state="complete" required-by="docs" worked-by="agent:principal-engineer" \
+        produced="the refusal names `--because`, not a rule id"
+    phase "design-system" state="complete" required-by="enforcement" worked-by="agent:principal-engineer" \
+        produced="both halves move together or neither does — the pointer and the promoted truth \
+            the cut wrote elsewhere are one operation"
+    phase "implement" state="complete" required-by="enforcement · docs" worked-by="agent:principal-engineer" \
+        produced="withdraw.rs, the withdraw command, `previously-cut`, and the split-vocabulary rule"
+    phase "learn" state="complete" required-by="always" worked-by="agent:principal-engineer" \
+        produced="AS9 and AT1 — two more declarations that nothing read"
+    phase "teach" state="complete" required-by="doctrine" worked-by="agent:principal-engineer" \
+        produced="the withdrawn release node explains itself"
+
+    finding "AT1" state="open" size="frame-sized" \
+        text="`states=` on an entity was declared and never read. `undeclared-state` works off the \
+            `state` field's `one-of=` alone, so adding `withdrawn` to `states=` changed nothing — \
+            the schema attribute was decorative for the whole life of the record" \
+        note="fourth in one session, after `when-state` (AS2), `needed-by` on read models, and the \
+            audit exclude list (AS9). The pattern is now the finding: this engine has no way to \
+            report a DECLARATION nothing consults. `praxis prove` does exactly that for rules, and \
+            the same question about fields, attributes and config keys is unanswerable"
+
+    finding "AT2" state="open" size="observation" \
+        text="a rule about the SCHEMA cannot be witnessed by a record, because the witness is a \
+            document and the rule reads the composed schema. a-state-vocabulary-is-declared-once \
+            reported UNWITNESSED until the checker was made to read schemas the documents declare" \
+        note="the fix was right for its own reasons — a repository's extension block deserves the \
+            same rule as the method's — but it was reached by needing a witness to fire. A rule \
+            that cannot be witnessed is a rule whose subject the witness mechanism cannot express, \
+            and that is worth knowing before the next one is declared"
+    closed-at "2026-08-22T18:44:53Z"
+    outcome "continue"
+
+    close {
+        claims-settled "C1" how="met"
+        claims-settled "C2" how="met"
+        claims-settled "C3" how="met"
+        claims-settled "C4" how="met"
+        claims-settled "C5" how="met"
+        all-met #true
+        attested-by "human:waelrabadi"
+        note "the accounting above was computed at close, not asserted. It says every claim is either met or carried by a finding that names it, and nothing about whether the work is any good"
+    }
 
     trail {
+        entry at="2026-08-22T18:44:53Z" by="agent:praxis" action="state-changed" from="open" to="closed" note="closed by `praxis close`. The accounting was computed; the conclusion is not the machine's to draw"
+
         entry at="2026-08-22T13:05:15Z" by="agent:praxis" action="created" \
             note="opened by the gate, on the ask of human:wael"
     }
