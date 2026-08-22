@@ -42,7 +42,9 @@ thin-slice "TS.260821.16" {
     step "3" does="`purpose` sits under the strategy: the outcome THIS product delivers, and what would count as delivered"
     step "4" does="a symptom names the persona it hurts and how. S1 through S7 describe things wrong for SOMEBODY, and this frame has never said who"
     step "5" does="the release opens with why — the purpose, and what this version moved toward it — before it says how"
-    step "6" does="`delivered-when` is the falsifier, on the PURPOSE and not above it. A purpose nobody could be wrong about is a slogan"
+    step "6" does="a finding may oblige a STRATEGY, not only a slice. Today everything learned feeds back into how the work is done and never into whether it is the right work"
+    step "7" does="a strategy is revised by appending, naming the evidence that forced it. A revision citing nothing is a rewrite wearing a revision's clothes"
+    step "8" does="`delivered-when` is the falsifier, on the PURPOSE and not above it. A purpose nobody could be wrong about is a slogan"
 
     excludes "checking whether a vision or a mission is TRUE. Neither is a claim about delivery; \
         both are what claims get judged against, and the record checks the same thing it checks \
@@ -65,6 +67,8 @@ thin-slice "TS.260821.16" {
         settled-by="a test declaring a purpose with no `delivered-when`, asserting a refusal — a purpose nobody could be wrong about is a slogan"
     claim "C2" text="every frame traces upward to a strategy, and one that does not is reported" \
         settled-by="a test asserting a frame naming no strategy is reported and not refused, because every frame in this record predates the kind — and that the chain frame → strategy → mission → vision is followed by dangling-relationship without a rule of its own"
+    claim "C6" text="a strategy is revised by appending, and a revision naming no evidence is refused" \
+        settled-by="a test amending a strategy with no cited finding, asserting a refusal — and one WITH a finding, asserting the prior wording survives and the seal still verifies"
     claim "C5" text="strategy is an ordering, and work out of sequence is reported" \
         settled-by="a test asserting a frame whose symptoms name personas the record does not hold is reported as out of sequence — the strategy says audience precedes frame, and adherence to a declared order is computable"
     claim "C3" text="a symptom names the persona it hurts and how" \
@@ -96,7 +100,7 @@ thin-slice "TS.260821.16" {
         everybody in the room already agrees on, so nobody writes it down, and the first person \
         who did not attend the conversation finds a tool with no reason attached"
 
-    proves "the record holds what the product is for, and a release can open with it"
+    proves "the record holds what the product is for, a release can open with it, and what changed it is visible"
     does-not-prove "that the purpose is the right one. It makes it falsifiable and contradictable, \
         which is what `delivered-when` is for — a wrong purpose stated beats a right one assumed"
 }

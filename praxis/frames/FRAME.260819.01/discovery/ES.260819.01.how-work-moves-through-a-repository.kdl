@@ -688,6 +688,24 @@ event-storm "ES.260819.01" {
             record can say so"
     }
 
+    policy "the-work-informs-the-strategy" {
+        rule "the arrow runs both ways: a strategy anchors the work, and the work within a frame informs the strategy"
+        rule "a strategy is revised by APPENDING, the way an accepted decision is — what it used to say survives"
+        rule "a revision names the evidence that forced it: a finding, a walkthrough, a refusal. A revision citing nothing is a rewrite"
+        rule "the seal covers what the strategy said, not its amendments, so revising it is legitimate and editing it silently is not"
+        because "a strategy the work can always revise constrains nothing, and one the work can \
+            never revise is a slogan nobody revisits. What separates learning from \
+            rationalisation is whether the revision can name what taught it"
+        note "this frame is the evidence. The ordering above — purpose, audience, frame, the four \
+            discovery activities, work, publish — was not stated first and then followed. It came \
+            out of thirty slices, a withdrawn release, and reading the published set as somebody \
+            who had not built it. The strategy was DERIVED from the work, which is the loop this \
+            policy describes running once before anything could record that it had"
+        note "findings oblige slices today. Nothing lets one oblige a change of direction, so \
+            everything learned feeds back into HOW the work is done and never into whether it is \
+            the right work"
+    }
+
     policy "discovery-names-the-person-before-the-system" {
         rule "purpose — what outcome this product exists to deliver, under the strategy it serves"
         rule "audience — each persona: what they came for, what they do not care about, and how they judge whether they got it"
