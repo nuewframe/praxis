@@ -690,6 +690,7 @@ event-storm "ES.260819.01" {
 
     policy "the-work-informs-the-strategy" {
         rule "the arrow runs both ways: a strategy anchors the work, and the work within a frame informs the strategy"
+        rule "the same is true of the audience. One persona is named upfront and the work within the frame identifies the rest"
         rule "a strategy is revised by APPENDING, the way an accepted decision is — what it used to say survives"
         rule "a revision names the evidence that forced it: a finding, a walkthrough, a refusal. A revision citing nothing is a rewrite"
         rule "the seal covers what the strategy said, not its amendments, so revising it is legitimate and editing it silently is not"
@@ -708,7 +709,9 @@ event-storm "ES.260819.01" {
 
     policy "discovery-names-the-person-before-the-system" {
         rule "purpose — what outcome this product exists to deliver, under the strategy it serves"
-        rule "audience — each persona: what they came for, what they do not care about, and how they judge whether they got it"
+        rule "audience — the PRIMARY persona, named before anything is framed. Who this is for is not a discovery output; it is the reason discovery is happening"
+        rule "further personas EMERGE from the work within the frame, and are added as they are found. Enumerating them upfront is a week spent on people nobody has met"
+        rule "an emergent persona names what surfaced it — a finding, a walkthrough, a slice. Same discipline as a strategy revision: discovered means discovered BY something"
         rule "frame — the problem, with every symptom naming which persona feels it and how"
         rule "discovery data — four activities, not one: STORM the timeline, ARCHITECT the capabilities and their boundaries, STRUCTURE the data shapes, integrations and commands, and VALIDATE"
         rule "validate is a category and the walkthrough is one activity in it, not the whole of it"
@@ -717,6 +720,10 @@ event-storm "ES.260819.01" {
         because "the two sides of this product want different halves. In development the question \
             is why, what, and the mechanics of how — and the record answers all three. In use the \
             question is why and how, and the record has never held the why at all"
+        note "the primary persona is knowable before framing — for this product it is the team \
+            building digital products — and everyone else is discovered. A symptom naming a \
+            persona the record does not hold yet is a prompt to declare one, which is why it is \
+            reported and never refused"
         note "notional-architecture holds BOTH what the capabilities are to each other and the \
             schema — architect and structure, which this ordering separates. One document carrying \
             two activities, the same shape as the method schema before TS.260821.10 moved it"

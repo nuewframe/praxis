@@ -118,8 +118,6 @@ These scripts check **shape and presence** — a file exists, a pattern matches,
 | `scripts/validate-plugin.sh`           | Plugin self-test: SKILL.md frontmatter validity (incl. single-line `tools:`), JSON/YAML parse, cross-reference integrity, manifest version parity, enforcement-script syntax, inventory parity, agent-frontmatter validity, and fenced-code balance. |
 | `scripts/test-probes.sh`               | Self-test for the guardrail probes' language coverage: runs `check-no-skipped-tests.sh` and `check-no-sleep-waits.sh` against multi-language fixtures and asserts the expected verdicts. |
 | `scripts/test-citation-scan.sh`        | Self-test for `scripts/citation_scan.py`, the shared citation-vs-assertion implementation both literal scanners consume: asserts that a literal inside a fence, blockquote, or code span is a citation, that a long fence is not closed early by a shorter inner one, and that an inline marker without a reason fails. |
-| `scripts/check-contract-freshness.sh`  | Fails when a sprint depends on a seam contract that moved or vanished since its bridge froze, and flags a `baseRevision` that is not an ancestor of HEAD. Warn-first via `.sprint-coordination.json`. |
-| `scripts/test-sprint-coordination.sh`  | Self-test for both concurrency probes, using fixtures taken from the first real concurrent dispatch rather than invented ones. |
 
 ## How the two halves compose
 

@@ -42,11 +42,16 @@ thin-slice "TS.260821.15" {
         """#
 
     step "1" does="`persona` is a kind: who they are, what they came for, what they do not care about, and what would make them say it worked"
+    step "1b" does="ONE persona is named before framing — the primary one, who the product is for. The rest emerge from the work and are added as they are found"
     step "2" does="`needed-by` references it. A view for `reader` where no persona is named `reader` goes dangling, the way every other unresolved edge does"
     step "3" does="a slice's `useful-alone` names whose. `what you get if this ships and nothing after it does` has always had an unstated subject"
     step "4" does="a symptom names who feels it. S1 through S7 describe things that are wrong for SOMEBODY, and the frame has never said who"
     step "5" does="discovery gains the activity. Storm, architecture and walkthrough are all about the system; naming the person comes before any of them"
 
+    excludes "enumerating every persona upfront. The primary one is knowable before framing — it \
+        is the reason discovery is happening at all — and the rest are discovered. A week spent \
+        writing personas for people nobody has met is the artifact this frame distrusts, produced \
+        earlier"
     excludes "market segments, demographics, or anything a persona document usually carries. \
         What is needed here is what a reader came for and how they judge it — the rest is \
         marketing research and the record cannot check a word of it"
@@ -61,6 +66,10 @@ thin-slice "TS.260821.15" {
     layer "enforcement" reaches="needed-by references persona; a claim of value naming no persona is reported"
     layer "docs"        reaches="`who is this for` is answerable from the record, and the published set can be ordered by a real reader instead of a label"
 
+    claim "C5" text="one primary persona is required and the rest are not" \
+        settled-by="a test asserting a record with no persona at all is reported, and one with a single primary persona is clean — emergence is the normal case, not a shortfall"
+    claim "C6" text="an emergent persona names what surfaced it" \
+        settled-by="a test asserting a persona declared as emergent with no `found-by` is refused, and that `found-by` follows to a finding, a walkthrough or a slice the record holds — discovered means discovered BY something"
     claim "C1" text="a persona is a record: who, what they came for, what they do not care about, how they judge it" \
         settled-by="praxis check over declared personas, and a test that one missing `judges-by` is refused — a persona nobody can be wrong about is a description, not a persona"
     claim "C2" text="needed-by names a persona the record holds, or it dangles" \

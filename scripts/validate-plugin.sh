@@ -215,7 +215,7 @@ fi
 #        is deliberately NOT applied: for a path, backticks are the ordinary
 #        notation, so exempting them would excuse nearly every reference.
 #      - `<placeholder>` segments stay unmatched.
-echo "validate-plugin: checking cross-references..."
+echo "validate-plugin: checking cross-references (CHANGELOG excluded — it cites what existed when written)..."
 XREF_REPORT=$(python3 <<'PY'
 import os, re, sys
 sys.path.insert(0, 'scripts')
@@ -259,6 +259,25 @@ for dirpath, dirnames, filenames in os.walk('.'):
     for fn in filenames:
         if fn.endswith('.md'):
             md_files.append(os.path.join(dirpath, fn).replace('./', '', 1))
+
+# Two kinds of document are exempt, for one reason: neither is a claim about the tree as it
+# stands now, so a "broken" path in either is the document being accurate.
+#
+#   HISTORICAL — a changelog entry, an ADR, a retired initiative. Each cites what existed
+#     when it was written, and an ADR is append-only by its own rule. Rewriting one to keep
+#     a linter green is editing history to satisfy a tool.
+#   GENERATED — the published set, and the archived baseline of a withdrawn cut.
+#     `what-this-plugin-ships` lists retired surfaces under "retired, and where it still
+#     stands", so the paths are absent BY DESIGN. Checking generated output against the tree
+#     checks the record's own statement that something was removed — and the baseline is a
+#     frozen copy kept precisely so an improvement can be diffed against it.
+HISTORICAL = ('docs/architecture/adr/', 'docs/product/initiatives/')
+GENERATED = ('docs/releases/', 'praxis/.usage/baseline/')
+md_files = [
+    p
+    for p in md_files
+    if p != 'CHANGELOG.md' and not p.startswith(HISTORICAL + GENERATED)
+]
 
 problems = []
 for path in sorted(md_files):
@@ -333,110 +352,14 @@ else
   echo "  ok"
 fi
 
-# 7. Inventory parity: every skill, script, and instruction on disk must be
-#    referenced in the canonical self-describing docs, so the docs cannot
-#    silently drift behind the file tree.
-#      - skills/<name>/        → README.md AND docs/product.md
-#      - scripts/check-*.sh    → README.md AND docs/product.md
-#      - scripts/*.sh (others) → docs/product.md (README allowlist below)
-#      - instructions/*.md     → README.md, docs/product.md, using-praxis
-echo "validate-plugin: checking inventory parity..."
-INV_REPORT=$(python3 <<'PY'
-import os, sys
+# 7. Inventory parity — RETIRED by TS.260821.07 and TS.260821.03.
+#    It required every skill, script and instruction to be listed in README.md AND
+#    docs/product.md, which is the same question `praxis audit-surfaces` answers from the
+#    record — and answering it by grepping two Markdown files is what made docs/product.md
+#    carry two skill inventories that drifted from the tree they described.
+#      praxis audit-surfaces   what ships, and what asked for each piece
+#      praxis check            refuses a shipped surface nothing anchors
 
-def read(path):
-    try:
-        return open(path).read()
-    except Exception:
-        return ''
-
-readme = read('README.md')
-context = read('docs/product.md')
-bootstrap = read('skills/using-praxis/SKILL.md')
-
-problems = []
-
-# README-optional scripts: release/dev tooling not wired into target projects.
-readme_optional_scripts = {'bump-version.sh'}
-
-# Skills — each must appear in README and docs/product.md.
-for skill in sorted(d for d in os.listdir('skills') if os.path.isdir(os.path.join('skills', d))):
-    if not os.path.isfile(os.path.join('skills', skill, 'SKILL.md')):
-        continue
-    if skill not in readme:
-        problems.append(f'skills/{skill}: not referenced in README.md')
-    if skill not in context:
-        problems.append(f'skills/{skill}: not referenced in docs/product.md')
-
-# Scripts — every script must appear in docs/product.md; check-*.sh + others
-# (minus the release allowlist) must also appear in README.
-for script in sorted(f for f in os.listdir('scripts') if f.endswith('.sh')):
-    if script not in context:
-        problems.append(f'scripts/{script}: not referenced in docs/product.md')
-    if script not in readme_optional_scripts and script not in readme:
-        problems.append(f'scripts/{script}: not referenced in README.md')
-
-# Instructions — each always-on guardrail must appear in README, docs/product.md,
-# and the bootstrap skill index, so the guardrail count never diverges.
-for instr in sorted(f for f in os.listdir('instructions') if f.endswith('.instructions.md')):
-    if instr not in readme:
-        problems.append(f'instructions/{instr}: not referenced in README.md')
-    if instr not in context:
-        problems.append(f'instructions/{instr}: not referenced in docs/product.md')
-    if instr not in bootstrap:
-        problems.append(f'instructions/{instr}: not referenced in skills/using-praxis/SKILL.md')
-
-# Reverse direction: a name claimed by a canonical doc must exist on disk.
-# The loops above prove "on disk -> mentioned"; nothing proved "mentioned -> on
-# disk", so deleting a skill left stale claims across three surfaces with a
-# green build. Check #4 does not cover this: it matches FILE paths, and these
-# references are directory-shaped.
-import re
-sys.path.insert(0, 'scripts')
-import citation_scan
-
-CANONICAL = ['README.md', 'docs/product.md', 'skills/using-praxis/SKILL.md']
-CLAIM_RE = re.compile(
-    r'`?(skills/([a-z0-9][a-z0-9-]*)/)`?'
-    r'|`?(instructions/([a-z0-9][a-z0-9-]*\.instructions\.md))`?'
-    r'|`?(agents/([a-z0-9][a-z0-9-]*\.agent\.md))`?')
-
-for doc in CANONICAL:
-    if not os.path.isfile(doc):
-        continue
-    result = citation_scan.analyze(doc, marker='praxis:allow-path')
-    for lineno, line in enumerate(open(doc, errors='replace').read().split('\n'), 1):
-        if lineno in result.exempt:
-            continue
-        for m in CLAIM_RE.finditer(line):
-            ref = m.group(1) or m.group(3) or m.group(5)
-            if not ref or '<' in ref or '>' in ref:
-                continue
-            target = ref.rstrip('/') if ref.startswith('skills/') else ref
-            if ref.startswith('skills/'):
-                if not os.path.isfile(os.path.join(target, 'SKILL.md')):
-                    problems.append('%s:%d: names `%s` but no such skill exists on disk'
-                                    % (doc, lineno, ref))
-            elif not os.path.isfile(target):
-                problems.append('%s:%d: names `%s` but no such file exists on disk'
-                                % (doc, lineno, ref))
-
-for p in problems:
-    print(p)
-sys.exit(1 if problems else 0)
-PY
-)
-INV_RC=$?
-if [[ $INV_RC -ne 0 ]]; then
-  echo "$INV_REPORT" >&2
-  FAILED=$((FAILED + 1))
-else
-  echo "  ok"
-fi
-
-# 8. Agent frontmatter — parseable, with required keys. Agent personas are a
-#    fourth surface the earlier checks never covered (where wrong tool names and
-#    missing keys can hide).
 echo "validate-plugin: checking agent frontmatter..."
 AGENT_REPORT=$(python3 <<'PY'
 import os, re, sys
@@ -692,12 +615,26 @@ LINK_PATTERN = r'\[[^\]]*\]\(([^)\s]+)'
 link_re = re.compile(LINK_PATTERN)
 
 problems = []
+# Same exemption as cross-references, and the same one reason: a HISTORICAL document cites
+# what existed when it was written, and a GENERATED one says what the record says. Neither
+# is a claim about the tree as it stands, so an unresolved link in either is the document
+# being accurate. An RFC is dated in its own filename; a changelog entry and an ADR are
+# append-only by rule; the published set lists retired surfaces by design.
+EXEMPT = (
+    'docs/architecture/adr/',
+    'docs/product/initiatives/',
+    'docs/product/RFC.',
+    'docs/releases/',
+    'praxis/.usage/baseline/',
+)
 for dirpath, dirnames, filenames in os.walk('.'):
     dirnames[:] = [d for d in dirnames if d not in SKIP_DIRS]
     for fn in filenames:
         if not fn.endswith('.md'):
             continue
         path = os.path.join(dirpath, fn)
+        if fn == 'CHANGELOG.md' or path.replace('./', '', 1).startswith(EXEMPT):
+            continue
         try:
             lines = open(path, errors='replace').read().split('\n')
         except Exception as e:

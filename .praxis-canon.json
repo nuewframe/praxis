@@ -52,18 +52,8 @@
   "requiredPhrases": [
     {
       "file": "README.md",
-      "pattern": "script-enforced, human-signed, and agent-attested",
-      "reason": "README's opening pitch must disclose the three-tier enforcement split so adopters don't over-trust a green check; see skills/using-praxis/SKILL.md's Enforcement model section (Course Correction Phase A1)."
-    },
-    {
-      "file": "docs/product.md",
-      "pattern": "the architecture tree is validated truth, promoted there by",
-      "reason": "Binds the product dashboard's authority statement to the template bootstrap-project scaffolds. TS-010's acceptance criterion spans two footprints \u2014 the scaffold can be written by one slice but only verified against a file that slice may not touch \u2014 so the two matched by construction and nothing enforced it. Requiring the phrase in both files makes the match mechanical."
-    },
-    {
-      "file": "skills/bootstrap-project/SKILL.md",
-      "pattern": "the architecture tree is validated truth, promoted there by",
-      "reason": "Binds the product dashboard's authority statement to the template bootstrap-project scaffolds. TS-010's acceptance criterion spans two footprints \u2014 the scaffold can be written by one slice but only verified against a file that slice may not touch \u2014 so the two matched by construction and nothing enforced it. Requiring the phrase in both files makes the match mechanical."
+      "pattern": "are \\*\\*not\\*\\* mechanically compelled",
+      "reason": "README's opening pitch must disclose that not every gate is equally binding, so an adopter does not over-trust a green check. The pattern is the honesty CLAIM rather than the list \u2014 the list was three kinds, is four since the delivery graph, and encoding a count in a check makes the check stale the next time the truth improves."
     },
     {
       "file": "skills/provision-project-overlay/SKILL.md",

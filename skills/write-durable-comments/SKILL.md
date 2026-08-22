@@ -104,6 +104,7 @@ puts the reasoning in two places, and only one of them is checked.
 | **Function** | the invariant it maintains, or the failure it prevents |
 | **Inline** | only where a reader would otherwise change it back |
 
+<!-- praxis:allow-version-literal reason="an example of the mistake, not a claim about a version. The literal is the point: a comment naming a release is what this skill forbids." -->
 Never: *"Restored by…"*, *"used to be…"*, *"fixed in 0.8.0"*, *"changed from A to B"*, or a name
 and a date.
 
