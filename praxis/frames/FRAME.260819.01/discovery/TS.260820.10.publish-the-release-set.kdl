@@ -63,6 +63,7 @@ thin-slice "TS.260820.10" {
 
     useful-alone "the regex ceiling is gone for published output, and every document becomes \
         true for exactly one version and false for every other"
+    useful-to "the-reader-of-a-release"
 
     attacks "S6"
     note "C3 is finding E10's falsifier, stated as an acceptance criterion. If it cannot be \

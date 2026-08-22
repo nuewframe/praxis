@@ -41,6 +41,7 @@ thin-slice "TS.260820.03" {
 
     useful-alone "S7 stops being structural. An agent that can ask does not re-derive, even \
         with no projection, no gate and no release machinery present"
+    useful-to "the-next-agent"
 
     attacks "S7"
 }

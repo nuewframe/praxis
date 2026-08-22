@@ -73,6 +73,7 @@ thin-slice "TS.260821.11" {
     useful-alone "the eight questions this session answered with grep become one command each, and \
         the four progress meters become one. Worth having with nothing else changed, because the \
         alternative is that every agent writes its own traversal of a graph the engine already holds"
+    useful-to "the-next-agent"
 
     attacks "S7"
 

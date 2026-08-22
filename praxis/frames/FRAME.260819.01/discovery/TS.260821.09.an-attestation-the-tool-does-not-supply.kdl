@@ -66,6 +66,7 @@ thin-slice "TS.260821.09" {
     useful-alone "the one gate this plugin describes as its strongest becomes reachable. It is \
         currently a rule that passes its tests and cannot fire in production, which is worse than \
         not having it: it reads as a guarantee"
+    useful-to "the-team-building-a-digital-product"
 
     attacks "S2"
 

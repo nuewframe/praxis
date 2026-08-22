@@ -57,6 +57,7 @@ thin-slice "TS.260821.02" {
 
     useful-alone "`which of our gates has never fired` becomes answerable. Worth having with nothing \
         else changed, because the answer today is that nobody knows"
+    useful-to "the-team-building-a-digital-product"
 
     attacks "S3"
 

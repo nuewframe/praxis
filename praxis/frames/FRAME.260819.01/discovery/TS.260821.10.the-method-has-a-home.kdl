@@ -80,6 +80,7 @@ thin-slice "TS.260821.10" {
     useful-alone "a project can adopt the method without owning a copy of it. That is the whole of \
         AK2, and until it is true every claim this frame makes about portability is a claim about \
         one repository"
+    useful-to "the-adopter"
 
     attacks "S1"
 

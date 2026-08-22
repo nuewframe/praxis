@@ -40,6 +40,7 @@ thin-slice "TS.260820.04" {
 
     useful-alone "an agent stops choosing work by reading prose and guessing. Useful with no \
         gate implemented at all, because the answer is already true"
+    useful-to "the-next-agent" "the-team-building-a-digital-product"
 
     attacks "S3"
     note "this is one of the two slices that test finding E10: its content is owned here, and \

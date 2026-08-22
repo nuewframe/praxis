@@ -49,6 +49,7 @@ thin-slice "TS.260820.02" {
 
     useful-alone "the step from problem to capability becomes a derivation with its work shown. \
         Nothing downstream needs to exist for that to be worth having"
+    useful-to "the-team-building-a-digital-product"
 
     attacks "S2"
 }

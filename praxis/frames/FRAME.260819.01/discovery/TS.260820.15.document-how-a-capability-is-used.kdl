@@ -47,6 +47,7 @@ thin-slice "TS.260820.15" {
 
     useful-alone "usage stops being written from memory at release time, which is when it is \
         least accurate and most rushed"
+    useful-to "the-reader-of-a-release"
 
     attacks "S2" "S6"
 }

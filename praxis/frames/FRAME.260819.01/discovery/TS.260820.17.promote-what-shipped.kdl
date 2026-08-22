@@ -46,6 +46,7 @@ thin-slice "TS.260820.17" {
     useful-alone "current truth stops being maintained by hand. This is the difference between \
         the record being a by-product of the work and a chore performed beside it, and the frame \
         says that difference is what makes the chore get skipped when the work is late"
+    useful-to "the-next-agent" "the-reader-of-a-release"
 
     attacks "S6" "S7"
 }

@@ -70,6 +70,7 @@ thin-slice "TS.260821.05" {
     useful-alone "`what does this plugin guarantee, and what enforces it` becomes answerable. \
         Today `enable-all-fail-closed #true` is a claim about fourteen shell scripts that nothing \
         has ever checked"
+    useful-to "the-adopter" "the-team-building-a-digital-product"
 
     attacks "S3"
 

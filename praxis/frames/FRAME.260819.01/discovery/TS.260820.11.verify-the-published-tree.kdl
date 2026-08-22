@@ -50,6 +50,7 @@ thin-slice "TS.260820.11" {
 
     useful-alone "a reader asking 'was this ever true?' gets a date rather than a shrug. \
         S6 fully closed"
+    useful-to "the-reader-of-a-release"
 
     proves "a published document was not hand-edited after the fact"
     does-not-prove "that the document still agrees with the record. See WALK.260820.01/W5 — \

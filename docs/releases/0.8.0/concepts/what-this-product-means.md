@@ -41,13 +41,14 @@ what problem does this exist for, and what does every word mean?
 | iteration | one COMMITMENT — the slices an ask committed to, worked together |
 | method | the vocabulary a repository is governed BY — kinds, rules, and the gate |
 | notional-architecture | what the capabilities are to each other, free of any tool decision |
+| persona | somebody the product is for — what they came for, and how they judge whether they got it |
 | phase | one stage of work inside an iteration — WHEN in the attempt, as a layer is WHERE in the stack |
 | profile | which guardrails apply here, and which layers a slice may declare |
 | read-model | a view an actor must see before acting, owned by exactly one capability |
 | refusal | a pick-up the gate refused, and the condition that failed |
 | release | an index into history — what it binds, what it resolves |
 | role | who may attest what — a position a human or an agent occupies, not a person |
-| symptom | one observable thing that is wrong, resolving on its own schedule by naming a release |
+| symptom | one observable thing that is wrong FOR SOMEBODY, resolving on its own schedule by naming a release |
 | thin-slice | an atomic vertical slice — one command or one read model, cut so it can exercise a capability |
 | walkthrough | one path through the record, walked all the way down — discovery's DEPTH activity |
 

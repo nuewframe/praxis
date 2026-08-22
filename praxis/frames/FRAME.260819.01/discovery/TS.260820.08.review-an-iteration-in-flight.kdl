@@ -47,6 +47,7 @@ thin-slice "TS.260820.08" {
 
     useful-alone "a reviewer stops judging an artifact by how finished it looks. That is S2, \
         and it needs no release machinery"
+    useful-to "the-team-building-a-digital-product"
 
     attacks "S2"
     note "the second E10 test: content owned by claim-settlement, mechanism owned by \

@@ -44,6 +44,7 @@ thin-slice "TS.260820.05" {
 
     useful-alone "the amount of process a unit of work received stops being the receiving \
         agent's own account of it"
+    useful-to "the-team-building-a-digital-product"
 
     attacks "S3"
     principle-note "selection is the commitment. Choosing to work this is choosing not to work \

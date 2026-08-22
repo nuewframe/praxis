@@ -46,6 +46,7 @@ thin-slice "TS.260820.18" {
 
     useful-alone "`resolved-by` becomes checkable. Every frame in the repository can be audited \
         against what actually shipped, with no projection and no publishing"
+    useful-to "the-team-building-a-digital-product"
 
     attacks "S5" "S6"
     note "the sharpest check in the set: it makes progress against a problem computable from the \

@@ -82,6 +82,7 @@ thin-slice "TS.260821.12" {
     useful-alone "docs/releases/<version>/ becomes the thing you hand somebody who has read \
         nothing — concepts, then architecture, then what changed, then how to start. Today it is a hundred and seventy lines that answer a question nobody asked, and \
         one document that says nothing shipped while five capabilities are active"
+    useful-to "the-reader-of-a-release"
 
     attacks "S6"
 

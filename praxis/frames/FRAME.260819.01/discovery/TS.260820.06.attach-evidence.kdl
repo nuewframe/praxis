@@ -44,6 +44,7 @@ thin-slice "TS.260820.06" {
 
     useful-alone "how much of a slice was actually reached becomes readable off the record, \
         with nothing else about closing or releasing in place"
+    useful-to "the-team-building-a-digital-product"
 
     attacks "S2" "S3"
 }

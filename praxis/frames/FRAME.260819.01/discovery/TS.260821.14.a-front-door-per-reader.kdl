@@ -75,6 +75,7 @@ thin-slice "TS.260821.14" {
     useful-alone "a reader opening a release directory is told which file is theirs and what it \
         answers. Today they are told nothing, and the first thing they see is whichever folder \
         sorts first"
+    useful-to "the-reader-of-a-release"
 
     attacks "S6"
 

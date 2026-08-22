@@ -81,6 +81,7 @@ thin-slice "TS.260821.16" {
     useful-alone "`what is this for` becomes a question the record answers. Praxis has stated its \
         own purpose in prose since before the delivery graph existed, and eighteen iterations of \
         work have descended from a frame that does not contain it"
+    useful-to "the-reader-of-a-release" "the-team-building-a-digital-product"
 
     attacks "S7"
 

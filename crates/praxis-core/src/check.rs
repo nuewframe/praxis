@@ -71,6 +71,8 @@ pub enum Refusal {
     SplitStateVocabulary { kind: String, only_in_states: Vec<String>, only_in_field: Vec<String> },
     /// The record holds no persona at all, so nothing it contains says who it is for.
     NobodyItIsFor,
+    /// A slice claiming value without naming whose value it is.
+    ValueWithNoJudge { slice: String },
     /// A symptom resolved by a release the record does not hold.
     ResolvedByNothing { symptom: String, version: String },
     /// A symptom resolved by a release that bound no slice attacking it.
@@ -140,6 +142,7 @@ impl Refusal {
             Self::UnknownMethod { .. } => "a-config-binds-a-method-the-engine-carries",
             Self::SplitStateVocabulary { .. } => "a-state-vocabulary-is-declared-once",
             Self::NobodyItIsFor => "a-record-names-somebody-it-is-for",
+            Self::ValueWithNoJudge { .. } => "a-claim-of-value-names-whose",
         }
     }
 
@@ -171,6 +174,7 @@ impl Refusal {
             Self::UnknownMethod { .. } => "governed-by",
             Self::SplitStateVocabulary { .. } => "states",
             Self::NobodyItIsFor => "persona",
+            Self::ValueWithNoJudge { .. } => "useful-to",
             Self::UnjustifiedLifetime { missing, .. } => missing,
         }
     }
@@ -188,6 +192,10 @@ impl Refusal {
             // absence of many — enumerating personas upfront is a week spent on people
             // nobody has met.
             | Self::NobodyItIsFor
+            // Reported: half this record predates the persona kind, and a rule failing closed
+            // on the day it lands is one nobody adopts. It flips when the count is zero, the
+            // way every enforcement in this frame has had to earn its severity.
+            | Self::ValueWithNoJudge { .. }
             | Self::UnevidencedLayer { .. } => Severity::Report,
             _ => Severity::Refuse,
         }
@@ -269,6 +277,11 @@ impl Refusal {
             Self::UnkeptInvariant { invariant, protects } => format!(
                 "`{invariant}` is enabled and nothing enforces it — the plugin guarantees that \
                  {protects}, and no shipped surface keeps it"
+            ),
+            Self::ValueWithNoJudge { slice } => format!(
+                "{slice} says what you get and not who gets it. Value is not a property of a \
+                 change — it is a judgement somebody makes, and a record stating the change \
+                 without the judge has recorded half of it. Name one with `useful-to`"
             ),
             Self::NobodyItIsFor => "the record names nobody it is for. Every fact it holds \
                  exists to serve somebody, and `useful-alone` — what you get if this ships — has \
@@ -853,6 +866,28 @@ pub fn check_corpus_given(
     out.extend(check_surfaces(docs, schema, facts));
     out.extend(check_invariants(docs, schema));
     out.extend(check_binding(docs));
+    // A slice claiming value with an unstated subject. Only where the kind is declared: a
+    // repository whose method predates `persona` is not missing something it never had.
+    if schema.entity("persona").is_some() {
+        for doc in docs {
+            for node in doc.nodes().iter().filter(|n| n.name().value() == "thin-slice") {
+                if children_named(node, "useful-alone").is_empty()
+                    || !children_named(node, "useful-to").is_empty()
+                {
+                    continue;
+                }
+                out.push(Violation {
+                    entity_kind: "thin-slice".to_owned(),
+                    entity_id: string_arg(node),
+                    refusal: Refusal::ValueWithNoJudge {
+                        slice: string_arg(node).unwrap_or_default(),
+                    },
+                    span: field_span(node, "useful-alone").unwrap_or_else(|| node.span()),
+                });
+            }
+        }
+    }
+
     // A record with no persona at all. Checked only where the kind is declared: a repository
     // whose method predates it is not missing something it never had.
     if schema.entity("persona").is_some()

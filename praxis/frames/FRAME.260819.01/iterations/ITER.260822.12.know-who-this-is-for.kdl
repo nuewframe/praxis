@@ -1,0 +1,113 @@
+// Opened by `praxis pick-up`. Every condition below was evaluated against the
+// tree as it stood at 2026-08-22T21:26:50Z, and the verdicts are recorded
+// rather than summarised: a gate whose reasoning is not on the record is a gate
+// you have to trust.
+
+iteration "ITER.260822.12" {
+    slug "know-who-this-is-for"
+    on-slice "TS.260821.15"
+    state "closed"
+    opened-at "2026-08-22T21:26:50Z"
+    opened-by "agent:praxis"
+
+    approval "admission" {
+        status "signed"
+        signer "human:wael"
+        at "2026-08-22T21:26:50Z"
+        signed-by "the ask to pick up this slice"
+    }
+
+    vet "create" state="done" at="2026-08-22T21:26:50Z" on-slice="TS.260821.15" {
+        condition "slice-is-shaped" verdict="passed"
+        condition "dependencies-delivered" verdict="passed"
+        condition "no-iteration-in-flight" verdict="passed"
+        condition "nothing-left-to-admit" verdict="passed"
+        condition "work-is-disjoint" verdict="not-computed" \
+            found="no seam manifest exists, so what two iterations would touch cannot be compared. Disjointness is half of what this capability says it judges, and half of what it judges is currently not computed at all"
+        condition "the-slice-is-the-best-available" verdict="left-to-the-maintainer"
+    }
+
+    // 2 of the declared conditions were not decided by the gate. They are
+    // recorded above rather than omitted: an admission that does not say what
+    // it left undecided claims more than it checked.
+
+    // Frozen at open, from the slices. Removing one from a slice now
+    // does not remove it from here — it makes the two disagree, and that is
+    // refused.
+    // The six frozen at open. Five were met by ITER.260822.11; this commitment exists to
+    // settle the one it carried, and re-states the others against the evidence that met them
+    // rather than pretending they were done here.
+    claim "C1" from-slice="TS.260821.15" state="met" \
+        evidence="settled by ITER.260822.11 — tests/personas.rs::a_persona_nobody_could_be_wrong_about_is_refused"
+    claim "C2" from-slice="TS.260821.15" state="met" \
+        evidence="settled by ITER.260822.11 — ::a_view_needed_by_nobody_the_record_holds_dangles"
+    claim "C3" from-slice="TS.260821.15" state="met" \
+        evidence="a-claim-of-value-names-whose reports and is WITNESSED. \
+            tests/personas.rs::a_slice_saying_what_you_get_without_saying_who_gets_it_is_reported \
+            asserts it fires on the slice that claims value and names nobody, stays silent on one \
+            that claims none, and reports rather than refuses. Thirty-four slices were annotated \
+            FIRST, so the rule landed on a count of zero"
+    claim "C4" from-slice="TS.260821.15" state="met" \
+        evidence="settled by ITER.260822.11 — felt-by on all seven symptoms"
+    claim "C5" from-slice="TS.260821.15" state="met" \
+        evidence="settled by ITER.260822.11 — ::one_persona_is_enough_and_none_is_reported"
+    claim "C6" from-slice="TS.260821.15" state="met" \
+        evidence="settled by ITER.260822.11 — ::an_emergent_persona_with_no_origin_is_refused"
+
+    layer "doctrine"    state="evidenced" \
+        evidence="skills/name-a-persona/SKILL.md, unchanged — the doctrine was right and the \
+            enforcement was missing" \
+        reaches="a slice states whose value it claims"
+    layer "enforcement" state="evidenced" \
+        evidence="a-claim-of-value-names-whose reports, is witnessed, and reports NOTHING on this \
+            record. 23 of 52 rules witnessed" \
+        reaches="value with an unstated subject is named"
+    layer "docs"        state="evidenced" \
+        evidence="every slice in the frame carries useful-to; `praxis ask thin-slice --show useful-to` \
+            answers who each was for" \
+        reaches="whose value a slice claims is readable"
+
+    phase "design-ux" state="complete" required-by="docs" worked-by="agent:principal-engineer" \
+        produced="the refusal says `name one with useful-to`, not a rule id"
+    phase "design-system" state="complete" required-by="enforcement" worked-by="agent:principal-engineer" \
+        produced="annotate to zero, THEN turn the rule on. AV1 carried rather than forcing a rule \
+            that would have named thirty slices on arrival, which is the order TS.260821.04 had to \
+            learn and this one did not have to relearn"
+    phase "implement" state="complete" required-by="enforcement · docs" worked-by="agent:principal-engineer" \
+        produced="useful-to on all thirty-four slices, the rule, its witness, and the test"
+    phase "learn" state="complete" required-by="always" worked-by="agent:principal-engineer" \
+        produced="AX1 — what a second commitment on one slice costs to read"
+    phase "teach" state="complete" required-by="doctrine" worked-by="agent:principal-engineer" \
+        produced="nothing new. The skill already said it; only the enforcement was missing"
+
+    finding "AX1" state="open" size="observation" \
+        text="settling one carried claim required a second commitment that re-states five claims \
+            it did not settle. `praxis close` accounts over the claims the ITERATION holds, so a \
+            follow-up must carry all six or drop scope by omission" \
+        note="a-commitment-carries-every-claim (AJ6) is why, and it is right — an iteration that \
+            carries only the unfinished claim would close green while five went unaccounted. The \
+            cost is that the record now holds two commitments asserting the same five settlements, \
+            and only one of them did the work. Worth a way to say `settled by ITER.260822.11` that \
+            the accounting understands rather than a comment that a reader has to"
+    closed-at "2026-08-22T21:29:48Z"
+    outcome "continue"
+
+    close {
+        claims-settled "C1" how="met"
+        claims-settled "C2" how="met"
+        claims-settled "C3" how="met"
+        claims-settled "C4" how="met"
+        claims-settled "C5" how="met"
+        claims-settled "C6" how="met"
+        all-met #true
+        attested-by "human:waelrabadi"
+        note "the accounting above was computed at close, not asserted. It says every claim is either met or carried by a finding that names it, and nothing about whether the work is any good"
+    }
+
+    trail {
+        entry at="2026-08-22T21:29:48Z" by="agent:praxis" action="state-changed" from="open" to="closed" note="closed by `praxis close`. The accounting was computed; the conclusion is not the machine's to draw"
+
+        entry at="2026-08-22T21:26:50Z" by="agent:praxis" action="created" \
+            note="opened by the gate, on the ask of human:wael"
+    }
+}

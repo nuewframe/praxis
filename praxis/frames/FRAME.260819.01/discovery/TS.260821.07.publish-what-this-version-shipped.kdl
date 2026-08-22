@@ -66,6 +66,7 @@ thin-slice "TS.260821.07" {
     useful-alone "`what did 0.8.0 ship, and what of it fails closed` becomes answerable from the \
         record, for any version, at any time. Today it is answerable only for the working tree and \
         only by running four scripts"
+    useful-to "the-reader-of-a-release" "the-adopter"
 
     attacks "S6"
 

@@ -47,6 +47,7 @@ thin-slice "TS.260820.16" {
 
     useful-alone "what is queued for the next version stops being a hand-kept list, and that is \
         useful with nothing ever cut"
+    useful-to "the-team-building-a-digital-product"
 
     attacks "S5"
 }

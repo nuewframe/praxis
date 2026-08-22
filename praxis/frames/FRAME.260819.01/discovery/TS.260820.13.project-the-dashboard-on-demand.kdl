@@ -51,6 +51,7 @@ thin-slice "TS.260820.13" {
 
     useful-alone "docs/product.md can be retired without losing anything, because the answer it \
         was approximating is now available whenever anyone asks for it"
+    useful-to "the-team-building-a-digital-product"
 
     attacks "S2" "S6" "S7"
     note "this is the slice that lets ES.260819.01/E17 be acted on. Retiring a published \

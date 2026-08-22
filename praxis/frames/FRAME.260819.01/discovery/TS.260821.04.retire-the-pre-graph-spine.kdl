@@ -61,6 +61,7 @@ thin-slice "TS.260821.04" {
     useful-alone "the front door stops contradicting the house. An arriving agent reads a spine it \
         can execute, which is the first thing every session does and currently the first thing that \
         misleads it"
+    useful-to "the-next-agent" "the-adopter"
 
     attacks "S1"
 

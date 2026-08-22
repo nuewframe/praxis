@@ -48,6 +48,7 @@ thin-slice "TS.260821.01" {
 
     useful-alone "the record stops being able to grow a kind of thing in silence. Nothing else in \
         this frame needs to ship for that to be worth having"
+    useful-to "the-team-building-a-digital-product"
 
     attacks "S2" "S7"
 

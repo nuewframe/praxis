@@ -38,6 +38,8 @@ what doctrine did this version ship, what asked for each piece, and which guaran
 | agents/product-designer.agent.md | agent | product-designer | not derivable from what it serves |
 | skills/adopt-the-method/SKILL.md | skill | TS.260821.10 | 0.8.0 |
 | skills/write-durable-comments/SKILL.md | skill | comments-state-meaning | not derivable from what it serves |
+| skills/name-a-persona/SKILL.md | skill | TS.260821.15 | not derivable from what it serves |
+| skills/ask-the-record/SKILL.md | skill | TS.260821.11 | not derivable from what it serves |
 | skills/define-seam-contract/SKILL.md | skill | seam-contract-parity | not derivable from what it serves |
 | skills/design-capability-layout/SKILL.md | skill | no-dumping-grounds · port-adapter-parity | not derivable from what it serves |
 | skills/implement-with-defensive-patterns/SKILL.md | skill | resilient-boundary · http-observability | not derivable from what it serves |

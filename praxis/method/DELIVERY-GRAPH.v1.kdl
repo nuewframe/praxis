@@ -741,6 +741,34 @@ method "delivery-graph" {
                 surfaced them, so this reports the ABSENCE of any and never the absence of many — \
                 enumerating personas upfront is a week spent on people nobody has met"
 
+        rule "a-claim-of-value-names-whose"           reports="a slice saying what you get without naming who gets it" \
+            because="value is not a property of a change — it is a judgement somebody makes, and \
+                a record stating the change without the judge has recorded half of it. \
+                `useful-alone` says `what you get if this ships and nothing after it does`, and \
+                the subject was unstated for the whole life of the record" \
+            found-by="ITER.260822.11/AV1" \
+            given-shipped="" \
+            witness=#"""
+                thin-slice "TS.witness" {
+                    slug "value-with-no-judge"
+                    title "a slice claiming value for nobody"
+                    kind "command"
+                    realizes "CAP.delivery-record"
+                    from-storm "ES.260819.01"
+                    command "witness"
+                    actor "somebody"
+                    produces-event "Witnessed"
+                    trigger "a witness is needed"
+                    outcome "the rule fires"
+                    layer "doctrine" reaches="nothing"
+                    claim "C1" text="something" settled-by="a test"
+                    useful-alone "something you get, and the record does not say who gets it"
+                }
+                """# \
+            note="reported, not refused. Thirty-four slices were annotated before this landed so \
+                the count is zero on arrival — the same order TS.260821.04 had to use, and the \
+                reason AV1 carried rather than being forced"
+
         rule "a-state-vocabulary-is-declared-once"    refuses="a kind whose `states=` and whose `state` field's `one-of=` disagree" \
             because="`withdrawn` had to be added to `release` in two places, and the first edit \
                 alone changed nothing — because `states=` was declared and never read. A kind that \

@@ -50,6 +50,7 @@ thin-slice "TS.260820.14" {
 
     useful-alone "a reader stops asking why something is the way it is and getting an answer \
         reconstructed from memory. Worth having with nothing published at all"
+    useful-to "the-next-agent" "the-team-building-a-digital-product"
 
     attacks "S2" "S7"
     note "the composite decision document is E19's second use: this capability carries the decision, \

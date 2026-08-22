@@ -65,6 +65,7 @@ thin-slice "TS.260821.13" {
     useful-alone "a cut stops being a one-way door. Today withdrawing one means editing seven files \
         by hand and hoping praxis check agrees afterwards, which is the kind of operation nobody \
         performs twice and everybody eventually performs wrong"
+    useful-to "the-team-building-a-digital-product"
 
     attacks "S5"
 

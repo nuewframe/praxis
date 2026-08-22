@@ -67,6 +67,7 @@ thin-slice "TS.260821.06" {
     useful-alone "`what can this version of Praxis do` becomes answerable from the record. Today the \
         answer is in three Markdown files nothing checks, and the published set answers a different \
         question confidently"
+    useful-to "the-reader-of-a-release"
 
     attacks "S7"
 

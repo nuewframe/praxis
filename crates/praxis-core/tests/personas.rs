@@ -164,3 +164,56 @@ notional-architecture "NA.test" {
 
     assert_eq!(found.len(), 1, "the label is now an edge, and an edge to nobody dangles: {found:?}");
 }
+
+/// C3 — a claim of value names whose value it is.
+///
+/// Reported, not refused: half the record predates the persona kind, and a rule failing
+/// closed on the day it lands is one nobody adopts. Thirty-four slices were annotated before
+/// this landed so the count is zero on arrival — the same order `TS.260821.04` had to use.
+#[test]
+fn a_slice_saying_what_you_get_without_saying_who_gets_it_is_reported() {
+    const WITH_SLICES: &str = r##"
+notional-architecture "NA.test" {
+    schema {
+        entity "persona" {
+            field "is"        each="1"
+            field "came-for"  each="1"
+            field "judges-by" each="1"
+        }
+        entity "thin-slice" {
+            field "slug"         each="1"
+            field "useful-alone" each="0..1"
+            field "useful-to"    each="0..n" references="persona"
+        }
+        rule "a-claim-of-value-names-whose" reports="value with an unstated subject"
+    }
+}
+"##;
+    let record = format!(
+        "{PRIMARY}\n\
+         thin-slice \"TS.silent\" {{\n    slug \"claims-value\"\n\
+         \x20   useful-alone \"something you get\"\n}}\n\
+         thin-slice \"TS.named\" {{\n    slug \"claims-value-for-somebody\"\n\
+         \x20   useful-alone \"something you get\"\n    useful-to \"the-team\"\n}}\n\
+         thin-slice \"TS.claims-nothing\" {{\n    slug \"no-value-claimed\"\n}}\n"
+    );
+    let schema_doc = parse(WITH_SLICES).expect("parses");
+    let record_doc = parse(&record).expect("parses");
+    let schema = Schema::from_document(&schema_doc);
+    let found: Vec<_> = check_corpus(&[schema_doc, record_doc], &schema)
+        .into_iter()
+        .filter(|v| v.refusal.rule() == "a-claim-of-value-names-whose")
+        .collect();
+
+    assert_eq!(found.len(), 1, "only the slice that claims value and names nobody: {found:?}");
+    assert_eq!(found[0].entity_id.as_deref(), Some("TS.silent"));
+    assert_eq!(
+        found[0].severity(),
+        Severity::Report,
+        "half the record predates the persona kind; a rule failing closed on arrival is one \
+         nobody adopts"
+    );
+    // A slice claiming no value at all is silent — this reports an unstated SUBJECT, not a
+    // missing claim.
+    assert!(!format!("{found:?}").contains("TS.claims-nothing"));
+}

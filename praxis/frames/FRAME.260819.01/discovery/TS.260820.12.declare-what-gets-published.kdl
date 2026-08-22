@@ -47,6 +47,7 @@ thin-slice "TS.260820.12" {
 
     useful-alone "the difference between a document worth freezing and a dashboard stops being \
         decided per-release by whoever is publishing that day"
+    useful-to "the-reader-of-a-release" "the-team-building-a-digital-product"
 
     attacks "S6"
     note "found by asking what `publish` actually publishes. The storm had the command and the \

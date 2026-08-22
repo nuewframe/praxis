@@ -45,6 +45,7 @@ thin-slice "TS.260820.07" {
 
     useful-alone "scope stops drifting silently. This is S5 closed on its own, and it is the \
         symptom with the most day-to-day cost"
+    useful-to "the-team-building-a-digital-product"
 
     attacks "S5"
     note "C3 is the one that matters. Every other check is defeated by editing the claim list, \
