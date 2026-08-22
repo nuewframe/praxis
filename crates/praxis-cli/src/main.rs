@@ -1385,8 +1385,10 @@ fn withdrawing(version: &str, because: Option<&str>, root: &Path) -> miette::Res
         }
     }
 
+    // Every file, or none. `write_once` is for records the gate CREATES; these already
+    // exist, and the point of the command is that both halves move together.
     for (path, text) in &staged {
-        write_once(path, text)?;
+        fs::write(path, text).map_err(|e| miette::miette!("{}: {e}", path.display()))?;
     }
 
     println!("praxis: {version} withdrawn — the pointer is back, and it says why");
@@ -1403,6 +1405,7 @@ fn withdrawing(version: &str, because: Option<&str>, root: &Path) -> miette::Res
 fn mark_withdrawn(text: &str, version: &str, because: &str) -> miette::Result<String> {
     let mut out = String::new();
     let mut inside = false;
+    let mut dropping = false;
     let mut depth = 0usize;
     for line in text.lines() {
         let trimmed = line.trim();
@@ -1429,7 +1432,10 @@ fn mark_withdrawn(text: &str, version: &str, because: &str) -> miette::Result<St
             continue;
         }
         // The seal covered a cut release's content, and there is no longer a cut to seal.
-        if inside && trimmed.starts_with("seal ") {
+        // Dropped WITH its continuation lines: a KDL node ending in `\` carries on, and
+        // removing only the first line orphans the rest into a parse error.
+        if dropping || (inside && trimmed.starts_with("seal ")) {
+            dropping = line.trim_end().ends_with('\\');
             continue;
         }
         out.push_str(line);
