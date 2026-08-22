@@ -703,6 +703,26 @@ notional-architecture "NA.260820.01" {
             field "finding"    each="0..n"
         }
 
+        entity "walkthrough" is="one path through the record, walked all the way down — discovery's DEPTH activity" \
+            owned-by="delivery-record" \
+            note="the storm is breadth: the whole timeline, shallow. A walk is one path, deep. \
+                Declared by WALK.260822.01, after the record was found to cite two walkthroughs \
+                thirty-four times — by finding id — into Markdown files nothing can check" {
+            field "slug"      each="1"
+            field "title"     each="1"
+            field "frame"     each="1" references="frame"
+            field "walked-at" each="1"
+            field "walked-by" each="1"
+            field "asks"      each="1" because="a walk with no question is a tour"
+            field "path"      each="1..n" because="which way it went, so someone can walk it again"
+            field "step"      each="0..n"
+            field "raised"    each="0..n" because="findings this walk produced, recorded where the work was"
+            field "finding"   each="0..n"
+            field "proves"    each="0..1"
+            field "does-not-prove" each="0..1"
+            field "trail"     each="1"
+        }
+
         entity "read-model" is="a view an actor must see before acting, owned by exactly one capability" \
             note="already load-bearing in every slice's needs/feeds edges and never declared"
 
