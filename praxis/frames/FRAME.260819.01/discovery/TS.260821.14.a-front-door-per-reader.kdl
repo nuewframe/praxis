@@ -15,7 +15,7 @@
 
 thin-slice "TS.260821.14" {
     slug "a-front-door-per-reader"
-    title "Order the published set by who each document is for"
+    title "Publish one product story, and leave the engineering in the record"
     kind "view"
     realizes "CAP.document-projection"
     from-storm "ES.260819.01"
@@ -24,8 +24,8 @@ thin-slice "TS.260821.14" {
     actor "somebody opening a release directory for the first time, with a reason"
     needs-read-model "what-is-currently-true"
 
-    trigger "a reader opens a release directory and has to guess which of seven files is theirs"
-    outcome "the directory has an index that names each audience the record declares, and says which document answers what for them"
+    trigger "a reader opens a release and finds seven sibling directories, four of them about how the tool is built"
+    outcome "a release is one document read front to back, and the engineering views stay in the record where the CLI answers them"
 
     scenario #"""
         Given a record whose read models each declare `needed-by`
@@ -35,12 +35,15 @@ thin-slice "TS.260821.14" {
              siblings in alphabetical order ask them to already know the answer in order to find it.
         """#
 
-    step "1" does="the index is a view like any other, and is published first in the directory"
-    step "2" does="audiences come from the record's own `needed-by` values. The engine groups; it never decides that `reader` means consumer, because an adopting project's audiences are its own"
-    step "3" does="each entry carries the view's `answers` line, which is the question a reader is actually holding"
-    step "4" does="a view naming no audience is listed as unaddressed rather than hidden — a document nobody is for is a finding, not a tidy omission"
-    step "5" does="the glossary orders by dependency rather than alphabetically, so `frame` precedes `adr` and a newcomer can read down it"
+    step "1" does="a release becomes ONE document with an order: what this is, what it can do, how to start, what changed, what is known missing"
+    step "2" does="the engineering views stop being publishable. decisions, architecture and the shipped-doctrine inventory are declared `working` — they live in the record, and `praxis` answers them"
+    step "3" does="the ordering is a property of the document, not of a directory listing. A reader who stops after the first section has the answer they came for"
+    step "4" does="the glossary carries only the words the story uses, in dependency order. The full vocabulary is `praxis schema --print`, for whoever wants it"
+    step "5" does="`needed-by` decides what belongs in the story at all — a view no persona reads is not published, it is queried"
 
+    excludes "removing the engineering views. They stop being PUBLISHED, which is a lifetime \
+        decision and nothing else — `declare-a-lifetime` already owns it. A decision record is \
+        not less true for being in the record rather than in a release directory"
     excludes "deciding what an audience MEANS. `reader`, `adopter` and `maintainer` are the \
         record's words; mapping them onto `consumer` and `engineer` would be the engine encoding \
         a vocabulary no record handed it, and would be wrong for any project whose audiences differ"
@@ -55,14 +58,16 @@ thin-slice "TS.260821.14" {
     layer "enforcement" reaches="a publishable view with no `needed-by` is reported, because a document nobody is for is one nobody will read"
     layer "docs"        reaches="the release directory answers `where do I start` before it answers anything else"
 
-    claim "C1" text="the directory opens with an index grouped by the audiences the record declares" \
-        settled-by="a test asserting the index names every distinct `needed-by` value in the corpus, and that a value the record does not use does not appear"
+    claim "C1" text="a release is one document with a declared order, not a set of sibling directories" \
+        settled-by="a test asserting the published set for a version is a single reader-facing document, and that its sections appear in the order the record declares rather than alphabetically"
     claim "C2" text="each entry carries the question that document answers, from the view's own `answers`" \
         settled-by="a test asserting the index's text for a view equals that view's declared `answers`, verbatim"
     claim "C3" text="a publishable view naming no audience is reported, not hidden" \
         settled-by="a test declaring a publishable view with no `needed-by`, asserting it is named in the index as unaddressed and reported by the checker"
-    claim "C4" text="the glossary reads in dependency order" \
-        settled-by="a test asserting `frame` precedes `thin-slice` precedes `iteration`, and that a kind referenced by another follows it"
+    claim "C4" text="the glossary carries the words the story uses, in dependency order" \
+        settled-by="a test asserting `frame` precedes `thin-slice` precedes `iteration`, and that a kind the story never mentions is absent — the full vocabulary is a command, not a release artifact"
+    claim "C5" text="the engineering views are in the record and answerable there, not published" \
+        settled-by="a test asserting decisions, architecture and the doctrine inventory are not in the published set, and that each is reachable from the corpus — publishing them was a lifetime decision and this reverses it"
 
     depends-on "TS.260821.12 — the documents exist and are worth ordering"
 
@@ -77,6 +82,12 @@ thin-slice "TS.260821.14" {
         note="the personas were the prompt; the finding is that the record had already answered \
             the question. `needed-by` has been on every read model since ES.260819.01 and no \
             projection has ever read it"
+
+    note "amended before any of it was built. The first cut of this slice added an INDEX over \
+        seven directories, which is the wrong fix if there should not be seven directories. A \
+        release is a logical flow of product information; engineering and decisions belong in the \
+        record, where whoever has the repository can ask the CLI for what is true NOW rather than \
+        what was frozen at a version"
 
     principle-note "six documents individually correct and collectively unnavigable is what \
         happens when derivability decides what gets built. Every one of them answers a real \
