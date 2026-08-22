@@ -225,6 +225,8 @@ pub struct Capability {
     pub id: String,
     pub state: String,
     pub from_cluster: String,
+    /// `product` — what a reader installed. `engine` — how it is built. See TS.260821.06/C3.
+    pub facet: String,
     pub owns: Vec<String>,
     /// Promoted truth: what shipped for this capability, and where. Derived, never
     /// hand-written — `promoted-truth-is-derived` recomputes it.
@@ -268,6 +270,10 @@ pub struct Config {
     /// is pre-1.0 and bumps MINOR for a breaking change, so a hardcoded semver rule would
     /// misreport its own author's releases.
     pub bump_rules: Vec<(String, String)>,
+    /// Invariants this repository's profile omits, by id. Omitting is a BINDING, not a
+    /// failure — Praxis has no HTTP surface — and the record holds both so that "we do not
+    /// need this" and "we did not do this" cannot read alike (TS.260821.05).
+    pub omitted: Vec<String>,
 }
 
 impl Attempt {
@@ -299,6 +305,8 @@ pub struct Corpus {
     pub config: Config,
     /// The doctrine this plugin ships, as the record declares it (TS.260821.03).
     pub surfaces: Vec<crate::surface::Surface>,
+    /// What the plugin guarantees about code it is loaded into (TS.260821.05).
+    pub invariants: Vec<crate::invariant::Invariant>,
     /// Ids the shape check refuses. A slice the checker refuses is not work waiting.
     pub refused: Vec<String>,
 }
@@ -355,6 +363,10 @@ impl Corpus {
                         id: string_arg(node).unwrap_or_default(),
                         state: child_arg(node, "state").unwrap_or_default(),
                         from_cluster: child_arg(node, "from-cluster").unwrap_or_default(),
+                        // Undeclared reads as engine: better to under-claim what the
+                        // product does than to hand a reader the internals as features.
+                        facet: child_arg(node, "facet")
+                            .unwrap_or_else(|| "engine".to_owned()),
                         // Every value, not the first of each node. `owns-event "A" "B" "C"`
                         // is one node carrying three events, and reading only the first
                         // reported every capability as owning exactly one (ITER.260821.12/AB1).
@@ -422,6 +434,17 @@ impl Corpus {
                         state: child_arg(node, "state")
                             .unwrap_or_else(|| "current".to_owned()),
                         stands_at: child_arg(node, "stands-at"),
+                    }),
+                    "invariant" => corpus.invariants.push(crate::invariant::Invariant {
+                        id: string_arg(node).unwrap_or_default(),
+                        protects: child_arg(node, "protects").unwrap_or_default(),
+                        severity: child_arg(node, "severity").unwrap_or_default(),
+                        languages: node
+                            .iter_children()
+                            .filter(|c| c.name().value() == "language")
+                            .flat_map(string_args)
+                            .collect(),
+                        structural: child_arg(node, "structural"),
                     }),
                     "config" => corpus.config = config_from(node),
                     _ => {}
@@ -558,6 +581,11 @@ fn config_from(node: &KdlNode) -> Config {
                     config.bump_rules.push((rule.name().value().to_owned(), position));
                 }
             }
+        }
+    }
+    for profile in node.iter_children().filter(|c| c.name().value() == "profile") {
+        for omit in profile.iter_children().filter(|c| c.name().value() == "omit-probe") {
+            config.omitted.extend(string_args(omit));
         }
     }
     config

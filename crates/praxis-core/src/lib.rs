@@ -13,6 +13,7 @@ pub mod close;
 pub mod pickup;
 pub mod dashboard;
 pub mod guide;
+pub mod invariant;
 pub mod promote;
 pub mod prove;
 pub mod publish;

@@ -5,7 +5,14 @@ what must the system be able to do, and which events does each keep consistent?
 > Depicts **0.8.0**, and nothing else. Regenerated whole from
 > the record; never edited in place.
 
-## capabilities
+## what the product can do
+
+| capability | derived from | events owned |
+| --- | --- | --- |
+| conformance-probes | evidence-and-settlement | 2 |
+| multi-harness-distribution | projection | 3 |
+
+## how it is built
 
 | capability | derived from | events owned |
 | --- | --- | --- |
@@ -26,6 +33,8 @@ what must the system be able to do, and which events does each keep consistent?
 | claim-settlement | DecisionRecorded |
 | claim-settlement | DecisionAccepted |
 | claim-settlement | AcceptanceRefused |
+| conformance-probes | InvariantEnforced |
+| conformance-probes | InvariantUnenforced |
 | delivery-record | IntentRaised |
 | delivery-record | SymptomRecorded |
 | delivery-record | RootCauseConverged |
@@ -48,6 +57,9 @@ what must the system be able to do, and which events does each keep consistent?
 | document-projection | DocumentsProjected |
 | document-projection | DocumentStamped |
 | document-projection | DriftDetected |
+| multi-harness-distribution | RouterInjected |
+| multi-harness-distribution | ManifestPublished |
+| multi-harness-distribution | OverlayProvisioned |
 | release-binding | WorkBound |
 | release-binding | ReleaseCut |
 | release-binding | TruthPromoted |

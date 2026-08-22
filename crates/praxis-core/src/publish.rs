@@ -222,10 +222,21 @@ pub(crate) fn published_set(version: &str, corpus: &Corpus) -> ReadModel {
 /// `capabilities-and-what-they-own` — what the system must be able to do, and which events
 /// each keeps consistent.
 fn capabilities(version: &str, corpus: &Corpus) -> ReadModel {
-    let mut section = Section::new("capabilities", &["capability", "derived from", "events owned"])
-        .empty_because("the record names no capability");
+    // Two sections, not one. A reader who installed the product and a maintainer who builds
+    // it are asking different questions of the same list, and answering both with one table
+    // is how docs/releases/0.8.0 came to hand a reader the engine's internals as a feature
+    // list (TS.260821.06/C3).
+    let mut section =
+        Section::new("what the product can do", &["capability", "derived from", "events owned"])
+            .empty_because(
+                "the record names no capability with facet=product — every capability it holds \
+                 describes how the tool is built, not what it does for whoever installed it",
+            );
+    let mut internals =
+        Section::new("how it is built", &["capability", "derived from", "events owned"])
+            .empty_because("the record names no engine capability");
     for capability in &corpus.capabilities {
-        section.push(vec![
+        let row = vec![
             capability.id.clone(),
             if capability.from_cluster.is_empty() {
                 "not declared".to_owned()
@@ -233,7 +244,12 @@ fn capabilities(version: &str, corpus: &Corpus) -> ReadModel {
                 capability.from_cluster.clone()
             },
             capability.owns.len().to_string(),
-        ]);
+        ];
+        if capability.facet == "product" {
+            section.push(row);
+        } else {
+            internals.push(row);
+        }
     }
 
     let mut owns = Section::new("what each owns", &["capability", "event"])
@@ -252,5 +268,5 @@ fn capabilities(version: &str, corpus: &Corpus) -> ReadModel {
     model.publishable = true;
     // An archival result names the version it depicts — read-model@v1's fourth constraint,
     // and the whole of "true for exactly one version and false for every other".
-    model.section(section).section(owns).define("depicts", version)
+    model.section(section).section(internals).section(owns).define("depicts", version)
 }

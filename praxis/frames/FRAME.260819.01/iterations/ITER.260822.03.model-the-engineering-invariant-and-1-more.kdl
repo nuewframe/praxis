@@ -1,0 +1,160 @@
+// Opened by `praxis pick-up`. Every condition below was evaluated against the
+// tree as it stood at 2026-08-22T03:31:34Z, and the verdicts are recorded
+// rather than summarised: a gate whose reasoning is not on the record is a gate
+// you have to trust.
+//
+// One commitment over 2 slices. They were vetted separately and admitted
+// together — a commitment that admits its easy half is not one thing.
+
+iteration "ITER.260822.03" {
+    slug "model-the-engineering-invariant-and-1-more"
+    on-slice "TS.260821.05"
+    on-slice "TS.260821.06"
+    state "closed"
+    opened-at "2026-08-22T03:31:34Z"
+    opened-by "agent:praxis"
+
+    approval "admission" {
+        status "signed"
+        signer "human:wael"
+        at "2026-08-22T03:31:34Z"
+        signed-by "the ask to pick up these slices, as one commitment"
+    }
+
+    vet "create" state="done" at="2026-08-22T03:31:34Z" on-slice="TS.260821.05" {
+        condition "slice-is-shaped" verdict="passed"
+        condition "dependencies-delivered" verdict="passed"
+        condition "no-iteration-in-flight" verdict="passed"
+        condition "nothing-left-to-admit" verdict="passed"
+        condition "work-is-disjoint" verdict="not-computed" \
+            found="no seam manifest exists, so what two iterations would touch cannot be compared. Disjointness is half of what this capability says it judges, and half of what it judges is currently not computed at all"
+        condition "the-slice-is-the-best-available" verdict="left-to-the-maintainer"
+    }
+
+    vet "create" state="done" at="2026-08-22T03:31:34Z" on-slice="TS.260821.06" {
+        condition "slice-is-shaped" verdict="passed"
+        condition "dependencies-delivered" verdict="passed"
+        condition "no-iteration-in-flight" verdict="passed"
+        condition "nothing-left-to-admit" verdict="passed"
+        condition "work-is-disjoint" verdict="not-computed" \
+            found="no seam manifest exists, so what two iterations would touch cannot be compared. Disjointness is half of what this capability says it judges, and half of what it judges is currently not computed at all"
+        condition "the-slice-is-the-best-available" verdict="left-to-the-maintainer"
+    }
+
+    // 2 of the declared conditions were not decided by the gate. They are
+    // recorded above rather than omitted: an admission that does not say what
+    // it left undecided claims more than it checked.
+
+    // Frozen at open, from the slices. Removing one from a slice now
+    // does not remove it from here — it makes the two disagree, and that is
+    // refused.
+    claim "C1" from-slice="TS.260821.05" state="met" \
+        evidence="tests/invariants.rs::a_guarantee_nothing_keeps_is_reported_by_name — total over \
+            the DECLARED set, at report severity, naming the invariant"
+    claim "C2" from-slice="TS.260821.05" state="met" \
+        evidence="tests/invariants.rs::a_probe_anchors_by_naming_what_it_enforces, plus \
+            `praxis audit-surfaces` at 35 of 48 anchored — the ten probes and the surviving \
+            guardrail left the unanchored set, which was 25 and is now 13"
+    claim "C3" from-slice="TS.260821.05" state="met" \
+        evidence="tests/invariants.rs::config_omitting_an_invariant_the_record_does_not_hold_is_refused \
+            — profile.omit-probe references invariant, so dangling-relationship refuses an invented id"
+    claim "C1" from-slice="TS.260821.06" state="met" \
+        evidence="praxis/capabilities/CAP.multi-harness-distribution.kdl and CAP.conformance-probes.kdl, \
+            both passing praxis check with four gate tests and a keeps-consistent each — neither \
+            stated in the Markdown originals"
+    claim "C2" from-slice="TS.260821.06" state="met" \
+        evidence="promoted-truth-is-derived is unchanged and applies to the ported records; both \
+            show `nothing yet` under shipped, derived from bound releases rather than written"
+    claim "C3" from-slice="TS.260821.06" state="met" \
+        evidence="publish.rs::capabilities emits `what the product can do` and `how it is built` as \
+            two sections; docs/releases/0.8.0/capabilities/ now lists 2 product capabilities above \
+            5 engine ones. The `facet` field defaults to engine when undeclared, so the failure \
+            mode is under-claiming rather than overselling"
+    claim "C4" from-slice="TS.260821.06" state="met" \
+        evidence="docs/capabilities/ is removed; three retired doctrine-surfaces name v0.7.1, and \
+            a-declared-surface-ships refuses a retirement whose file is still in the tree"
+
+    layer "doctrine"    state="evidenced" \
+        evidence="skills/declare-an-invariant/SKILL.md, registered and anchored" \
+        reaches="declaring what a probe is FOR is part of writing the probe"
+    layer "enforcement" state="evidenced" \
+        evidence="an-enabled-invariant-is-enforced, witnessed. profile.omit-probe references \
+            invariant, so config may bind and may never declare. 20 of 44 rules witnessed; \
+            7 of 10 invariants kept, 3 omitted, 0 unkept" \
+        reaches="what the plugin guarantees is checked against what enforces it"
+    layer "docs"        state="evidenced" \
+        evidence="`praxis check-invariants` prints the three states separately; \
+            docs/releases/0.8.0/capabilities/ separates the product from the engine" \
+        reaches="a reader of a release is told what the product does"
+
+    phase "design-ux" state="complete" required-by="docs" \
+        produced="three states, not two — kept, omitted, unkept. A profile that has answered the \
+            question must not be reported, or adopters learn to ignore the report"
+    phase "design-system" state="complete" required-by="enforcement" \
+        produced="invariant and profile as kinds, and `facet` on capability. The default for facet \
+            is `engine`, so an untagged capability under-claims rather than oversells"
+    phase "implement" state="complete" required-by="enforcement · docs" \
+        produced="invariant.rs, check_invariants, the check-invariants command, ten invariants, \
+            eleven probe anchors, two ported capability records, the split published view"
+    phase "learn" state="complete" required-by="always" \
+        produced="four findings, two of them things the retirement sweep had missed"
+    phase "teach" state="complete" required-by="doctrine" \
+        produced="skills/declare-an-invariant/SKILL.md"
+
+    finding "AN1" state="open" size="observation" \
+        text="check-contract-freshness.sh should have been retired by TS.260821.04 and was not. Its \
+            subject is `each active sprint's Sprint Footprint block` and it reads \
+            docs/product/sprints/, which nothing ships. The sweep classified by FILENAME and this \
+            one is not called check-sprint-anything" \
+        note="a retirement sweep that reads names finds the files that were named for the thing. \
+            It was caught here only because anchoring a probe to an invariant forces someone to \
+            read what the probe is for — which is the anchor doing work beyond bookkeeping"
+
+    finding "AN2" state="open" size="frame-sized" \
+        text="CAP.method-spine-and-execution was not ported. Its core purpose is the PLAN-TRIAGE- \
+            BUILD-LEARN-TEACH spine, the thin-slice lifecycle, sprint-as-immutable-bridge and \
+            tier-table routing — all retired by TS.260821.04. It is not a capability needing a \
+            port; it is the old method wearing a capability's name" \
+        note="the product claimed three capabilities and one of them had been hollow since the \
+            graph replaced the spine. Nothing said so, because a Markdown capability record \
+            declares no gate tests and traces to no cluster, so there was no test it could fail"
+
+    finding "AN3" state="open" size="observation" \
+        text="config declared `field \"profile\"` as a plain field, so the profile's body was never \
+            descended into and omit-probe was an unchecked string. The schema already had the \
+            mechanism — `holds=` — and it simply was not used" \
+        note="the rule `config may enable or omit, never invent` had been written in a comment at \
+            the top of the binding for its whole life. Making a sentence enforceable meant making \
+            it an EDGE, and the vocabulary for that already existed"
+
+    finding "AN4" state="open" size="observation" \
+        text="the two ported capabilities declare `from-cluster` against clusters of ES.260819.01, \
+            a storm about how work moves through a repository. multi-harness-distribution is not \
+            in that storm. The trace is the nearest honest fit rather than a derivation" \
+        obliges="a storm for the product itself, or an explicit statement that the product's \
+            capabilities are derived from something other than a storm" \
+        note="recorded rather than hidden, because `derived-from` exists precisely so that a \
+            capability tracing to nothing is an assertion. Two of them now trace to a cluster that \
+            did not produce them, which is weaker than a refusal and stronger than silence"
+    closed-at "2026-08-22T03:47:11Z"
+    outcome "continue"
+
+    close {
+        claims-settled "C1" how="met"
+        claims-settled "C2" how="met"
+        claims-settled "C3" how="met"
+        claims-settled "C1" how="met"
+        claims-settled "C2" how="met"
+        claims-settled "C3" how="met"
+        claims-settled "C4" how="met"
+        all-met #true
+        note "the accounting above was computed at close, not asserted. It says every claim is either met or carried by a finding that names it, and nothing about whether the work is any good"
+    }
+
+    trail {
+        entry at="2026-08-22T03:47:11Z" by="agent:praxis" action="state-changed" from="open" to="closed" note="closed by `praxis close`. The accounting was computed; the conclusion is not the machine's to draw"
+
+        entry at="2026-08-22T03:31:34Z" by="agent:praxis" action="created" \
+            note="opened by the gate, on the ask of human:wael"
+    }
+}

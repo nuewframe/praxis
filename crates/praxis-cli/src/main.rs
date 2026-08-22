@@ -16,6 +16,7 @@ use praxis_core::{
     dashboard, guide_for, prove, review, unbind, verify, what_is_currently_true,
 };
 use praxis_core::check::{Facts, check_corpus_given, decision_body};
+use praxis_core::invariant::{Enforcement, check_invariants};
 use praxis_core::surface::{audit, surfaces};
 use praxis_core::cut::seal;
 
@@ -171,6 +172,15 @@ enum Command {
         /// The tree whose shipped doctrine is audited.
         #[arg(long, default_value = ".")]
         from: PathBuf,
+    },
+    /// Report any guarantee this plugin makes that nothing keeps.
+    ///
+    /// `enable-all-fail-closed` is a claim about shell scripts until something compares it
+    /// to what the record says enforces each invariant.
+    CheckInvariants {
+        /// The state root to read.
+        #[arg(long, default_value = "praxis")]
+        root: PathBuf,
     },
     /// Seal every accepted decision and resolved symptom that carries no seal.
     ///
@@ -373,6 +383,13 @@ fn main() -> ExitCode {
                     ExitCode::SUCCESS
                 }
             }
+            Err(report) => {
+                eprintln!("{report:?}");
+                ExitCode::FAILURE
+            }
+        },
+        Command::CheckInvariants { root } => match invariants(&root) {
+            Ok(()) => ExitCode::SUCCESS,
             Err(report) => {
                 eprintln!("{report:?}");
                 ExitCode::FAILURE
@@ -1330,6 +1347,55 @@ fn auditing(root: &Path, from: &Path) -> miette::Result<bool> {
         shipped.len()
     );
     Ok(audit.clean())
+}
+
+/// `TS.260821.05`. What this plugin guarantees, and what keeps each guarantee.
+fn invariants(root: &Path) -> miette::Result<()> {
+    let sources = load(root)?;
+    let mut schema = Schema::default();
+    for (_, _, doc) in &sources {
+        let found = Schema::from_document(doc);
+        if !found.is_empty() {
+            schema = found;
+        }
+    }
+    if schema.is_empty() {
+        miette::bail!("the record declares no schema, so nothing declares what an invariant is");
+    }
+    if schema.entity("invariant").is_none() {
+        miette::bail!(
+            "the record does not declare `invariant`, so what this plugin guarantees is not \
+             something it can be asked about. See TS.260821.05"
+        );
+    }
+
+    let docs: Vec<_> = sources.into_iter().map(|(_, _, doc)| doc).collect();
+    let corpus = Corpus::from_documents(&docs, &schema);
+    let found = check_invariants(&corpus);
+
+    let (mut kept, mut omitted, mut unkept) = (0, 0, 0);
+    for enforcement in &found {
+        match enforcement {
+            Enforcement::Kept { invariant, by } => {
+                kept += 1;
+                println!("praxis: {invariant} — kept by {}", by.join(" · "));
+            }
+            Enforcement::Omitted { invariant, because } => {
+                omitted += 1;
+                println!("praxis: {invariant} — {because}, so it is not owed");
+            }
+            Enforcement::Unkept { invariant } => {
+                unkept += 1;
+                println!("praxis: {invariant} — UNKEPT, nothing the record holds enforces it");
+            }
+        }
+    }
+    println!(
+        "praxis: {kept} of {} declared invariants are kept · {omitted} omitted by this profile · \
+         {unkept} unkept",
+        found.len()
+    );
+    Ok(())
 }
 
 fn proving(root: &Path) -> miette::Result<usize> {

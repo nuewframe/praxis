@@ -120,6 +120,7 @@ retired, not left where an agent will read it.
 | | `cut-a-slice` | Cut an atomic vertical slice in a shape a checker can refuse — one command or one view, one actor, declared layers, claims naming their evidence |
 | | `declare-an-entity-kind` | Declare a kind the record must hold, and its shape, on the architecture's schema — an amendment to the record, never a change to the engine |
 | | `witness-a-rule` | Declare a rule together with the record that demonstrates it refusing — a rule never shown to refuse is indistinguishable from one that cannot |
+| | `declare-an-invariant` | Declare what this plugin guarantees about code it is loaded into, and anchor the probe that keeps it — `enabled` and `enforced` are different facts |
 | | `anchor-a-doctrine-surface` | Declare what a shipped skill, guardrail, agent or probe exists to serve — instruction the record cannot trace is doctrine an agent follows on the plugin's authority alone |
 | **READY** | `see-what-is-ready` | Ask which slices could be started right now, and what would refuse each of the rest — including the conditions the gate declares and nobody computed |
 | | `see-the-dashboard` | Where the product stands right now — several views composed on demand into one document, each still singly owned, and never committed |

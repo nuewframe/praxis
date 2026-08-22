@@ -219,3 +219,43 @@ doctrine-surface "surface.retired.check-design-approval-gate" {
         checker refuses on"
 }
 
+// The Markdown capability records, retired by TS.260821.06. A living record kept in two
+// places has one that is wrong and no way to say which.
+//
+// Two of the three were ported. CAP.method-spine-and-execution was NOT: its core purpose is
+// "the PLAN -> TRIAGE -> BUILD -> LEARN -> TEACH spine, thin-slice lifecycle,
+// sprint-as-immutable-bridge, tier-table routing" — the spine TS.260821.04 retired. It is
+// not a capability that needs porting; it is the old method wearing a capability's name, and
+// what replaced it is work-admission and claim-settlement.
+doctrine-surface "surface.retired.cap-method-spine" {
+    path "docs/capabilities/CAP.method-spine-and-execution.md"
+    kind "guardrail"
+    serves "TS.260821.06"
+    state "retired"
+    retired-at "2026-08-22"
+    stands-at "v0.7.1"
+    because "it describes the sprint spine, the tier table and the immutable bridge. All three \
+        were retired by TS.260821.04; the capability that named them has nothing left to own"
+}
+
+doctrine-surface "surface.retired.cap-multi-harness-md" {
+    path "docs/capabilities/CAP.multi-harness-distribution.md"
+    kind "guardrail"
+    serves "TS.260821.06"
+    state "retired"
+    retired-at "2026-08-22"
+    stands-at "v0.7.1"
+    because "ported to praxis/capabilities/CAP.multi-harness-distribution.kdl, where the four \
+        gate tests and what it keeps consistent are stated for the first time"
+}
+
+doctrine-surface "surface.retired.cap-conformance-md" {
+    path "docs/capabilities/CAP.plugin-conformance-and-validation-probes.md"
+    kind "guardrail"
+    serves "TS.260821.06"
+    state "retired"
+    retired-at "2026-08-22"
+    stands-at "v0.7.1"
+    because "ported and NARROWED to praxis/capabilities/CAP.conformance-probes.kdl. The Markdown \
+        record claimed five script families, which is a list rather than a consistency boundary"
+}

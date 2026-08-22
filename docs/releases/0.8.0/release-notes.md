@@ -131,6 +131,9 @@ _Nothing here — no symptom names this version as what resolved it._
 | ITER.260821.19 | AJ1 | — |
 | ITER.260821.19 | AJ2 | — |
 | ITER.260821.19 | AJ3 | — |
+| ITER.260821.19 | AK1 | — |
+| ITER.260821.19 | AK2 | — |
+| ITER.260821.19 | AK3 | — |
 | ITER.260821.19 | AJ6 | — |
 | ITER.260821.19 | AJ5 | — |
 | ITER.260821.19 | AJ4 | — |

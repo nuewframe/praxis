@@ -150,3 +150,9 @@ doctrine-surface "surface.skill.anchor-a-doctrine-surface" {
     kind "skill"
     serves "TS.260821.03"
 }
+
+doctrine-surface "surface.skill.declare-an-invariant" {
+    path "skills/declare-an-invariant/SKILL.md"
+    kind "skill"
+    serves "TS.260821.05"
+}

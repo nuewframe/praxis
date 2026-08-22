@@ -63,6 +63,8 @@ pub enum Refusal {
     RetiredSurfaceStillShips { path: String },
     /// A shipped instruction file no doctrine-surface declares.
     UnanchoredSurface { path: String },
+    /// An invariant the config enables that no surface enforces.
+    UnkeptInvariant { invariant: String, protects: String },
     /// A symptom resolved by a release the record does not hold.
     ResolvedByNothing { symptom: String, version: String },
     /// A symptom resolved by a release that bound no slice attacking it.
@@ -128,6 +130,7 @@ impl Refusal {
                 "a-declared-surface-ships"
             }
             Self::UnanchoredSurface { .. } => "every-shipped-surface-is-anchored",
+            Self::UnkeptInvariant { .. } => "an-enabled-invariant-is-enforced",
         }
     }
 
@@ -155,6 +158,7 @@ impl Refusal {
             Self::SurfaceDoesNotShip { .. }
             | Self::RetiredSurfaceStillShips { .. }
             | Self::UnanchoredSurface { .. } => "path",
+            Self::UnkeptInvariant { .. } => "protects",
             Self::UnjustifiedLifetime { missing, .. } => missing,
         }
     }
@@ -168,6 +172,9 @@ impl Refusal {
             // Reported, not refused, until TS.260821.04 takes the count to zero. A rule that
             // fails closed on its first run names twenty-five files and is unadoptable.
             | Self::UnanchoredSurface { .. }
+            // An invariant declared before its probe is written is a legitimate order of
+            // work. What is not legitimate is nobody knowing which.
+            | Self::UnkeptInvariant { .. }
             | Self::UnevidencedLayer { .. } => Severity::Report,
             _ => Severity::Refuse,
         }
@@ -241,6 +248,10 @@ impl Refusal {
             Self::UnanchoredSurface { path } => format!(
                 "`{path}` ships and no doctrine-surface declares it — instruction an agent \
                  follows on the plugin's authority alone"
+            ),
+            Self::UnkeptInvariant { invariant, protects } => format!(
+                "`{invariant}` is enabled and nothing enforces it — the plugin guarantees that \
+                 {protects}, and no shipped surface keeps it"
             ),
             Self::UnwitnessedRule { rule, why } => format!(
                 "{rule} is declared and {why}. A rule that has never been shown to refuse is \
@@ -803,6 +814,63 @@ pub fn check_corpus_given(
     }
 
     out.extend(check_surfaces(docs, schema, facts));
+    out.extend(check_invariants(docs, schema));
+    out
+}
+
+/// `TS.260821.05`: every invariant the config enables names something that keeps it.
+///
+/// Read entirely from the record — unlike the surface rules, no part of this needs the
+/// world. What the plugin guarantees and what enforces it are both things the record says.
+fn check_invariants(docs: &[KdlDocument], schema: &Schema) -> Vec<Violation> {
+    if schema.entity("invariant").is_none() {
+        return Vec::new();
+    }
+
+    // Every non-retired surface's `serves`, and every id the profile omits.
+    let mut enforced: Vec<String> = Vec::new();
+    let mut omitted: Vec<String> = Vec::new();
+    for doc in docs {
+        for node in doc.nodes() {
+            match node.name().value() {
+                "doctrine-surface" if child_arg(node, "state").as_deref() != Some("retired") => {
+                    for child in children_named(node, "serves") {
+                        enforced.extend(string_args(child));
+                    }
+                }
+                "config" => {
+                    for profile in children_named(node, "profile") {
+                        for omit in children_named(profile, "omit-probe") {
+                            omitted.extend(string_args(omit));
+                        }
+                    }
+                }
+                _ => {}
+            }
+        }
+    }
+
+    let mut out = Vec::new();
+    for doc in docs {
+        for node in doc.nodes().iter().filter(|n| n.name().value() == "invariant") {
+            let Some(id) = string_arg(node) else { continue };
+            // Omitted is a BINDING, not a gap. A profile that says it has no HTTP surface is
+            // answering the question, and reporting it would teach adopters to ignore the
+            // report — which is how a rule stops being read.
+            if omitted.iter().any(|o| o == &id) || enforced.iter().any(|e| e == &id) {
+                continue;
+            }
+            out.push(Violation {
+                entity_kind: "invariant".to_owned(),
+                entity_id: Some(id.clone()),
+                refusal: Refusal::UnkeptInvariant {
+                    invariant: id,
+                    protects: child_arg(node, "protects").unwrap_or_default(),
+                },
+                span: field_span(node, "protects").unwrap_or_else(|| node.span()),
+            });
+        }
+    }
     out
 }
 

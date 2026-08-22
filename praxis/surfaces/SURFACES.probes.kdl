@@ -1,0 +1,90 @@
+// Every probe, anchored to the invariant it enforces (TS.260821.05).
+//
+// Before this file a probe served nothing, because there was nothing for it to serve. The
+// anchor is not bookkeeping: it is what makes `enable-all-fail-closed #true` checkable, and
+// what lets an adopter be told which of the plugin's guarantees actually has a keeper.
+
+doctrine-surface "surface.probe.check-anti-dumping" {
+    path "scripts/check-anti-dumping.sh"
+    kind "probe"
+    serves "no-dumping-grounds"
+}
+
+doctrine-surface "surface.probe.check-no-skipped-tests" {
+    path "scripts/check-no-skipped-tests.sh"
+    kind "probe"
+    serves "no-skipped-tests"
+}
+
+doctrine-surface "surface.probe.check-no-sleep-waits" {
+    path "scripts/check-no-sleep-waits.sh"
+    kind "probe"
+    serves "no-sleep-waits"
+}
+
+doctrine-surface "surface.probe.check-config-externalized" {
+    path "scripts/check-config-externalized.sh"
+    kind "probe"
+    serves "remote-config-externalization"
+}
+
+doctrine-surface "surface.probe.check-observability-at-seams" {
+    path "scripts/check-observability-at-seams.sh"
+    kind "probe"
+    serves "http-observability"
+}
+
+doctrine-surface "surface.probe.check-stateless-request-path" {
+    path "scripts/check-stateless-request-path.sh"
+    kind "probe"
+    serves "stateless-request-path"
+}
+
+doctrine-surface "surface.probe.check-resilient-boundary" {
+    path "scripts/check-resilient-boundary.sh"
+    kind "probe"
+    serves "resilient-boundary"
+}
+
+doctrine-surface "surface.probe.check-port-adapter-parity" {
+    path "scripts/check-port-adapter-parity.sh"
+    kind "probe"
+    serves "port-adapter-parity"
+}
+
+doctrine-surface "surface.probe.check-seam-contract-parity" {
+    path "scripts/check-seam-contract-parity.sh"
+    kind "probe"
+    serves "seam-contract-parity"
+}
+
+doctrine-surface "surface.probe.check-escape-hatch-usage" {
+    path "scripts/check-escape-hatch-usage.sh"
+    kind "probe"
+    serves "escape-hatch-visibility"
+}
+
+// The guardrail states invariants rather than enforcing one, so it serves several.
+doctrine-surface "surface.guardrail.capability-driven" {
+    path "instructions/capability-driven-guardrails.instructions.md"
+    kind "guardrail"
+    serves "no-dumping-grounds" "resilient-boundary" "http-observability" "port-adapter-parity"
+    note "the one guardrail that survived TS.260821.04, because none of its rules were about \
+        sprints. It is doctrine an agent reads; the probes beside it are what checks the reading"
+}
+
+// Retired here rather than in TS.260821.04, which missed it: the sweep classified by
+// filename and this one is called check-contract-freshness. Its subject is `each active
+// sprint's Sprint Footprint block` and it reads docs/product/sprints/, which no longer
+// exists. A retirement sweep that reads names finds the files that were named for the thing.
+doctrine-surface "surface.retired.check-contract-freshness" {
+    path "scripts/check-contract-freshness.sh"
+    kind "probe"
+    serves "TS.260821.04"
+    state "retired"
+    retired-at "2026-08-22"
+    stands-at "v0.7.1"
+    because "it checks that a sprint's frozen seam contracts have not moved since the sprint \
+        froze. There are no sprints, and the directory it reads was never created by anything \
+        this version ships"
+}

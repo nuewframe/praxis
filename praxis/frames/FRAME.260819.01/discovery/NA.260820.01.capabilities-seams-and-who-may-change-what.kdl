@@ -481,10 +481,23 @@ notional-architecture "NA.260820.01" {
                 slice proving itself against a real omission rather than a fixture" {
             field "repository"  each="1"
             field "governed-by" each="0..1" because="unbound today — the schema moved off the ADR and no node has claimed it"
-            field "profile"     each="1"
+            field "profile"     each="1" holds="profile" \
+                because="a field that HOLDS an entity is checked as one. Declared as a bare field, \
+                    the profile's body was never descended into and omit-probe was an unchecked string"
             field "versioning"  each="0..1"
             field "invariants"  each="0..1"
             field "paths"       each="1"
+        }
+        entity "profile" is="which guardrails apply here, and which layers a slice may declare" \
+            owned-by="delivery-record" \
+            note="declared by TS.260821.05. config's `profile` field existed and had no SHAPE, so \
+                `omit-probe` was an unchecked string — the file said `may enable or omit, never \
+                invent` and nothing could tell the difference between omitting an invariant and \
+                inventing one" {
+            field "layer"       each="1..n" because="the layer vocabulary is a binding: a service's strata are not a method's"
+            field "omit-probe"  each="0..n" references="invariant" \
+                because="config may BIND an invariant and may never declare one. Referencing the \
+                    kind is what makes that sentence enforceable rather than a comment"
         }
         entity "notional-architecture" is="what the capabilities are to each other, free of any tool decision" \
             states="sought held" \
@@ -529,7 +542,12 @@ notional-architecture "NA.260820.01" {
                 because="the cluster IS the derivation. Naming a storm without the cluster inside it proves nothing"
             field "owns-event"       each="1" unique-in="capability" \
                 because="an event kept consistent by two capabilities has no single owner, and the boundary between them is drawn wrong"
-            field "owns-read-model"  each="1..n"
+                        field "facet"      each="0..1" one-of="product" "engine" \
+                because="a reader who installed the product and a maintainer who builds it are \
+                    asking different questions of the same list. Undeclared reads as engine, which \
+                    is the safe default: it is better to under-claim what the product does than to \
+                    hand a reader the tool's internals as a feature list (TS.260821.06/C3)"
+field "owns-read-model"  each="1..n"
             field "gate-test"        each="1..n" because="the four tests, each with the reason it passes"
             field "keeps-consistent" each="1"
             field "attacks"          each="1" references="symptom"
@@ -730,6 +748,27 @@ notional-architecture "NA.260820.01" {
         entity "read-model" is="a view an actor must see before acting, owned by exactly one capability" \
             note="already load-bearing in every slice's needs/feeds edges and never declared"
 
+        entity "invariant" is="one property the plugin GUARANTEES about code it is loaded into" \
+            states="enforced advisory" \
+            owned-by="delivery-record" \
+            note="declared by TS.260821.05. config.kdl has said `enable-all-fail-closed #true` and \
+                omitted three probes BY NAME since the binding was written, and neither the \
+                enabling nor the omitting referred to anything the record held — the ids were \
+                strings, and what actually enforced them was fourteen shell scripts and their \
+                header comments. An invariant is what a probe is FOR; the probe is how, and the \
+                two were never connected" {
+            field "protects"  each="1" because="a guarantee that cannot be stated in a sentence is not one"
+            field "severity"  each="1" one-of="refuse" "report" \
+                because="the difference between a gate and a notice is the whole of what an adopter \
+                    needs to know, and describing a probe as stronger than it is was already a \
+                    named failure in this repository's own README"
+            field "language"  each="0..n" because="static enforcement is best-effort per language, and which languages is a FACT about the probe rather than a hope"
+            field "structural" each="0..1" because="a probe that reads structure rather than text applies to every language, and saying so is different from listing nine"
+            field "from-adr"  each="0..1" references="adr" because="config may enable an invariant and may never invent one; this names where the id came from"
+            field "state"     each="0..1" one-of="enforced" "advisory"
+            field "note"      each="0..n"
+        }
+
         entity "doctrine-surface" is="one file this plugin SHIPS as instruction — a skill, a guardrail, an agent, or a probe" \
             states="current retired" \
             owned-by="delivery-record" \
@@ -739,7 +778,7 @@ notional-architecture "NA.260820.01" {
                 what asks for it; an unanchored one is instruction on the plugin's authority alone" {
             field "path"        each="1" because="the anchor is to a file, so an absent file is a broken promise rather than an untidy one"
             field "kind"        each="1" one-of="skill" "guardrail" "agent" "probe"
-            field "serves"      each="1..n" references="thin-slice capability read-model frame event-storm" \
+            field "serves"      each="1..n" references="thin-slice capability read-model frame event-storm invariant" \
                 because="a surface serving nothing is doctrine nobody asked for, which is the whole \
                     rule. It references five kinds, so a surface whose reason was withdrawn is \
                     already caught by dangling-relationship rather than by a second rule" \
@@ -751,7 +790,15 @@ notional-architecture "NA.260820.01" {
                     produces a slice. using-praxis serves the FRAME because the router exists for \
                     the method this frame defines — when the frame closes, its justification \
                     changes, which is the dependency worth being able to see. What must not be \
-                    added is a sixth kind chosen because something failed"
+                    added is a sixth kind chosen because something failed" \
+                note="`invariant` was added as the sixth by TS.260821.05, and the note above is the \
+                    reason it has to be argued rather than noted. It is not the forbidden move: the \
+                    forbidden move is widening the set to silence a refusal about a surface that \
+                    genuinely serves nothing. A probe OPERATES an invariant — that is the plainest \
+                    reading of `serves` in the whole vocabulary, and the invariant kind was cut as \
+                    a slice precisely so that this anchor could exist. The test is whether the kind \
+                    was declared for its own reasons or reached for; this one has its own slice, \
+                    its own rule and its own witness"
             field "state"       each="0..1" one-of="current" "retired"
             field "retired-at"  each="0..1" when-state="retired"
             field "stands-at"   each="0..1" when-state="retired" because="a retirement names where the file still stands, so removal is recoverable by name"
@@ -992,6 +1039,28 @@ notional-architecture "NA.260820.01" {
                 by a rule firing, never by a test" \
             note="reported rather than refused: a rule declared today for a shape the record does \
                 not hold yet is legitimate. What is not legitimate is nobody knowing which"
+
+        rule "an-enabled-invariant-is-enforced"    reports="an invariant the config enables that no doctrine-surface enforces" \
+            because="`enable-all-fail-closed #true` has been a claim about fourteen shell scripts \
+                that nothing ever compared against anything. An invariant with no enforcer is a \
+                guarantee the plugin makes and nothing keeps — the root cause wearing the \
+                enforcement layer's clothes" \
+            found-by="ITER.260822.02/AM1 — twenty-five surfaces had no anchor because the record had \
+                no vocabulary for what a probe is FOR" \
+            given-shipped="scripts/check-witness.sh" \
+            witness=#"""
+                invariant "witness-unenforced" {
+                    protects "nothing, because nothing enforces it"
+                    severity "refuse"
+                }
+                doctrine-surface "surface.probe.witness" {
+                    path "scripts/check-witness.sh"
+                    kind "probe"
+                    serves "TS.260821.05"
+                }
+                """# \
+            note="reported, not refused: an invariant declared before its probe is written is a \
+                legitimate order of work. What is not legitimate is nobody knowing which"
 
         rule "a-declared-surface-ships"            refuses="a doctrine-surface naming a path the plugin does not ship" \
             because="a surface declared for an absent file is a promise the record makes on the \

@@ -10,6 +10,7 @@ capability "delivery-record" {
     doing "hold everything the method produces — problems, discoveries, capabilities, slices and claims — as typed, queryable, trailed facts"
     not "it enforces nothing about DOING the work. It refuses a malformed fact, never a bad decision"
     state "sought"
+    facet "engine"
 
     derived-from "ES.260819.01"
     from-cluster "problem-record" "discovery-record" "work-decomposition"

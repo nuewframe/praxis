@@ -2,6 +2,7 @@ capability "claim-settlement" {
     doing "settle every stated claim against evidence, or refuse to let the work close"
     not "it does not judge whether the work should have been started, and it does not produce the evidence. It refuses to let a claim close without it"
     state "sought"
+    facet "engine"
 
     derived-from "ES.260819.01"
     from-cluster "evidence-and-settlement"

@@ -2,6 +2,7 @@ capability "work-admission" {
     doing "decide whether a slice may be started right now, and record the decision either way"
     not "it does not judge whether the work was done well. It judges readiness and disjointness, at one moment, and then it is finished"
     state "sought"
+    facet "engine"
 
     derived-from "ES.260819.01"
     from-cluster "iteration-control"

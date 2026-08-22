@@ -9,6 +9,7 @@ capability "document-projection" {
     doing "compose any declared read model as a whole document, mark what lifetime it has, and prove a published one still matches the release it claims"
     not "it never mutates the record, never edits a document toward a new state, and does not decide what any view CONTAINS — only how a view becomes a document"
     state "sought"
+    facet "engine"
 
     derived-from "ES.260819.01"
     from-cluster "projection"
