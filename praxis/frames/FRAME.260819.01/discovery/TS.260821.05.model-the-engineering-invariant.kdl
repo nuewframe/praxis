@@ -59,7 +59,13 @@ thin-slice "TS.260821.05" {
     claim "C3" text="config may bind an invariant and may never declare one" \
         settled-by="a test declaring an invariant id in config that the schema does not hold, asserting a refusal"
 
-    depends-on "TS.260821.04 — the retired half leaves before the unmodelled half is modelled"
+    depends-on "TS.260821.03 — a probe anchors by serving an invariant, so doctrine-surface exists first"
+
+    note "originally declared depends-on TS.260821.04, which deadlocked the record: 04 carries C1 \
+        and C3 against THIS slice, so 04 cannot deliver until 05 lands, and 05 could not start \
+        until 04 delivered. The dependency was never real — retiring the sprint spine has nothing \
+        to do with modelling an invariant. It was a preference about ORDER written into the field \
+        that means necessity, and `depends-on` does not distinguish the two"
 
     useful-alone "`what does this plugin guarantee, and what enforces it` becomes answerable. \
         Today `enable-all-fail-closed #true` is a claim about fourteen shell scripts that nothing \
