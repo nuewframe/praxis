@@ -127,6 +127,7 @@ retired, not left where an agent will read it.
 | | `declare-an-entity-kind` | Declare a kind the record must hold, and its shape, on the architecture's schema — an amendment to the record, never a change to the engine |
 | | `witness-a-rule` | Declare a rule together with the record that demonstrates it refusing — a rule never shown to refuse is indistinguishable from one that cannot |
 | | `write-durable-comments` | Decide what belongs in a comment and what belongs in the record — if a sentence stops being true after the next refactor, it is a changelog |
+| | `mature-a-value` | Record a value that changed as a change rather than overwriting it — the third of the three moves an iteration makes, and the one that usually leaves no trace |
 | | `ask-the-record` | Ask the record about any declared kind instead of reaching for grep — generic by necessity, and it refuses rather than answering empty |
 | | `name-a-persona` | Name who the product is for, before anything is framed — one persona is enough to start, and the rest emerge from the work and cite what surfaced them |
 | | `adopt-the-method` | Put a repository under the delivery graph without copying it — what the method carries, what you may add, and what you may never redefine |

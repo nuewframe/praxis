@@ -21,6 +21,20 @@ capability "conformance-probes" {
             owned by delivery-record with the rest of what is true. This capability owns the \
             pairing, not the view of it"
 
+    matured "doing" {
+        from "owns the automated quality probes, the plugin validation probe, the version \
+            single-source audit, the cross-reference scanners, and the test-suite fixtures"
+        to "keep every guarantee this plugin makes about code it is loaded into paired with \
+            something that enforces it, at a severity an adopter can read"
+        at "2026-08-22"
+        because "the prior claim was five script families, which is a list rather than a \
+            consistency boundary. What it actually keeps consistent is one thing, and \
+            TS.260821.05 gave the record a word for it"
+        taught-by "ITER.260822.03"
+        note "entered retroactively by TS.260821.18. The narrowing happened on port and the \
+            prior claim was simply gone — right as a change, invisible as one"
+    }
+
     attacks "S3"
 
     property "severity is declared, not inferred" \

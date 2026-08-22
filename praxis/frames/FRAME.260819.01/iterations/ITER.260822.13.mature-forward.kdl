@@ -1,0 +1,114 @@
+// Opened by `praxis pick-up`. Every condition below was evaluated against the
+// tree as it stood at 2026-08-22T22:29:08Z, and the verdicts are recorded
+// rather than summarised: a gate whose reasoning is not on the record is a gate
+// you have to trust.
+
+iteration "ITER.260822.13" {
+    slug "mature-forward"
+    on-slice "TS.260821.18"
+    state "closed"
+    opened-at "2026-08-22T22:29:08Z"
+    opened-by "agent:praxis"
+
+    approval "admission" {
+        status "signed"
+        signer "human:wael"
+        at "2026-08-22T22:29:08Z"
+        signed-by "the ask to pick up this slice"
+    }
+
+    vet "create" state="done" at="2026-08-22T22:29:08Z" on-slice="TS.260821.18" {
+        condition "slice-is-shaped" verdict="passed"
+        condition "dependencies-delivered" verdict="passed"
+        condition "no-iteration-in-flight" verdict="passed"
+        condition "nothing-left-to-admit" verdict="passed"
+        condition "work-is-disjoint" verdict="not-computed" \
+            found="no seam manifest exists, so what two iterations would touch cannot be compared. Disjointness is half of what this capability says it judges, and half of what it judges is currently not computed at all"
+        condition "the-slice-is-the-best-available" verdict="left-to-the-maintainer"
+    }
+
+    // 2 of the declared conditions were not decided by the gate. They are
+    // recorded above rather than omitted: an admission that does not say what
+    // it left undecided claims more than it checked.
+
+    // Frozen at open, from the slices. Removing one from a slice now
+    // does not remove it from here — it makes the two disagree, and that is
+    // refused.
+    claim "C1" from-slice="TS.260821.18" state="met" \
+        evidence="a maturation carries from, to, at, because and taught-by as child nodes of the \
+            record itself, identified by the field that changed. Asserted by a test reading all \
+            five out of the record with no file outside it named"
+    claim "C2" from-slice="TS.260821.18" state="met" \
+        evidence="a-value-agrees-with-its-maturation refuses and is witnessed. A test sets the \
+            field to one value while its maturation says another and asserts the refusal names \
+            both — which is what makes it worse than silence rather than better"
+    claim "C3" from-slice="TS.260821.18" state="met" \
+        evidence="a test omitting taught-by is refused, and one omitting `from` too — a change \
+            that does not say what it was is a new value wearing a change's clothes"
+    claim "C4" from-slice="TS.260821.18" state="met" \
+        evidence="both back-filled. every-shipped-surface-is-anchored carries its reports-to- \
+            refuses maturation taught by ITER.260822.04; CAP.conformance-probes carries what it \
+            claimed before the port narrowed it, taught by ITER.260822.03"
+
+    layer "doctrine"    state="evidenced" \
+        evidence="skills/mature-a-value/SKILL.md, anchored and registered. 53 of 53 anchored" \
+        reaches="changing a value includes recording that it changed, in the same edit"
+    layer "enforcement" state="evidenced" \
+        evidence="a-value-agrees-with-its-maturation refuses and is witnessed; every field of a \
+            maturation is required. 25 rules witnessed" \
+        reaches="a value disagreeing with its own maturation is refused"
+    layer "docs"        state="evidenced" \
+        evidence="`praxis ask capability --show matured` answers what a record used to say" \
+        reaches="`what did this used to say, and what changed our mind` is answerable"
+
+    phase "design-ux" state="complete" required-by="docs" worked-by="agent:principal-engineer" \
+        produced="the refusal names what is held AND what was claimed, because the reader's \
+            problem is not knowing which of the two is wrong"
+    phase "design-system" state="complete" required-by="enforcement" worked-by="agent:principal-engineer" \
+        produced="only the head of a chain is checked. A field that matured twice has a stale \
+            first `to` by construction, and refusing it would make a chain of improvements look \
+            like a defect"
+    phase "implement" state="complete" required-by="enforcement · docs" worked-by="agent:principal-engineer" \
+        produced="the matured kind, the agreement rule, its witness, and both back-fills"
+    phase "learn" state="complete" required-by="always" worked-by="agent:principal-engineer" \
+        produced="AY1, caught by writing a test that passed"
+    phase "teach" state="complete" required-by="doctrine" worked-by="agent:principal-engineer" \
+        produced="skills/mature-a-value/SKILL.md"
+
+    finding "AY1" state="open" size="observation" \
+        text="the first implementation refused every superseded maturation in a chain, and the \
+            test I wrote for it PASSED — because I wrote the assertion to describe what the code \
+            did and called it `visible as superseded, not silently accepted`" \
+        note="a green test that rationalises the behaviour it found is worse than a failing one. \
+            The tell was the sentence: it explained why the output was acceptable rather than \
+            asserting what should happen, and a test whose message argues for the result is a \
+            test written after the fact. Only the head of the chain is checked now"
+
+    finding "AY2" state="open" size="frame-sized" \
+        text="this cannot see a change nobody recorded. From one snapshot it is impossible, and \
+            the obvious source — git — is outside the record, which the durability principle \
+            forbids" \
+        note="the honest limit and it is structural. What this buys is that a RECORDED change is \
+            trustworthy and an unrecorded one now has somewhere it should have gone. Everything \
+            in the record today is either original or was changed by somebody who left no trace, \
+            and nothing can distinguish the two retrospectively"
+    closed-at "2026-08-22T22:35:54Z"
+    outcome "continue"
+
+    close {
+        claims-settled "C1" how="met"
+        claims-settled "C2" how="met"
+        claims-settled "C3" how="met"
+        claims-settled "C4" how="met"
+        all-met #true
+        attested-by "human:waelrabadi"
+        note "the accounting above was computed at close, not asserted. It says every claim is either met or carried by a finding that names it, and nothing about whether the work is any good"
+    }
+
+    trail {
+        entry at="2026-08-22T22:35:54Z" by="agent:praxis" action="state-changed" from="open" to="closed" note="closed by `praxis close`. The accounting was computed; the conclusion is not the machine's to draw"
+
+        entry at="2026-08-22T22:29:08Z" by="agent:praxis" action="created" \
+            note="opened by the gate, on the ask of human:wael"
+    }
+}

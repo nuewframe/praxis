@@ -420,6 +420,27 @@ method "delivery-graph" {
         entity "read-model" is="a view an actor must see before acting, owned by exactly one capability" \
             note="already load-bearing in every slice's needs/feeds edges and never declared"
 
+        entity "matured" is="one value the record changed, and what changed it" \
+            identified-by="the field that changed — `matured \"severity\"` is about `severity`" \
+            owned-by="whatever holds the value" \
+            note="declared by TS.260821.18. A product matures by ADDING a value, REMOVING one \
+                that did not work, and CHANGING one for something better. This record held two of \
+                the three: removal is strong — twenty-six retired surfaces name the tag they still \
+                stand at — and addition is a new node. Change was rewritten in place, so `we \
+                changed our mind` and `we were always right` looked identical afterwards" \
+            note="not a history of every edit. A change that taught nobody anything is a typo, and \
+                typos are not values" {
+            field "from"      each="1" because="what it used to say. The half that gets lost, and the half that makes the change legible"
+            field "to"        each="1" because="what it says now. Checked against the value the record actually holds"
+            field "at"        each="1"
+            field "because"   each="1" because="why it is better. `it changed` is not a reason and improvement is not self-evident"
+            field "taught-by" each="1" \
+                because="what made the case — a finding, a walkthrough, an iteration. A change \
+                    citing nothing is a rewrite, which is the discipline a strategy revision and \
+                    an emergent persona are already held to"
+            field "note"      each="0..n"
+        }
+
         entity "persona" is="somebody the product is for — what they came for, and how they judge whether they got it" \
             states="primary emergent" \
             owned-by="delivery-record" \
@@ -740,6 +761,32 @@ method "delivery-graph" {
             note="one primary persona is enough. The rest emerge from the work and cite what \
                 surfaced them, so this reports the ABSENCE of any and never the absence of many — \
                 enumerating personas upfront is a week spent on people nobody has met"
+
+        rule "a-value-agrees-with-its-maturation"     refuses="a record whose field disagrees with the latest `matured` entry for it" \
+            because="a maturation says a value became X. If the record holds Y, one of the two is \
+                wrong and a reader cannot tell which — which is worse than not recording the \
+                change at all, because it reads as an account of what happened" \
+            found-by="the maintainer: maturing forward is what supports iterative development" \
+            witness=#"""
+                capability "witness-disagreeing" {
+                    doing "one thing"
+                    not "another thing"
+                    state "sought"
+                    derived-from "ES.260819.01"
+                    from-cluster "projection"
+                    owns-event "WitnessDisagreed"
+                    matured "doing" {
+                        from "an older thing"
+                        to "a different thing"
+                        at "2026-08-22"
+                        because "it got better"
+                        taught-by "ITER.260822.13"
+                    }
+                    trail {
+                        entry at="2026-08-22T00:00:00Z" by="human:witness" action="created"
+                    }
+                }
+                """#
 
         rule "a-claim-of-value-names-whose"           reports="a slice saying what you get without naming who gets it" \
             because="value is not a property of a change — it is a judgement somebody makes, and \

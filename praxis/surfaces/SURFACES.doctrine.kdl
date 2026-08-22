@@ -215,3 +215,9 @@ doctrine-surface "surface.skill.ask-the-record" {
     kind "skill"
     serves "TS.260821.11"
 }
+
+doctrine-surface "surface.skill.mature-a-value" {
+    path "skills/mature-a-value/SKILL.md"
+    kind "skill"
+    serves "TS.260821.18"
+}

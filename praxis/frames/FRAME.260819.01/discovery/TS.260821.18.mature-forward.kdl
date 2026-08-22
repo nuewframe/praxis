@@ -1,0 +1,89 @@
+// Three moves, and the record holds two of them.
+//
+// REMOVAL is strong: twenty-six retired surfaces name the tag they still stand at, a
+// withdrawn symptom carries why, a withdrawn release keeps `previously-cut`. ADDITION is
+// trivially visible — a new node is a new node.
+//
+// CHANGE is rewritten in place. `every-shipped-surface-is-anchored` went from report to
+// refuse and left a NOTE. `CAP.conformance-probes` was narrowed on port and its prior claim
+// is simply gone. Both changes were right, neither is a record, and afterwards "we changed
+// our mind" and "we were always right" look identical.
+//
+// That is the trust-transfer problem turned on the record's own evolution, which is the one
+// place this frame had not pointed it.
+
+thin-slice "TS.260821.18" {
+    slug "mature-forward"
+    title "Record a value that changed as a change, not as a new value"
+    kind "command"
+    realizes "CAP.delivery-record"
+    from-storm "ES.260819.01"
+
+    command "check"
+    actor "whoever changes something the record already said"
+    produces-event "ValueMatured" "UnrecordedChangeRefused"
+    needs-read-model "what-is-currently-true"
+
+    trigger "an iteration improves a value the record already holds, and overwrites it"
+    outcome "the record carries what it used to say, what taught it otherwise, and the current value agrees with both"
+
+    scenario #"""
+        Given a record holding a value an iteration is about to improve
+        When the value changes
+        Then the record carries what it was, what it became, why, and what taught it — because a
+             product matures by adding what works, removing what does not, and changing what can
+             be better, and a record that keeps only the latest of the three can show progress it
+             never made.
+        """#
+
+    step "1" does="`matured` is a contained shape: when, from what, to what, why, and what taught it"
+    step "2" does="the current value must AGREE with the latest `matured` for that field. A record saying it changed to X while holding Y is refused"
+    step "3" does="a `matured` naming nothing that taught it is refused — the same discipline a strategy revision and an emergent persona are held to"
+    step "4" does="the two known unrecorded changes are entered retroactively, as changes, so the first thing this ships is its own back-fill"
+    step "5" does="the existing four spellings stay. `stands-at` names a tag, `previously-cut` carries a whole index — they are the PAYLOAD of a removal and lose information if flattened"
+
+    excludes "detecting a change nobody recorded. From one snapshot it cannot be done, and doing \
+        it from git would point outside the record — which the durability principle forbids, and \
+        which would make this rule depend on the one thing least guaranteed to survive"
+    excludes "versioning the record. This is not a history of every edit; it is the record \
+        carrying its own corrections. A change that taught nobody anything is a typo, and typos \
+        are not values"
+    excludes "unifying the four existing spellings away. They are specialised and carry more than \
+        a generic shape would — flattening them would be a change that loses a value, which is \
+        the move this slice exists to make visible"
+
+    layer "doctrine"    reaches="changing a value includes recording that it changed, in the same edit"
+    layer "enforcement" reaches="a value disagreeing with its own maturation is refused; a maturation citing nothing is refused"
+    layer "docs"        reaches="`what did this used to say, and what changed our mind` is answerable from the record"
+
+    claim "C1" text="a value that changed carries what it was, what it became, why, and what taught it" \
+        settled-by="a test declaring a matured value and asserting all four are readable from the record alone, with no file outside it named"
+    claim "C2" text="a current value disagreeing with its own latest maturation is refused" \
+        settled-by="a test setting a field to one value while its latest `matured` says another, asserting a refusal that names both"
+    claim "C3" text="a maturation naming nothing that taught it is refused" \
+        settled-by="a test omitting `taught-by`, asserting a refusal — a change citing nothing is a rewrite, which is what a strategy revision is already held to"
+    claim "C4" text="the two changes this record made without recording them are entered as changes" \
+        settled-by="every-shipped-surface-is-anchored carrying its report-to-refuse maturation, and CAP.conformance-probes carrying what it claimed before it was narrowed"
+
+    depends-on "TS.260821.15 — a maturation cites what taught it, and half of what teaches is a finding about somebody"
+
+    useful-alone "the record stops being able to improve silently. Every value it holds today is \
+        either original or was changed by somebody who left no trace, and there is no way to tell \
+        which — on a record whose entire argument is that fidelity should be computable"
+
+    attacks "S2"
+
+    useful-to "the-team-building-a-digital-product" "the-next-agent"
+
+    cut-from "the maintainer: maturing forward is what supports iterative development"
+
+    principle-note "a product matures by adding a value, removing one that did not work, and \
+        changing one for something better. A record that keeps only the latest of the three can \
+        show a progress it never made — and this record has been doing exactly that for two \
+        changes, both of which were improvements, which is what made it invisible"
+
+    proves "a change the record made is legible as a change"
+    does-not-prove "that every change was recorded. It cannot see one nobody wrote down, and it \
+        deliberately will not look at git to find out — it makes the recorded ones trustworthy and \
+        gives the rest somewhere to go"
+}

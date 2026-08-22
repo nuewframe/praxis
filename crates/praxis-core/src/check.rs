@@ -73,6 +73,8 @@ pub enum Refusal {
     NobodyItIsFor,
     /// A slice claiming value without naming whose value it is.
     ValueWithNoJudge { slice: String },
+    /// A field disagreeing with the latest `matured` entry recorded for it.
+    ContradictedMaturation { field: String, matured_to: String, holds: String },
     /// A symptom resolved by a release the record does not hold.
     ResolvedByNothing { symptom: String, version: String },
     /// A symptom resolved by a release that bound no slice attacking it.
@@ -143,6 +145,7 @@ impl Refusal {
             Self::SplitStateVocabulary { .. } => "a-state-vocabulary-is-declared-once",
             Self::NobodyItIsFor => "a-record-names-somebody-it-is-for",
             Self::ValueWithNoJudge { .. } => "a-claim-of-value-names-whose",
+            Self::ContradictedMaturation { .. } => "a-value-agrees-with-its-maturation",
         }
     }
 
@@ -175,6 +178,7 @@ impl Refusal {
             Self::SplitStateVocabulary { .. } => "states",
             Self::NobodyItIsFor => "persona",
             Self::ValueWithNoJudge { .. } => "useful-to",
+            Self::ContradictedMaturation { field, .. } => field,
             Self::UnjustifiedLifetime { missing, .. } => missing,
         }
     }
@@ -277,6 +281,11 @@ impl Refusal {
             Self::UnkeptInvariant { invariant, protects } => format!(
                 "`{invariant}` is enabled and nothing enforces it — the plugin guarantees that \
                  {protects}, and no shipped surface keeps it"
+            ),
+            Self::ContradictedMaturation { field, matured_to, holds } => format!(
+                "`{field}` matured to {matured_to:?} and the record holds {holds:?}. One of the \
+                 two is wrong and a reader cannot tell which — which is worse than not recording \
+                 the change, because it reads as an account of what happened"
             ),
             Self::ValueWithNoJudge { slice } => format!(
                 "{slice} says what you get and not who gets it. Value is not a property of a \
@@ -866,6 +875,43 @@ pub fn check_corpus_given(
     out.extend(check_surfaces(docs, schema, facts));
     out.extend(check_invariants(docs, schema));
     out.extend(check_binding(docs));
+    // A value that disagrees with its own maturation. Checked from the record alone: the
+    // prior value is carried, so no comparison against git is needed — and reaching outside
+    // the record for it would make this rule depend on the least durable thing there is.
+    if schema.entity("matured").is_some() {
+        for doc in docs {
+            for node in doc.nodes() {
+                // The LATEST maturation per field, and only that one. A field that matured
+                // twice has a stale first `to` by construction — that is what iterating IS,
+                // and refusing it would make a chain of improvements look like a defect.
+                let mut latest: Vec<(String, &KdlNode)> = Vec::new();
+                for entry in children_named(node, "matured") {
+                    let Some(field) = string_arg(entry) else { continue };
+                    match latest.iter_mut().find(|(f, _)| f == &field) {
+                        Some(slot) => slot.1 = entry,
+                        None => latest.push((field, entry)),
+                    }
+                }
+                for (field, entry) in latest {
+                    let Some(to) = child_arg(entry, "to") else { continue };
+                    let Some(holds) = child_arg(node, &field) else { continue };
+                    if holds != to {
+                        out.push(Violation {
+                            entity_kind: node.name().value().to_owned(),
+                            entity_id: string_arg(node),
+                            refusal: Refusal::ContradictedMaturation {
+                                field,
+                                matured_to: to,
+                                holds,
+                            },
+                            span: entry.span(),
+                        });
+                    }
+                }
+            }
+        }
+    }
+
     // A slice claiming value with an unstated subject. Only where the kind is declared: a
     // repository whose method predates `persona` is not missing something it never had.
     if schema.entity("persona").is_some() {
