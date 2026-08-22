@@ -6,7 +6,7 @@
 iteration "ITER.260822.06" {
     slug "an-attestation-the-tool-does-not-supply"
     on-slice "TS.260821.09"
-    state "working"
+    state "closed"
     opened-at "2026-08-22T05:26:24Z"
     opened-by "agent:praxis"
 
@@ -97,8 +97,22 @@ iteration "ITER.260822.06" {
             a role IS, so its absence cannot be permission" \
         note="the opposite default would have been the natural reading of `role not found, nothing \
             to check`, and would have made the rule trivially avoidable by not declaring a role"
+    closed-at "2026-08-22T05:34:09Z"
+    outcome "continue"
+
+    close {
+        claims-settled "C1" how="met"
+        claims-settled "C2" how="met"
+        claims-settled "C3" how="met"
+        claims-settled "C4" how="met"
+        all-met #true
+        attested-by "human:waelrabadi"
+        note "the accounting above was computed at close, not asserted. It says every claim is either met or carried by a finding that names it, and nothing about whether the work is any good"
+    }
 
     trail {
+        entry at="2026-08-22T05:34:09Z" by="agent:praxis" action="state-changed" from="open" to="closed" note="closed by `praxis close`. The accounting was computed; the conclusion is not the machine's to draw"
+
         entry at="2026-08-22T05:26:24Z" by="agent:praxis" action="created" \
             note="opened by the gate, on the ask of human:wael"
     }
