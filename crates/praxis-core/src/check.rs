@@ -69,6 +69,8 @@ pub enum Refusal {
     UnknownMethod { named: String, carried: String },
     /// A kind whose `states=` and whose `state` field's `one-of=` disagree.
     SplitStateVocabulary { kind: String, only_in_states: Vec<String>, only_in_field: Vec<String> },
+    /// The record holds no persona at all, so nothing it contains says who it is for.
+    NobodyItIsFor,
     /// A symptom resolved by a release the record does not hold.
     ResolvedByNothing { symptom: String, version: String },
     /// A symptom resolved by a release that bound no slice attacking it.
@@ -137,6 +139,7 @@ impl Refusal {
             Self::UnkeptInvariant { .. } => "an-enabled-invariant-is-enforced",
             Self::UnknownMethod { .. } => "a-config-binds-a-method-the-engine-carries",
             Self::SplitStateVocabulary { .. } => "a-state-vocabulary-is-declared-once",
+            Self::NobodyItIsFor => "a-record-names-somebody-it-is-for",
         }
     }
 
@@ -167,6 +170,7 @@ impl Refusal {
             Self::UnkeptInvariant { .. } => "protects",
             Self::UnknownMethod { .. } => "governed-by",
             Self::SplitStateVocabulary { .. } => "states",
+            Self::NobodyItIsFor => "persona",
             Self::UnjustifiedLifetime { missing, .. } => missing,
         }
     }
@@ -180,6 +184,10 @@ impl Refusal {
             // An invariant declared before its probe is written is a legitimate order of
             // work. What is not legitimate is nobody knowing which.
             | Self::UnkeptInvariant { .. }
+            // One primary persona is enough. This reports the ABSENCE of any, never the
+            // absence of many — enumerating personas upfront is a week spent on people
+            // nobody has met.
+            | Self::NobodyItIsFor
             | Self::UnevidencedLayer { .. } => Severity::Report,
             _ => Severity::Refuse,
         }
@@ -262,6 +270,10 @@ impl Refusal {
                 "`{invariant}` is enabled and nothing enforces it — the plugin guarantees that \
                  {protects}, and no shipped surface keeps it"
             ),
+            Self::NobodyItIsFor => "the record names nobody it is for. Every fact it holds \
+                 exists to serve somebody, and `useful-alone` — what you get if this ships — has \
+                 an unstated subject until one persona is declared"
+                .to_owned(),
             Self::SplitStateVocabulary { kind, only_in_states, only_in_field } => format!(
                 "`{kind}` declares its states twice and the two disagree — {} only in `states=`, \
                  {} only in the `state` field's `one-of=`. A kind refuses what it also permits, \
@@ -841,6 +853,18 @@ pub fn check_corpus_given(
     out.extend(check_surfaces(docs, schema, facts));
     out.extend(check_invariants(docs, schema));
     out.extend(check_binding(docs));
+    // A record with no persona at all. Checked only where the kind is declared: a repository
+    // whose method predates it is not missing something it never had.
+    if schema.entity("persona").is_some()
+        && !docs.iter().any(|d| d.nodes().iter().any(|n| n.name().value() == "persona"))
+    {
+        out.push(Violation {
+            entity_kind: "persona".to_owned(),
+            entity_id: None,
+            refusal: Refusal::NobodyItIsFor,
+            span: SourceSpan::from(0..0),
+        });
+    }
     // The composed schema, and any schema a document declares. A rule about the SCHEMA
     // cannot be witnessed by a record unless the witness's own declarations are checked —
     // and a repository's extension block deserves the same rule as the method's.

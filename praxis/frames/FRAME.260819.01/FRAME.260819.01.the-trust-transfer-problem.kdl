@@ -20,19 +20,33 @@ frame "FRAME.260819.01" {
             an assertion nobody can check is not evidence" \
         note="withdrawn rather than grandfathered. A method that exempts its own progress reports \
             from the standard it sets is the root cause with a nicer surface, and the first thing \
-            self-application cost this frame was a claimed win"
+            self-application cost this frame was a claimed win" {
+        felt-by "the-team-building-a-digital-product"
+    }
     symptom "S2" state="present" \
-        text="an artifact looks identical whether the agent reasoned hard or pattern-matched a template"
+        text="an artifact looks identical whether the agent reasoned hard or pattern-matched a template" {
+        felt-by "the-team-building-a-digital-product"
+    }
     symptom "S3" state="present" \
-        text="how much process a unit of work received is declared by the agent that received it"
+        text="how much process a unit of work received is declared by the agent that received it" {
+        felt-by "the-team-building-a-digital-product"
+    }
     symptom "S4" state="present" \
-        text="a slice claimed vertical cannot be shown to have cut anything"
+        text="a slice claimed vertical cannot be shown to have cut anything" {
+        felt-by "the-team-building-a-digital-product"
+    }
     symptom "S5" state="present" \
-        text="scope drifts silently — work closes with unmet claims and nothing objects"
+        text="scope drifts silently — work closes with unmet claims and nothing objects" {
+        felt-by "the-team-building-a-digital-product"
+    }
     symptom "S6" state="present" \
-        text="a published document carries no evidence of when, or whether, it was ever true"
+        text="a published document carries no evidence of when, or whether, it was ever true" {
+        felt-by "the-reader-of-a-release"
+    }
     symptom "S7" state="present" \
-        text="the next agent re-derives what is already known, because current truth is prose"
+        text="the next agent re-derives what is already known, because current truth is prose" {
+        felt-by "the-next-agent"
+    }
 
     // ---- The convergence gate. ----
     root-cause "execution fidelity is invisible in the artifact, so trust in it must be granted rather than computed"

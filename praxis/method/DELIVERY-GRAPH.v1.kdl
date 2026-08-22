@@ -100,6 +100,10 @@ method "delivery-graph" {
             field "attacks"          each="0..n" references="symptom"
             field "depends-on"       each="0..n"
             field "useful-alone"     each="0..1" because="what you get if this ships and nothing after it does"
+            field "useful-to"        each="0..n" references="persona" \
+                because="`what you get` has an unstated subject until somebody is named. Value is \
+                    not a property of a change — it is a judgement, and a record stating the \
+                    change without the judge has recorded half of it"
             field "needs-read-model" each="0..n"
             field "feeds-read-model" each="0..n"
             field "content-owned-by" each="0..n"
@@ -210,8 +214,17 @@ method "delivery-graph" {
         entity "cluster" is="a group of events that must stay consistent together — the unit a capability is derived FROM" \
             note="contained in an event-storm. Declared so `from-cluster` resolves rather than merely being present"
 
-        entity "symptom" is="one observable thing that is wrong, resolving on its own schedule by naming a release" \
-            note="contained in a frame. Declared so `attacks` resolves"
+        entity "symptom" is="one observable thing that is wrong FOR SOMEBODY, resolving on its own schedule by naming a release" \
+            note="contained in a frame. Declared so `attacks` resolves" {
+            field "felt-by" each="0..n" references="persona" \
+                because="a symptom describes something wrong for somebody, and naming who makes \
+                    the difference between a problem and a complaint. Optional because every \
+                    symptom in this record predates the persona kind — a rule that fails closed \
+                    on the day it lands names all seven"
+            field "text"    each="0..1"
+            field "state"   each="0..1"
+            field "note"    each="0..n"
+        }
         entity "adr" is="a durable technical decision, its argument, its alternatives, and its corrections" \
             states="proposed accepted superseded" \
             note="one record; cardinalities conservative for the same reason as frame" {
@@ -406,6 +419,35 @@ method "delivery-graph" {
 
         entity "read-model" is="a view an actor must see before acting, owned by exactly one capability" \
             note="already load-bearing in every slice's needs/feeds edges and never declared"
+
+        entity "persona" is="somebody the product is for — what they came for, and how they judge whether they got it" \
+            states="primary emergent" \
+            owned-by="delivery-record" \
+            note="declared by TS.260821.15. `needed-by` has been on every read model since the \
+                storm was written and named nothing the record held: a label saying a reader needs \
+                this view, with no statement of who a reader IS. So `useful-alone` — the field \
+                that says what you get — has always had an unstated subject" \
+            note="not a role. A role is what you may attest (TS.260821.08); a persona is what you \
+                came for, and one person occupies several roles in a week" {
+            field "is"            each="1" because="who they are, in a sentence"
+            field "came-for"      each="1" because="the outcome they arrived wanting. Not what the product does — what they were trying to get done"
+            field "does-not-care" each="0..n" \
+                because="what they will not read and do not want explained. The half a document \
+                    gets wrong by including, and the reason two personas need two documents rather \
+                    than one longer one"
+            field "judges-by"     each="1" \
+                because="how they would know they got it. A persona nobody can be wrong about is a \
+                    description, and this is the field that makes it a claim"
+            field "state"         each="0..1" one-of="primary" "emergent"
+            field "found-by"      each="1" when-state="emergent" \
+                because="discovered means discovered BY something — a finding, a walkthrough, a \
+                    slice. One primary persona is named before framing because it is the reason \
+                    discovery is happening; the rest emerge from the work and cite what surfaced \
+                    them. Required WHEN emergent rather than by a rule of its own — \
+                    entity-without-a-required-field already refuses a missing field, and a second \
+                    rule saying the same thing is a second thing to keep in step"
+            field "note"          each="0..n"
+        }
 
         entity "role" is="who may attest what — a position a human or an agent occupies, not a person" \
             owned-by="claim-settlement" \
@@ -689,6 +731,15 @@ method "delivery-graph" {
         rule "a-role-owns-a-declared-phase"           reports="a role owning a phase the record does not name" \
             because="a role owning no recognisable phase is a title, and a title in a record is a \
                 dumping ground with a job description"
+
+        rule "a-record-names-somebody-it-is-for"      reports="a record holding no persona at all" \
+            because="every fact this record holds exists to serve somebody, and until TS.260821.15 \
+                the one fact it never held was who. `needed-by` named a role with nothing behind \
+                it, and `useful-alone` — the field that says what you get — had an unstated subject" \
+            found-by="the maintainer, reading the published set as two personas" \
+            note="one primary persona is enough. The rest emerge from the work and cite what \
+                surfaced them, so this reports the ABSENCE of any and never the absence of many — \
+                enumerating personas upfront is a week spent on people nobody has met"
 
         rule "a-state-vocabulary-is-declared-once"    refuses="a kind whose `states=` and whose `state` field's `one-of=` disagree" \
             because="`withdrawn` had to be added to `release` in two places, and the first edit \

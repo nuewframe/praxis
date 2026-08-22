@@ -203,3 +203,9 @@ doctrine-surface "surface.skill.write-durable-comments" {
     kind "skill"
     serves "comments-state-meaning"
 }
+
+doctrine-surface "surface.skill.name-a-persona" {
+    path "skills/name-a-persona/SKILL.md"
+    kind "skill"
+    serves "TS.260821.15"
+}

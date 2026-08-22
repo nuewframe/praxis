@@ -322,35 +322,35 @@ event-storm "ES.260819.01" {
     // Each one is a projection, and each is the value half of some slice.
     // ================================================================
 
-    read-model "the-problem-as-it-stands" needed-by="maintainer" before="converge" \
+    read-model "the-problem-as-it-stands" needed-by="the-team-building-a-digital-product" before="converge" \
         answers="what have we observed, and does it hang together yet?" \
         publishable=#false \
         because="a problem definition's value is being current. What we thought the problem was at 0.8.0 misleads more than it informs; the part worth freezing is which symptoms a release resolved, which the release record carries"
 
-    read-model "capabilities-and-what-they-own" needed-by="maintainer" before="cut-slice" \
+    read-model "capabilities-and-what-they-own" needed-by="the-team-building-a-digital-product" before="cut-slice" \
         answers="what must the system be able to do, and which events does each keep consistent?" \
         publishable=#true \
         because="what the system could do at 0.8.0 is exactly what a reader pinned to 0.8.0 needs, and it does not decay — it becomes history" \
         publishes-to="docs/releases/<version>/capabilities/"
 
-    read-model "what-is-ready-to-pick-up" needed-by="working-agent" before="pick-up" \
+    read-model "what-is-ready-to-pick-up" needed-by="the-next-agent" before="pick-up" \
         answers="which slices could be started right now, and what would refuse each of them?" \
         publishable=#false \
         because="`right now` is in the question. Frozen it is not merely stale, it is wrong"
 
-    read-model "what-this-iteration-claims-and-has-shown" needed-by="reviewer" before="close-iteration" \
+    read-model "what-this-iteration-claims-and-has-shown" needed-by="the-team-building-a-digital-product" before="close-iteration" \
         answers="what did it promise, what has it evidenced, and what is still open?" \
         attacks="S2" \
         publishable=#false \
         because="an iteration is transient. What survives it is what shipped, which the release record carries"
 
-    read-model "what-is-currently-true" needed-by="next-agent" before="pick-up" \
+    read-model "what-is-currently-true" needed-by="the-next-agent" before="pick-up" \
         answers="what does this repository already know, so I do not re-derive it?" \
         attacks="S7" \
         publishable=#false \
         because="`currently` is in the name. This is the content behind the dashboard, and the dashboard is the clearest case the publication test rejects"
 
-    read-model "the-published-set-for-a-release" needed-by="reader" \
+    read-model "the-published-set-for-a-release" needed-by="the-reader-of-a-release"\
         answers="what shipped at version N, which symptoms it resolved, and what it left owed?" \
         attacks="S6" \
         publishable=#true \
@@ -360,7 +360,7 @@ event-storm "ES.260819.01" {
     // ---- Found by applying the publication test. Both are published by Praxis today and
     // ---- neither appeared anywhere in this storm.
 
-    read-model "what-this-product-means" needed-by="reader" "next-agent" \
+    read-model "what-this-product-means" needed-by="the-reader-of-a-release" "the-next-agent"\
         answers="what problem does this exist for, and what does every word mean?" \
         attacks="S7" \
         publishable=#true \
@@ -372,7 +372,7 @@ event-storm "ES.260819.01" {
         note="the glossary is generated from whatever the schema declares, so a kind an adopting \
             project adds appears in ITS release without the publisher being touched"
 
-    read-model "how-it-fits-together" needed-by="reader" "next-agent" \
+    read-model "how-it-fits-together" needed-by="the-reader-of-a-release" "the-next-agent"\
         answers="what does each part do, what does it refuse to do, and what does it keep true?" \
         attacks="S7" \
         publishable=#true \
@@ -382,7 +382,7 @@ event-storm "ES.260819.01" {
         publishes-to="docs/releases/<version>/architecture/" \
         content-owned-by="CAP.delivery-record" "CAP.document-projection"
 
-    read-model "what-this-plugin-ships" needed-by="reader" "adopter" \
+    read-model "what-this-plugin-ships" needed-by="the-reader-of-a-release" "the-adopter"\
         answers="what doctrine did this version ship, what asked for each piece, and which guarantees fail closed?" \
         attacks="S6" \
         publishable=#true \
@@ -400,7 +400,7 @@ event-storm "ES.260819.01" {
             the surface would be a second copy of a fact the record already holds, and the first \
             thing to go stale"
 
-    read-model "the-decisions-that-shaped-this" needed-by="reader" "next-agent" \
+    read-model "the-decisions-that-shaped-this" needed-by="the-reader-of-a-release" "the-next-agent"\
         answers="what was decided, what were the alternatives, and what tested it?" \
         attacks="S2" "S7" \
         publishable=#true \
@@ -412,7 +412,7 @@ event-storm "ES.260819.01" {
             that tested it; delivery-record carries the discovery options that were rejected. \
             Together they are what an ADR has always been"
 
-    read-model "how-to-use-a-capability" needed-by="reader" \
+    read-model "how-to-use-a-capability" needed-by="the-reader-of-a-release"\
         answers="how do I use what this version can do?" \
         publishable=#true \
         because="someone pinned to 0.8.0 needs 0.8.0's guide, not the current one" \
