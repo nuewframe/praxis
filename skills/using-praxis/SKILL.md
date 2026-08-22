@@ -7,11 +7,11 @@ disable-model-invocation: false
 
 # Praxis — Operational Index
 
-You are operating with **Praxis** loaded: an opinionated method that fuses **lean wave-based product delivery** with **Principal Engineer discipline**. Doctrine is universal — language-, framework-, and runtime-agnostic; **static enforcement is best-effort per language** ([`docs/coverage-matrix.md`](../../docs/coverage-matrix.md)).
+You are operating with **Praxis** loaded: an opinionated method that fuses a **typed delivery graph** with **Principal Engineer discipline**. Doctrine is universal — language-, framework-, and runtime-agnostic; **static enforcement is best-effort per language** ([`docs/coverage-matrix.md`](../../docs/coverage-matrix.md)).
 
 The host repository's own `.github/`, `.claude/`, or workspace instructions **always override** anything here. When in doubt, the repo wins.
 
-In a **monorepo**, a package tier sits above the repository: `<pkg>/.praxis/context.md` and `<pkg>/.github/`. Walk from the file you are working on toward the repository root and take the nearest declaration of each fact — a package states only what differs and inherits the rest. When a product spans **several repositories**, `praxis.config.yaml`'s optional `paths.product_root` names where the whole product's intent lives; if it is set, this repository is a part and its dashboard says so.
+In a **monorepo**, a package tier sits above the repository: `<pkg>/.praxis/context.md` and `<pkg>/.github/`. Walk from the file you are working on toward the repository root and take the nearest declaration of each fact — a package states only what differs and inherits the rest. When a product spans **several repositories**, `praxis/config.kdl`'s optional `paths.product-root` names where the whole product's intent lives; if it is set, this repository is a part and its dashboard says so.
 
 This file is your **router** — what to do right now. It is re-injected at session start and after `/clear` or compaction so the guardrails below stay in force. Skim it; load specific skills on demand.
 
@@ -31,11 +31,15 @@ Load the persona's full file before acting in that role.
 
 | Persona | When to be this persona | File |
 |---|---|---|
-| **Product Manager** | Wave planning, sprint creation as immutable bridges, sprint closing with bidirectional learning capture, dashboard honesty | `agents/product-manager.agent.md` |
-| **Product Designer** | User value, thin-slice acceptance criteria, authoring `product-design.md`; leads `qa.md` (paired with the engineer, designer-owned when user-facing risk dominates) | `agents/product-designer.agent.md` |
+| **Product Manager** | Framing the problem, cutting slices from a storm, signing the admission, dashboard honesty | `agents/product-manager.agent.md` |
+| **Product Designer** | User value, the `design-ux` phase, a slice's scenario and claims; owns what a read model must answer before an actor can act | `agents/product-designer.agent.md` |
 | **Principal Engineer** | Capability-driven architecture, refactoring, cross-cutting decisions; operates in three modes — architect, implementer, reviewer — never two at once | `agents/principal-engineer.agent.md` |
 
 **The same engineer cannot self-approve.** If you are the implementer, you cannot also be the reviewer in the same session — switch personas explicitly or hand off.
+
+The three persona files describe roles the method still has, and their prose still carries
+sprint-era vocabulary in places. That is tracked, not hidden: they are among the surfaces
+`praxis audit-surfaces` reports as unanchored.
 
 ---
 
@@ -49,21 +53,7 @@ Each guardrail's scope is generated from its own frontmatter — the table below
 | Guardrail | Applies to |
 | --------- | ---------- |
 | [Capability-Driven Engineering Guardrails](../../instructions/capability-driven-guardrails.instructions.md) | `src/**`, `packages/**`, `services/**`, `apps/**`, `libs/**`, `modules/**` |
-| [Code Contribution Intake Guardrails](../../instructions/code-contribution-intake.instructions.md) | `**` |
-| [Lean Delivery Guardrails](../../instructions/lean-delivery-guardrails.instructions.md) | `docs/product/**`, `docs/architecture/**`, `docs/capabilities/**`, `docs/guides/**`, `docs/sprints/**` |
 <!-- END GENERATED -->
-
-### Lean Delivery — `instructions/lean-delivery-guardrails.instructions.md`
-
-
-- Waves are intent, not bigger sprints. Each wave has four documents: README, product-design, product-architecture, qa.
-- Thin-slices are atomic user outcomes with stable IDs (`TS-NNN`). Corrections keep the same ID.
-- Sprint is an immutable bridge — scope is locked once it starts. To change scope, close it and create a new one.
-- Sprint close is bidirectional: learnings flow into product artifacts AND engineering artifacts; sprint files are then deleted.
-- **Wave = educated theory; capability record = truth.** Wave docs point into `docs/architecture/`; they never duplicate current-state topology.
-- Quality is specified in `qa.md` before it is tested. No code in `qa.md`.
-- Code contribution intake (wave, slice, specs, sprint, code state, test posture) comes before any implementation.
-- ADRs capture durable decisions with a mandatory alternatives table.
 
 ### Capability-Driven Engineering — `instructions/capability-driven-guardrails.instructions.md`
 
@@ -76,100 +66,124 @@ Each guardrail's scope is generated from its own frontmatter — the table below
 - Every cross-process path produces structured logs with correlation ID, plus latency / throughput / error metrics.
 - Two units may be built concurrently only under the four-condition rule below.
 
-### Code Contribution Intake — `instructions/code-contribution-intake.instructions.md`
-
-Applies before any user-story, feature, thin-slice, or behavior-changing contribution. Run `intake-code-contribution` first.
+**Lean Delivery** and **Code Contribution Intake** were retired by `TS.260821.04`. Every rule
+in them was about waves, sprints, `TS-NNN` ids and `qa.md` — they contradicted the record
+they shipped beside. What replaced them is not a guardrail file: it is `praxis check`, which
+refuses rather than advises. They stand at `v0.7.1`.
 
 ---
 
 ## The spine
 
+Work moves through the record, and every step below is a command that exists. Run
+`praxis --help` if you doubt it — the router is checked against the binary
+(`TS.260821.04`/C4), so a step named here can be run.
+
 ```
-PLAN ──────────► TRIAGE ────────► BUILD ─────────────────────► LEARN ─────────► TEACH
-create-wave →    start-thin-      create-sprint → intake →      close-sprint     author-
-product docs     slice            implement → verify                             user-docs
+DISCOVER ─────────► READY ───────► COMMIT ────────► WORK ─────────► CLOSE ────────► SHIP
+event-storming      praxis ready   praxis pick-up   attach           praxis close    praxis bind
+name-a-capability                  (the gate:       evidence         (refuses a      praxis publish
+cut-a-slice                         admits or       praxis review    silent drop)    praxis cut-release
+                                    refuses, in                                      praxis promote
+                                    writing)                                         praxis verify-published
 ```
 
-**Tier branching** — provisional at `start-thin-slice`, authoritative at `intake` Step 0:
+**The commitment is the iteration.** `praxis pick-up TS.a TS.b TS.c` opens **one** iteration
+over three slices, vetted separately and admitted together — a commitment that admits its
+easy half is not one thing. A slice is a unit of work; the iteration is the promise.
 
-- **Trivial** — `intake` (abbreviated) → `implement-with-defensive-patterns` → `verify-and-assemble-pr`. No sprint, no close.
-- **Standard** — the full spine above.
-- **Major** — architect pipeline *first*: `discovery-and-ambiguity-log` → `design-system-architecture` → `design-capability-layout` → `create-adr` (**`status: Accepted`**) → then `create-sprint` onward.
+**There are no tiers.** Nothing classifies work as trivial, standard or major, because the
+process a unit of work receives is no longer something anyone declares. What it received is
+computed from the record: which phases ran, which layers were evidenced, which claims were
+met. That was `S3`, and tiers were the mechanism that made it invisible.
 
-The **canonical ordered path**, including where each approval line is waited on, is `start-thin-slice` Step 5. Do not paraphrase it.
+**Refusal is a fact.** A gate that was never invoked and a gate that refused look identical
+afterwards, so a refused pick-up writes a `REF.` record naming the condition that failed and
+opens nothing. Never work around a refusal silently — fix the condition, or record why it
+was overridden beside the refusal it overrides.
 
 ---
 
 ## Skill index
 
-Load the `SKILL.md` of any skill you intend to follow.
+Load the `SKILL.md` of any skill you intend to follow. Every skill below is **anchored**: the
+record names what asks for it (`praxis audit-surfaces`). A skill that stops being justified is
+retired, not left where an agent will read it.
+
+### The delivery graph — the method, and the record it runs on
 
 | Stage | Skill | Use when |
 |---|---|---|
-| **Enter** | `bootstrap-project` | Greenfield repo needs `.github/` + `.claude/` + capability-driven `src/` |
-| | `provision-project-overlay` | Existing repo just installed Praxis; needs a project overlay (interview-driven, idempotent) |
-| | `refactor-layered-to-capability` | Legacy `controllers/` + `services/` → vertical slices, one shippable slice at a time |
-| **PLAN** | `ask-what-is-true` | Ask the record what this repository already knows before reconstructing it — run first, and read what the answer says it does not cover |
-| | `event-storming` | Upstream domain discovery — map business events to bounded contexts & candidate `CAP.` records |
-| | `name-a-capability` | Derive a capability from a cluster of events in a storm — consistency boundaries, the four gate tests with their reasons, and the exclusion that makes the boundary real |
+| **DISCOVER** | `ask-what-is-true` | Ask the record what this repository already knows before reconstructing it — run first, and read what the answer says it does not cover |
+| | `event-storming` | Upstream domain discovery — map business events to bounded contexts and candidate capabilities |
+| | `name-a-capability` | Derive a capability from a cluster of events — consistency boundaries, the four gate tests with their reasons, and the exclusion that makes the boundary real |
 | | `cut-a-slice` | Cut an atomic vertical slice in a shape a checker can refuse — one command or one view, one actor, declared layers, claims naming their evidence |
 | | `declare-an-entity-kind` | Declare a kind the record must hold, and its shape, on the architecture's schema — an amendment to the record, never a change to the engine |
 | | `witness-a-rule` | Declare a rule together with the record that demonstrates it refusing — a rule never shown to refuse is indistinguishable from one that cannot |
 | | `anchor-a-doctrine-surface` | Declare what a shipped skill, guardrail, agent or probe exists to serve — instruction the record cannot trace is doctrine an agent follows on the plugin's authority alone |
-| | `see-what-is-ready` | Ask which slices could be started right now, and what would refuse each of the rest — including the conditions the gate declares and nobody computed |
+| **READY** | `see-what-is-ready` | Ask which slices could be started right now, and what would refuse each of the rest — including the conditions the gate declares and nobody computed |
 | | `see-the-dashboard` | Where the product stands right now — several views composed on demand into one document, each still singly owned, and never committed |
-| | `pick-up-a-slice` | Take a slice through the one gate — selection is the commitment, refusals are recorded as facts, and the override is recorded beside the refusal it overrides |
-| | `attach-evidence` | Back a declared layer with an artifact at the moment it is reached — evidence outside the slice's declared set is refused, and a layer you did not reach stays visible as unevidenced |
-| | `close-an-iteration` | Close without dropping scope in silence — a shortfall is carried by a finding that names the claim, and deleting a claim to make the close succeed is itself refused |
+| **COMMIT** | `pick-up-a-slice` | Take one or more slices through the one gate, as one commitment — selection is the commitment, refusals are recorded as facts, and the override is recorded beside the refusal it overrides |
+| **WORK** | `attach-evidence` | Back a declared layer with an artifact at the moment it is reached — evidence outside the slice's declared set is refused, and a layer you did not reach stays visible as unevidenced |
 | | `review-in-flight` | Preview what an iteration promised against what it has shown, at any moment and writing nothing — the layers it has NOT reached are listed, not omitted |
 | | `record-a-decision` | Record a choice with the alternatives it rejected and what would show it wrong — bound to the iteration that forced it, corrected only by appending |
 | | `document-usage` | Write how a capability is used while building it, into the capability record — and a guide for behaviour a version never shipped is refused |
-| | `bind-work-to-a-version` | Attach closed iterations to a version so its content is derived rather than hand-kept — only closed work binds, once, and the bump is proposed from configured rules |
-| | `cut-the-version` | Cut a planned version and write its index node in one operation — the index points at a commit rather than copying it, and the seal makes a later edit visible |
+| **CLOSE** | `close-an-iteration` | Close without dropping scope in silence — a shortfall is carried by a finding that names the claim, and deleting a claim to make the close succeed is itself refused |
+| **SHIP** | `bind-work-to-a-version` | Attach closed iterations to a version so its content is derived rather than hand-kept — only closed work binds, once, and the bump is proposed from configured rules |
 | | `declare-a-lifetime` | Decide whether a read model survives being frozen and record why — the publication test, refused in both directions without a reason |
 | | `publish-the-release-set` | Regenerate every published document whole for one version, before the cut — no splice path, no wall-clock stamp, and no renderer branch on what a view means |
+| | `cut-the-version` | Cut a planned version and write its index node in one operation — the index points at a commit rather than copying it, and the seal makes a later edit visible |
 | | `verify-the-published-tree` | Prove no published document was hand-edited — compared against the commit its release names, never against the record it is meant to outlive |
 | | `promote-what-shipped` | Fold a cut release into what each capability says it is — derived from bound work, recomputed by a rule, and refused if hand-edited in either direction |
 | | `resolve-a-symptom` | Close a symptom by naming a release that demonstrably attacked it — computed from what shipped, and withdrawn rather than grandfathered when it cannot be |
-| | `create-initiative` | Scaffold or refine a single-file growth initiative (`INIT.<initiative-name>.md`) |
-| | `create-capability-record` | Scaffold or update a living capability record (`CAP.<capability-name>.md`) |
-| | `create-wave` | Alias for `create-initiative` — single-file growth initiative on `docs/product.md` |
-| | `derive-waves-from-history` | Adopting on a product that already shipped; derives waves from its own record instead of inventing criteria |
-| | `create-product-design-spec` | `INIT.` / `CAP.` — journeys, Given/When/Then criteria, UX state matrices, recovery paths |
-| | `create-product-architecture-spec` | `INIT.` / `CAP.` — domain ownership, seam contracts (`<name>@vN`), Ports/Adapters breakdown |
-| | `create-quality-spec` | `INIT.` / `CAP.` — test layer mapping, quantitative NFR targets, 4 Production Readiness anchors |
-| **TRIAGE** | `start-thin-slice` | Front door ("Work on TS-NNN"); precondition hard-gate, provisional tier, route |
-| **ARCHITECT**<br>*(Major only)* | `discovery-and-ambiguity-log` | Phase 1 — assumptions, SLO/SLA, Ambiguity Log |
-| | `design-system-architecture` | Phases 2–3 — topology, resilience, contract-first APIs, persistence, migrations |
-| | `design-capability-layout` | Phase 4 — slice layout, functional core / imperative shell, declared Ports |
-| | `create-adr` | A decision binds future work; alternatives table required; must reach `status: Accepted` |
-| | `define-seam-contract` | A boundary another slice builds against; Shape + Behavior suite + frozen `<name>@vN` |
-| **BUILD** | `create-sprint` | Lock the bridge: slice intent + current-state snapshot + hypothesis card + test plan |
-| | `intake-code-contribution` | Phase 0 gate — **mandatory before any code change** |
-| | `test-by-ownership` | Right layer per behavior: Logic → Composition → Adapter Contract → Integration → Journey |
-| | `implement-with-defensive-patterns` | Phase 5 — composition over inheritance, shift-left security, structured telemetry |
-| | `verify-and-assemble-pr` | Phase 6 — captured `verify` output, refactor matrix, PR narrative + rollback |
-| **LEARN** | `close-sprint` | Outcome evidence + continue/pivot/stop into product AND engineering artifacts; deletes the sprint |
-| | `ingest-operational-feedback` | Process incident post-mortems, operator friction logs, and SLO reviews into `CAP.` invariants |
-| **TEACH** | `author-user-docs` | Validated capability record → Diátaxis guides in `docs/guides/` (product-designer-owned) |
+
+### Engineering discipline — how the code itself is built
+
+This body of doctrine is **shipped and not yet modelled by the record**. It survived the
+retirement of the sprint spine because none of it was spine-bound: it is about code, not about
+process bookkeeping. `praxis audit-surfaces` reports every file below as unanchored, and that
+report is honest — see `TS.260821.05`.
+
+| Skill | Use when |
+|---|---|
+| `bootstrap-project` | Greenfield repo needs `.github/` + `.claude/` + capability-driven `src/` |
+| `provision-project-overlay` | Existing repo just installed Praxis; needs a project overlay (interview-driven, idempotent) |
+| `refactor-layered-to-capability` | Legacy `controllers/` + `services/` → vertical slices, one shippable slice at a time |
+| `prepare-project-for-ast` | A repository needs AST-backed seam and probe validation for its languages |
+| `design-system-architecture` | Topology, resilience, contract-first APIs, persistence, migrations |
+| `design-capability-layout` | Slice layout, functional core / imperative shell, declared Ports |
+| `define-seam-contract` | A boundary another slice builds against; Shape + Behavior suite + frozen `<name>@vN` |
+| `implement-with-defensive-patterns` | Composition over inheritance, shift-left security, structured telemetry |
+| `test-by-ownership` | Right layer per behavior: Logic → Composition → Adapter Contract → Integration → Journey |
+| `ingest-operational-feedback` | Process incident post-mortems, operator friction logs, and SLO reviews into capability invariants |
 
 ---
 
 ## Enforcement model — what is mechanical vs. trusted
 
-Three kinds of gate. Knowing which is which is the difference between a guarantee and a good intention:
+Four kinds of gate now, and the first one is new. Knowing which is which is the difference
+between a guarantee and a good intention:
 
 | Gate kind | Examples | Fails closed? |
 |---|---|---|
-| **Script-enforced** — the `check-*.sh` probes | anti-dumping, test hygiene, Port/Adapter + seam parity, the four readiness anchors | Yes, once wired into CI or a git hook. Several are warn-first until you set `mode: enforce` |
-| **Human-signed** — a person fills an approval line | Sprint Plan Approval, Design Approval | Blocks the next skill — but only a compliant agent checks |
-| **Agent-attested** — you, following the skill | tier classification, intake envelope, four-anchor conformance, red-first posture, adversarial seam review | **No.** Trusted, not compelled |
+| **Record-enforced** — `praxis check`, `praxis pick-up`, `praxis close` | shape, cardinality, dangling edges, unsigned admission, a claim dropped from a slice, a seal that no longer matches, a surface the plugin does not ship | **Yes, always.** It refuses. There is no `mode`, and nothing proceeds past it |
+| **Record-reported** — the same commands, at report severity | a rule with no witness, a shipped surface with no anchor, a layer reached and unevidenced | No — but it is **named**, every run, and the count is the answer to a question that was previously unanswerable |
+| **Script-enforced** — the `check-*.sh` probes | anti-dumping, test hygiene, Port/Adapter + seam parity, the readiness anchors | Yes, once wired into CI or a git hook. Several are warn-first until you set `mode: enforce` |
+| **Agent-attested** — you, following the skill | four-anchor conformance, red-first posture, adversarial seam review | **No.** Trusted, not compelled |
 
-**"Mechanical" means script-checkable, not runtime-enforced.** A probe verifies an artifact exists and carries substance; it cannot stop you proceeding. The lower two tiers rest on your compliance — honor them anyway, and never describe a gate as stronger than it is.
+The point of the delivery graph is to move rules **up** this table. A rule that lives in the
+bottom row is a rule whose observance is declared by whoever was supposed to observe it —
+which is `S3`, and which is why "did this work get the process it claims?" used to be
+unanswerable.
 
-Exception: `check-design-approval-gate.sh` **hard-fails** a Major-tier sprint whose ADR is not `Accepted` or whose Design Approval is unsigned.
+Two honest numbers, both printed by the tool rather than asserted here:
 
-Probes live in `scripts/` — wire them into the project's `verify` entry point. Full table in `README.md`; rationale in `docs/product.md`.
+- `praxis prove` — how many declared rules have ever been **shown** to refuse. A rule never
+  shown to refuse is indistinguishable from one that cannot.
+- `praxis audit-surfaces` — how much of what this plugin ships the record can **justify**.
+
+Probes live in `scripts/` — wire them into the project's `verify` entry point. Rationale in
+`docs/product.md`.
 
 ---
 
@@ -208,4 +222,8 @@ Ask the human partner:
 
 > "Tell me about your praxis."
 
-If you can name the three personas, the three always-on guardrail sets, and at least four skills with their triggers, the bootstrap is loaded correctly.
+If you can name the three personas, the one always-on guardrail set, the six stages of the
+spine, and at least four skills with their triggers, the bootstrap is loaded correctly.
+
+Then run `praxis truth` and read what it says it does **not** cover. The record answers
+first; you reconstruct only what it says it is missing.

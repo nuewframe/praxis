@@ -115,31 +115,32 @@ The bias firewall is the tool restriction where the harness enforces it, and the
 
 ---
 
-## Phased workflow (driven by intake tier)
+## The workflow, and where your modes sit in it
 
-The triage tier set in `intake-code-contribution` Step 0 chooses the path:
+There are **no tiers**. Nothing classifies work as trivial, standard or major, because how
+much process a unit of work received is no longer something anyone declares — it is computed
+from the record (`TS.260821.04`, and `S3` before it).
 
-<!-- BEGIN GENERATED: tier-table (source: scripts/data/tier-classification.json; regenerate with scripts/gen-tier-table.sh --write) -->
-- **Trivial:** implementer mode (minimal ceremony — no design package; the existing capability layout is the design; confirm green baseline) → reviewer mode. No sprint.
-- **Standard:** implementer mode → reviewer mode. Existing wave specs are the design package.
-- **Major:** architect mode (Phases 1–4) → mechanical Design Approval → implementer mode → reviewer mode.
-<!-- END GENERATED -->
+What decides the shape of the work is the **slice**, and specifically the layers it declares.
+A slice declaring `doctrine` cannot skip the teach phase; one declaring `enforcement` cannot
+skip design-system. The phases are `design-ux · design-system · implement · learn · teach`,
+and which are mandatory is derived from the sealed layer set — `praxis review` shows which
+have been reached and which have not.
 
-Phase order for Major:
+| Your mode | The phase it owns | What ends it |
+|---|---|---|
+| **architect** | `design-system` | a decision recorded with its rejected alternatives and its falsifier (`record-a-decision`) |
+| **implementer** | `implement` | every declared layer evidenced at the moment it was reached (`attach-evidence`) |
+| **reviewer** | `learn` | `praxis close`, which refuses a close that drops a claim in silence |
 
-The front door is `start-thin-slice` (triage + provisional tier); its Step 5 routing table is the canonical ordered Major path. Full `intake-code-contribution` is the last gate before implementer mode — not the trigger of architecture. `start-thin-slice` Step 0 / intake Step 0 set and confirm the tier.
+The gate before any of it is `praxis pick-up`. It admits and opens an iteration, or it
+refuses and writes a `REF.` record naming the condition that failed. **Never work around a
+refusal silently** — fix the condition, or record the override beside the refusal it
+overrides.
 
-1. `discovery-and-ambiguity-log` _(architect)_
-2. `design-system-architecture` _(architect)_
-3. `design-capability-layout` _(architect)_
-4. `create-adr` _(architect)_ — sets `status: Accepted` once approved
-5. `create-sprint` _(PM)_ — implementation plan informed by the Design Package; the sprint hosts both the Sprint Plan Approval and the Design Approval line the exit signal requires
-6. mechanical Design Approval — human signs the Design Approval line (ADR `status: Accepted` + signed line in the sprint)
-7. `intake-code-contribution` — final pre-implementation anchor against the approved sprint
-8. `implement-with-defensive-patterns` _(implementer)_
-9. `verify-and-assemble-pr` _(reviewer)_
-
-Stop at each phase boundary and request human approval before proceeding.
+Stop at each phase boundary and request human approval before proceeding. You are still not
+permitted to self-approve: if you were the implementer, you cannot be the reviewer in the
+same session.
 
 ---
 

@@ -115,39 +115,22 @@ docs/
 
 ### Guardrails (`instructions/`)
 
-- [`lean-delivery-guardrails.instructions.md`](../instructions/lean-delivery-guardrails.instructions.md)
 - [`capability-driven-guardrails.instructions.md`](../instructions/capability-driven-guardrails.instructions.md)
-- [`code-contribution-intake.instructions.md`](../instructions/code-contribution-intake.instructions.md)
 
 ### Skills (`skills/`)
 
-- [`author-user-docs`](../skills/author-user-docs/SKILL.md)
 - [`bootstrap-project`](../skills/bootstrap-project/SKILL.md)
-- [`close-sprint`](../skills/close-sprint/SKILL.md)
-- [`create-adr`](../skills/create-adr/SKILL.md)
-- [`create-capability-record`](../skills/create-capability-record/SKILL.md)
-- [`create-initiative`](../skills/create-initiative/SKILL.md)
-- [`create-product-architecture-spec`](../skills/create-product-architecture-spec/SKILL.md)
-- [`create-product-design-spec`](../skills/create-product-design-spec/SKILL.md)
-- [`create-quality-spec`](../skills/create-quality-spec/SKILL.md)
-- [`create-sprint`](../skills/create-sprint/SKILL.md)
-- [`create-wave`](../skills/create-wave/SKILL.md)
 - [`define-seam-contract`](../skills/define-seam-contract/SKILL.md)
-- [`derive-waves-from-history`](../skills/derive-waves-from-history/SKILL.md)
 - [`design-capability-layout`](../skills/design-capability-layout/SKILL.md)
 - [`design-system-architecture`](../skills/design-system-architecture/SKILL.md)
-- [`discovery-and-ambiguity-log`](../skills/discovery-and-ambiguity-log/SKILL.md)
 - [`event-storming`](../skills/event-storming/SKILL.md)
 - [`implement-with-defensive-patterns`](../skills/implement-with-defensive-patterns/SKILL.md)
 - [`ingest-operational-feedback`](../skills/ingest-operational-feedback/SKILL.md)
-- [`intake-code-contribution`](../skills/intake-code-contribution/SKILL.md)
 - [`prepare-project-for-ast`](../skills/prepare-project-for-ast/SKILL.md)
 - [`provision-project-overlay`](../skills/provision-project-overlay/SKILL.md)
 - [`refactor-layered-to-capability`](../skills/refactor-layered-to-capability/SKILL.md)
-- [`start-thin-slice`](../skills/start-thin-slice/SKILL.md)
 - [`test-by-ownership`](../skills/test-by-ownership/SKILL.md)
 - [`using-praxis`](../skills/using-praxis/SKILL.md)
-- [`verify-and-assemble-pr`](../skills/verify-and-assemble-pr/SKILL.md)
 
 ### Scripts & Probes (`scripts/`)
 
@@ -156,7 +139,6 @@ docs/
 - [`check-anti-dumping.sh`](../scripts/check-anti-dumping.sh)
 - [`check-config-externalized.sh`](../scripts/check-config-externalized.sh)
 - [`check-contract-freshness.sh`](../scripts/check-contract-freshness.sh)
-- [`check-design-approval-gate.sh`](../scripts/check-design-approval-gate.sh)
 - [`check-escape-hatch-usage.sh`](../scripts/check-escape-hatch-usage.sh)
 - [`check-no-skipped-tests.sh`](../scripts/check-no-skipped-tests.sh)
 - [`check-no-sleep-waits.sh`](../scripts/check-no-sleep-waits.sh)
@@ -164,13 +146,10 @@ docs/
 - [`check-port-adapter-parity.sh`](../scripts/check-port-adapter-parity.sh)
 - [`check-resilient-boundary.sh`](../scripts/check-resilient-boundary.sh)
 - [`check-seam-contract-parity.sh`](../scripts/check-seam-contract-parity.sh)
-- [`check-sprint-disjointness.sh`](../scripts/check-sprint-disjointness.sh)
-- [`check-sprint-id-collision.sh`](../scripts/check-sprint-id-collision.sh)
 - [`check-stateless-request-path.sh`](../scripts/check-stateless-request-path.sh)
 - [`citation_scan.py`](../scripts/citation_scan.py)
 - [`gen-coverage-matrix.sh`](../scripts/gen-coverage-matrix.sh)
 - [`gen-doctrine-index.sh`](../scripts/gen-doctrine-index.sh)
-- [`gen-tier-table.sh`](../scripts/gen-tier-table.sh)
 - [`test-citation-scan.sh`](../scripts/test-citation-scan.sh)
 - [`test-probes.sh`](../scripts/test-probes.sh)
 - [`test-sprint-coordination.sh`](../scripts/test-sprint-coordination.sh)
@@ -203,3 +182,45 @@ Parallel work between two units is permitted **only if all four hold**:
 1. Single-source versioning: `package.json` is the sole authored version, synced via `scripts/bump-version.sh`.
 2. Breaking or structural changes bump the minor position under pre-1.0 (`0.5.0 → 0.6.0`). `1.0.0` is reserved for explicit interface stabilization.
 3. Real-repo evidence rule: methodology changes must cite evidence from real-repo adoption in `CHANGELOG.md`.
+
+## Skill inventory — the delivery graph
+
+Every skill below is anchored in the record (`praxis audit-surfaces`); each corresponds to a slice the record delivered.
+
+- [`skills/ask-what-is-true/`](../skills/ask-what-is-true/SKILL.md) — Ask the record what this repository already knows before reconstructing it — and read what the answer says it does not cover.
+- [`skills/event-storming/`](../skills/event-storming/SKILL.md) — Upstream domain discovery — map business events to bounded contexts and candidate capabilities.
+- [`skills/name-a-capability/`](../skills/name-a-capability/SKILL.md) — Derive a capability from a cluster of events: consistency boundary, the four gate tests with their reasons, and the exclusion that makes the boundary real.
+- [`skills/cut-a-slice/`](../skills/cut-a-slice/SKILL.md) — Cut an atomic vertical slice in a shape a checker can refuse — one command or one view, one actor, declared layers, claims naming their evidence.
+- [`skills/declare-an-entity-kind/`](../skills/declare-an-entity-kind/SKILL.md) — Declare a kind the record must hold, and its shape, on the architecture's schema. An amendment to the record, never a change to the engine.
+- [`skills/witness-a-rule/`](../skills/witness-a-rule/SKILL.md) — Declare a rule together with the record that demonstrates it refusing. A rule never shown to refuse is indistinguishable from one that cannot.
+- [`skills/anchor-a-doctrine-surface/`](../skills/anchor-a-doctrine-surface/SKILL.md) — Declare what a shipped skill, guardrail, agent or probe exists to serve. Instruction the record cannot trace is doctrine on the plugin's authority alone.
+- [`skills/see-what-is-ready/`](../skills/see-what-is-ready/SKILL.md) — Which slices could be started right now, and what would refuse each of the rest — including the conditions the gate declares and nobody computed.
+- [`skills/see-the-dashboard/`](../skills/see-the-dashboard/SKILL.md) — Where the product stands right now: several views composed on demand, each still singly owned, never committed.
+- [`skills/pick-up-a-slice/`](../skills/pick-up-a-slice/SKILL.md) — Take one or more slices through the one gate, as one commitment. Refusals are recorded as facts; an override is recorded beside the refusal it overrides.
+- [`skills/attach-evidence/`](../skills/attach-evidence/SKILL.md) — Back a declared layer with an artifact at the moment it is reached. Evidence outside the slice's declared set is refused.
+- [`skills/review-in-flight/`](../skills/review-in-flight/SKILL.md) — Preview what an iteration promised against what it has shown, writing nothing. The layers it has NOT reached are listed, not omitted.
+- [`skills/record-a-decision/`](../skills/record-a-decision/SKILL.md) — Record a choice with the alternatives it rejected and what would show it wrong, bound to the iteration that forced it, corrected only by appending.
+- [`skills/document-usage/`](../skills/document-usage/SKILL.md) — Write how a capability is used while building it. A guide for behaviour a version never shipped is refused.
+- [`skills/close-an-iteration/`](../skills/close-an-iteration/SKILL.md) — Close without dropping scope in silence. A shortfall is carried by a finding that names the claim; deleting a claim to make the close succeed is itself refused.
+- [`skills/bind-work-to-a-version/`](../skills/bind-work-to-a-version/SKILL.md) — Attach closed iterations to a version so its content is derived rather than hand-kept. Only closed work binds, once.
+- [`skills/declare-a-lifetime/`](../skills/declare-a-lifetime/SKILL.md) — Decide whether a read model survives being frozen, and record why. Refused in both directions without a reason.
+- [`skills/publish-the-release-set/`](../skills/publish-the-release-set/SKILL.md) — Regenerate every published document whole for one version, before the cut. No splice path, no wall-clock stamp.
+- [`skills/cut-the-version/`](../skills/cut-the-version/SKILL.md) — Cut a planned version and write its index node in one operation. The index points at a commit rather than copying it; the seal makes a later edit visible.
+- [`skills/verify-the-published-tree/`](../skills/verify-the-published-tree/SKILL.md) — Prove no published document was hand-edited — compared against the commit its release names, never against the record it is meant to outlive.
+- [`skills/promote-what-shipped/`](../skills/promote-what-shipped/SKILL.md) — Fold a cut release into what each capability says it is. Derived from bound work, recomputed by a rule, refused if hand-edited in either direction.
+- [`skills/resolve-a-symptom/`](../skills/resolve-a-symptom/SKILL.md) — Close a symptom by naming a release that demonstrably attacked it. Computed from what shipped, and withdrawn rather than grandfathered when it cannot be.
+
+## Skill inventory — engineering doctrine
+
+Shipped, still valid, and **not yet modelled by the record**. `praxis audit-surfaces` reports each as unanchored; see `TS.260821.05`.
+
+- [`skills/bootstrap-project/`](../skills/bootstrap-project/SKILL.md)
+- [`skills/provision-project-overlay/`](../skills/provision-project-overlay/SKILL.md)
+- [`skills/refactor-layered-to-capability/`](../skills/refactor-layered-to-capability/SKILL.md)
+- [`skills/prepare-project-for-ast/`](../skills/prepare-project-for-ast/SKILL.md)
+- [`skills/design-system-architecture/`](../skills/design-system-architecture/SKILL.md)
+- [`skills/design-capability-layout/`](../skills/design-capability-layout/SKILL.md)
+- [`skills/define-seam-contract/`](../skills/define-seam-contract/SKILL.md)
+- [`skills/implement-with-defensive-patterns/`](../skills/implement-with-defensive-patterns/SKILL.md)
+- [`skills/test-by-ownership/`](../skills/test-by-ownership/SKILL.md)
+- [`skills/ingest-operational-feedback/`](../skills/ingest-operational-feedback/SKILL.md)

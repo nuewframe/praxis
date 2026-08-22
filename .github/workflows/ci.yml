@@ -48,8 +48,6 @@ jobs:
       - name: coverage matrix is current
         run: bash scripts/gen-coverage-matrix.sh --check
 
-      - name: tier table is current
-        run: bash scripts/gen-tier-table.sh --check
 
       - name: doctrine index is current
         run: bash scripts/gen-doctrine-index.sh --check

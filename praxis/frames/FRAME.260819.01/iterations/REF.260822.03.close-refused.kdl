@@ -1,0 +1,17 @@
+// Written by `praxis close`, which refused. The iteration stays open, and
+// every claim it could not account for is named below. Nothing was closed.
+
+refusal "REF.260822.03" {
+    on-slice "TS.260821.04"
+    at "2026-08-22T03:04:28Z"
+    by "agent:praxis"
+    asked-by "human:wael"
+    on-iteration "ITER.260822.02"
+    condition "claim-C3-is-unaccounted" failed=#true \
+        found="C3 is \"unmet\" and no finding carries it — record a finding that names it, or settle it. A shortfall nobody wrote down and a claim that was met look identical afterwards"
+
+    trail {
+        entry at="2026-08-22T03:04:28Z" by="agent:praxis" action="created" \
+            note="the close was refused. The iteration stays open"
+    }
+}

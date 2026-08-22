@@ -1,0 +1,221 @@
+// Retired by TS.260821.04. Each of these described the sprint-era spine — create-wave,
+// start-thin-slice, create-sprint, intake, close-sprint — which the delivery graph replaced
+// eighteen iterations before anything objected.
+//
+// The files are removed, not shimmed. v0.7.1 is tagged, so every one is recoverable by name
+// with `git checkout v0.7.1 -- <path>`. Keeping both spines loaded would mean an arriving
+// agent reads two methods and picks one, which is S1 — the symptom, not a mitigation of it.
+//
+// A retired surface whose file is still in the tree REFUSES. The record does not get to say
+// a thing was retired and leave it where an agent will read it.
+
+doctrine-surface "surface.retired.create-wave" {
+    path "skills/create-wave/SKILL.md"
+    kind "skill"
+    serves "TS.260821.04"
+    state "retired"
+    retired-at "2026-08-22"
+    stands-at "v0.7.1"
+    because "a wave is an initiative document. A frame is a problem with symptoms and a root \
+        cause, and slices are cut from a storm"
+}
+
+doctrine-surface "surface.retired.create-initiative" {
+    path "skills/create-initiative/SKILL.md"
+    kind "skill"
+    serves "TS.260821.04"
+    state "retired"
+    retired-at "2026-08-22"
+    stands-at "v0.7.1"
+    because "same document under its own name — INIT.<name>.md, replaced by the frame and its \
+        discovery"
+}
+
+doctrine-surface "surface.retired.derive-waves-from-history" {
+    path "skills/derive-waves-from-history/SKILL.md"
+    kind "skill"
+    serves "TS.260821.04"
+    state "retired"
+    retired-at "2026-08-22"
+    stands-at "v0.7.1"
+    because "derives waves. There are no waves"
+}
+
+doctrine-surface "surface.retired.start-thin-slice" {
+    path "skills/start-thin-slice/SKILL.md"
+    kind "skill"
+    serves "TS.260821.04"
+    state "retired"
+    retired-at "2026-08-22"
+    stands-at "v0.7.1"
+    because "the front door of the sprint spine. The gate is pick-up-a-slice, and it refuses in \
+        writing"
+}
+
+doctrine-surface "surface.retired.create-sprint" {
+    path "skills/create-sprint/SKILL.md"
+    kind "skill"
+    serves "TS.260821.04"
+    state "retired"
+    retired-at "2026-08-22"
+    stands-at "v0.7.1"
+    because "a sprint is an immutable bridge. The commitment is the iteration, opened by the gate"
+}
+
+doctrine-surface "surface.retired.close-sprint" {
+    path "skills/close-sprint/SKILL.md"
+    kind "skill"
+    serves "TS.260821.04"
+    state "retired"
+    retired-at "2026-08-22"
+    stands-at "v0.7.1"
+    because "replaced by close-an-iteration, which refuses a silent drop rather than trusting the \
+        close"
+}
+
+doctrine-surface "surface.retired.intake-code-contribution" {
+    path "skills/intake-code-contribution/SKILL.md"
+    kind "skill"
+    serves "TS.260821.04"
+    state "retired"
+    retired-at "2026-08-22"
+    stands-at "v0.7.1"
+    because "the Phase 0 gate of a spine that no longer exists. Admission is computed by the gate"
+}
+
+doctrine-surface "surface.retired.verify-and-assemble-pr" {
+    path "skills/verify-and-assemble-pr/SKILL.md"
+    kind "skill"
+    serves "TS.260821.04"
+    state "retired"
+    retired-at "2026-08-22"
+    stands-at "v0.7.1"
+    because "Phase 6 of the same spine. What an iteration showed is what it evidenced"
+}
+
+doctrine-surface "surface.retired.create-adr" {
+    path "skills/create-adr/SKILL.md"
+    kind "skill"
+    serves "TS.260821.04"
+    state "retired"
+    retired-at "2026-08-22"
+    stands-at "v0.7.1"
+    because "replaced by record-a-decision, which binds a decision to the iteration that forced \
+        it"
+}
+
+doctrine-surface "surface.retired.create-capability-record" {
+    path "skills/create-capability-record/SKILL.md"
+    kind "skill"
+    serves "TS.260821.04"
+    state "retired"
+    retired-at "2026-08-22"
+    stands-at "v0.7.1"
+    because "a CAP.<name>.md. Capabilities are records the checker reads, cut by \
+        name-a-capability"
+}
+
+doctrine-surface "surface.retired.create-product-design-spec" {
+    path "skills/create-product-design-spec/SKILL.md"
+    kind "skill"
+    serves "TS.260821.04"
+    state "retired"
+    retired-at "2026-08-22"
+    stands-at "v0.7.1"
+    because "a spec beside an INIT. A slice declares its own scenario, steps and claims"
+}
+
+doctrine-surface "surface.retired.create-product-architecture-spec" {
+    path "skills/create-product-architecture-spec/SKILL.md"
+    kind "skill"
+    serves "TS.260821.04"
+    state "retired"
+    retired-at "2026-08-22"
+    stands-at "v0.7.1"
+    because "same, for architecture. The notional architecture is a record and carries the schema"
+}
+
+doctrine-surface "surface.retired.create-quality-spec" {
+    path "skills/create-quality-spec/SKILL.md"
+    kind "skill"
+    serves "TS.260821.04"
+    state "retired"
+    retired-at "2026-08-22"
+    stands-at "v0.7.1"
+    because "same, for quality. A claim names the evidence that settles it, at cut time"
+}
+
+doctrine-surface "surface.retired.discovery-and-ambiguity-log" {
+    path "skills/discovery-and-ambiguity-log/SKILL.md"
+    kind "skill"
+    serves "TS.260821.04"
+    state "retired"
+    retired-at "2026-08-22"
+    stands-at "v0.7.1"
+    because "Phase 1 of the Major-tier architect pipeline. Discovery is the storm, the notional \
+        architecture and the walkthrough"
+}
+
+doctrine-surface "surface.retired.author-user-docs" {
+    path "skills/author-user-docs/SKILL.md"
+    kind "skill"
+    serves "TS.260821.04"
+    state "retired"
+    retired-at "2026-08-22"
+    stands-at "v0.7.1"
+    because "replaced by document-usage, which refuses a guide for behaviour a version never \
+        shipped"
+}
+
+doctrine-surface "surface.retired.lean-delivery-guardrails" {
+    path "instructions/lean-delivery-guardrails.instructions.md"
+    kind "guardrail"
+    serves "TS.260821.04"
+    state "retired"
+    retired-at "2026-08-22"
+    stands-at "v0.7.1"
+    because "every rule in it is about waves, sprints, TS-NNN ids and qa.md. It contradicts the \
+        record it ships beside"
+}
+
+doctrine-surface "surface.retired.code-contribution-intake" {
+    path "instructions/code-contribution-intake.instructions.md"
+    kind "guardrail"
+    serves "TS.260821.04"
+    state "retired"
+    retired-at "2026-08-22"
+    stands-at "v0.7.1"
+    because "it exists to require intake-code-contribution, which is retired above"
+}
+
+doctrine-surface "surface.retired.check-sprint-disjointness" {
+    path "scripts/check-sprint-disjointness.sh"
+    kind "probe"
+    serves "TS.260821.04"
+    state "retired"
+    retired-at "2026-08-22"
+    stands-at "v0.7.1"
+    because "checks disjointness between sprints. Nothing produces a sprint"
+}
+
+doctrine-surface "surface.retired.check-sprint-id-collision" {
+    path "scripts/check-sprint-id-collision.sh"
+    kind "probe"
+    serves "TS.260821.04"
+    state "retired"
+    retired-at "2026-08-22"
+    stands-at "v0.7.1"
+    because "checks sprint id collisions. Ids are allocated by the gate, without coordination"
+}
+
+doctrine-surface "surface.retired.check-design-approval-gate" {
+    path "scripts/check-design-approval-gate.sh"
+    kind "probe"
+    serves "TS.260821.04"
+    state "retired"
+    retired-at "2026-08-22"
+    stands-at "v0.7.1"
+    because "hard-fails a Major-tier sprint whose ADR is unsigned. Approvals are a field the \
+        checker refuses on"
+}
+

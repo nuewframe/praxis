@@ -1,0 +1,137 @@
+// Opened by `praxis pick-up`. Every condition below was evaluated against the
+// tree as it stood at 2026-08-22T02:29:42Z, and the verdicts are recorded
+// rather than summarised: a gate whose reasoning is not on the record is a gate
+// you have to trust.
+
+iteration "ITER.260822.02" {
+    slug "retire-the-pre-graph-spine"
+    on-slice "TS.260821.04"
+    state "closed"
+    opened-at "2026-08-22T02:29:42Z"
+    opened-by "agent:praxis"
+
+    approval "admission" {
+        status "signed"
+        signer "human:wael"
+        at "2026-08-22T02:29:42Z"
+        signed-by "the ask to pick up this slice"
+    }
+
+    vet "create" state="done" at="2026-08-22T02:29:42Z" on-slice="TS.260821.04" {
+        condition "slice-is-shaped" verdict="passed"
+        condition "dependencies-delivered" verdict="passed"
+        condition "no-iteration-in-flight" verdict="passed"
+        condition "nothing-left-to-admit" verdict="passed"
+        condition "work-is-disjoint" verdict="not-computed" \
+            found="no seam manifest exists, so what two iterations would touch cannot be compared. Disjointness is half of what this capability says it judges, and half of what it judges is currently not computed at all"
+        condition "the-slice-is-the-best-available" verdict="left-to-the-maintainer"
+    }
+
+    // 2 of the declared conditions were not decided by the gate. They are
+    // recorded above rather than omitted: an admission that does not say what
+    // it left undecided claims more than it checked.
+
+    // Frozen at open, from the slices. Removing one from a slice now
+    // does not remove it from here — it makes the two disagree, and that is
+    // refused.
+    // C1 is NOT met, and is carried rather than quietly restated. Anchoring the remaining
+    // twenty-five to the frame would have satisfied it and made the rule worthless.
+    claim "C1" from-slice="TS.260821.04" state="unmet" carried-by="AM1"
+    claim "C2" from-slice="TS.260821.04" state="met" \
+        evidence="praxis/surfaces/SURFACES.retired.kdl — twenty retirements, each naming v0.7.1 as \
+            where the file stands, and each with an argument for why it is superseded rather than \
+            merely old. tests/doctrine_surfaces.rs::a_retired_surface_still_in_the_tree_refuses \
+            asserts the record cannot say retired and leave the file where an agent will read it"
+    claim "C3" from-slice="TS.260821.04" state="unmet" carried-by="AM1" \
+        note="the flip to refuse waits on the count reaching zero, which waits on TS.260821.05"
+    claim "C4" from-slice="TS.260821.04" state="met" \
+        evidence="tests/the_router_matches_the_binary.rs — every backticked or fenced `praxis \
+            <verb>` in the router is checked against the binary's own subcommand list, and the \
+            seven retired skill names are asserted absent. It failed on its first run, on `praxis \
+            --help`, which is how it was shown to be looking"
+
+    layer "doctrine"    state="evidenced" \
+        evidence="skills/using-praxis/SKILL.md — spine, skill index, personas, guardrails and \
+            enforcement model rewritten; twenty skills, two guardrails and three probes removed; \
+            agents/principal-engineer.agent.md's tier workflow replaced by the phase/layer model" \
+        reaches="the router is a projection of what the record holds"
+    layer "enforcement" state="evidenced" \
+        evidence="every-shipped-surface-is-anchored took 68 to 48 shipped and 23 anchored; the \
+            router test fails closed on a stale spine; 196 tests pass" \
+        reaches="re-adding the retired spine to the router fails the suite. The audit rule stays at REPORT — see AM1"
+    layer "docs"        state="evidenced" \
+        evidence="README.md gained the delivery-graph skill inventory it never had and lost twenty \
+            dead rows, the composition diagram and the quick start; docs/product.md gained both \
+            inventories" \
+        reaches="README and docs/product.md name only surfaces that exist"
+
+    phase "design-ux" state="complete" required-by="docs" \
+        produced="the router now opens on a spine of commands that exist, and says so — the first \
+            thing an arriving agent reads is checkable against the binary"
+    phase "design-system" state="complete" required-by="enforcement" \
+        produced="the retirement shape: state, retired-at, stands-at. A retirement names the tag \
+            where the file still stands, which is what licenses removing it instead of shimming it"
+    phase "implement" state="complete" required-by="enforcement · docs" \
+        produced="twenty surfaces retired and removed, the router and README rewritten, \
+            tests/the_router_matches_the_binary.rs"
+    phase "learn" state="complete" required-by="always" \
+        produced="three findings, one of which is a slice — TS.260821.05, cut mid-iteration when \
+            the count would not go to zero honestly"
+    phase "teach" state="complete" required-by="doctrine" \
+        produced="the router itself, which is this slice's doctrine artifact"
+
+    finding "AM1" state="open" size="frame-sized" carries="C1" \
+        text="the count did not reach zero and cannot yet. Twenty of the forty-five unanchored \
+            surfaces retired; the other twenty-five are Principal-Engineer doctrine the record has \
+            no vocabulary for — fourteen probes, one guardrail, three personas, seven engineering \
+            skills. There is no node for `a probe enforces an invariant`, so there is nothing for a \
+            probe to serve" \
+        obliges="TS.260821.05 — model the engineering invariant, then the probes and the guardrail \
+            anchor and the rule can flip to refuse" \
+        note="anchoring all twenty-five to FRAME.260819.01 would have satisfied C1 today and left a \
+            rule that reports nothing forever. The audit was built to catch doctrine that STOPPED \
+            corresponding to anything; its first real run found doctrine that never corresponded to \
+            anything, because the record had no words for it"
+
+    finding "AM4" state="open" size="observation" carries="C3" \
+        text="the rule stays at REPORT. Flipping every-shipped-surface-is-anchored to refuse \
+            requires the count to be zero, and AM1 is why it is not" \
+        obliges="TS.260821.05, then the flip" \
+        note="recorded separately from AM1 rather than folded into it, because they fail for one \
+            reason and would be fixed by two different edits — and a finding that carries two \
+            claims is one somebody will later satisfy halfway"
+
+    finding "AM2" state="open" size="observation" \
+        text="validate-plugin's link checker cannot tell an instruction pointing at a live file \
+            from a dated RFC citing what existed when it was written. Retiring twenty surfaces \
+            broke twelve links inside RFC.260725 and two ADRs, all of which are correct as history" \
+        note="W16 inverted. There, prose the record CITED could not be checked; here, prose that \
+            cites the past is checked as though it were instructing the present. Both are the same \
+            missing distinction — whether a document instructs or records — and nothing in this \
+            repository currently declares which a file is"
+
+    finding "AM3" state="open" size="observation" \
+        text="scripts/gen-tier-table.sh generated a tier table into three surfaces, two of which \
+            were retired here. Deleting a skill silently broke a generator and a CI step" \
+        note="the tier table was itself an anti-drift mechanism — one fact rendered into three \
+            documents so they could not disagree. It worked, and it kept three documents agreeing \
+            about a concept that had ceased to exist. Consistency is not currency"
+    closed-at "2026-08-22T03:04:45Z"
+    outcome "continue"
+
+    close {
+        claims-settled "C1" how="carried by AM1"
+        claims-settled "C2" how="met"
+        claims-settled "C3" how="carried by AM4"
+        claims-settled "C4" how="met"
+        all-met #false
+        note "the accounting above was computed at close, not asserted. It says every claim is either met or carried by a finding that names it, and nothing about whether the work is any good"
+    }
+
+    trail {
+        entry at="2026-08-22T03:04:45Z" by="agent:praxis" action="state-changed" from="open" to="closed" note="closed by `praxis close`. The accounting was computed; the conclusion is not the machine's to draw"
+
+        entry at="2026-08-22T02:29:42Z" by="agent:praxis" action="created" \
+            note="opened by the gate, on the ask of human:wael"
+    }
+}

@@ -17,9 +17,7 @@ If your harness auto-loads `AGENTS.md` (Codex, Aider, Sourcegraph Amp, and other
 
 ## Always-on guardrails
 
-- Lean delivery — [`instructions/lean-delivery-guardrails.instructions.md`](./instructions/lean-delivery-guardrails.instructions.md)
 - Capability-driven engineering — [`instructions/capability-driven-guardrails.instructions.md`](./instructions/capability-driven-guardrails.instructions.md)
-- Code contribution intake — [`instructions/code-contribution-intake.instructions.md`](./instructions/code-contribution-intake.instructions.md)
 
 ## Precedence
 
