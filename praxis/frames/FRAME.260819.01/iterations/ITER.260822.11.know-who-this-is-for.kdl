@@ -81,7 +81,8 @@ iteration "ITER.260822.11" {
     phase "learn" state="complete" required-by="always" worked-by="agent:principal-engineer" \
         produced="two findings, and one claim carried rather than met"
     phase "teach" state="complete" required-by="doctrine" worked-by="agent:principal-engineer" \
-        produced="skills/name-a-persona/SKILL.md"
+        produced="skills/name-a-persona/SKILL.md" \
+        taught="the-next-agent"
 
     finding "AV1" state="open" size="observation" \
         carries="C3" \

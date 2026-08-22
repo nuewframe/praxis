@@ -95,7 +95,9 @@ iteration "ITER.260821.05" {
             for S7"
     phase "learn" state="complete" required-by="always" produced="six findings, and the audit S1 obliged" \
         note="never skippable — it is the phase that judges the others"
-    phase "teach" state="complete" required-by="doctrine" produced="skills/attach-evidence/SKILL.md"
+    phase "teach" state="complete" required-by="doctrine" produced="skills/attach-evidence/SKILL.md" \
+        taught="the-next-agent" \
+        taught="the-next-agent"
 
     finding "U1" state="open" size="observation" \
         text="the gate's first generated record was misindented — the continuation lines of its \

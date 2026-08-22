@@ -79,7 +79,8 @@ iteration "ITER.260822.05" {
     phase "learn" state="complete" required-by="always" worked-by="agent:principal-engineer" \
         produced="two findings and an amendment to a sealed decision"
     phase "teach" state="complete" required-by="doctrine" worked-by="agent:principal-engineer" \
-        produced="the router and the engineer persona both now describe a rule that refuses"
+        produced="the router and the engineer persona both now describe a rule that refuses" \
+        taught="the-next-agent"
 
     finding "AP1" state="open" size="frame-sized" \
         text="this iteration cannot legitimately close itself. Every phase above is worked-by \

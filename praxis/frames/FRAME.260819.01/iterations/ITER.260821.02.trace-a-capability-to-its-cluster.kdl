@@ -103,7 +103,8 @@ iteration "ITER.260821.02" {
         note="never skippable — it is the phase that judges the others"
     phase "teach" state="complete" produced="skills/name-a-capability/SKILL.md" required-by="doctrine" \
         note="mandatory here because the slice sealed a doctrine layer. A slice that declares no \
-            doctrine layer may skip it with a recorded rationale"
+            doctrine layer may skip it with a recorded rationale" \
+        taught="the-next-agent"
 
     finding "R1" state="open" size="owed-work" \
         text="the pass-to-iteration rename corrupted a verb in TS.260820.02 — `the reason each \

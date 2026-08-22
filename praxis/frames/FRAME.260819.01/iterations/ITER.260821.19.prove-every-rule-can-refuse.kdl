@@ -227,7 +227,9 @@ iteration "ITER.260821.19" {
             `praxis prove`, `praxis accept`, and eleven tests"
     phase "learn" state="complete" required-by="always" produced="four findings, three of them defects the prover found in its first hour" \
         note="never skippable — it is the phase that judges the others"
-    phase "teach" state="complete" required-by="doctrine" produced="skills/witness-a-rule/SKILL.md"
+    phase "teach" state="complete" required-by="doctrine" produced="skills/witness-a-rule/SKILL.md" \
+        taught="the-next-agent" \
+        taught="the-next-agent"
 
     finding "AJ1" state="open" size="frame-sized" \
         text="the engine was enforcing five rules the record never named. Writing Refusal::rule — \

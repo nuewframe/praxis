@@ -92,7 +92,9 @@ iteration "ITER.260821.01" {
     phase "design-system" state="complete" produced="severity split — refuse versus report — and `holds` to separate a contained entity from a value"
     phase "implement"     state="complete" produced="root and contained kind checking, optional cardinalities, and the vocabulary the record itself named"
     phase "learn"         state="complete" produced="five findings, four of which changed the record or the engine while the iteration was open"
-    phase "teach"         state="complete" produced="skills/declare-an-entity-kind/SKILL.md"
+    phase "teach"         state="complete" produced="skills/declare-an-entity-kind/SKILL.md" \
+        taught="the-next-agent" \
+        taught="the-next-agent"
 
     finding "Q1" state="open" size="owed-work" \
         text="the record told us its own vocabulary. Turning the rule on produced 254 refusals, and \

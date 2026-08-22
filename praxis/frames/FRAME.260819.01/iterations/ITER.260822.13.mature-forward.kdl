@@ -73,7 +73,8 @@ iteration "ITER.260822.13" {
     phase "learn" state="complete" required-by="always" worked-by="agent:principal-engineer" \
         produced="AY1, caught by writing a test that passed"
     phase "teach" state="complete" required-by="doctrine" worked-by="agent:principal-engineer" \
-        produced="skills/mature-a-value/SKILL.md"
+        produced="skills/mature-a-value/SKILL.md" \
+        taught="the-next-agent"
 
     finding "AY1" state="open" size="observation" \
         text="the first implementation refused every superseded maturation in a chain, and the \

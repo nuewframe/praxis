@@ -78,7 +78,8 @@ iteration "ITER.260822.02" {
         produced="three findings, one of which is a slice — TS.260821.05, cut mid-iteration when \
             the count would not go to zero honestly"
     phase "teach" state="complete" required-by="doctrine" \
-        produced="the router itself, which is this slice's doctrine artifact"
+        produced="the router itself, which is this slice's doctrine artifact" \
+        taught="the-next-agent"
 
     finding "AM1" state="open" size="frame-sized" carries="C1" \
         text="the count did not reach zero and cannot yet. Twenty of the forty-five unanchored \

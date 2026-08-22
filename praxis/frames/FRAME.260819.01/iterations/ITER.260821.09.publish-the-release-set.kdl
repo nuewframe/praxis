@@ -111,7 +111,9 @@ iteration "ITER.260821.09" {
             `praxis publish`, the containment check at cut, and eleven tests"
     phase "learn" state="complete" required-by="always" produced="five findings, one of them a contradiction between two slices" \
         note="never skippable — it is the phase that judges the others"
-    phase "teach" state="complete" required-by="doctrine" produced="skills/publish-the-release-set/SKILL.md"
+    phase "teach" state="complete" required-by="doctrine" produced="skills/publish-the-release-set/SKILL.md" \
+        taught="the-next-agent" \
+        taught="the-next-agent"
 
     finding "Y1" state="open" size="frame-sized" \
         text="TS.260820.10 and TS.260820.09 contradicted each other and both were cut from the same \

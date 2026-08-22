@@ -75,7 +75,8 @@ iteration "ITER.260822.01" {
         produced="four findings — two defects the record caught in this iteration's first hour, one \
             widening that had to be argued rather than made, and one honest count"
     phase "teach" state="complete" required-by="doctrine" \
-        produced="skills/anchor-a-doctrine-surface/SKILL.md"
+        produced="skills/anchor-a-doctrine-surface/SKILL.md" \
+        taught="the-next-agent"
 
     finding "AL1" state="open" size="frame-sized" \
         text="`praxis pick-up` over two slices wrote a refusal naming one thin-slice called \

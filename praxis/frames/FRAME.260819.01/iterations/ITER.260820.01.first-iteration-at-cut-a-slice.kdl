@@ -142,7 +142,8 @@ iteration "ITER.260820.01" {
             claims-with-evidence, and teaches that a refusable command names its refusal too" \
         note="it deliberately does NOT restate the field list. Doctrine that duplicates a fact the \
             graph owns becomes a second writer for it, so the skill points at `praxis check` and \
-            says the answer is the checker's, not the document's"
+            says the answer is the checker's, not the document's" \
+        taught="the-next-agent"
 
     phase "learn" state="complete" \
         produced="nine findings. Four changed the record while the iteration was open — the missing \

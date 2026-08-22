@@ -78,7 +78,8 @@ iteration "ITER.260822.10" {
     phase "learn" state="complete" required-by="always" worked-by="agent:principal-engineer" \
         produced="AS9 and AT1 — two more declarations that nothing read"
     phase "teach" state="complete" required-by="doctrine" worked-by="agent:principal-engineer" \
-        produced="the withdrawn release node explains itself"
+        produced="the withdrawn release node explains itself" \
+        taught="the-next-agent"
 
     finding "AT1" state="open" size="frame-sized" \
         text="`states=` on an entity was declared and never read. `undeclared-state` works off the \

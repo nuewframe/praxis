@@ -75,6 +75,11 @@ pub enum Refusal {
     ValueWithNoJudge { slice: String },
     /// A field disagreeing with the latest `matured` entry recorded for it.
     ContradictedMaturation { field: String, matured_to: String, holds: String },
+    /// An implement phase marked complete against a design-system that produced an approach
+    /// it does not name.
+    ImplementWithoutApproach { iteration: String, approaches: usize },
+    /// A teach phase that names no reader.
+    TaughtNobody { iteration: String },
     /// A symptom resolved by a release the record does not hold.
     ResolvedByNothing { symptom: String, version: String },
     /// A symptom resolved by a release that bound no slice attacking it.
@@ -146,6 +151,8 @@ impl Refusal {
             Self::NobodyItIsFor => "a-record-names-somebody-it-is-for",
             Self::ValueWithNoJudge { .. } => "a-claim-of-value-names-whose",
             Self::ContradictedMaturation { .. } => "a-value-agrees-with-its-maturation",
+            Self::ImplementWithoutApproach { .. } => "implement-follows-an-approach",
+            Self::TaughtNobody { .. } => "teach-reaches-an-end-user",
         }
     }
 
@@ -179,6 +186,8 @@ impl Refusal {
             Self::NobodyItIsFor => "persona",
             Self::ValueWithNoJudge { .. } => "useful-to",
             Self::ContradictedMaturation { field, .. } => field,
+            Self::ImplementWithoutApproach { .. } => "followed",
+            Self::TaughtNobody { .. } => "produced",
             Self::UnjustifiedLifetime { missing, .. } => missing,
         }
     }
@@ -200,6 +209,9 @@ impl Refusal {
             // on the day it lands is one nobody adopts. It flips when the count is zero, the
             // way every enforcement in this frame has had to earn its severity.
             | Self::ValueWithNoJudge { .. }
+            // Reported: every teach phase in this record names a skill today, and a rule
+            // failing closed on arrival names fourteen. Flips when the count is zero.
+            | Self::TaughtNobody { .. }
             | Self::UnevidencedLayer { .. } => Severity::Report,
             _ => Severity::Refuse,
         }
@@ -281,6 +293,17 @@ impl Refusal {
             Self::UnkeptInvariant { invariant, protects } => format!(
                 "`{invariant}` is enabled and nothing enforces it — the plugin guarantees that \
                  {protects}, and no shipped surface keeps it"
+            ),
+            Self::ImplementWithoutApproach { iteration, approaches } => format!(
+                "{iteration} implemented without naming which of its {approaches} approach(es) it \
+                 followed. Deriving the better approach is what design-system is FOR, and an \
+                 implement that does not point at one built something the plan did not describe"
+            ),
+            Self::TaughtNobody { iteration } => format!(
+                "{iteration}'s teach phase names no reader. Say who it taught with `taught`: a \
+                 skill teaches an AGENT and is the doctrine layer, while a version's docs teach \
+                 the reader of a release. Counting one artifact as both is what hid the \
+                 difference for fourteen iterations"
             ),
             Self::ContradictedMaturation { field, matured_to, holds } => format!(
                 "`{field}` matured to {matured_to:?} and the record holds {holds:?}. One of the \
@@ -589,18 +612,27 @@ fn body(node: &KdlNode) -> Option<&KdlDocument> {
     node.children()
 }
 
+/// How many times a field appears — as a child node, or as a property.
+///
+/// A kind whose values are carried as properties was unshapeable until `TS.260821.19`, and
+/// `phase` was declared "deliberately shapeless" for exactly that reason. It was not a
+/// choice about phases; it was the schema having no way to describe them.
 fn count_of(node: &KdlNode, field: &str) -> usize {
-    body(node).map_or(0, |b| {
+    let children = body(node).map_or(0, |b| {
         b.nodes().iter().filter(|n| n.name().value() == field).count()
-    })
+    });
+    if children > 0 {
+        return children;
+    }
+    usize::from(node.get(field).is_some())
 }
 
+/// A field's single value, from a child node or from a property.
 fn child_arg(node: &KdlNode, field: &str) -> Option<String> {
-    body(node)?
-        .nodes()
-        .iter()
-        .find(|n| n.name().value() == field)
+    body(node)
+        .and_then(|b| b.nodes().iter().find(|n| n.name().value() == field))
         .and_then(string_arg)
+        .or_else(|| prop(node, field))
 }
 
 fn field_span(node: &KdlNode, field: &str) -> Option<SourceSpan> {
@@ -875,6 +907,58 @@ pub fn check_corpus_given(
     out.extend(check_surfaces(docs, schema, facts));
     out.extend(check_invariants(docs, schema));
     out.extend(check_binding(docs));
+    // `TS.260821.19`. What each phase produced, and whether the next one read it.
+    if schema.entity("approach").is_some() {
+        for doc in docs {
+            for node in doc.nodes().iter().filter(|n| n.name().value() == "iteration") {
+                let id = string_arg(node).unwrap_or_default();
+                let phases: Vec<&KdlNode> = children_named(node, "phase");
+                let complete = |kind: &str| -> Option<&KdlNode> {
+                    phases.iter().copied().find(|p| {
+                        string_arg(p).as_deref() == Some(kind)
+                            && child_arg(p, "state").as_deref() == Some("complete")
+                    })
+                };
+
+                // An implement that did not read its own plan.
+                let approaches = complete("design-system")
+                    .map(|p| children_named(p, "approach").len())
+                    .unwrap_or_default();
+                if approaches > 0
+                    && let Some(implement) = complete("implement")
+                    && children_named(implement, "followed").is_empty()
+                    && prop(implement, "followed").is_none()
+                {
+                    out.push(Violation {
+                        entity_kind: "phase".to_owned(),
+                        entity_id: Some(id.clone()),
+                        refusal: Refusal::ImplementWithoutApproach {
+                            iteration: id.clone(),
+                            approaches,
+                        },
+                        span: implement.span(),
+                    });
+                }
+
+                // A teach phase that does not say who it taught. Naming the reader rather
+                // than sniffing the path: `produced="skills/…"` was a heuristic on a string,
+                // and it would have called a correct teach phase wrong the moment somebody
+                // wrote a guide under a different directory.
+                if let Some(teach) = complete("teach")
+                    && children_named(teach, "taught").is_empty()
+                    && prop(teach, "taught").is_none()
+                {
+                    out.push(Violation {
+                        entity_kind: "phase".to_owned(),
+                        entity_id: Some(id.clone()),
+                        refusal: Refusal::TaughtNobody { iteration: id },
+                        span: teach.span(),
+                    });
+                }
+            }
+        }
+    }
+
     // A value that disagrees with its own maturation. Checked from the record alone: the
     // prior value is carried, so no comparison against git is needed — and reaching outside
     // the record for it would make this rule depend on the least durable thing there is.

@@ -105,7 +105,9 @@ iteration "ITER.260821.08" {
             derived from the symptoms that name it, and ten tests"
     phase "learn" state="complete" required-by="always" produced="four findings, one correcting an earlier finding's method" \
         note="never skippable — it is the phase that judges the others"
-    phase "teach" state="complete" required-by="doctrine" produced="skills/cut-the-version/SKILL.md"
+    phase "teach" state="complete" required-by="doctrine" produced="skills/cut-the-version/SKILL.md" \
+        taught="the-next-agent" \
+        taught="the-next-agent"
 
     finding "X1" state="open" size="owed-work" carries="C3" \
         text="C3's second half — that the recorded commit CONTAINS the release's published directory \

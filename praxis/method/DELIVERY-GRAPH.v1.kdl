@@ -368,13 +368,45 @@ method "delivery-graph" {
         entity "phase" is="one stage of work inside an iteration — WHEN in the attempt, as a layer is WHERE in the stack" \
             states="pending active complete skipped" \
             owned-by="the iteration" \
-            kinds="design-ux · design-system · implement · learn · teach" \
             note="undeclared until ITER.260820.01/P8. It survived the withdrawal of ADR.260819.02, \
                 where it was a first-class node, and nothing carried it forward — so the first \
                 iteration went from admission straight to implement with no phase recorded" \
-            shape="carried entirely as properties — the node's own argument IS the kind. Declaring \
-                child fields for it would be wrong, so it is deliberately shapeless and reported \
-                as such. Property shapes are a separate cut (TS.260821.01 excludes them by name)"
+            note="shapeless until TS.260821.19, with its kinds carried as a PROSE STRING. So every \
+                phase in this frame was a `produced=` sentence written at close by whoever did the \
+                work, and every design-system among them is a past-tense summary of what was built" {
+            field "state"     each="1" one-of="pending" "active" "complete" "skipped"
+            field "approach"  each="0..n" holds="approach" \
+                because="what design-system PRODUCES. The phase exists to derive a better \
+                    approach, and it can only do that before the code exists — written afterwards \
+                    it is a description, and a description cannot be argued with while there is \
+                    still time to change what gets built"
+            field "taught"    each="0..n" references="persona" \
+                because="who the teach phase reached. A skill teaches an AGENT and is the doctrine \
+                    layer; a version's docs teach the reader of a release. Every iteration in this \
+                    frame named one skill under both, which is how the difference stayed invisible"
+            field "followed"  each="0..n" \
+                because="which approach implement built. An implement naming none against a \
+                    design-system that produced one is a phase that did not read its own plan"
+            field "produced"  each="0..1"
+            field "required-by" each="0..1"
+            field "worked-by" each="0..1"
+            field "skipped-because" each="0..1"
+            field "note"      each="0..n"
+            field "matured"   each="0..n" holds="matured" \
+                because="an approach that turns out wrong mid-iteration is matured, never edited. \
+                    Discovering the design was wrong while building is the normal case, and a rule \
+                    that punished it would teach people to write the approach at close"
+        }
+
+        entity "approach" is="what will be built, and what it was chosen over" \
+            owned-by="the design-system phase" \
+            note="declared by TS.260821.19. The alternative is the half that proves a choice was \
+                made — an approach with nothing rejected is a description of the only thing \
+                anybody thought of" {
+            field "over"    each="1..n" because="what it was chosen over. Without one this is not a decision, it is the first idea"
+            field "because" each="1" because="why this one. `it is better` is not a reason and improvement is not self-evident"
+            field "note"    each="0..n"
+        }
 
         entity "event-storm" is="one sweep of a domain's timeline — the evidence a capability is derived FROM" \
             note="declared with fields so `read-model` stops being indistinguishable from a field" {
@@ -761,6 +793,49 @@ method "delivery-graph" {
             note="one primary persona is enough. The rest emerge from the work and cite what \
                 surfaced them, so this reports the ABSENCE of any and never the absence of many — \
                 enumerating personas upfront is a week spent on people nobody has met"
+
+        rule "implement-follows-an-approach"          refuses="an implement phase complete against a design-system that produced an approach it does not name" \
+            because="deriving the better approach is what design-system is FOR, and an implement \
+                that points at none built something the plan did not describe. Every design-system \
+                in this frame was a past-tense summary written at close by whoever did the work — \
+                including one that was wrong in exactly the way a design phase exists to catch" \
+            found-by="the maintainer, on ADR.260819.02's phase list" \
+            witness=#"""
+                iteration "ITER.witness" {
+                    slug "built-without-reading-the-plan"
+                    on-slice "TS.260821.19"
+                    state "closed"
+                    phase "design-system" state="complete" {
+                        approach "one way" {
+                            over "another way"
+                            because "it is better"
+                        }
+                    }
+                    phase "implement" state="complete"
+                    trail {
+                        entry at="2026-08-22T00:00:00Z" by="human:witness" action="created"
+                    }
+                }
+                """#
+
+        rule "teach-reaches-an-end-user"              reports="a teach phase that names no reader" \
+            because="a skill teaches an AGENT and is the doctrine layer; a version's docs teach \
+                the reader of a release. Every iteration in this frame named one skill under both, \
+                which is how the difference stayed invisible for thirty-three of them" \
+            witness=#"""
+                iteration "ITER.witness-taught" {
+                    slug "taught-nobody-in-particular"
+                    on-slice "TS.260821.19"
+                    state "closed"
+                    phase "teach" state="complete" produced="a skill"
+                    trail {
+                        entry at="2026-08-22T00:00:00Z" by="human:witness" action="created"
+                    }
+                }
+                """# \
+            note="reported, and it names the READER rather than sniffing the path. `produced` \
+                containing `skills/` was a heuristic on a string, and it would have called a \
+                correct teach phase wrong the moment somebody wrote a guide somewhere else"
 
         rule "a-value-agrees-with-its-maturation"     refuses="a record whose field disagrees with the latest `matured` entry for it" \
             because="a maturation says a value became X. If the record holds Y, one of the two is \

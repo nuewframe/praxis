@@ -101,7 +101,9 @@ iteration "ITER.260821.16" {
             all five capabilities, and eight tests"
     phase "learn" state="complete" required-by="always" produced="three findings" \
         note="never skippable — it is the phase that judges the others"
-    phase "teach" state="complete" required-by="doctrine" produced="skills/document-usage/SKILL.md"
+    phase "teach" state="complete" required-by="doctrine" produced="skills/document-usage/SKILL.md" \
+        taught="the-next-agent" \
+        taught="the-next-agent"
 
     finding "AF1" state="open" size="answered" \
         text="AD2 is cleared. All four declared publishable views now compose, and \

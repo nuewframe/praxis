@@ -101,7 +101,9 @@ iteration "ITER.260821.07" {
             `contributes` field, and ten tests"
     phase "learn" state="complete" required-by="always" produced="five findings, one of them a gap in the record's own vocabulary" \
         note="never skippable — it is the phase that judges the others"
-    phase "teach" state="complete" required-by="doctrine" produced="skills/bind-work-to-a-version/SKILL.md"
+    phase "teach" state="complete" required-by="doctrine" produced="skills/bind-work-to-a-version/SKILL.md" \
+        taught="the-next-agent" \
+        taught="the-next-agent"
 
     finding "W1" state="open" size="owed-work" \
         text="the engine wrote a record the record refuses. `bind`'s refusal carries `on-version`, \

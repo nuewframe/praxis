@@ -77,7 +77,8 @@ iteration "ITER.260822.06" {
     phase "learn" state="complete" required-by="always" worked-by="agent:principal-engineer" \
         produced="two findings, one of them about the test harness itself"
     phase "teach" state="complete" required-by="doctrine" worked-by="agent:principal-engineer" \
-        produced="skills/close-an-iteration/SKILL.md, rewritten around who attests"
+        produced="skills/close-an-iteration/SKILL.md, rewritten around who attests" \
+        taught="the-next-agent"
 
     finding "AQ1" state="open" size="frame-sized" \
         text="four test files had `attested_by: None, attested_by: None` — a duplicated struct \

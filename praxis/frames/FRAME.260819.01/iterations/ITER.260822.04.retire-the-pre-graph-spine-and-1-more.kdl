@@ -109,7 +109,8 @@ iteration "ITER.260822.04" {
     phase "learn" state="complete" required-by="always" \
         produced="two findings and one decision"
     phase "teach" state="complete" required-by="doctrine" \
-        produced="the published document is itself the teaching artifact for this slice"
+        produced="the published document is itself the teaching artifact for this slice" \
+        taught="the-next-agent"
 
     decision "what a persona serves" \
         chose="anchor the three personas to FRAME.260819.01, the weakest anchor in the vocabulary" \

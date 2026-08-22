@@ -99,7 +99,8 @@ iteration "ITER.260822.03" {
     phase "learn" state="complete" required-by="always" \
         produced="four findings, two of them things the retirement sweep had missed"
     phase "teach" state="complete" required-by="doctrine" \
-        produced="skills/declare-an-invariant/SKILL.md"
+        produced="skills/declare-an-invariant/SKILL.md" \
+        taught="the-next-agent"
 
     finding "AN1" state="open" size="observation" \
         text="check-contract-freshness.sh should have been retired by TS.260821.04 and was not. Its \

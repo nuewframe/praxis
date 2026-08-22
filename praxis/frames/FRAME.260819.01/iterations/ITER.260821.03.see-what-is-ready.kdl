@@ -133,7 +133,8 @@ iteration "ITER.260821.03" {
     phase "teach" state="complete" required-by="doctrine" \
         produced="skills/see-what-is-ready/SKILL.md, whose longest section is how to read a SHORT \
             ready set — because the first real answer produced one, and the instinct it invites is \
-            to weaken a condition"
+            to weaken a condition" \
+        taught="the-next-agent"
 
     finding "S1" state="open" size="owed-work" carries="C1" \
         text="C1 cannot be settled by the slice that owns it. It asks for a property test against \

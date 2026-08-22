@@ -110,7 +110,9 @@ iteration "ITER.260821.15" {
             edge, and nine tests"
     phase "learn" state="complete" required-by="always" produced="three findings" \
         note="never skippable — it is the phase that judges the others"
-    phase "teach" state="complete" required-by="doctrine" produced="skills/record-a-decision/SKILL.md"
+    phase "teach" state="complete" required-by="doctrine" produced="skills/record-a-decision/SKILL.md" \
+        taught="the-next-agent" \
+        taught="the-next-agent"
 
     finding "AE1" state="open" size="frame-sized" \
         text="the rule refused every decision the frame had ever recorded — six, across four \

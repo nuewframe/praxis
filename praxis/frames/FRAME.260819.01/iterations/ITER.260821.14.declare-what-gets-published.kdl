@@ -96,7 +96,9 @@ iteration "ITER.260821.14" {
             in praxis-core::publish, and nine tests"
     phase "learn" state="complete" required-by="always" produced="three findings, one of them about a decision the engine had quietly taken" \
         note="never skippable — it is the phase that judges the others"
-    phase "teach" state="complete" required-by="doctrine" produced="skills/declare-a-lifetime/SKILL.md"
+    phase "teach" state="complete" required-by="doctrine" produced="skills/declare-a-lifetime/SKILL.md" \
+        taught="the-next-agent" \
+        taught="the-next-agent"
 
     finding "AD1" state="open" size="frame-sized" \
         text="the record had been carrying the right answer the whole time and nothing read it. \

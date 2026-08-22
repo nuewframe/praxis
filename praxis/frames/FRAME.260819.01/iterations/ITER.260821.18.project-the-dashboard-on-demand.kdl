@@ -98,7 +98,9 @@ iteration "ITER.260821.18" {
         produced="praxis-core::dashboard, render_composed, `praxis dashboard`, and nine tests"
     phase "learn" state="complete" required-by="always" produced="three findings, one of them about the frame rather than the slice" \
         note="never skippable — it is the phase that judges the others"
-    phase "teach" state="complete" required-by="doctrine" produced="skills/see-the-dashboard/SKILL.md"
+    phase "teach" state="complete" required-by="doctrine" produced="skills/see-the-dashboard/SKILL.md" \
+        taught="the-next-agent" \
+        taught="the-next-agent"
 
     finding "AH1" state="open" size="observation" \
         text="the E10 falsifier is finished and did not fire. Five views, three renderers — terminal, \

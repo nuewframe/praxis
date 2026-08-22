@@ -82,7 +82,8 @@ iteration "ITER.260822.07" {
     phase "learn" state="complete" required-by="always" worked-by="agent:principal-engineer" \
         produced="three findings, two of them from the maintainer reading the work as it landed"
     phase "teach" state="complete" required-by="doctrine" worked-by="agent:principal-engineer" \
-        produced="skills/adopt-the-method/SKILL.md"
+        produced="skills/adopt-the-method/SKILL.md" \
+        taught="the-next-agent"
 
     finding "AR1" state="open" size="frame-sized" \
         text="nothing pulls the binary. The plugin ships to six harnesses as a Markdown and \

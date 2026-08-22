@@ -76,7 +76,8 @@ iteration "ITER.260822.08" {
     phase "learn" state="complete" required-by="always" worked-by="agent:principal-engineer" \
         produced="AW1 — an exclusion that produced a wrong-looking answer rather than a refusal"
     phase "teach" state="complete" required-by="doctrine" worked-by="agent:principal-engineer" \
-        produced="skills/ask-the-record/SKILL.md"
+        produced="skills/ask-the-record/SKILL.md" \
+        taught="the-next-agent"
 
     finding "AW1" state="open" size="observation" \
         text="the slice excluded nested entities by name, and the exclusion produced `0` — \

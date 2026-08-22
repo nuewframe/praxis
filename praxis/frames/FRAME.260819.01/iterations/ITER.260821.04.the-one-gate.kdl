@@ -131,7 +131,9 @@ iteration "ITER.260821.04" {
         produced="praxis-core::pickup, `praxis pick-up`, the `refusal` kind, and ten tests"
     phase "learn" state="complete" required-by="always" produced="five findings" \
         note="never skippable — it is the phase that judges the others"
-    phase "teach" state="complete" required-by="doctrine" produced="skills/pick-up-a-slice/SKILL.md"
+    phase "teach" state="complete" required-by="doctrine" produced="skills/pick-up-a-slice/SKILL.md" \
+        taught="the-next-agent" \
+        taught="the-next-agent"
 
     finding "T1" state="open" size="owed-work" \
         text="the gate wrote a correct record to the wrong place — praxis/iterations/ rather than \

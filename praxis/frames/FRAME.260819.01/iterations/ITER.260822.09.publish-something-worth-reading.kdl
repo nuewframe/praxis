@@ -83,7 +83,8 @@ iteration "ITER.260822.09" {
     phase "learn" state="complete" required-by="always" worked-by="agent:principal-engineer" \
         produced="AS8 — a guide that could never have had content, and five tests asserting it"
     phase "teach" state="complete" required-by="doctrine" worked-by="agent:principal-engineer" \
-        produced="the published document is the teaching artifact for this slice"
+        produced="the published document is the teaching artifact for this slice" \
+        taught="the-next-agent"
 
     finding "AU1" state="open" size="observation" \
         text="the readable set cannot land in 0.8.0 as first cut. Archival immutability froze the \

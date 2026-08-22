@@ -116,7 +116,9 @@ iteration "ITER.260821.10" {
             and four end-to-end tests against a real repository"
     phase "learn" state="complete" required-by="always" produced="four findings, one of them a contradiction between the config and a slice" \
         note="never skippable — it is the phase that judges the others"
-    phase "teach" state="complete" required-by="doctrine" produced="skills/verify-the-published-tree/SKILL.md"
+    phase "teach" state="complete" required-by="doctrine" produced="skills/verify-the-published-tree/SKILL.md" \
+        taught="the-next-agent" \
+        taught="the-next-agent"
 
     finding "Z1" state="open" size="answered" \
         text="P1 is answered. It has said since the graph was seeded that no slice reaches all four \

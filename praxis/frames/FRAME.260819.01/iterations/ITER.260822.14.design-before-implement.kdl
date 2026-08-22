@@ -1,0 +1,200 @@
+// Opened by `praxis pick-up`. Every condition below was evaluated against the
+// tree as it stood at 2026-08-22T22:53:29Z, and the verdicts are recorded
+// rather than summarised: a gate whose reasoning is not on the record is a gate
+// you have to trust.
+
+iteration "ITER.260822.14" {
+    slug "design-before-implement"
+    on-slice "TS.260821.19"
+    state "closed"
+    opened-at "2026-08-22T22:53:29Z"
+    opened-by "agent:praxis"
+
+    approval "admission" {
+        status "signed"
+        signer "human:wael"
+        at "2026-08-22T22:53:29Z"
+        signed-by "the ask to pick up this slice"
+    }
+
+    vet "create" state="done" at="2026-08-22T22:53:29Z" on-slice="TS.260821.19" {
+        condition "slice-is-shaped" verdict="passed"
+        condition "dependencies-delivered" verdict="passed"
+        condition "no-iteration-in-flight" verdict="passed"
+        condition "nothing-left-to-admit" verdict="passed"
+        condition "work-is-disjoint" verdict="not-computed" \
+            found="no seam manifest exists, so what two iterations would touch cannot be compared. Disjointness is half of what this capability says it judges, and half of what it judges is currently not computed at all"
+        condition "the-slice-is-the-best-available" verdict="left-to-the-maintainer"
+    }
+
+    // 2 of the declared conditions were not decided by the gate. They are
+    // recorded above rather than omitted: an admission that does not say what
+    // it left undecided claims more than it checked.
+
+    // Frozen at open, from the slices. Removing one from a slice now
+    // does not remove it from here — it makes the two disagree, and that is
+    // refused.
+    claim "C1" from-slice="TS.260821.19" state="met" \
+        evidence="tests/phases.rs::an_approach_with_no_alternative_is_refused — `over` is required, \
+            because an approach with nothing rejected is a description of the only thing anybody \
+            thought of"
+    claim "C2" from-slice="TS.260821.19" state="met" \
+        evidence="tests/phases.rs::implementing_without_naming_the_approach_is_refused. \
+            implement-follows-an-approach refuses and is witnessed. The test also asserts a \
+            design-system that produced NO approach forces nothing — this refuses building against \
+            no plan, never building without permission"
+    claim "C3" from-slice="TS.260821.19" state="met" \
+        evidence="this iteration itself. The approach was recorded before any code, and a fourth \
+            approach was discovered while implementing when shaping `phase` refused a hundred and \
+            sixty-six existing ones. It is on the record as a `matured` entry rather than edited \
+            into the plan, so what was planned and what was learned stay distinguishable"
+    claim "C4" from-slice="TS.260821.19" state="met" \
+        evidence="tests/phases.rs::a_teach_phase_that_names_no_reader_is_reported. \
+            teach-reaches-an-end-user reports and is witnessed; thirty-three historical teach \
+            phases were back-filled with `taught=\"the-next-agent\"`, which is what they actually \
+            did, so the rule landed on zero"
+    claim "C5" from-slice="TS.260821.19" state="met" \
+        evidence="tests/phases.rs::a_phase_is_shaped_whether_its_fields_are_nodes_or_properties. \
+            `phase` has a shape and its states are a checked vocabulary rather than a prose string"
+
+    layer "doctrine"    state="evidenced" \
+        evidence="skills/plan-before-building/SKILL.md, anchored and registered. 54 of 54 anchored" \
+        reaches="the phases say what each must produce, and teach says for whom"
+    layer "enforcement" state="evidenced" \
+        evidence="implement-follows-an-approach refuses; teach-reaches-an-end-user reports; both \
+            witnessed. 26 of 54 rules witnessed, and praxis check is clean at zero reports" \
+        reaches="implement complete with no approach is refused"
+    layer "docs"        state="evidenced" \
+        evidence="`praxis ask iteration --show phase` answers what was planned per iteration, and \
+            this iteration's own approach block is the worked example" \
+        reaches="`what did they consider, and why this` is answerable per iteration"
+
+    phase "design-ux" state="complete" required-by="docs" worked-by="agent:principal-engineer" \
+        produced="the refusal names the PHASE and what it should point at, not the rule"
+    phase "implement" state="complete" required-by="enforcement · docs" \
+        worked-by="agent:principal-engineer" \
+        followed="the phase carries its own approach, and implement points at it" \
+        followed="four rules, and the fourth reports rather than refuses" \
+        followed="the schema describes a field whether it is a child node or a property" \
+        followed="an approach is matured, never overwritten" \
+        produced="the phase and approach kinds, the two rules with witnesses, property-aware \
+            field reading, and thirty-three back-filled teach phases"
+    phase "learn" state="complete" required-by="always" worked-by="agent:principal-engineer" \
+        produced="AZ1 and AZ2 — one about what the shape exposed, one about what it still cannot see"
+    phase "teach" state="complete" required-by="doctrine" worked-by="agent:principal-engineer" \
+        taught="the-next-agent" \
+        produced="skills/plan-before-building/SKILL.md" \
+        note="taught an AGENT and says so. The reader of a release gets nothing from this slice, \
+            which is now visible rather than hidden behind a skill counted twice"
+
+    finding "AZ1" state="open" size="frame-sized" \
+        text="`phase` was called `deliberately shapeless` and it was not a choice — the schema \
+            could only describe child nodes, and phases carry their values as PROPERTIES. \
+            Declaring a shape refused a hundred and sixty-six of them until the checker learned to \
+            read a property as a field" \
+        obliges="`condition`, `vet` and `entry` are carried as properties too and are shapeable \
+            now. None is shaped; each is a separate decision" \
+        note="the sixth declaration this session that read to nothing, after states=, when-state, \
+            needed-by, the audit exclude list and the phase `kinds=` string. The pattern has a \
+            shape: a limitation gets written down as an intention, and `deliberately shapeless` \
+            is what that sounds like a year later"
+
+    finding "AZ2" state="open" size="observation" \
+        text="nothing checks that the approach was recorded BEFORE the code. A phase written at \
+            close with an `over` clause satisfies every rule this slice adds" \
+        note="the honest limit, and it is the same shape as AY2: order in time is not something a \
+            snapshot holds, and the obvious source is git, which is outside the record. What this \
+            buys is that the choice and its alternatives are legible at all — a summary written at \
+            close that names what it was chosen over is already better than the fourteen that \
+            named nothing"
+
+    // Written BEFORE any code, which is the whole subject of the slice. If this iteration
+    // records its approach at close like every other one in this frame, it has demonstrated
+    // the defect rather than fixed it.
+    phase "design-system" state="complete" worked-by="agent:principal-engineer" {
+        matured "approach" {
+            from "three approaches, recorded before any code existed"
+            to "four — the fourth discovered while implementing, when declaring a shape for `phase` refused a hundred and sixty-six existing phases"
+            at "2026-08-22"
+            because "the plan did not decide whether a field is a child node or a property, and \
+                the answer only appeared when the shape was applied to a record that already had \
+                phases in it. Recorded as a maturation so the plan and the discovery stay \
+                distinguishable — which is what this iteration is about"
+            taught-by "ITER.260822.14"
+        }
+
+        approach "the phase carries its own approach, and implement points at it" {
+            over "a design document per slice, under docs/ or beside the record"
+            over "an approval gate between design and implement"
+            over "making design-system mandatory on every slice"
+            over "a free-text `plan` field with nothing checked about it"
+            because "the approach belongs where the claims it will settle already are. Thirty-four \
+                slices already carry a scenario and steps in exactly this shape, so the record \
+                needs a place for the CHOICE rather than a new document to hold it. A separate \
+                file is a second thing to keep in step, and this frame has spent the day finding \
+                what happens to second copies"
+            note "the approval gate was the tempting one and it is a different rule. The same \
+                agent may design and build; what is refused is implementing with no approach \
+                recorded. Who may ATTEST is TS.260821.08 and it already refuses"
+            note "mandatory-on-every-slice was rejected because skipped-phase-without-rationale \
+                already exists for the skip, and is unwitnessed. A slice whose layers do not need \
+                a design phase skips it with a reason"
+        }
+
+        approach "four rules, and the fourth reports rather than refuses" {
+            over "one rule doing all four checks"
+            over "refusing a teach phase that names only a skill"
+            because "an undeclared phase kind, an approach with no alternative, and an implement \
+                with no approach are all shape violations and fail closed. Whether a teach phase \
+                served an END USER is a judgement about a document, and every iteration in this \
+                record would fail it today — a rule that names all fourteen on arrival is one \
+                nobody adopts, which this frame has now learned twice"
+            note "the order is the same one TS.260821.04 and a-claim-of-value-names-whose had to \
+                use: report, take the count to zero, then flip"
+        }
+
+        approach "the schema describes a field whether it is a child node or a property" {
+            over "rewriting a hundred and sixty-six existing phases into child nodes"
+            over "leaving `phase` shapeless and checking its kinds some other way"
+            because "declaring a shape for `phase` refused every phase in the record, because they \
+                are written as PROPERTIES and the schema could only describe child nodes. That is \
+                why `phase` was called `deliberately shapeless` — it was not a choice about \
+                phases, it was the schema having no way to describe them. Reading a property as a \
+                field removes the escape hatch entirely, and no existing record had to change"
+            note "this approach was not in the plan above. It was discovered while implementing, \
+                which is C3's case — matured onto the record rather than edited into the original, \
+                so what was planned and what was learned stay distinguishable"
+            note "the wider consequence is that `condition`, `vet` and `entry` are also carried as \
+                properties and are also shapeable now. None is shaped yet, and each is a separate \
+                decision"
+        }
+
+        approach "an approach is matured, never overwritten" {
+            over "letting an approach be edited in place while the iteration is open"
+            because "discovering the design was wrong while building is the normal case and must \
+                stay cheap. TS.260821.18 shipped the shape for exactly this, and a rule that \
+                punished a mid-flight correction would teach people to write the approach at close \
+                — which is the behaviour being fixed"
+        }
+    }
+    closed-at "2026-08-22T23:03:32Z"
+    outcome "continue"
+
+    close {
+        claims-settled "C1" how="met"
+        claims-settled "C2" how="met"
+        claims-settled "C3" how="met"
+        claims-settled "C4" how="met"
+        claims-settled "C5" how="met"
+        all-met #true
+        attested-by "human:waelrabadi"
+        note "the accounting above was computed at close, not asserted. It says every claim is either met or carried by a finding that names it, and nothing about whether the work is any good"
+    }
+
+    trail {
+        entry at="2026-08-22T23:03:32Z" by="agent:praxis" action="state-changed" from="open" to="closed" note="closed by `praxis close`. The accounting was computed; the conclusion is not the machine's to draw"
+
+        entry at="2026-08-22T22:53:29Z" by="agent:praxis" action="created" \
+            note "opened by the gate, on the ask of human:wael"
+    }
+}

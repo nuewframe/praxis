@@ -91,7 +91,9 @@ iteration "ITER.260821.06" {
             eight tests"
     phase "learn" state="complete" required-by="always" produced="five findings" \
         note="never skippable — it is the phase that judges the others"
-    phase "teach" state="complete" required-by="doctrine" produced="skills/close-an-iteration/SKILL.md"
+    phase "teach" state="complete" required-by="doctrine" produced="skills/close-an-iteration/SKILL.md" \
+        taught="the-next-agent" \
+        taught="the-next-agent"
 
     finding "V1" state="open" size="observation" \
         text="turning no-silent-drop on refused exactly one record in the tree: ITER.260821.03, \

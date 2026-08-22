@@ -221,3 +221,9 @@ doctrine-surface "surface.skill.mature-a-value" {
     kind "skill"
     serves "TS.260821.18"
 }
+
+doctrine-surface "surface.skill.plan-before-building" {
+    path "skills/plan-before-building/SKILL.md"
+    kind "skill"
+    serves "TS.260821.19"
+}

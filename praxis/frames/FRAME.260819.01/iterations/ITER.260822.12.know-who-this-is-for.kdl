@@ -78,7 +78,8 @@ iteration "ITER.260822.12" {
     phase "learn" state="complete" required-by="always" worked-by="agent:principal-engineer" \
         produced="AX1 — what a second commitment on one slice costs to read"
     phase "teach" state="complete" required-by="doctrine" worked-by="agent:principal-engineer" \
-        produced="nothing new. The skill already said it; only the enforcement was missing"
+        produced="nothing new. The skill already said it; only the enforcement was missing" \
+        taught="the-next-agent"
 
     finding "AX1" state="open" size="observation" \
         text="settling one carried claim required a second commitment that re-states five claims \
