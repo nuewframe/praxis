@@ -47,7 +47,7 @@ pub fn guide_for<'a>(
     version: &str,
     corpus: &'a Corpus,
 ) -> Result<&'a [String], NoGuide> {
-    let name = capability.trim_start_matches("CAP.");
+    let name = corpus.bare_capability(capability);
     let Some(record) = corpus.capabilities.iter().find(|c| c.id == name) else {
         return Err(NoGuide::NoSuchCapability(capability.to_owned()));
     };
@@ -76,7 +76,7 @@ pub fn guides(version: &str, corpus: &Corpus) -> ReadModel {
         .filter_map(|id| corpus.attempts.iter().find(|a| &a.id == id))
         .flat_map(|a| a.on_slices.iter())
         .filter_map(|id| corpus.slice(id))
-        .map(|s| s.realizes.trim_start_matches("CAP.").to_owned())
+        .map(|s| corpus.bare_capability(&s.realizes).to_owned())
         .collect::<std::collections::BTreeSet<_>>()
         .into_iter()
         .collect::<Vec<_>>()

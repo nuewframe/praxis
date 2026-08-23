@@ -60,7 +60,7 @@ pub fn derive(corpus: &Corpus) -> BTreeMap<String, Vec<Shipped>> {
                 if slice.realizes.is_empty() {
                     continue;
                 }
-                let capability = slice.realizes.trim_start_matches("CAP.").to_owned();
+                let capability = corpus.bare_capability(&slice.realizes).to_owned();
                 out.entry(capability).or_default().push(Shipped {
                     version: release.version.clone(),
                     iteration: attempt.id.clone(),

@@ -81,6 +81,69 @@ Leaving a kind shapeless is a decision. Make it deliberately, and say why on the
 - **It does not let you add the rule to the engine instead.** If the checker needs a rule the record
   does not state, the record is what changes.
 
+
+## A field is read in whichever form you write it
+
+**Both of these are the same fact, and both check:**
+
+```kdl
+read-model "x" { publishable #false }        // as a child node
+read-model "x" publishable=#false            // as a property
+```
+
+**So are these:**
+
+```kdl
+owns-event "A"                               owns-event "A" "B"
+owns-event "B"
+```
+
+`each=` counts **values**, not nodes. Two values is two, written either way, and a field with
+no values at all is still missing — counting values did not turn cardinality into a formality.
+
+### Why this is worth stating
+
+Until `TS.260823.04` the schema declared a field and the **engine** decided what shape it took,
+differently in different places. An author reading `praxis schema` could not tell which, and the
+refusal did not say:
+
+| written | said |
+|---|---|
+| `publishable #false` | *does not say whether it survives being frozen* — while it said so on the line above |
+| one `owns-event` node per event | *appears 2 times; the schema requires exactly one* |
+| four `followed=` properties | three of four approaches silently read as unfollowed |
+
+All three are valid KDL. The validation review hit every one inside twenty minutes while
+building a first record by **following this skill** — and the fastest way past them was to copy
+an existing record and mutate it, which is transcription, the one move `adopt-the-method` spends
+its longest section arguing against.
+
+**A checker teaches.** Every refusal is doctrine delivered at the moment it is needed, and a
+refusal that misdescribes the fault teaches the author to route around the checker — which
+produces exactly the improvised structure this method exists to prevent.
+
+`D1` on `ITER.260823.07` chose reading both forms over declaring a form per field: nothing in
+the record needs to insist on a form, and a method already carrying 27 kinds and 158 field names
+does not need vocabulary for a distinction nobody wants enforced.
+
+### Counting values found nine wrong cardinalities
+
+Turning it on refused the record immediately. `owns-event`, `keeps-consistent`, `attacks`,
+`from-cluster`, `affected`, `baseline`, `deciders`, `held-by` and `exercised-by` were all
+declared `each="1"` or `each="0..1"` while the record had **always** carried lists. Node-counting
+made nine years of that invisible in a schema whose whole job is to say what a record may be.
+
+## An identity prefix is declared on the kind
+
+```kdl
+entity "capability" id-prefix="CAP." { … }
+```
+
+`CAP.` used to be `trim_start_matches("CAP.")` in four engine call sites — a naming convention
+only the engine knew, applied to every repository whether it used that prefix or not, and
+explained to nobody when references stopped resolving. A repository may now choose its own, and
+`praxis schema` prints it.
+
 ## Related
 
 - `cut-a-slice` — the shape a slice must carry is declared the same way.

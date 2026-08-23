@@ -121,6 +121,9 @@ impl FieldSpec {
 /// What one entity kind must look like.
 #[derive(Debug, Clone, Default)]
 pub struct EntitySpec {
+    /// The prefix a reference to this kind carries, if it carries one — `CAP.` for a
+    /// capability. Declared on the kind rather than known to the engine (`TS.260823.04`).
+    pub id_prefix: Option<String>,
     /// What this kind IS, in the words the schema uses. A sentence written for a person,
     /// and the glossary a release publishes.
     pub is: Option<String>,
@@ -262,6 +265,7 @@ impl Schema {
                 entities.insert(
                     name,
                     EntitySpec {
+                        id_prefix: prop(entity, "id-prefix"),
                         is: prop(entity, "is"),
                         states: prop(entity, "states")
                             .map(|s| s.split_whitespace().map(str::to_owned).collect())
@@ -286,6 +290,25 @@ impl Schema {
             }
         }
         Self { entities, rules }
+    }
+
+    /// Strip the prefix a kind declares for its references, if it declares one.
+    ///
+    /// `TS.260823.04`. The engine used to do `trim_start_matches("CAP.")` in four call
+    /// sites, which is A4 exactly: a naming convention only the engine knew, in a record
+    /// free to use any other and never told why nothing resolved. The fact now lives where
+    /// every other fact about a kind lives, and `praxis schema` prints it.
+    pub fn strip_prefix<'a>(&self, kind: &str, id: &'a str) -> &'a str {
+        match self.entities.get(kind).and_then(|e| e.id_prefix.as_deref()) {
+            Some(prefix) => id.strip_prefix(prefix).unwrap_or(id),
+            None => id,
+        }
+    }
+
+    /// The prefix a capability reference carries, as the record declares it.
+    #[must_use]
+    pub fn capability_prefix(&self) -> Option<String> {
+        self.entities.get("capability").and_then(|e| e.id_prefix.clone())
     }
 
     /// Whether the record declares this rule. A rule the record does not name is a rule
@@ -374,6 +397,29 @@ pub fn prop(node: &KdlNode, key: &str) -> Option<String> {
 /// tail belongs to the key before it. `needed-by="a" needed-by="b"` repeats the key. Both
 /// are written in this record and reading only the first spelling silently drops half of
 /// what a node says — which is how `needed-by` named two personas and answered for one.
+/// How many values a property carries, whatever their type.
+///
+/// `all_props` collects STRINGS, because every caller wanted strings. Counting with it made
+/// `publishable=#false` uncountable and reported the field as missing while it sat on the
+/// line — the same trap this slice removes, re-created inside the fix for it
+/// (`TS.260823.04`).
+#[must_use]
+pub fn count_props(node: &KdlNode, key: &str) -> usize {
+    let mut count = 0;
+    let mut collecting = false;
+    for entry in node.entries() {
+        match entry.name() {
+            Some(name) => collecting = name.value() == key,
+            None if !collecting => continue,
+            None => {}
+        }
+        if collecting {
+            count += 1;
+        }
+    }
+    count
+}
+
 pub fn all_props(node: &KdlNode, key: &str) -> Vec<String> {
     let mut out = Vec::new();
     let mut collecting = false;

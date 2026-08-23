@@ -41,6 +41,31 @@ enum Command {
         #[arg(default_value = "praxis")]
         root: PathBuf,
     },
+    /// Settle a claim on a run this tool watched, capturing what it exited with.
+    ///
+    /// The command is NOT yours to choose. The repository declares its verification once,
+    /// in the config, and `--by` selects within it — an engine that ran whatever the caller
+    /// named would be a command runner driven by the agent it exists to check.
+    Evidence {
+        /// The iteration holding the claim.
+        iteration: String,
+        /// The claim to settle.
+        #[arg(long)]
+        claim: String,
+        /// Which part of the declared verification to run. Omit to run all of it.
+        #[arg(long)]
+        by: Option<String>,
+        /// Which slice's claim, when one commitment covers several and they share an id.
+        ///
+        /// A claim id is unique within a SLICE, not within an iteration — an iteration over
+        /// three slices carries three `C1`s. Settling "whichever comes first" is the exact
+        /// failure `a-claim-id-is-unique-in-its-iteration` was written about.
+        #[arg(long)]
+        slice: Option<String>,
+        /// The state root to read and write.
+        #[arg(long, default_value = "praxis")]
+        root: PathBuf,
+    },
     /// Take a slice. The gate admits and opens an iteration, or refuses and records why.
     ///
     /// Selection is the commitment: choosing this is choosing not to work something else.
@@ -54,6 +79,15 @@ enum Command {
         /// positional is ambiguous, and clap refuses to build it (ITER.260821.19/AK1).
         #[arg(long, default_value = "praxis")]
         root: PathBuf,
+        /// Who asked for this work to start. Required, and deliberately without a default.
+        ///
+        /// The ask IS the permission — that was never in doubt. What is refused is the TOOL
+        /// deciding whose ask it was: a git identity names whose machine this is and knows
+        /// nothing about who decided (`TS.260823.01`). An identity the tool supplied would
+        /// prove the tool ran, which nobody doubted — the same argument `--attested-by`
+        /// makes at the other end of the iteration.
+        #[arg(long)]
+        asked_by: String,
         /// Say what would happen and write nothing.
         #[arg(long)]
         dry_run: bool,
@@ -315,7 +349,17 @@ fn main() -> ExitCode {
                 ExitCode::FAILURE
             }
         },
-        Command::PickUp { slices, root, dry_run } => match pickup(&slices, &root, dry_run) {
+        Command::Evidence { iteration, claim, by, slice, root } => {
+            match evidencing(&iteration, &claim, by.as_deref(), slice.as_deref(), &root) {
+                Ok(true) => ExitCode::SUCCESS,
+                Ok(false) => ExitCode::FAILURE,
+                Err(report) => {
+                    eprintln!("{report:?}");
+                    ExitCode::FAILURE
+                }
+            }
+        }
+        Command::PickUp { slices, root, asked_by, dry_run } => match pickup(&slices, &root, &asked_by, dry_run) {
             Ok(admitted) => {
                 if admitted {
                     ExitCode::SUCCESS
@@ -535,9 +579,200 @@ fn main() -> ExitCode {
     }
 }
 
+/// `TS.260823.02` — settle a claim on a run, and hold what came back.
+///
+/// The shell runs it, because running is I/O; the core decides what a run means and what it
+/// contributes. What is run comes from the config and never from the caller.
+fn evidencing(
+    iteration: &str,
+    claim: &str,
+    by: Option<&str>,
+    slice: Option<&str>,
+    root: &Path,
+) -> miette::Result<bool> {
+    use praxis_core::evidence::{Unwitnessed, Witnessed, command_for, digest, verification};
+
+    let sources = load(root)?;
+    let docs: Vec<_> = sources.iter().map(|(_, _, d)| d.clone()).collect();
+
+    let Some(declared) = verification(&docs) else {
+        miette::bail!(
+            "this repository declares no `verification` in its config, so there is nothing to \
+             run and a claim here settles on prose. Declare one — `verification {{ runner \
+             \"...\" }}` — or settle the claim by hand and let the record show it was REPORTED \
+             rather than witnessed"
+        );
+    };
+
+    let argv = match command_for(&declared, by) {
+        Ok(argv) => argv,
+        Err(Unwitnessed::RunnerTakesNoSelector { runner }) => miette::bail!(
+            "`{runner}` declares no `select-with`, so it cannot be pointed at one part of \
+             itself. Running the whole suite and recording it as the selected one would settle \
+             the claim on a run nobody asked for"
+        ),
+        Err(other) => miette::bail!("cannot build the verification command: {other:?}"),
+    };
+
+    let (program, rest) = argv.split_first().expect("a runner is never empty");
+    let printed = argv.join(" ");
+    eprintln!("praxis: running {printed}");
+
+    let output = std::process::Command::new(program)
+        .args(rest)
+        .output()
+        .map_err(|e| miette::miette!("cannot run `{printed}`: {e}"))?;
+
+    let mut captured = String::from_utf8_lossy(&output.stdout).into_owned();
+    captured.push_str(&String::from_utf8_lossy(&output.stderr));
+    let exit = output.status.code().unwrap_or(-1);
+
+    let run = Witnessed { command: printed, exit, digest: digest(&captured), at: now() };
+
+    if !run.settles() {
+        eprintln!(
+            "praxis: {} exited {} — the claim stays pending. A red run is a fact and it is not \
+             evidence the claim holds",
+            run.command, run.exit
+        );
+        return Ok(false);
+    }
+
+    let (path, updated) = settle_claim(iteration, claim, slice, &run, &sources)?;
+    fs::write(&path, updated).map_err(|e| miette::miette!("{}: {e}", path.display()))?;
+    eprintln!(
+        "praxis: {claim} — met, witnessed by a run exiting {} ({})",
+        run.exit, run.digest
+    );
+    Ok(true)
+}
+
+/// Rewrite the iteration whole, with the run folded into the named claim.
+///
+/// The document model preserves everything it did not touch, so a hand-written note beside
+/// the claim survives — the record is edited, never regenerated.
+fn settle_claim(
+    iteration: &str,
+    claim: &str,
+    slice: Option<&str>,
+    run: &praxis_core::evidence::Witnessed,
+    sources: &[(PathBuf, String, kdl::KdlDocument)],
+) -> miette::Result<(PathBuf, String)> {
+    let (path, text, _) = sources
+        .iter()
+        .find(|(_, _, d)| {
+            d.nodes().iter().any(|n| {
+                n.name().value() == "iteration" && root_id(n).as_deref() == Some(iteration)
+            })
+        })
+        .ok_or_else(|| miette::miette!("no iteration {iteration} in the record"))?;
+
+    let mut doc: kdl::KdlDocument = text
+        .parse()
+        .map_err(|e| miette::Report::new(e).context("reparsing to settle"))?;
+    let node = doc
+        .nodes_mut()
+        .iter_mut()
+        .find(|n| n.name().value() == "iteration" && root_id(n).as_deref() == Some(iteration))
+        .ok_or_else(|| miette::miette!("{iteration} vanished between reading and writing"))?;
+    let body = node
+        .children_mut()
+        .as_mut()
+        .ok_or_else(|| miette::miette!("{iteration} has no body"))?;
+
+    // A claim id is unique within a SLICE. An iteration over several carries the same id
+    // once per slice, so settling by id alone would settle whichever came first — which is
+    // the failure `a-claim-id-is-unique-in-its-iteration` exists to name.
+    let matching: Vec<String> = body
+        .nodes()
+        .iter()
+        .filter(|n| n.name().value() == "claim" && root_id(n).as_deref() == Some(claim))
+        .map(|n| praxis_core::schema::prop(n, "from-slice").unwrap_or_else(|| "(no slice)".to_owned()))
+        .collect();
+    if matching.is_empty() {
+        miette::bail!("{iteration} carries no claim {claim}");
+    }
+    if matching.len() > 1 && slice.is_none() {
+        miette::bail!(
+            "{iteration} carries {claim} for {} slices ({}). Name which with `--slice` — \
+             settling whichever comes first is the failure the claim-uniqueness rule is about",
+            matching.len(),
+            matching.join(", ")
+        );
+    }
+    if let Some(want) = slice {
+        if !matching.iter().any(|s| s == want) {
+            miette::bail!("{iteration} carries no {claim} from {want} — it has {}", matching.join(", "));
+        }
+    }
+
+    let target = body
+        .nodes_mut()
+        .iter_mut()
+        .find(|n| {
+            n.name().value() == "claim"
+                && root_id(n).as_deref() == Some(claim)
+                && slice.is_none_or(|want| praxis_core::schema::prop(n, "from-slice").as_deref() == Some(want))
+        })
+        .ok_or_else(|| miette::miette!("{iteration} carries no claim {claim}"))?;
+
+    let children = target.children_mut().get_or_insert_with(kdl::KdlDocument::new);
+
+    // Behaviour evolves, and a claim re-witnessed against new behaviour must not lose what
+    // it settled on before. The superseded run is MATURED, not overwritten: the latest is
+    // truth and the chain back is the maturation, which is what the record already uses in
+    // place of a pointer (`TS.260821.18`, `TS.260823.02/C4`).
+    let previous: Vec<(String, String)> = ["ran", "exited", "digest", "witnessed-at"]
+        .iter()
+        .filter_map(|field| {
+            children
+                .nodes()
+                .iter()
+                .find(|n| n.name().value() == *field)
+                .and_then(|n| n.entries().first())
+                .map(|e| ((*field).to_owned(), e.value().to_string()))
+        })
+        .collect();
+    if !previous.is_empty() {
+        let was: String = previous
+            .iter()
+            .map(|(f, v)| format!("{f} {v}"))
+            .collect::<Vec<_>>()
+            .join(", ");
+        let matured = format!(
+            "        matured \"ran\" to={:?} at={:?} \
+             because=\"re-witnessed against changed behaviour; the superseded run is kept \
+             because the chain back is what a pointer would have been\"\n",
+            was, run.at
+        );
+        let block: kdl::KdlDocument = matured
+            .parse()
+            .map_err(|e| miette::Report::new(e).context("composing the maturation"))?;
+        for node in block.nodes() {
+            children.nodes_mut().push(node.clone());
+        }
+    }
+
+    let block: kdl::KdlDocument = praxis_core::evidence::witnessed_kdl(run)
+        .parse()
+        .map_err(|e| miette::Report::new(e).context("composing the run"))?;
+    children
+        .nodes_mut()
+        .retain(|n| !matches!(n.name().value(), "ran" | "exited" | "digest" | "witnessed-at"));
+    for fresh in block.nodes() {
+        children.nodes_mut().push(fresh.clone());
+    }
+    // The claim is MET now, and the state is a property on the claim node. Written through
+    // the document model rather than by string surgery so everything else on the line —
+    // `from-slice`, `text`, `settled-by`, a note somebody added — survives untouched.
+    target.insert("state", "met");
+
+    Ok((path.clone(), doc.to_string()))
+}
+
 /// `TS.260820.05` — the one gate. Either an iteration is open, or a refusal is on the
 /// record naming the condition that failed. Never both, and never neither.
-fn pickup(slices: &[String], root: &Path, dry_run: bool) -> miette::Result<bool> {
+fn pickup(slices: &[String], root: &Path, asked_by: &str, dry_run: bool) -> miette::Result<bool> {
     let sources = load(root)?;
     let docs: Vec<_> = sources.iter().map(|(_, _, d)| d.clone()).collect();
 
@@ -547,10 +782,14 @@ fn pickup(slices: &[String], root: &Path, dry_run: bool) -> miette::Result<bool>
         miette::bail!("the record declares no admission conditions — an empty gate is not an open one");
     }
 
-    // The signer is whoever is asking, read from the tree they are asking in. An
-    // agent-signed approval is the trust-transfer problem expressed as a signature, so
-    // there is nowhere here to put an agent's name.
-    let signer = human()?;
+    // The asker is named by whoever asks. It is NOT read from the tree.
+    //
+    // It used to be `git config user.email`, stripped and prefixed `human:` — which
+    // reports whose machine the command ran on, and the question an admission answers is
+    // who decided the work should start. The two are only ever equal by coincidence, and
+    // an agent running in the maintainer's shell produced a signed human approval nobody
+    // typed. `TS.260823.01`.
+    let signer = asker(asked_by)?;
     let ask = Ask {
         signer,
         at: now(),
@@ -1903,6 +2142,38 @@ fn admission<'a>(docs: impl Iterator<Item = &'a kdl::KdlDocument>) -> Conditions
         }
     }
     conditions
+}
+
+/// The identity of whoever asked for work to start, as they gave it.
+///
+/// `TS.260823.01`. Two things are refused here and nothing else is checked, because
+/// nothing else CAN be: the record can hold who was named, and never whether they meant
+/// it. Pretending otherwise would repeat one level up the fault this function removes.
+///
+/// - an empty ask, because an admission with no asker admits on nobody's word
+/// - an `agent:` namespace, because an agent admitting its own work is the whole subject
+///
+/// A bare name is taken as a human. Requiring the prefix would teach people to type
+/// `human:` as a formality, and a formality is what the git identity had become.
+fn asker(given: &str) -> miette::Result<String> {
+    let given = given.trim();
+    if given.is_empty() {
+        miette::bail!(
+            "`--asked-by` is empty, so there is nobody the admission is on the word of. The \
+             ask is the permission and it needs somebody to have made it"
+        );
+    }
+    if let Some(rest) = given.strip_prefix("agent:") {
+        miette::bail!(
+            "`{rest}` is in the agent namespace, and an agent may not admit its own work. \
+             Name whoever asked for it — the ask through a prompt is the permission, and \
+             this records whose ask it was"
+        );
+    }
+    Ok(match given.strip_prefix("human:") {
+        Some(name) => format!("human:{}", name.trim()),
+        None => format!("human:{given}"),
+    })
 }
 
 fn human() -> miette::Result<String> {

@@ -204,7 +204,12 @@ fn an_admission_opens_an_iteration_that_the_record_will_accept() {
             "the opened iteration carries `{required}`"
         );
     }
-    assert!(record.kdl.contains(r#"signer "human:someone""#), "signed by a human, or not signed");
+    // ASKED, not signed, and the asker is whoever asked (`TS.260823.01`). The word
+    // changed because nothing here was ever signed: the schema's own reason for this
+    // field reads "the human's ask is the only gate", and the engine wrote `signed` over
+    // it for nineteen iterations.
+    assert!(record.kdl.contains(r#"asked-by "human:someone""#), "the asker is named, or nobody asked");
+    assert!(record.kdl.contains(r#"status "asked""#), "an ask is an ask — nothing here was signed");
     assert!(record.kdl.contains(r#"state "open""#), "opened, not working — the start vet is a second ask");
 }
 

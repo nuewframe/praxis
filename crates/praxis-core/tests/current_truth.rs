@@ -25,7 +25,7 @@ notional-architecture "NA.test" {
             field "state"   each="1"
             field "binds"   each="0..n"
         }
-        entity "capability" {
+        entity "capability" id-prefix="CAP." {
             field "state"      each="1"
             field "owns-event" each="0..n"
         }

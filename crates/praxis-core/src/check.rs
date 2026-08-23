@@ -98,6 +98,12 @@ pub enum Refusal {
     RewrittenDecision { decision: String },
     /// A read model nobody has said whether to publish.
     UndeclaredLifetime { view: String },
+    /// An iteration carrying no admission at all, so nobody asked for the work to start.
+    IterationNobodyAsked { iteration: String },
+    /// An admission whose asker is in the agent namespace.
+    AdmittedByAnAgent { iteration: String, asker: String },
+    /// An admission naming no asker, so it admits on nobody's word.
+    AdmissionWithoutAnAsker { iteration: String },
     /// A publishable view with no reason, or nowhere to land.
     UnjustifiedLifetime { view: String, missing: &'static str },
     /// A capability whose promoted truth is not what the record derives from cut releases.
@@ -182,6 +188,10 @@ impl Refusal {
                 "work-follows-the-declared-sequence"
             }
             Self::ViewForNobody { .. } => "a-published-view-names-its-reader",
+            Self::IterationNobodyAsked { .. } | Self::AdmissionWithoutAnAsker { .. } => {
+                "iteration-without-signed-admission"
+            }
+            Self::AdmittedByAnAgent { .. } => "approval-signed-by-agent",
         }
     }
 
@@ -224,6 +234,8 @@ impl Refusal {
             Self::UnfollowableCitation { field, .. } => field,
             Self::OutOfSequence { .. } | Self::StepNamesNoKind { .. } => "satisfied-by",
             Self::ViewForNobody { .. } => "needed-by",
+            Self::IterationNobodyAsked { .. } => "approval",
+            Self::AdmittedByAnAgent { .. } | Self::AdmissionWithoutAnAsker { .. } => "asked-by",
         }
     }
 
@@ -374,6 +386,21 @@ impl Refusal {
                  where it lives. To point at something, point at an id — the record holds those, \
                  and a dangling one is refused"
             ),
+            Self::IterationNobodyAsked { iteration } => format!(
+                "{iteration} carries no admission, so no ask is on the record and the work \
+                 began on nobody's word. The ask IS the gate — it is recorded or it did not \
+                 happen"
+            ),
+            Self::AdmittedByAnAgent { iteration, asker } => format!(
+                "{iteration} was admitted by {asker:?}, which is an agent. An agent admitting \
+                 its own work is the trust-transfer problem with the method's name on it — \
+                 name whoever asked for it instead"
+            ),
+            Self::AdmissionWithoutAnAsker { iteration } => format!(
+                "{iteration}'s admission names nobody who asked. A status with no asker records \
+                 that a gate was passed and not who opened it, which is the half that cannot be \
+                 checked afterwards"
+            ),
             Self::ViewForNobody { view } => format!(
                 "{view} is published and names no persona it is for. `needed-by` decides where a \
                  view lands and whether it belongs in the story at all — a document nobody is for \
@@ -453,7 +480,7 @@ impl Refusal {
                  type — declare `publishable`, either way"
             ),
             Self::UnjustifiedLifetime { view, missing } => format!(
-                "{view} is publishable and declares no `{missing}`. The whole decision is a \
+                "{view} declares a lifetime and no `{missing}`. The whole decision is a \
                  judgement about perishability, and an unjustified judgement is indistinguishable \
                  from an oversight"
             ),
@@ -591,7 +618,7 @@ pub fn check_node(node: &KdlNode, schema: &Schema, known: &Known) -> Vec<Violati
             continue;
         }
         if let Some(target) = &field.references {
-            let names = value.trim_start_matches("CAP.").to_owned();
+            let names = schema.strip_prefix(target, &value).to_owned();
             // A field may reference one of SEVERAL kinds: `doctrine-surface.serves` names a
             // slice, a capability, or a read model, and splitting that into three fields
             // would make the schema describe the checker's convenience rather than the
@@ -695,27 +722,63 @@ pub fn check_document(doc: &KdlDocument, schema: &Schema, known: &Known) -> Vec<
     out
 }
 
+/// A boolean field, in whichever form it was written.
+///
+/// `publishable #false` inside the body and `publishable=#false` on the node are the same
+/// fact. The read-model check saw only the second and refused the first for *not saying
+/// whether it survives being frozen* — while it said so on the line above (`TS.260823.04`).
+fn bool_field(node: &KdlNode, field: &str) -> Option<bool> {
+    body(node)
+        .and_then(|b| b.nodes().iter().find(|n| n.name().value() == field))
+        .and_then(|n| n.entries().first())
+        .and_then(|e| e.value().as_bool())
+        .or_else(|| node.get(field).and_then(|v| v.as_bool()))
+}
+
 fn body(node: &KdlNode) -> Option<&KdlDocument> {
     node.children()
 }
 
-/// How many times a field appears — as a child node, or as a property.
+/// How many VALUES a field carries, in whichever form they were written.
 ///
 /// A kind whose values are carried as properties was unshapeable until `TS.260821.19`, and
 /// `phase` was declared "deliberately shapeless" for exactly that reason. It was not a
 /// choice about phases; it was the schema having no way to describe them.
+///
+/// `TS.260823.04` — this counts VALUES, and both forms count. Before, it counted child
+/// NODES and fell back to *does a property exist*, which meant three different things
+/// depending on how an author wrote a field the schema described only one way:
+///
+/// ```text
+/// owns-event "A"          owns-event "A" "B"      followed="a" followed="b"
+/// owns-event "B"
+///     counted 2               counted 1               counted 1
+///     REFUSED at each="1"     passed                  three of four approaches
+///                                                     read as unfollowed
+/// ```
+///
+/// All three are valid KDL and the schema says nothing about which to write. The author
+/// who writes one node per value is doing the obvious thing, and was refused for it with
+/// a message about cardinality that named no form at all. Counting values makes the three
+/// agree, and `D1` is why that was chosen over declaring a form per field: nothing in this
+/// record needs to insist on a form, and a method already carrying 27 kinds and 158 field
+/// names does not need a vocabulary for one nobody wants enforced.
 fn count_of(node: &KdlNode, field: &str) -> usize {
-    let children = body(node).map_or(0, |b| {
-        b.nodes().iter().filter(|n| n.name().value() == field).count()
+    // Every argument of every child node with this name. `owns-event "A" "B"` is two
+    // values on one node, and `owns-event "A"` twice is the same two values.
+    let children: usize = body(node).map_or(0, |b| {
+        b.nodes()
+            .iter()
+            .filter(|n| n.name().value() == field)
+            .map(|n| n.entries().iter().filter(|e| e.name().is_none()).count().max(1))
+            .sum()
     });
-    if children > 0 {
-        return children;
-    }
-    usize::from(node.get(field).is_some())
+    children + crate::schema::count_props(node, field)
 }
 
-/// A field's single value, from a child node or from a property.
-fn child_arg(node: &KdlNode, field: &str) -> Option<String> {
+/// A field's single value, from a child node or from a property. Both forms, always
+/// (`TS.260823.04`).
+pub fn child_arg(node: &KdlNode, field: &str) -> Option<String> {
     body(node)
         .and_then(|b| b.nodes().iter().find(|n| n.name().value() == field))
         .and_then(string_arg)
@@ -790,6 +853,20 @@ pub fn check_corpus_given(
                 }
             }
         }
+    }
+
+    // `iteration-without-signed-admission` and `approval-signed-by-agent`. Both were
+    // DECLARED by the method and implemented nowhere: until now the only code in this
+    // engine that touched an approval was the one that wrote it, so the human gate every
+    // other rule assumes held was a string nothing ever read back (`TS.260823.01`).
+    if schema.declares_rule("iteration-without-signed-admission")
+        || schema.declares_rule("approval-signed-by-agent")
+    {
+        out.extend(check_admissions(
+            docs,
+            schema.declares_rule("iteration-without-signed-admission"),
+            schema.declares_rule("approval-signed-by-agent"),
+        ));
     }
 
     // `evidence-names-its-layer`, if the record declares it. An iteration's layers are
@@ -914,7 +991,7 @@ pub fn check_corpus_given(
                     // unaddressed, and telling somebody only the first wastes the second
                     // trip.
                     if reader_rule
-                        && view.get("publishable").and_then(|v| v.as_bool()) == Some(true)
+                        && bool_field(view, "publishable") == Some(true)
                         && crate::schema::all_props(view, "needed-by").is_empty()
                     {
                         out.push(Violation {
@@ -927,7 +1004,7 @@ pub fn check_corpus_given(
                     if !lifetime_rule {
                         continue;
                     }
-                    match view.get("publishable").and_then(|v| v.as_bool()) {
+                    match bool_field(view, "publishable") {
                         None => out.push(Violation {
                             entity_kind: "read-model".to_owned(),
                             entity_id: Some(name.clone()),
@@ -940,7 +1017,7 @@ pub fn check_corpus_given(
                                 wanted.push(("publishes-to", "publishes-to"));
                             }
                             for (field, missing) in wanted {
-                                if prop(view, field).is_none() {
+                                if child_arg(view, field).is_none() {
                                     out.push(Violation {
                                         entity_kind: "read-model".to_owned(),
                                         entity_id: Some(name.clone()),
@@ -954,7 +1031,7 @@ pub fn check_corpus_given(
                             }
                         }
                         Some(false) => {
-                            if prop(view, "because").is_none() {
+                            if child_arg(view, "because").is_none() {
                                 out.push(Violation {
                                     entity_kind: "read-model".to_owned(),
                                     entity_id: Some(name.clone()),
@@ -1078,7 +1155,11 @@ pub fn check_corpus_given(
                             children_named(i, "followed")
                                 .iter()
                                 .filter_map(|f| string_arg(f))
-                                .chain(prop(i, "followed"))
+                                // `all_props`, not `prop`: repeated properties are several
+                                // values and `prop` returns one of them, so three of four
+                                // approaches read as unfollowed while the record named all
+                                // four (`TS.260823.04`).
+                                .chain(crate::schema::all_props(i, "followed"))
                                 .collect()
                         })
                         .unwrap_or_default();
@@ -2013,6 +2094,75 @@ fn check_claims(docs: &[KdlDocument], silent_drop: bool, dropped: bool) -> Vec<V
 
 /// `TS.260820.06`. Evidence naming a layer the slice never declared is refused; a
 /// declared layer the iteration evidences nothing for is reported, never omitted.
+/// `TS.260823.01`. Read the admission back.
+///
+/// Both forms are accepted on READ — `asked-by` is what the gate writes now, `signer` is
+/// what it wrote before. Refusing the old form would refuse every iteration this record
+/// already holds, and the fault was never that those records are malformed: it is that
+/// the tool supplied the name in them. What is written going forward is the new form,
+/// which is `C2`, and this is the rule that catches the case `C4` names.
+fn check_admissions(docs: &[KdlDocument], missing: bool, by_agent: bool) -> Vec<Violation> {
+    let mut out = Vec::new();
+    for doc in docs {
+        for iteration in doc.nodes().iter().filter(|n| n.name().value() == "iteration") {
+            let Some(id) = string_arg(iteration) else { continue };
+            let admissions: Vec<&KdlNode> = children_named(iteration, "approval")
+                .into_iter()
+                .filter(|a| string_arg(a).as_deref() == Some("admission"))
+                .collect();
+
+            if admissions.is_empty() {
+                if missing {
+                    out.push(Violation {
+                        entity_kind: "iteration".to_owned(),
+                        entity_id: Some(id.clone()),
+                        refusal: Refusal::IterationNobodyAsked { iteration: id.clone() },
+                        span: iteration.span(),
+                    });
+                }
+                continue;
+            }
+
+            for admission in admissions {
+                let asker = child_arg(admission, "asked-by")
+                    .or_else(|| child_arg(admission, "signer"))
+                    .or_else(|| prop(admission, "asked-by"))
+                    .or_else(|| prop(admission, "signer"));
+
+                match asker {
+                    None => {
+                        if missing {
+                            out.push(Violation {
+                                entity_kind: "iteration".to_owned(),
+                                entity_id: Some(id.clone()),
+                                refusal: Refusal::AdmissionWithoutAnAsker {
+                                    iteration: id.clone(),
+                                },
+                                span: admission.span(),
+                            });
+                        }
+                    }
+                    Some(who) if who.trim_start().starts_with("agent:") => {
+                        if by_agent {
+                            out.push(Violation {
+                                entity_kind: "iteration".to_owned(),
+                                entity_id: Some(id.clone()),
+                                refusal: Refusal::AdmittedByAnAgent {
+                                    iteration: id.clone(),
+                                    asker: who,
+                                },
+                                span: admission.span(),
+                            });
+                        }
+                    }
+                    Some(_) => {}
+                }
+            }
+        }
+    }
+    out
+}
+
 fn check_layers(docs: &[KdlDocument]) -> Vec<Violation> {
     let mut declared: Vec<(String, Vec<String>)> = Vec::new();
     for doc in docs {

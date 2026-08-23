@@ -9,7 +9,7 @@ use praxis_core::{Corpus, NoGuide, Schema, guide_for, guides, parse};
 const SCHEMA: &str = r##"
 notional-architecture "NA.test" {
     schema {
-        entity "capability" {
+        entity "capability" id-prefix="CAP." {
             field "state"   each="1"
             field "usage"   each="0..n"
             field "shipped" each="0..n"

@@ -104,8 +104,8 @@ method "delivery-graph" {
             field "principle"        each="1"
             field "trail"            each="1"
             field "current-ceiling"  each="0..1"
-            field "affected"         each="0..1"
-            field "baseline"         each="0..1"
+            field "affected"         each="0..n"
+            field "baseline"         each="0..n"
             field "cost-of-inaction" each="0..1"
             field "identifies"       each="0..n"
             field "retires"          each="0..n"
@@ -174,6 +174,11 @@ method "delivery-graph" {
             field "profile"     each="1" holds="profile" \
                 because="a field that HOLDS an entity is checked as one. Declared as a bare field, \
                     the profile's body was never descended into and omit-probe was an unchecked string"
+            field "verification" each="0..1" \
+                because="how this repository verifies, declared once so that `praxis evidence` runs \
+                    what the RECORD names and never what a caller passed. Optional: a repository \
+                    that declares none settles claims on prose, and the record shows those as \
+                    reported rather than witnessed (TS.260823.02)"
             field "versioning"  each="0..1"
             field "invariants"  each="0..1"
             field "paths"       each="1"
@@ -204,7 +209,7 @@ method "delivery-graph" {
                     block is not a statement anybody makes on purpose"
             field "trail"           each="1"
             field "derived-from"    each="0..n"
-            field "exercised-by"    each="0..1"
+            field "exercised-by"    each="1..n"
             field "excludes"        each="0..n" because="what it refuses to decide is what makes it notional"
             field "substrate"       each="0..n"
             field "external"        each="0..n"
@@ -219,6 +224,11 @@ method "delivery-graph" {
                     reader knows the answer was reached rather than assumed"
         }
         entity "capability" is="a permanent doing the system must have" \
+            id-prefix="CAP." \
+            note="the prefix a reference to this kind is written with. Declared by TS.260823.04: \
+                the engine trimmed the literal `CAP.` in four call sites, which is A4 exactly — \
+                a convention only the engine knew, in a record that could have used any other \
+                and never been told why nothing resolved" \
             states="sought active retired" \
             completes="never; it is retired" {
             field "doing"            each="1" because="a capability that names no doing is a noun someone liked"
@@ -233,9 +243,9 @@ method "delivery-graph" {
                     promotion and recomputed by promoted-truth-is-derived — never hand-written"
             field "derived-from"     each="1" references="event-storm" \
                 because="capability-must-trace — a capability owns a cluster of events from a storm, or it is an assertion"
-            field "from-cluster"     each="1" references="cluster" \
+            field "from-cluster"     each="1..n" references="cluster" \
                 because="the cluster IS the derivation. Naming a storm without the cluster inside it proves nothing"
-            field "owns-event"       each="1" unique-in="capability" \
+            field "owns-event"       each="1..n" unique-in="capability" \
                 because="an event kept consistent by two capabilities has no single owner, and the boundary between them is drawn wrong"
                         field "facet"      each="0..1" one-of="product" "engine" \
                 because="a reader who installed the product and a maintainer who builds it are \
@@ -244,8 +254,8 @@ method "delivery-graph" {
                     hand a reader the tool's internals as a feature list (TS.260821.06/C3)"
             field "owns-read-model"  each="1..n"
             field "gate-test"        each="1..n" because="the four tests, each with the reason it passes"
-            field "keeps-consistent" each="1"
-            field "attacks"          each="1" references="symptom"
+            field "keeps-consistent" each="1..n"
+            field "attacks"          each="1..n" references="symptom"
             field "trail"            each="1"
             field "enforces"         each="0..n"
             field "principle-note"   each="0..1"
@@ -280,7 +290,7 @@ method "delivery-graph" {
             field "trail"      each="1"
             field "decided-at" each="0..1"
             field "matured-at" each="0..1"
-            field "deciders"   each="0..1"
+            field "deciders"   each="0..n"
             field "raised-by"  each="0..1"
             field "supersedes" each="0..n"
             field "amendment"  each="0..n"
@@ -463,7 +473,7 @@ method "delivery-graph" {
             field "frame"      each="1" references="frame"
             field "scope"      each="0..1"
             field "held-at"    each="0..1"
-            field "held-by"    each="0..1"
+            field "held-by"    each="0..n"
             field "actor"      each="0..n"
             field "external"   each="0..n"
             field "command"    each="1..n"
@@ -599,17 +609,27 @@ method "delivery-graph" {
             constraint="never slice → slice. Dependency is only ever on a frozen contract, which is what makes disjointness a query" \
             violated-by="seventeen of eighteen slices today. Carried as open"
 
-        requires "every entity carries a trail" \
+        // RESTATED by TS.260823.04. It read "every entity carries a trail" and contradicted
+        // the schema beside it: eight of twenty-five kinds declare a `trail` field, so writing
+        // one on a capability was refused as an undeclared field WHILE this line called it
+        // required. Nothing could tell, because nothing in the engine reads this block —
+        // every `requires` here is prose, and the ones that hold are held by a `rule` further
+        // down. Said accurately, this is enforced: a kind that declares a trail with each="1"
+        // is refused without one by `entity-without-a-required-field`.
+        requires "an entity whose kind declares a trail carries one" \
             entry-common="at" "by" "action" append-only=#true \
             because="attribution distinguishes human authorship from agent authorship, which is the \
                 distinction a method built on trust transfer exists to make legible"
-        requires "only a human may sign an approval" kinds="acceptance" "admission" \
+        // Held by `approval-signed-by-agent` since TS.260823.01, and by nothing before it.
+        requires "only a human may be named as having asked or attested" kinds="acceptance" "admission" \
             because="an agent-signed approval is the trust-transfer problem expressed as a signature"
         requires "an iteration is vetted twice — at the ask to create, and again at the ask to start" \
             because="the tree moves in between. An admission computed against a tree that has since \
                 changed is an admission of something else, and the second vet is where a stale \
                 freeze is caught"
-        requires "an iteration carries a signed admission before it may be worked" \
+        // The admission is an ASK, not a signature — TS.260823.01. Held by
+        // `iteration-without-signed-admission`, implemented by that slice.
+        requires "an iteration carries an admission naming who asked, before it may be worked" \
             because="selection IS the commitment, and ITERATE has exactly one gate. The human's ask \
                 to start an iteration is that approval — so it is recorded as one, or `the agent \
                 was asked` is the agent's own account of having been asked" \
@@ -707,9 +727,32 @@ method "delivery-graph" {
         rule "unknown-trail-action"         refuses="a trail action outside the vocabulary"
         rule "trail-entry-missing-field"    refuses="a trail entry without at, by or action"
         rule "unknown-approval-kind"        refuses="an approval kind this schema does not name"
-        rule "approval-signed-by-agent"     refuses="a signature outside the human namespace"
+        // Both witnesses added by TS.260823.01, together with the code that makes them
+        // refuse. Declared since the graph was written and implemented NOWHERE: until that
+        // slice the only code in this engine that touched an approval was the code that
+        // wrote it, so the human gate every other rule assumes held was a string nothing
+        // ever read back.
+        rule "approval-signed-by-agent"     refuses="an asker outside the human namespace" \
+            witness=#"""
+                iteration "ITER.witness" {
+                    slug "admitted-by-an-agent"
+                    on-slice "TS.witness"
+                    state "open"
+                    approval "admission" {
+                        status "asked"
+                        asked-by "agent:praxis"
+                    }
+                }
+                """#
         rule "adr-accepted-without-approval" refuses="an accepted decision nobody signed"
-        rule "iteration-without-signed-admission" refuses="work beginning on an iteration whose admission is unsigned"
+        rule "iteration-without-signed-admission" refuses="work beginning on an iteration nobody asked for" \
+            witness=#"""
+                iteration "ITER.witness" {
+                    slug "nobody-asked"
+                    on-slice "TS.witness"
+                    state "open"
+                }
+                """#
         rule "iteration-worked-without-start-vet"  refuses="work beginning on a create-vet alone"
         rule "complete-phase-without-evidence"     refuses="a phase marked complete that produced nothing"
         // Cross-field constraint. Declared as vocabulary rather than as a rule, because it

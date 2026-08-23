@@ -48,6 +48,58 @@ layer "enforcement" state="evidenced" \
     reaches="evidence-names-its-layer, failing closed on an undeclared layer"
 ```
 
+## Settle it on a run, not on a sentence
+
+```
+praxis evidence <ITERATION> --claim <ID> [--slice <TS-ID>] [--by <selector>]
+```
+
+**Praxis runs your verification and records what came back** — the command, the exit status,
+and a digest of what it printed. `TS.260823.02`.
+
+This exists because the sentence was never checkable. `attach-evidence` used to say, in this
+file, *"It does not judge the evidence"* — so `evidence="46 tests pass"` read identically
+whether 46 passed or none existed. The validation review closed an iteration with three
+evidenced layers and a met claim in a repository containing **no application code**, and
+nothing objected. That is `S2` reproduced inside the mechanism built to compute it away.
+
+**What runs is the record's, never yours.** The repository declares its verification once:
+
+```kdl
+config {
+    verification {
+        runner "cargo test --quiet"
+        select-with "--test"
+    }
+}
+```
+
+`--by` **selects within** that runner; it never becomes a command. An engine that ran whatever
+the caller passed would be a command runner driven by the agent it exists to check — that
+agent could name `true` and settle every claim in the record.
+
+| | |
+|---|---|
+| a non-zero exit | **refuses.** The claim stays pending and the status is named. A red run is a fact, and it is not evidence the claim holds |
+| a selector a runner cannot take | **refused, not dropped.** A dropped selector runs the whole suite and records it as the one test |
+| a claim id in a multi-slice iteration | **refused without `--slice`.** A claim id is unique within a *slice*; an iteration over three carries three `C1`s, and settling whichever comes first is the failure `a-claim-id-is-unique-in-its-iteration` names |
+| re-witnessing a settled claim | the superseded run is **matured**, not overwritten. Behaviour evolves; the latest is truth and the chain back is the maturation |
+
+**A repository that declares no verification keeps prose evidence**, and the record shows those
+claims as reported rather than witnessed. That fallback is a stated fallback — not a default to
+drift into.
+
+### What the digest does and does not claim
+
+It is not a signature, and it is not hard to forge: anyone who can edit the record can run the
+same function. What it catches is the value **written from memory** — the agent does not know
+the digest until the run has happened, and that is the property prose never had.
+
+It also does not prove the run tests the behaviour the claim describes. Four claims settled
+against one test file share one digest, and that is honest: it witnesses *that a run happened
+and passed*, never *that it proves this*. Choosing a run that proves the right thing stays
+yours, and no checker can take it.
+
 ## Evidence states WHAT was shown, never where to look
 
 **A path is not a citation this record can follow.** `the-record-cites-what-it-holds` refuses a
@@ -87,8 +139,9 @@ measuring here.
 
 ## What this does not do
 
-- **It does not judge the evidence.** Absence and mismatch, never quality. A weak test evidences the
-  layer; whether it is a good test is a review question, at close.
+- **It does not judge whether the verification is any good.** A weak test that passes witnesses the
+  run; whether it proves the behaviour is a review question, at close. What it no longer accepts is
+  a claim settled on nothing at all.
 - **It does not produce the evidence.** That is the work itself.
 
 Related: `pick-up-a-slice` · `cut-a-slice` · `see-what-is-ready` · `adopt-the-method` (why a path is never a citation) · `write-durable-comments` (the same test, for comments).

@@ -10,6 +10,7 @@ pub mod ask;
 pub mod binding;
 pub mod check;
 pub mod cut;
+pub mod evidence;
 pub mod close;
 pub mod pickup;
 pub mod dashboard;

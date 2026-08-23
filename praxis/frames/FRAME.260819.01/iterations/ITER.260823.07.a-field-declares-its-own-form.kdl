@@ -1,0 +1,191 @@
+// Opened by `praxis pick-up`. Every condition below was evaluated against the
+// tree as it stood at 2026-08-23T05:39:52Z, and the verdicts are recorded
+// rather than summarised: a gate whose reasoning is not on the record is a gate
+// you have to trust.
+
+iteration "ITER.260823.07" {
+    slug "a-field-declares-its-own-form"
+    on-slice "TS.260823.04"
+    state "closed"
+    opened-at "2026-08-23T05:39:52Z"
+    opened-by "agent:praxis"
+
+    approval "admission" {
+        status "asked"
+        asked-by "human:wael"
+        at "2026-08-23T05:39:52Z"
+        via "the ask to pick up this slice"
+    }
+
+    vet "create" state="done" at="2026-08-23T05:39:52Z" on-slice="TS.260823.04" {
+        condition "slice-is-shaped" verdict="passed"
+        condition "dependencies-delivered" verdict="passed"
+        condition "no-iteration-in-flight" verdict="passed"
+        condition "nothing-left-to-admit" verdict="passed"
+        condition "work-is-disjoint" verdict="not-computed" \
+            found="no seam manifest exists, so what two iterations would touch cannot be compared. Disjointness is half of what this capability says it judges, and half of what it judges is currently not computed at all"
+        condition "the-slice-is-the-best-available" verdict="left-to-the-maintainer"
+    }
+
+    // 2 of the declared conditions were not decided by the gate. They are
+    // recorded above rather than omitted: an admission that does not say what
+    // it left undecided claims more than it checked.
+
+    // Frozen at open, from the slices. Removing one from a slice now
+    // does not remove it from here — it makes the two disagree, and that is
+    // refused.
+    claim "C1" from-slice="TS.260823.04" state=met \
+        text="a field written in the form the schema declares is accepted, in both directions" \
+        settled-by="a test writing one field as a property and another as a node, each matching its declaration, asserting both check clean"{
+        ran "cargo test --quiet --test field_form"
+        exited 0
+        digest "fnv1a64:c344c82e4a7ae86e"
+        witnessed-at "2026-08-23T06:02:50Z"
+    }
+    claim "C2" from-slice="TS.260823.04" state="pending"
+    claim "C3" from-slice="TS.260823.04" state=met \
+        text="cardinality over nodes and over values are separately declared and separately reported" \
+        settled-by="a test declaring a multi-valued field, writing it as repeated nodes, and asserting the refusal explains which of the two was exceeded"{
+        ran "cargo test --quiet --test field_form"
+        exited 0
+        digest "fnv1a64:c344c82e4a7ae86e"
+        witnessed-at "2026-08-23T06:02:56Z"
+    }
+    claim "C4" from-slice="TS.260823.04" state=met \
+        text="every kind the gate requires a trail of declares a trail field" \
+        settled-by="a test over the method asserting no kind is required to carry a field its own shape does not declare"{
+        ran "cargo test --quiet --test field_form"
+        exited 0
+        digest "fnv1a64:c046d9669caf8ae0"
+        witnessed-at "2026-08-23T06:03:49Z"
+    }
+    claim "C5" from-slice="TS.260823.04" state=met \
+        text="an identity prefix is resolved from the record rather than trimmed by the engine" \
+        settled-by="a test resolving references in a corpus whose prefixes differ from this repository's"{
+        ran "cargo test --quiet --test field_form"
+        exited 0
+        digest "fnv1a64:c344c82e4a7ae86e"
+        witnessed-at "2026-08-23T06:03:02Z"
+    }
+
+
+    // ---- DESIGN ----------------------------------------------------------------
+    // ACTIVE, not complete, and F4 of ITER.260823.06 is why: `the-plan-and-the-code-agree`
+    // reads `followed` only from a COMPLETE implement phase, so a design recorded before
+    // implementation refuses every approach it produced.
+
+    phase "design-system" state="complete" worked-by="agent:principal-engineer" {
+        approach "read every field in both forms, and count VALUES" {
+            over "declaring a form per field with `as=\"node\"` / `as=\"property\"`, and refusing a mismatch"
+            over "accepting both forms but leaving cardinality counting nodes"
+            over "normalising the record to one form and refusing the other"
+            because "the fault is that an author writes valid KDL matching a declared field and is \
+                told the field is missing. Declaring a form FIXES that by making the rule legible; \
+                accepting both forms REMOVES it. Nothing in this record needs to insist on a form \
+                — both are used freely today — so a form declaration would add vocabulary to a \
+                method already carrying twenty-seven kinds and a hundred and fifty-eight field \
+                names, to enforce a distinction nobody wants enforced"
+            note "this is what C2 was cut assuming, and it is what this iteration rejects. Under \
+                this approach there is no form MISMATCH to report, so C2 cannot be met as \
+                written. It is carried by a finding rather than reinterpreted into something \
+                weaker — settling a claim against a reading it did not have is the silent drop \
+                with better manners"
+        }
+
+        approach "an identity prefix is declared on the kind that carries it" {
+            over "matching on the suffix after the last dot"
+            over "deriving the prefix set from the ids the record already holds"
+            because "`trim_start_matches(\"CAP.\")` in four engine call sites is A4 exactly — the \
+                engine encoding what the record declares. Suffix-matching and derivation both \
+                replace one piece of engine knowledge with another, cleverer piece. Declaring \
+                `id-prefix` on the entity puts the fact where every other fact about a kind \
+                already lives, and `praxis schema` then prints it"
+        }
+
+        approach "the trail requirement and the schema are reconciled in the SCHEMA" {
+            over "dropping `requires \"every entity carries a trail\"` from the gate"
+            over "adding a trail field to all twenty-five kinds"
+            because "eight of twenty-five kinds declare a trail and the gate demands one of every \
+                entity, so writing a trail on a capability is refused as an undeclared field while \
+                the gate says it is required. One of the two is wrong. The gate's reason — \
+                attribution distinguishes human authorship from agent authorship — is sound and \
+                worth keeping, so the requirement stays and it becomes a statement about the \
+                kinds that DECLARE a trail rather than about every kind. Adding the field to all \
+                twenty-five would be a schema change nobody asked for, made to satisfy a sentence"
+        }
+
+        produced "three approaches, and a claim this iteration will not meet"
+    }
+
+    phase "implement" state="complete" worked-by="agent:principal-engineer" \
+        produced="value-counting cardinality, form-agnostic reads, a declared identity prefix, \
+            nine corrected cardinalities, and six tests" {
+        followed "read every field in both forms, and count VALUES"
+        followed "an identity prefix is declared on the kind that carries it"
+        followed "the trail requirement and the schema are reconciled in the SCHEMA"
+    }
+
+    layer "doctrine" state="evidenced" \
+        evidence="`declare-an-entity-kind` says a field is read in whichever form it is written, \
+            shows the three refusals that were wrong, and states that an identity prefix is \
+            declared on the kind" \
+        reaches="the skill an author follows when writing a kind, which is where all three traps were met"
+
+    layer "enforcement" state="evidenced" \
+        evidence="cardinality counts values across both forms; a boolean reads in either; the \
+            identity prefix comes from the schema and a repository may choose its own; the gate \
+            no longer requires of every kind a field only eight declare" \
+        reaches="the three traps, and the nine cardinalities that were wrong beneath them"
+
+    layer "docs" state="evidenced" \
+        evidence="`what shape does this field take` is answerable from `praxis schema` alone, \
+            because the answer is `either`" \
+        reaches="the question an adopter could not previously answer without reading the engine"
+
+    layer-set sealed=#true at="2026-08-23T05:40:00Z"
+
+    // `falsified-by` and `state` are written as PROPERTIES because the checker reads them
+    // with `prop()` and sees nothing when they are child nodes. Written the natural way —
+    // as children, beside `title` and `over` — this decision was refused for declaring no
+    // falsifier while the falsifier sat on the line above. That is this slice's own subject,
+    // hit while recording the decision that decides how to fix it (F1 below).
+    decision "D1" state="accepted" \
+        title="A field is read in both forms, rather than declaring which form it takes" \
+        chose="form-agnostic reading, with cardinality counting values" \
+        falsified-by="a repository that needs to REQUIRE one form — a renderer, a diff tool or an \
+            external parser that cannot read both. None exists today; one appearing would say this \
+            was wrong" seal=fnv1a64:9ecb83001ee8fd75 {
+        over "a declared form per field, with a mismatch refused by name"
+        over "leaving cardinality counting nodes while accepting both forms for reading"
+        because "removing a trap beats documenting it, and this method is already carrying more \
+            vocabulary than its stated audience can hold"
+    }
+
+    finding "F1" \
+        text="recording D1 hit this slice's own fault twice in one node: `falsified-by` written as \
+            a child node is invisible to `prop()`, and the refusal said the decision declared no \
+            falsifier while the falsifier was on the previous line. The refusal named the wrong \
+            problem — it sent the author to the argument rather than to the syntax, which is \
+            exactly what C2 was cut to fix and what D1 chooses to remove instead" \
+        carries="C2"
+    closed-at "2026-08-23T06:08:35Z"
+    outcome "continue"
+
+    close {
+        claims-settled "C1" how="met"
+        claims-settled "C2" how="carried by F1"
+        claims-settled "C3" how="met"
+        claims-settled "C4" how="met"
+        claims-settled "C5" how="met"
+        all-met #false
+        attested-by "human:wael"
+        note "the accounting above was computed at close, not asserted. It says every claim is either met or carried by a finding that names it, and nothing about whether the work is any good"
+    }
+
+    trail {
+        entry at="2026-08-23T06:08:35Z" by="agent:praxis" action="state-changed" from="open" to="closed" note="closed by `praxis close`. The accounting was computed; the conclusion is not the machine's to draw"
+
+        entry at="2026-08-23T05:39:52Z" by="agent:praxis" action="created" \
+            note="opened by the gate, on the ask of human:wael"
+    }
+}

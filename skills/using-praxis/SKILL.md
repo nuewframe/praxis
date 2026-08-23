@@ -31,11 +31,17 @@ Load the persona's full file before acting in that role.
 
 | Persona | When to be this persona | File |
 |---|---|---|
-| **Product Manager** | Framing the problem, cutting slices from a storm, signing the admission, dashboard honesty | `agents/product-manager.agent.md` |
+| **Product Manager** | Framing the problem, cutting slices from a storm, asking for the admission, dashboard honesty | `agents/product-manager.agent.md` |
 | **Product Designer** | User value, the `design-ux` phase, a slice's scenario and claims; owns what a read model must answer before an actor can act | `agents/product-designer.agent.md` |
 | **Principal Engineer** | Capability-driven architecture, refactoring, cross-cutting decisions; operates in three modes — architect, implementer, reviewer — never two at once | `agents/principal-engineer.agent.md` |
 
 **The same engineer cannot self-approve — and since `TS.260821.08`, `praxis close` refuses it.**
+
+**Neither end of an iteration lets the tool name a person.** `pick-up --asked-by` and
+`close --attested-by` are both required and both without a default. Until `TS.260823.01` the
+admission took its identity from `git config user.email`, which names whose machine the command ran
+on — so an agent in the maintainer's shell wrote a signed human approval nobody typed. The approval
+now records `asked`, because an ask is what it is.
 
 Each persona names a `role` in the record, and a role declares which phases it may not attest
 when it did the work itself. A phase records `worked-by`, and `praxis close` requires
@@ -94,7 +100,7 @@ cut-a-slice                         admits or       praxis review    silent drop
                                     writing)                                         praxis verify-published
 ```
 
-**The commitment is the iteration.** `praxis pick-up TS.a TS.b TS.c` opens **one** iteration
+**The commitment is the iteration.** `praxis pick-up TS.a TS.b TS.c --asked-by <who>` opens **one** iteration
 over three slices, vetted separately and admitted together — a commitment that admits its
 easy half is not one thing. A slice is a unit of work; the iteration is the promise.
 

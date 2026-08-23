@@ -152,6 +152,11 @@ pub struct Settled {
     pub id: String,
     pub from: String,
     pub state: String,
+    /// The run that settled it, if a run did. `None` is a claim settled on prose — legitimate
+    /// in a repository that declares no verification, and the difference must be VISIBLE
+    /// rather than assumed: a reader who cannot tell a witnessed claim from a reported one
+    /// has to trust both equally, which is the whole subject (`TS.260823.02`).
+    pub witnessed_by: Option<String>,
 }
 
 /// A choice an iteration could not make implicitly, with what it rejected and what would
@@ -426,6 +431,10 @@ pub struct Corpus {
     pub roles: Vec<Role>,
     /// The problems this repository is working on.
     pub frames: Vec<Frame>,
+    /// The prefix a reference to a capability carries, as the SCHEMA declares it. Carried
+    /// on the corpus so the views that resolve a capability by name do not each hold their
+    /// own copy of `CAP.` — which is what four call sites did until `TS.260823.04`.
+    pub capability_prefix: Option<String>,
     /// Why the product exists, above the problem it attacks (TS.260821.16).
     pub anchor: Anchor,
     /// Kind → what it means, from the schema's own `is=`. Carried on the corpus so a
@@ -437,6 +446,19 @@ pub struct Corpus {
 }
 
 impl Corpus {
+    /// A capability id with whatever prefix the schema declares removed.
+    ///
+    /// `TS.260823.04`. Four call sites did `trim_start_matches("CAP.")` — a naming
+    /// convention only the engine knew, applied to every repository whether or not it used
+    /// that prefix, and never explained when nothing resolved.
+    #[must_use]
+    pub fn bare_capability<'a>(&self, id: &'a str) -> &'a str {
+        match self.capability_prefix.as_deref() {
+            Some(prefix) => id.strip_prefix(prefix).unwrap_or(id),
+            None => id,
+        }
+    }
+
     pub fn from_documents(docs: &[KdlDocument], schema: &Schema) -> Self {
         let mut known = Known::default();
         for doc in docs {
@@ -444,6 +466,9 @@ impl Corpus {
         }
 
         let mut corpus = Self::default();
+        // From the SCHEMA, once, rather than from a literal in each view that resolves a
+        // capability by name (`TS.260823.04`).
+        corpus.capability_prefix = schema.capability_prefix();
         for doc in docs {
             for violation in check_document(doc, schema, &known) {
                 if violation.severity() == crate::Severity::Refuse
@@ -787,6 +812,7 @@ fn attempt_from(node: &KdlNode) -> Attempt {
                 id: string_arg(c).unwrap_or_default(),
                 from: prop(c, "from-slice").unwrap_or_default(),
                 state: prop(c, "state").unwrap_or_default(),
+                witnessed_by: child_arg(c, "digest"),
             })
             .collect(),
         contributes: child_args(node, "contributes"),

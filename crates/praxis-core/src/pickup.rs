@@ -38,6 +38,9 @@ pub struct Record {
 /// approval is the trust-transfer problem expressed as a signature.
 #[derive(Debug, Clone)]
 pub struct Ask {
+    /// Who ASKED, for a pick-up — named by whoever asked, never inferred from the tree
+    /// (`TS.260823.01`). For close, bind and cut this is who RAN the command, which is a
+    /// trail fact and honest as one; only pick-up promotes it into an approval.
     pub signer: String,
     pub at: String,
     /// What RAN. The tool, always — `agent:praxis`.
@@ -181,12 +184,17 @@ fn iteration_kdl(
     out.push_str("    state \"open\"\n");
     out.push_str(&format!("    opened-at {:?}\n", ask.at));
     out.push_str(&format!("    opened-by {:?}\n", ask.by));
+    // ASKED, not signed. Nothing here was signed and the schema has never said it was:
+    // its reason for this field reads "the human's ask is the only gate, and it is
+    // recorded or it did not happen". The engine wrote `signed` over it for nineteen
+    // iterations, and a reader answering "who decided this" got a word that claimed a
+    // witness nobody produced (`TS.260823.01`).
     out.push_str("\n    approval \"admission\" {\n");
-    out.push_str("        status \"signed\"\n");
-    out.push_str(&format!("        signer {:?}\n", ask.signer));
+    out.push_str("        status \"asked\"\n");
+    out.push_str(&format!("        asked-by {:?}\n", ask.signer));
     out.push_str(&format!("        at {:?}\n", ask.at));
     out.push_str(&format!(
-        "        signed-by \"the ask to pick up {}\"\n",
+        "        via \"the ask to pick up {}\"\n",
         if per_slice.len() == 1 { "this slice" } else { "these slices, as one commitment" }
     ));
     out.push_str("    }\n");

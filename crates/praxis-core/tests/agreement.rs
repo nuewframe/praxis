@@ -128,11 +128,21 @@ fn an_abandoned_approach_satisfies_the_rule_and_remains() {
 
 /// Several approaches, all followed, is silent — and `followed` must be child nodes.
 ///
-/// KDL keeps only the LAST of a repeated property, so four `followed="…"` properties on one
-/// node record one approach and lose three. `ITER.260822.14` claimed four and held one
-/// (`BB1`).
+/// Both forms record every value (`TS.260823.04`/`D1`).
+///
+/// This test used to assert the opposite: that repeated `followed="…"` properties collapse
+/// to one, and that the collapse is *caught rather than silently accepted*. The premise was
+/// half right — `node.get()` returns one of them — but the document keeps every entry, and
+/// `all_props` reads them all. So the collapse was never in KDL; it was in the one accessor
+/// the rule happened to use.
+///
+/// `D1` decided that a field is read in whichever form it was written, over declaring a form
+/// per field and refusing a mismatch. Catching the property form is what that decision
+/// rejects: the author who writes four properties means four, and a method that refuses them
+/// is teaching syntax it has no reason to care about. `BB1` — an iteration that claimed four
+/// approaches and held one — is fixed by reading all four, not by refusing the line.
 #[test]
-fn followed_is_a_repeatable_child_and_not_a_repeated_property() {
+fn followed_records_every_value_in_either_form() {
     let two = format!(
         "{ONE}\n        approach \"the second one\" {{\n\
          \x20           over \"doing it all at once\"\n            because \"it splits cleanly\"\n        }}"
@@ -151,11 +161,10 @@ fn followed_is_a_repeatable_child_and_not_a_repeated_property() {
          \x20       followed=\"the one that was written down\" \\\n\
          \x20       followed=\"the second one\"",
     );
-    assert_eq!(
-        agreement(&as_properties).len(),
-        1,
-        "the collapsed one is caught rather than silently accepted — which is the whole reason \
-         it is worth catching: {:?}",
+    assert!(
+        agreement(&as_properties).is_empty(),
+        "four properties mean four approaches, the same as four child nodes — the author who \
+         writes one form should not be refused for not writing the other: {:?}",
         agreement(&as_properties)
     );
 }

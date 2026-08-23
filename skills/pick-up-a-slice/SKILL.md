@@ -14,7 +14,7 @@ tools: [read_file, file_search, grep_search, run_in_terminal]
 **Audience:** Working agent, Maintainer. **Phase:** `ITERATE`. Run `see-what-is-ready` first.
 
 ```
-praxis pick-up <SLICE-ID> [root] [--dry-run]
+praxis pick-up <SLICE-ID>... --asked-by <IDENTITY> [--root <ROOT>] [--dry-run]
 ```
 
 ---
@@ -27,8 +27,8 @@ method and this is it — nothing later asks permission again.
 
 Two outcomes, never both and never neither:
 
-- **admitted** — an iteration record is written in state `open`, carrying the signed admission and
-  every condition's verdict;
+- **admitted** — an iteration record is written in state `open`, carrying the admission, who asked
+  for it, and every condition's verdict;
 - **refused** — a `REF.` record is written naming the conditions that failed, and **nothing opens**.
 
 ---
@@ -64,7 +64,7 @@ This happens, and there is a right way through it. In order:
 2. **Ask whether the block is real or an accounting artefact.** A dependency can be genuinely
    satisfied while the record has not caught up. If so, **fix the accounting** — that is a finding and
    usually a real defect.
-3. **If it is real and you proceed anyway**, a human signs the admission and **the refusal stays
+3. **If it is real and you proceed anyway**, a human is named as having asked and **the refusal stays
    standing.** Record both: the `REF.` file, and a create-vet condition naming it with the reason.
    A reader must be able to see that the gate ran, what it said, and who decided otherwise.
 
@@ -87,10 +87,40 @@ to save you one argument, and the conditions are the only reason anyone believes
 
 ---
 
-## Who signs
+## Who asked
 
-The tree's own git identity, as `human:<name>`. **An agent cannot sign an admission** — not because a
-rule refuses it, but because there is nowhere in the command to put an agent's name. An agent-signed
-approval is the trust-transfer problem expressed as a signature.
+**`--asked-by` is required and has no default. Name whoever asked.**
+
+The ask is the permission. Somebody said "pick this up" and that is the authority — this method does
+not add a second confirmation, and a prompt inside the tool would only prove the tool ran twice.
+
+What it will not do is decide **whose** ask it was. Until `TS.260823.01` the identity came from
+`git config user.email`, stripped and prefixed `human:` — which reports whose machine the command ran
+on. An agent working in the maintainer's shell therefore produced a signed human approval nobody
+typed, in the one gate every other rule in this method assumes held.
+
+`close --attested-by` had made this argument for two versions already:
+
+> *An identity the tool supplied would prove the tool ran, which nobody doubted.*
+
+The same sentence is true of the admission, and both ends of an iteration now say so.
+
+**The word is `asked`, not `signed`.** Nothing here is signed, and the schema never claimed it was —
+its reason for the approval field has always read *"the human's ask is the only gate, and it is
+recorded or it did not happen."* The engine wrote `signed` over it for nineteen iterations, so a
+reader asking *who decided this* got a word promising a witness nobody produced.
+
+| Refused | Why |
+|---|---|
+| no `--asked-by` | an admission on nobody's word |
+| `--asked-by ""` | the same, said longer |
+| `--asked-by agent:anything` | an agent admitting its own work is this frame's root cause with the method's name on it |
+
+A bare name is read as a human. Requiring the `human:` prefix would teach people to type it as a
+formality, and a formality is exactly what the git identity had become.
+
+**What this does not claim.** The record holds who was *named*. It cannot hold whether they asked,
+agreed, or read the slice — and a mechanism pretending otherwise would repeat, one level up, the
+fault this replaced.
 
 Related: `see-what-is-ready` · `cut-a-slice` · `declare-an-entity-kind`.

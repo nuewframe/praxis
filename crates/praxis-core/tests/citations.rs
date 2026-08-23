@@ -21,7 +21,7 @@ use praxis_core::{Known, Schema, check_corpus, check_node, index_all, parse};
 const SCHEMA: &str = r##"
 notional-architecture "NA.test" {
     schema {
-        entity "capability" {
+        entity "capability" id-prefix="CAP." {
             field "doing"            each="1"
             field "not"              each="1"
             field "state"            each="1"

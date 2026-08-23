@@ -42,7 +42,13 @@ pub fn review(iteration_id: &str, corpus: &Corpus, as_of: &str) -> Option<ReadMo
             .find(|f| f.carries.as_deref() == Some(claim.id.as_str()))
             .map(|f| format!("carried by {}", f.id));
         let shown = match (claim.state.as_str(), carried) {
-            ("met", _) => "settled".to_owned(),
+            // Witnessed and reported are different facts and the view says which. A claim
+            // settled by a run names the run; one settled on prose says so, so nobody has
+            // to assume the stronger of the two (`TS.260823.02/C3`).
+            ("met", _) => match &claim.witnessed_by {
+                Some(digest) => format!("witnessed · {digest}"),
+                None => "reported — settled on prose, no run".to_owned(),
+            },
             (_, Some(by)) => by,
             (state, None) if state.is_empty() => "nothing yet".to_owned(),
             (_, None) => "nothing yet".to_owned(),

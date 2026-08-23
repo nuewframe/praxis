@@ -69,6 +69,17 @@ config {
         enable-all-report #true
     }
 
+    // ====================================================================
+    // How this repository verifies. Declared ONCE, here, and never on the command line:
+    // `praxis evidence` runs what this names and `--by` selects within it. An engine that
+    // ran whatever the caller passed would be a command runner driven by the agent it
+    // exists to check — it could name `true` and settle every claim (TS.260823.02).
+    // ====================================================================
+    verification {
+        runner "cargo test --quiet"
+        select-with "--test"
+    }
+
     paths {
         product-root "."
         state-root "praxis/"

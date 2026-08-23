@@ -95,7 +95,13 @@ fn c3_a_preview_reflects_the_moment_it_was_asked() {
     );
     let second = review("ITER.1", &corpus_of(&moved), "now").expect("a preview");
     assert_ne!(first, second);
-    assert_eq!(section(&second, "what it promised").rows[1][3], "settled");
+    // Settled on prose, and the view SAYS so — this fixture declares no run, and a reader
+    // who cannot tell a witnessed claim from a reported one has to trust both equally
+    // (`TS.260823.02/C3`).
+    assert_eq!(
+        section(&second, "what it promised").rows[1][3],
+        "reported — settled on prose, no run"
+    );
 }
 
 #[test]
