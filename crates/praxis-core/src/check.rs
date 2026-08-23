@@ -148,6 +148,12 @@ pub enum Refusal {
     /// designs before it builds — `ApproachNotTaken` is what the same fact becomes once
     /// implement is complete and there is no longer time left for it to change.
     ApproachInFlight { iteration: String, approach: String },
+    /// A harness manifest whose version or description no longer matches what the record
+    /// derives for it — hand-edited, or never regenerated since the record moved on.
+    ManifestDrifted { path: String, field: String, expected: String, found: String },
+    /// The distributed package's `files` omits something its own doctrine instructs an
+    /// agent to run — the engine, or the method file that says what to run.
+    PackageMissingWhatItShips { missing: String, why: &'static str },
 }
 
 impl Refusal {
@@ -222,6 +228,8 @@ impl Refusal {
             Self::ContinuesUnrelatedIteration { .. } => "a-continuation-shares-its-slice",
             Self::ContinuationWithoutReason { .. } => "a-continuation-states-why",
             Self::ApproachInFlight { .. } => "the-plan-and-the-code-agree",
+            Self::ManifestDrifted { .. } => "a-manifest-is-derived-from-the-record",
+            Self::PackageMissingWhatItShips { .. } => "the-package-ships-what-it-tells-you-to-run",
         }
     }
 
@@ -273,6 +281,8 @@ impl Refusal {
                 "continues"
             }
             Self::ApproachInFlight { .. } => "approach",
+            Self::ManifestDrifted { field, .. } => field,
+            Self::PackageMissingWhatItShips { .. } => "files",
         }
     }
 
@@ -487,6 +497,15 @@ impl Refusal {
                 "{iteration} continues {continues}, and the two share no slice. A continuation \
                  stands on a prior attempt at the SAME work — one naming an iteration over \
                  different work is borrowing its name rather than carrying its claims forward"
+            ),
+            Self::ManifestDrifted { path, field, expected, found } => format!(
+                "{path}'s `{field}` is {found:?}; the record derives {expected:?}. A manifest is \
+                 the first thing an adopter reads, and one describing a version or a method the \
+                 record no longer holds is a published document with no evidence it was ever true"
+            ),
+            Self::PackageMissingWhatItShips { missing, why } => format!(
+                "the distributed package's `files` omits `{missing}` — {why}. Every skill in the \
+                 tree instructs an agent to run a command the package would not contain"
             ),
             Self::ContinuationWithoutReason { iteration, continues } => format!(
                 "{iteration} continues {continues} and says nothing about why. \
@@ -1218,6 +1237,19 @@ pub fn check_corpus_given(
     out.extend(check_retired_vocabulary(docs, schema, facts));
     out.extend(check_invariants(docs, schema));
     out.extend(check_binding(docs));
+
+    // `a-manifest-is-derived-from-the-record` and `the-package-ships-what-it-tells-you-to-
+    // run`, if the record declares either. `TS.260823.07`.
+    if schema.declares_rule("a-manifest-is-derived-from-the-record") {
+        let corpus = crate::admission::Corpus::from_documents(docs, schema);
+        if let Some(release) = corpus.releases.last() {
+            let description = (!corpus.anchor.mission.is_empty()).then_some(corpus.anchor.mission.as_str());
+            out.extend(check_manifests(facts, &release.version, description));
+        }
+    }
+    if schema.declares_rule("the-package-ships-what-it-tells-you-to-run") {
+        out.extend(check_package_contents(facts));
+    }
 
     // `a-continuation-shares-its-slice` and `a-continuation-states-why`, if the record
     // declares either. `TS.260823.10`.
@@ -2036,6 +2068,93 @@ fn check_retired_vocabulary(
                     line: found.line,
                     word: found.word,
                     instead: found.instead,
+                },
+                span: SourceSpan::from(0..0),
+            });
+        }
+    }
+    out
+}
+
+/// `TS.260823.07`/C1 and C2. Every harness manifest's derived fields, compared against
+/// what is actually on disk — whether that disk copy was never regenerated since the
+/// version moved on, or hand-edited afterward, reads identically: drift the record can
+/// name.
+///
+/// Compared field by field, on the PARSED value, rather than by re-rendering the whole
+/// document and comparing bytes: a manifest is only partly derived — its structure and
+/// most of its fields stay hand-authored — so a hand author's own formatting is not the
+/// fact this rule is about, and would drown the fact it is in reformatting noise.
+fn check_manifests(facts: &Facts, version: &str, description: Option<&str>) -> Vec<Violation> {
+    let mut out = Vec::new();
+    for path in crate::manifest::PATHS {
+        let Some((_, text)) = facts.text.iter().find(|(p, _)| p == path) else { continue };
+        let Ok(value) = serde_json::from_str::<serde_json::Value>(text) else { continue };
+        let entry = if *path == ".claude-plugin/marketplace.json" {
+            value.get("plugins").and_then(|p| p.as_array()).and_then(|plugins| {
+                plugins.iter().find(|p| p.get("name").and_then(|n| n.as_str()) == Some("praxis"))
+            })
+        } else {
+            Some(&value)
+        };
+        let Some(entry) = entry else { continue };
+
+        let found = entry.get("version").and_then(|v| v.as_str()).unwrap_or_default();
+        if found != version {
+            out.push(manifest_drift(path, "version", version, found));
+        }
+        if let Some(description) = description
+            && let Some(found) = entry.get("description").and_then(|v| v.as_str())
+            && found != description
+        {
+            out.push(manifest_drift(path, "description", description, found));
+        }
+    }
+    out
+}
+
+fn manifest_drift(path: &str, field: &str, expected: &str, found: &str) -> Violation {
+    Violation {
+        entity_kind: "manifest".to_owned(),
+        entity_id: Some(path.to_owned()),
+        refusal: Refusal::ManifestDrifted {
+            path: path.to_owned(),
+            field: field.to_owned(),
+            expected: expected.to_owned(),
+            found: found.to_owned(),
+        },
+        span: SourceSpan::from(0..0),
+    }
+}
+
+/// `TS.260823.07`/C3. The distributed package instructs an agent to run the engine and
+/// read the method file, so a package shipped without either is doctrine that cannot be
+/// obeyed by whoever installed it.
+fn check_package_contents(facts: &Facts) -> Vec<Violation> {
+    let mut out = Vec::new();
+    let Some((_, text)) = facts.text.iter().find(|(p, _)| p == "package.json") else {
+        return out;
+    };
+    let Ok(value) = serde_json::from_str::<serde_json::Value>(text) else {
+        return out;
+    };
+    let files: Vec<&str> = value
+        .get("files")
+        .and_then(|f| f.as_array())
+        .map(|a| a.iter().filter_map(|v| v.as_str()).collect())
+        .unwrap_or_default();
+    let ships = |name: &str| files.iter().any(|f| *f == name || f.starts_with(&format!("{name}/")));
+    for (missing, why) in [
+        ("crates", "the engine every skill instructs an agent to run"),
+        ("praxis", "the method file doctrine points at"),
+    ] {
+        if !ships(missing) {
+            out.push(Violation {
+                entity_kind: "config".to_owned(),
+                entity_id: Some("package.json".to_owned()),
+                refusal: Refusal::PackageMissingWhatItShips {
+                    missing: missing.to_owned(),
+                    why,
                 },
                 span: SourceSpan::from(0..0),
             });

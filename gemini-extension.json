@@ -1,6 +1,6 @@
 {
+  "contextFileName": "GEMINI.md",
+  "description": "make execution fidelity a property computed from the record, rather than a claim made by whoever produced the artifact",
   "name": "praxis",
-  "description": "Lean wave-based product delivery unified with Principal Engineer discipline.",
-  "version": "0.7.1",
-  "contextFileName": "GEMINI.md"
+  "version": "0.8.0"
 }

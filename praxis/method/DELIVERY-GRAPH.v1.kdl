@@ -1486,6 +1486,40 @@ method "delivery-graph" {
                 text="Create a sprint for this work, then close the sprint."
         }
 
+        rule "a-manifest-is-derived-from-the-record" refuses="a harness manifest whose version \
+                or description no longer matches what the record derives for it" \
+            because="a manifest is the first thing an adopter reads and the only thing a \
+                marketplace shows — a published document carrying no evidence of when, or \
+                whether, it was ever true. Five of them described a version two behind the \
+                record and a method the record had retired, and nothing noticed because nothing \
+                compared them to anything" \
+            found-by="the validation review of 2026-08-22, which read all five manifests at \
+                0.7.1 against a record holding 0.8.0" \
+            witness=#"""
+                release "REL.witness" {
+                    version "1.0.0"
+                    state "planned"
+                    trail {
+                        entry at="2026-08-22T00:00:00Z" by="human:witness" action="created"
+                    }
+                }
+                """# {
+            given-file ".claude-plugin/plugin.json" \
+                text="{\"name\": \"praxis\", \"version\": \"0.7.1\"}"
+        }
+
+        rule "the-package-ships-what-it-tells-you-to-run" refuses="the distributed package's \
+                `files` omitting the engine or the method file" \
+            because="every skill in the tree instructs an agent to run `praxis check`, and a \
+                package shipping `skills`, `agents`, `instructions`, `scripts` without `crates` \
+                or `praxis` delivers doctrine that says to run a command it does not contain" \
+            found-by="the same validation review, reading the npm package's own file list \
+                against what a skill in it instructs an agent to do" \
+            witness="" {
+            given-file "package.json" \
+                text="{\"name\": \"praxis\", \"files\": [\"skills\", \"agents\"]}"
+        }
+
         // Whether this model is working, six months on. Two of these falsify rather than
         // confirm, and both fail quietly if the model is right on paper and unused in
         // practice — the failure mode a method is least likely to notice about itself.

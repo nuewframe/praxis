@@ -1401,6 +1401,31 @@ fn publishing(version: &str, root: &Path, dry_run: bool) -> miette::Result<bool>
                 fs::write(path, text).map_err(|e| miette::miette!("{}: {e}", path.display()))?;
                 println!("praxis: wrote {}", path.display());
             }
+
+            // The harness manifests, regenerated alongside the release notes. `TS.260823.07`:
+            // version and description are projections of this same release; everything else
+            // about a manifest stays whatever a human last wrote there.
+            let description = (!corpus.anchor.mission.is_empty()).then_some(corpus.anchor.mission.as_str());
+            let projection = praxis_core::manifest::Projection { version, description };
+            for path in praxis_core::manifest::PATHS {
+                let full = Path::new(".").join(path);
+                let Ok(existing) = fs::read_to_string(&full) else {
+                    eprintln!("praxis: {path} is not on disk — skipped, not refused: a manifest \
+                               this repository has not adopted is not this command's to create");
+                    continue;
+                };
+                let derived = praxis_core::manifest::derive(path, &existing, projection)
+                    .map_err(|e| miette::miette!("{path}: {e}"))?;
+                if derived == existing {
+                    continue;
+                }
+                if dry_run {
+                    println!("would rewrite {path}");
+                    continue;
+                }
+                fs::write(&full, derived).map_err(|e| miette::miette!("{}: {e}", full.display()))?;
+                println!("praxis: wrote {path}");
+            }
             Ok(true)
         }
     }
@@ -2553,11 +2578,15 @@ fn check(root: &Path) -> miette::Result<usize> {
     // The shapes come from the record here too. A repository that declares none audits
     // nothing rather than falling back to a set the engine chose (`TS.260823.05`).
     let shipped = shipped_doctrine(Path::new("."), &praxis_core::surface::declared_shapes(&docs));
-    let facts = Facts {
-        text: shipped_text(Path::new("."), &shipped),
-        shipped,
-        owed: owed_anchors(Path::new("."), &docs),
-    };
+    // The harness manifests and the npm package manifest are read alongside the shipped
+    // doctrine's own text, never added to `shipped` itself: they are not instruction a
+    // persona follows, so `every-shipped-surface-is-anchored` has no opinion about them.
+    // `TS.260823.07`.
+    let mut text = shipped_text(Path::new("."), &shipped);
+    let manifests: Vec<String> = praxis_core::manifest::PATHS.iter().map(|p| (*p).to_owned()).collect();
+    text.extend(shipped_text(Path::new("."), &manifests));
+    text.extend(shipped_text(Path::new("."), &["package.json".to_owned()]));
+    let facts = Facts { text, shipped, owed: owed_anchors(Path::new("."), &docs) };
     let corpus = check_corpus_given(&docs, &schema, &facts);
 
     // Redefinitions count as refusals: a repository running a variant of the method is not

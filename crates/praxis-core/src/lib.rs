@@ -17,6 +17,7 @@ pub mod pickup;
 pub mod dashboard;
 pub mod guide;
 pub mod invariant;
+pub mod manifest;
 pub mod promote;
 pub mod prove;
 pub mod publish;

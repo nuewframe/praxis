@@ -1,42 +1,41 @@
 {
-  "name": "praxis",
-  "version": "0.7.1",
-  "description": "Lean wave-based product delivery unified with Principal Engineer discipline: planning, design, capability-driven architecture, defensive implementation, and TDD verification.",
+  "agents": "./agents/",
   "author": {
     "name": "Nuewframe",
     "url": "https://github.com/nuewframe"
   },
+  "description": "make execution fidelity a property computed from the record, rather than a claim made by whoever produced the artifact",
   "homepage": "https://github.com/nuewframe/praxis",
-  "repository": "https://github.com/nuewframe/praxis",
-  "license": "MIT",
-  "keywords": [
-    "praxis",
-    "skills",
-    "planning",
-    "tdd",
-    "wave-methodology",
-    "capability-driven",
-    "adr",
-    "code-review",
-    "workflow"
-  ],
-  "skills": "./skills/",
-  "agents": "./agents/",
   "interface": {
-    "displayName": "Praxis",
-    "shortDescription": "Lean delivery + Principal Engineer discipline for coding agents",
-    "longDescription": "Use Praxis to guide product and engineering work through wave planning, thin-slice design, immutable sprint bridges, code-contribution intake, capability-driven architecture, defensive implementation, and TDD verification. Includes three personas (Product Manager, Product Designer, Principal Engineer) and ADR discipline.",
-    "developerName": "Nuewframe",
-    "category": "Coding",
     "capabilities": [
       "Interactive",
       "Read",
       "Write"
     ],
+    "category": "Coding",
     "defaultPrompt": [
-      "Help me plan a new wave for this product.",
-      "Let's start a sprint and create the immutable bridge."
+      "Help me frame a new problem for this product.",
+      "Let's cut a slice and open the iteration."
     ],
+    "developerName": "Nuewframe",
+    "displayName": "Praxis",
+    "longDescription": "Use Praxis to guide product and engineering work through frame discovery, thin-slice design, iterations opened by the gate on somebody's ask, code-contribution intake, capability-driven architecture, defensive implementation, and TDD verification. Includes three personas (Product Manager, Product Designer, Principal Engineer) and ADR discipline.",
+    "shortDescription": "Lean delivery + Principal Engineer discipline for coding agents",
     "websiteURL": "https://github.com/nuewframe/praxis"
-  }
+  },
+  "keywords": [
+    "praxis",
+    "skills",
+    "planning",
+    "tdd",
+    "capability-driven",
+    "adr",
+    "code-review",
+    "workflow"
+  ],
+  "license": "MIT",
+  "name": "praxis",
+  "repository": "https://github.com/nuewframe/praxis",
+  "skills": "./skills/",
+  "version": "0.8.0"
 }

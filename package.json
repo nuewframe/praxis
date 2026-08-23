@@ -1,7 +1,7 @@
 {
   "name": "praxis",
   "version": "0.7.1",
-  "description": "Lean wave-based product delivery unified with Principal Engineer discipline. Bootstraps coding agents with personas, always-on guardrails, and a skill index across Claude Code, Codex, Cursor, Gemini CLI, OpenCode, and GitHub Copilot.",
+  "description": "Make execution fidelity a property computed from the record, rather than a claim made by whoever produced the artifact. Bootstraps coding agents with personas, always-on guardrails, and a skill index across Claude Code, Codex, Cursor, Gemini CLI, OpenCode, and GitHub Copilot.",
   "type": "module",
   "main": ".opencode/plugins/praxis.js",
   "author": {
@@ -17,7 +17,6 @@
   "keywords": [
     "praxis",
     "skills",
-    "wave-methodology",
     "capability-driven",
     "tdd",
     "adr",
@@ -31,6 +30,11 @@
     "instructions",
     "scripts",
     "hooks",
+    "crates",
+    "praxis",
+    "Cargo.toml",
+    "Cargo.lock",
+    "rust-toolchain.toml",
     ".claude-plugin",
     ".codex-plugin",
     ".cursor-plugin",
