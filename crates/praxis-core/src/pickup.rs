@@ -57,6 +57,16 @@ pub struct Ask {
     pub attested_by: Option<String>,
 }
 
+/// A second iteration standing on a prior one, for the SAME slice. `TS.260823.10`.
+pub struct Continuation<'a> {
+    /// The iteration this one continues.
+    pub iteration: &'a str,
+    /// Why there is a second attempt — mis-cut, large, or blocked on something the first
+    /// could not reach. Absent is left to the record: `a-continuation-states-why` reports
+    /// it rather than this refusing to write.
+    pub because: Option<&'a str>,
+}
+
 /// Evaluate the gate for one slice and compose whichever record it produced.
 ///
 /// `taken` is every id already in use, so a new one does not collide. The gate never
@@ -72,6 +82,7 @@ pub fn pick_up(
     assessment: &Assessment,
     ask: &Ask,
     taken: &[String],
+    continuation: Option<&Continuation<'_>>,
 ) -> Pickup {
     if slice_ids.is_empty() {
         return Pickup::NoSuchSlice("no slice was named, so there is nothing to admit".to_owned());
@@ -131,7 +142,22 @@ pub fn pick_up(
             .iter()
             .flat_map(|s| s.claims.iter().map(|c| (s.id.clone(), c.clone())))
             .collect();
-        let kdl = iteration_kdl(&id, &name, &claims, ask, &per_slice, &undecided);
+        // Claims the continued iteration already met, on a slice this commitment shares
+        // with it. `TS.260823.10`/C2: these arrive CARRIED rather than pinned pending —
+        // citing that iteration's witness, not restating it.
+        let continued_claims: Vec<(String, String)> = continuation
+            .and_then(|c| corpus.attempts.iter().find(|a| a.id == c.iteration))
+            .map(|prior| {
+                prior
+                    .claims
+                    .iter()
+                    .filter(|claim| claim.state == "met")
+                    .map(|claim| (claim.from.clone(), claim.id.clone()))
+                    .collect()
+            })
+            .unwrap_or_default();
+        let kdl =
+            iteration_kdl(&id, &name, &claims, ask, &per_slice, &undecided, continuation, &continued_claims);
         Pickup::Opened(Record { file: format!("iterations/{id}.{name}.kdl"), id, kdl, failed })
     } else {
         let id = next_id("REF", &ask.at, taken);
@@ -159,6 +185,8 @@ fn iteration_kdl(
     ask: &Ask,
     per_slice: &[(String, Vec<(String, Verdict)>)],
     undecided: &[(String, String)],
+    continuation: Option<&Continuation<'_>>,
+    continued_claims: &[(String, String)],
 ) -> String {
     let mut out = String::new();
     out.push_str("// Opened by `praxis pick-up`. Every condition below was evaluated against the\n");
@@ -180,6 +208,13 @@ fn iteration_kdl(
     out.push_str(&format!("    slug {name:?}\n"));
     for (slice, _) in per_slice {
         out.push_str(&format!("    on-slice {slice:?}\n"));
+    }
+    if let Some(cont) = continuation {
+        out.push_str(&format!("    continues {:?}", cont.iteration));
+        if let Some(why) = cont.because {
+            out.push_str(&format!(" because={why:?}"));
+        }
+        out.push('\n');
     }
     out.push_str("    state \"open\"\n");
     out.push_str(&format!("    opened-at {:?}\n", ask.at));
@@ -237,9 +272,17 @@ fn iteration_kdl(
         out.push_str("    // does not remove it from here — it makes the two disagree, and that is\n");
         out.push_str("    // refused.\n");
         for (slice, claim) in claims {
-            out.push_str(&format!(
-                "    claim {claim:?} from-slice={slice:?} state=\"pending\"\n"
-            ));
+            // Already met by the iteration this one continues — arrives CARRIED, citing
+            // that iteration rather than restating its digest (`TS.260823.10`/C2).
+            match continuation.filter(|_| continued_claims.contains(&(slice.clone(), claim.clone()))) {
+                Some(cont) => out.push_str(&format!(
+                    "    claim {claim:?} from-slice={slice:?} state=\"carried\" carried-from={:?}\n",
+                    cont.iteration
+                )),
+                None => out.push_str(&format!(
+                    "    claim {claim:?} from-slice={slice:?} state=\"pending\"\n"
+                )),
+            }
         }
     }
 

@@ -208,6 +208,14 @@ pub fn close_iteration(iteration_id: &str, corpus: &Corpus, ask: &Ask, taken: &[
             accounting.push((claim.id.clone(), "met".to_owned()));
             continue;
         }
+        // Carried in from a prior iteration on the same slice (`TS.260823.10`/C2),
+        // distinguished by CITATION rather than by the state word alone: `state="carried"`
+        // has meant "carried by a finding" since before this existed, and a claim carrying
+        // neither a finding nor a `carried-from` is still the shortfall this rule refuses.
+        if let Some(from) = &claim.carried_from {
+            accounting.push((claim.id.clone(), format!("carried from {from}")));
+            continue;
+        }
         match attempt.findings.iter().find(|f| f.carries.as_deref() == Some(claim.id.as_str())) {
             Some(finding) => {
                 accounting.push((claim.id.clone(), format!("carried by {}", finding.id)));

@@ -50,7 +50,7 @@ fn gate(record: &str, slice: &str) -> Pickup {
     let docs = vec![schema_doc, record_doc];
     let corpus = Corpus::from_documents(&docs, &schema);
     let assessment = assess(&corpus, &conditions, &ask().at);
-    pick_up(&[slice.to_owned()], &corpus, &assessment, &ask(), &[])
+    pick_up(&[slice.to_owned()], &corpus, &assessment, &ask(), &[], None)
 }
 
 fn refusal(pickup: &Pickup) -> &praxis_core::Record {
@@ -243,7 +243,7 @@ fn two_pickups_on_one_day_do_not_contend() {
     let docs = vec![schema_doc, record_doc];
     let corpus = Corpus::from_documents(&docs, &schema);
     let assessment = assess(&corpus, &conditions, &ask().at);
-    let second = pick_up(&["TS.ready".to_owned()], &corpus, &assessment, &ask(), &[a.id.clone()]);
+    let second = pick_up(&["TS.ready".to_owned()], &corpus, &assessment, &ask(), &[a.id.clone()], None);
     let Pickup::Opened(b) = &second else { panic!("expected an admission") };
 
     assert_ne!(a.id, b.id, "two agents on one day get distinct files and never contend");
@@ -317,14 +317,14 @@ iteration "ITER.2" {
     // Every slice the VIEW calls ready is admitted by the GATE.
     for id in &ready {
         assert!(
-            matches!(pick_up(&[id.to_owned()], &corpus, &assessment, &ask(), &[]), Pickup::Opened(_)),
+            matches!(pick_up(&[id.to_owned()], &corpus, &assessment, &ask(), &[], None), Pickup::Opened(_)),
             "{id} is listed ready and the gate refused it"
         );
     }
     // And every slice it excludes is refused — whether excluded as blocked or as done.
     for id in blocked.iter().chain(delivered.iter()) {
         assert!(
-            matches!(pick_up(&[id.to_owned()], &corpus, &assessment, &ask(), &[]), Pickup::Refused(_)),
+            matches!(pick_up(&[id.to_owned()], &corpus, &assessment, &ask(), &[], None), Pickup::Refused(_)),
             "{id} is excluded by the view and the gate admitted it"
         );
     }
@@ -357,7 +357,7 @@ fn gate_many(record: &str, slices: &[&str]) -> Pickup {
     let corpus = Corpus::from_documents(&docs, &schema);
     let assessment = assess(&corpus, &conditions, &ask().at);
     let ids: Vec<String> = slices.iter().map(|s| (*s).to_owned()).collect();
-    pick_up(&ids, &corpus, &assessment, &ask(), &[])
+    pick_up(&ids, &corpus, &assessment, &ask(), &[], None)
 }
 
 #[test]

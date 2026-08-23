@@ -10,8 +10,8 @@ use std::process::ExitCode;
 use clap::{Parser, Subcommand};
 use miette::{Diagnostic, NamedSource, SourceSpan};
 use praxis_core::{
-    Ask, Binding, Closing, Conditions, Corpus, Known, Pickup, Schema, Severity, Violation,
-    Cut, Promotion, Publication, Published, Verified, assess, bind,
+    Ask, Binding, Closing, Conditions, Continuation, Corpus, Known, Pickup, Schema, Severity,
+    Violation, Cut, Promotion, Publication, Published, Verified, assess, bind,
     check_document, close_iteration, cut, index_all, parse, pick_up, project, promote, publish,
     dashboard, guide_for, prove, review, unbind, verify, what_is_currently_true,
 };
@@ -88,6 +88,15 @@ enum Command {
         /// makes at the other end of the iteration.
         #[arg(long)]
         asked_by: String,
+        /// The iteration this one continues, when a slice is getting a second attempt.
+        ///
+        /// Claims the named iteration already met, on a slice this pick-up shares with it,
+        /// arrive CARRIED rather than pinned pending (`TS.260823.10`).
+        #[arg(long)]
+        continues: Option<String>,
+        /// Why there is a second attempt. Left unset is reported, not refused.
+        #[arg(long)]
+        because: Option<String>,
         /// Say what would happen and write nothing.
         #[arg(long)]
         dry_run: bool,
@@ -396,7 +405,8 @@ fn main() -> ExitCode {
                 }
             }
         }
-        Command::PickUp { slices, root, asked_by, dry_run } => match pickup(&slices, &root, &asked_by, dry_run) {
+        Command::PickUp { slices, root, asked_by, continues, because, dry_run } =>
+            match pickup(&slices, &root, &asked_by, continues.as_deref(), because.as_deref(), dry_run) {
             Ok(admitted) => {
                 if admitted {
                     ExitCode::SUCCESS
@@ -932,7 +942,14 @@ fn settle_claim(
 
 /// `TS.260820.05` — the one gate. Either an iteration is open, or a refusal is on the
 /// record naming the condition that failed. Never both, and never neither.
-fn pickup(slices: &[String], root: &Path, asked_by: &str, dry_run: bool) -> miette::Result<bool> {
+fn pickup(
+    slices: &[String],
+    root: &Path,
+    asked_by: &str,
+    continues: Option<&str>,
+    because: Option<&str>,
+    dry_run: bool,
+) -> miette::Result<bool> {
     let sources = load(root)?;
     let docs: Vec<_> = sources.iter().map(|(_, _, d)| d.clone()).collect();
 
@@ -985,7 +1002,8 @@ fn pickup(slices: &[String], root: &Path, asked_by: &str, dry_run: bool) -> miet
     }
     let home = homes.remove(0);
 
-    match pick_up(slices, &corpus, &assessment, &ask, &taken) {
+    let continuation = continues.map(|iteration| Continuation { iteration, because });
+    match pick_up(slices, &corpus, &assessment, &ask, &taken, continuation.as_ref()) {
         Pickup::NoSuchSlice(why) => miette::bail!("{why}"),
         Pickup::Opened(record) => {
             let path = home.join(&record.file);

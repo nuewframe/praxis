@@ -157,6 +157,10 @@ pub struct Settled {
     /// rather than assumed: a reader who cannot tell a witnessed claim from a reported one
     /// has to trust both equally, which is the whole subject (`TS.260823.02`).
     pub witnessed_by: Option<String>,
+    /// The iteration this claim was carried FROM, when its state is `carried` rather than
+    /// pinned fresh. `TS.260823.10`/C2: a claim a prior iteration already met arrives
+    /// citing that iteration, not duplicating its digest.
+    pub carried_from: Option<String>,
 }
 
 /// A choice an iteration could not make implicitly, with what it rejected and what would
@@ -852,6 +856,7 @@ fn attempt_from(node: &KdlNode) -> Attempt {
                 from: prop(c, "from-slice").unwrap_or_default(),
                 state: prop(c, "state").unwrap_or_default(),
                 witnessed_by: child_arg(c, "digest"),
+                carried_from: prop(c, "carried-from"),
             })
             .collect(),
         contributes: child_args(node, "contributes"),

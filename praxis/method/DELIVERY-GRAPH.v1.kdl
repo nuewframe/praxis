@@ -361,6 +361,11 @@ method "delivery-graph" {
                 because="the commitment may span several slices. Its claims are the union of theirs, \
                     its layers are bounded by their union, and it closes when all of them are \
                     accounted for"
+            field "continues" each="0..1" references="iteration" \
+                because="a slice that took more than one iteration is not two unrelated attempts. \
+                    Naming which one this stands on is what lets a completeness question be asked \
+                    of the slice's whole history rather than of the current attempt alone \
+                    (`TS.260823.10`)"
             field "state"     each="1" one-of="open" "working" "closed" "abandoned"
             field "opened-at" each="1"
             field "opened-by" each="1"
@@ -960,6 +965,60 @@ method "delivery-graph" {
                         }
                     }
                     phase "implement" state="complete" followed="an approach nobody recorded"
+                    trail {
+                        entry at="2026-08-22T00:00:00Z" by="human:witness" action="created"
+                    }
+                }
+                """#
+
+        rule "a-continuation-shares-its-slice"        refuses="`continues` naming an iteration whose slices do not overlap this one's" \
+            because="a continuation stands on a PRIOR ATTEMPT AT THE SAME SLICE. One naming an \
+                iteration over different work is not carrying that iteration's claims forward, it \
+                is borrowing its name — and the claims a second iteration inherits are exactly the \
+                ones this rule protects from arriving unearned" \
+            found-by="`TS.260823.10`, cut from ITER.260823.08/F1, ITER.260823.08/F2 and \
+                ITER.260823.06/F4 — three findings, one shape: every completeness question in this \
+                engine was asked of one iteration as though the iteration's span and the slice's \
+                life were the same span" \
+            witness=#"""
+                iteration "ITER.witness-first" {
+                    slug "witness-first"
+                    on-slice "TS.witness-a"
+                    state "closed"
+                    trail {
+                        entry at="2026-08-22T00:00:00Z" by="human:witness" action="created"
+                    }
+                }
+                iteration "ITER.witness-second" {
+                    slug "witness-second"
+                    on-slice "TS.witness-b"
+                    continues "ITER.witness-first" because="borrows the name, not the slice"
+                    state "open"
+                    trail {
+                        entry at="2026-08-22T00:00:00Z" by="human:witness" action="created"
+                    }
+                }
+                """#
+
+        rule "a-continuation-states-why"              reports="`continues` naming an iteration with no `because`" \
+            because="`a-slice-took-more-than-one-iteration` is a fitness function that reads the \
+                COUNT of attempts and infers a cause. A continuation that says why — mis-cut, \
+                large, or something the first iteration could not reach — turns that inference into \
+                a fact the record states rather than one a reader has to guess at" \
+            witness=#"""
+                iteration "ITER.witness-first" {
+                    slug "witness-first"
+                    on-slice "TS.witness"
+                    state "closed"
+                    trail {
+                        entry at="2026-08-22T00:00:00Z" by="human:witness" action="created"
+                    }
+                }
+                iteration "ITER.witness-second" {
+                    slug "witness-second"
+                    on-slice "TS.witness"
+                    continues "ITER.witness-first"
+                    state "open"
                     trail {
                         entry at="2026-08-22T00:00:00Z" by="human:witness" action="created"
                     }

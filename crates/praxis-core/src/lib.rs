@@ -36,7 +36,7 @@ pub use admission::{Assessment, Capability, Carried, Config, Decision, Release, 
 pub use binding::{Binding, Proposal, Rejected, bind, propose, unbind};
 pub use cut::{Blocked, Cut, cut, seal};
 pub use close::{Closing, Unaccounted, close_iteration};
-pub use pickup::{Ask, Pickup, Record, pick_up};
+pub use pickup::{Ask, Continuation, Pickup, Record, pick_up};
 pub use dashboard::{Composed, Part, dashboard};
 pub use guide::{NoGuide, guide_for, guides};
 pub use prove::{

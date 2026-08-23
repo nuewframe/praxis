@@ -137,6 +137,17 @@ pub enum Refusal {
     /// on every view and read by nothing, which is how a release came to sort its
     /// documents alphabetically for a reader who arrived with a reason.
     ViewForNobody { view: String },
+    /// `continues` naming an iteration whose slices share nothing with this one's.
+    ContinuesUnrelatedIteration { iteration: String, continues: String },
+    /// `continues` naming an iteration with no stated reason. Reported: the fitness
+    /// function that reads how many attempts a slice took gets a count either way; this
+    /// is what turns the count into a cause.
+    ContinuationWithoutReason { iteration: String, continues: String },
+    /// An approach neither followed nor abandoned, while its implement phase is still in
+    /// flight. Reported, not refused: this is the normal state of any iteration that
+    /// designs before it builds — `ApproachNotTaken` is what the same fact becomes once
+    /// implement is complete and there is no longer time left for it to change.
+    ApproachInFlight { iteration: String, approach: String },
 }
 
 impl Refusal {
@@ -208,6 +219,9 @@ impl Refusal {
                 "iteration-without-signed-admission"
             }
             Self::AdmittedByAnAgent { .. } => "approval-signed-by-agent",
+            Self::ContinuesUnrelatedIteration { .. } => "a-continuation-shares-its-slice",
+            Self::ContinuationWithoutReason { .. } => "a-continuation-states-why",
+            Self::ApproachInFlight { .. } => "the-plan-and-the-code-agree",
         }
     }
 
@@ -255,6 +269,10 @@ impl Refusal {
             Self::ViewForNobody { .. } => "needed-by",
             Self::IterationNobodyAsked { .. } => "approval",
             Self::AdmittedByAnAgent { .. } | Self::AdmissionWithoutAnAsker { .. } => "asked-by",
+            Self::ContinuesUnrelatedIteration { .. } | Self::ContinuationWithoutReason { .. } => {
+                "continues"
+            }
+            Self::ApproachInFlight { .. } => "approach",
         }
     }
 
@@ -299,7 +317,14 @@ impl Refusal {
             // method named three rules and no words for two versions, and reporting it is
             // how that stops being invisible — refusing would fail the record closed over
             // an omission in the record's own history.
-            | Self::RetirementWithoutVocabulary { .. } => Severity::Report,
+            | Self::RetirementWithoutVocabulary { .. }
+            // The count of attempts is a fact either way; only the CAUSE is missing, and
+            // the fitness function that reads the count still fires without it.
+            | Self::ContinuationWithoutReason { .. }
+            // The normal in-flight state of any iteration that designed before it built —
+            // this is what `ApproachNotTaken` reads like before implement is complete, and
+            // refusing it defeats the exact sequencing `design-before-implement` asks for.
+            | Self::ApproachInFlight { .. } => Severity::Report,
             _ => Severity::Refuse,
         }
     }
@@ -457,6 +482,22 @@ impl Refusal {
                  view lands and whether it belongs in the story at all — a document nobody is for \
                  is one nobody will read, and it goes out under `addressed to nobody` rather than \
                  quietly"
+            ),
+            Self::ContinuesUnrelatedIteration { iteration, continues } => format!(
+                "{iteration} continues {continues}, and the two share no slice. A continuation \
+                 stands on a prior attempt at the SAME work — one naming an iteration over \
+                 different work is borrowing its name rather than carrying its claims forward"
+            ),
+            Self::ContinuationWithoutReason { iteration, continues } => format!(
+                "{iteration} continues {continues} and says nothing about why. \
+                 `a-slice-took-more-than-one-iteration` reads the count either way; without a \
+                 reason the record has the count and a reader is left to guess whether the slice \
+                 was mis-cut, large, or blocked on something the first attempt could not reach"
+            ),
+            Self::ApproachInFlight { iteration, approach } => format!(
+                "{iteration} produced the approach {approach:?} and its implement phase is still \
+                 in flight — neither followed nor abandoned yet. Reported rather than refused: an \
+                 iteration that designed before it built spends real time exactly here"
             ),
             Self::OutOfSequence { step, wants, occupied, by } => format!(
                 "step {step:?} is satisfied by nothing, and step {occupied:?} is already occupied \
@@ -1177,8 +1218,23 @@ pub fn check_corpus_given(
     out.extend(check_retired_vocabulary(docs, schema, facts));
     out.extend(check_invariants(docs, schema));
     out.extend(check_binding(docs));
+
+    // `a-continuation-shares-its-slice` and `a-continuation-states-why`, if the record
+    // declares either. `TS.260823.10`.
+    if schema.declares_rule("a-continuation-shares-its-slice")
+        || schema.declares_rule("a-continuation-states-why")
+    {
+        out.extend(check_continuations(docs));
+    }
+
     // `TS.260821.19`. What each phase produced, and whether the next one read it.
     if schema.entity("approach").is_some() {
+        let find_iteration = |id: &str| -> Option<&KdlNode> {
+            docs.iter()
+                .flat_map(|d| d.nodes())
+                .find(|n| n.name().value() == "iteration" && string_arg(n).as_deref() == Some(id))
+        };
+
         for doc in docs {
             for node in doc.nodes().iter().filter(|n| n.name().value() == "iteration") {
                 let id = string_arg(node).unwrap_or_default();
@@ -1189,11 +1245,34 @@ pub fn check_corpus_given(
                             && child_arg(p, "state").as_deref() == Some("complete")
                     })
                 };
+                // A design-system this iteration does not hold itself, produced by the
+                // iteration it CONTINUES. `TS.260823.10`/C4: an iteration carrying out a
+                // prior iteration's approach satisfies `implement-follows-an-approach` by
+                // naming it, without needing to hold — or repeat — that iteration's plan.
+                let continued_design = child_arg(node, "continues")
+                    .and_then(|cont| find_iteration(&cont))
+                    .and_then(|prior| {
+                        children_named(prior, "phase").into_iter().find(|p| {
+                            string_arg(p).as_deref() == Some("design-system")
+                                && child_arg(p, "state").as_deref() == Some("complete")
+                        })
+                    });
+                let continued_approaches: Vec<String> = continued_design
+                    .map(|p| children_named(p, "approach").iter().filter_map(|a| string_arg(a)).collect())
+                    .unwrap_or_default();
+
+                // The implement phase, whatever state it is in. Distinct from `complete`
+                // below: C5 needs to tell a plan not yet carried out from one that was
+                // skipped, and both currently read as "no implement phase complete".
+                let implement = phases.iter().copied().find(|p| string_arg(p).as_deref() == Some("implement"));
+                let implement_in_flight =
+                    implement.is_none_or(|i| child_arg(i, "state").as_deref() != Some("complete"));
 
                 // An implement that did not read its own plan.
                 let approaches = complete("design-system")
                     .map(|p| children_named(p, "approach").len())
-                    .unwrap_or_default();
+                    .unwrap_or_default()
+                    + continued_approaches.len();
                 if approaches > 0
                     && let Some(implement) = complete("implement")
                     && children_named(implement, "followed").is_empty()
@@ -1214,12 +1293,14 @@ pub fn check_corpus_given(
                 // unverifiable and was the wrong question (ITER.260822.14/AZ2, superseded).
                 // What is checkable is that every approach the record holds was taken, and
                 // that what implement claims to have followed exists.
-                if let Some(design) = complete("design-system") {
-                    let produced: Vec<String> = children_named(design, "approach")
-                        .iter()
-                        .filter_map(|a| string_arg(a))
-                        .collect();
-                    let followed: Vec<String> = complete("implement")
+                let design = complete("design-system");
+                if design.is_some() || !continued_approaches.is_empty() {
+                    let produced: Vec<String> = design
+                        .map(|d| children_named(d, "approach").iter().filter_map(|a| string_arg(a)).collect())
+                        .unwrap_or_default();
+                    let produced: Vec<String> =
+                        produced.into_iter().chain(continued_approaches.iter().cloned()).collect();
+                    let followed: Vec<String> = implement
                         .map(|i| {
                             children_named(i, "followed")
                                 .iter()
@@ -1242,27 +1323,52 @@ pub fn check_corpus_given(
                                     iteration: id.clone(),
                                     named: named.clone(),
                                 },
-                                span: design.span(),
+                                span: design.map_or_else(|| node.span(), KdlNode::span),
                             });
                         }
                     }
-                    for approach in children_named(design, "approach") {
-                        let Some(name) = string_arg(approach) else { continue };
-                        // Abandoning is a recorded act. The approach stays in the record —
-                        // deleting it loses the alternative that was considered, which is the
-                        // reason the plan was worth writing.
-                        let abandoned = !children_named(approach, "abandoned").is_empty()
-                            || prop(approach, "abandoned").is_some();
-                        if !abandoned && !followed.contains(&name) {
-                            out.push(Violation {
-                                entity_kind: "phase".to_owned(),
-                                entity_id: Some(id.clone()),
-                                refusal: Refusal::ApproachNotTaken {
-                                    iteration: id.clone(),
-                                    approach: name,
-                                },
-                                span: approach.span(),
-                            });
+                    // Only the LOCAL design's own approaches are checked here — an
+                    // approach the continued iteration produced is that iteration's own
+                    // plan, already checked against its own implement when IT closed.
+                    if let Some(design) = design {
+                        for approach in children_named(design, "approach") {
+                            let Some(name) = string_arg(approach) else { continue };
+                            // Abandoning is a recorded act. The approach stays in the record —
+                            // deleting it loses the alternative that was considered, which is the
+                            // reason the plan was worth writing.
+                            let abandoned = !children_named(approach, "abandoned").is_empty()
+                                || prop(approach, "abandoned").is_some();
+                            if abandoned || followed.contains(&name) {
+                                continue;
+                            }
+                            // `TS.260823.10`/C5: an approach whose implement is still in
+                            // flight — pending, active, or not started at all — is neither
+                            // followed nor abandoned yet, and that is the ordinary shape
+                            // of an iteration that designed before it built. Refusing it
+                            // defeats the sequencing `design-before-implement` asks for;
+                            // reporting it keeps it visible without failing closed on the
+                            // state every iteration spends most of its time in.
+                            if implement_in_flight {
+                                out.push(Violation {
+                                    entity_kind: "phase".to_owned(),
+                                    entity_id: Some(id.clone()),
+                                    refusal: Refusal::ApproachInFlight {
+                                        iteration: id.clone(),
+                                        approach: name,
+                                    },
+                                    span: approach.span(),
+                                });
+                            } else {
+                                out.push(Violation {
+                                    entity_kind: "phase".to_owned(),
+                                    entity_id: Some(id.clone()),
+                                    refusal: Refusal::ApproachNotTaken {
+                                        iteration: id.clone(),
+                                        approach: name,
+                                    },
+                                    span: approach.span(),
+                                });
+                            }
                         }
                     }
                 }
@@ -2064,6 +2170,59 @@ fn check_seals_and_claims(
     out
 }
 
+/// `TS.260823.10`/C1 and C6. `continues` names a prior attempt at the SAME slice, and says
+/// why there was a second one.
+///
+/// Both read straight off the two iteration nodes rather than through the corpus: an
+/// unknown target is left to the generic `dangling-relationship` rule (`continues`
+/// declares `references="iteration"`), so this only runs once the name resolves to
+/// something in the tree.
+fn check_continuations(docs: &[KdlDocument]) -> Vec<Violation> {
+    let mut out = Vec::new();
+    let iterations: Vec<&KdlNode> = docs
+        .iter()
+        .flat_map(|d| d.nodes())
+        .filter(|n| n.name().value() == "iteration")
+        .collect();
+
+    for node in &iterations {
+        let Some(continues) = child_arg(node, "continues") else { continue };
+        let Some(target) = iterations.iter().find(|i| string_arg(i).as_deref() == Some(continues.as_str())) else {
+            continue;
+        };
+        let id = string_arg(node).unwrap_or_default();
+        let on: Vec<String> =
+            children_named(node, "on-slice").iter().filter_map(|n| string_arg(n)).collect();
+        let their: Vec<String> =
+            children_named(target, "on-slice").iter().filter_map(|n| string_arg(n)).collect();
+        if !on.iter().any(|s| their.contains(s)) {
+            out.push(Violation {
+                entity_kind: "iteration".to_owned(),
+                entity_id: Some(id.clone()),
+                refusal: Refusal::ContinuesUnrelatedIteration {
+                    iteration: id.clone(),
+                    continues: continues.clone(),
+                },
+                span: node.span(),
+            });
+        }
+
+        let because = children_named(node, "continues")
+            .first()
+            .and_then(|n| prop(n, "because"))
+            .or_else(|| prop(node, "because"));
+        if because.is_none() {
+            out.push(Violation {
+                entity_kind: "iteration".to_owned(),
+                entity_id: Some(id.clone()),
+                refusal: Refusal::ContinuationWithoutReason { iteration: id, continues },
+                span: node.span(),
+            });
+        }
+    }
+    out
+}
+
 /// `TS.260820.14`. A decision is bound, argued and falsifiable, or it is a preference.
 fn check_decisions(docs: &[KdlDocument], schema: &Schema) -> Vec<Violation> {
     let mut out = Vec::new();
@@ -2261,6 +2420,13 @@ fn check_claims(docs: &[KdlDocument], silent_drop: bool, dropped: bool) -> Vec<V
                 if silent_drop
                     && closed
                     && state != "met"
+                    // A claim carried in from a prior iteration on the same slice is
+                    // accounted for by that iteration's own witness, not by a finding here
+                    // — `TS.260823.10`/C2. Distinguished by the CITATION rather than by
+                    // the state word: `state="carried"` already meant "carried by a
+                    // finding" before this existed, and one with no citation and no
+                    // finding is still the drop this rule exists to catch.
+                    && prop(claim, "carried-from").is_none()
                     && !findings.iter().any(|f| f.as_deref() == Some(claim_id.as_str()))
                 {
                     out.push(Violation {
