@@ -38,33 +38,33 @@ iteration "ITER.260821.07" {
     claim "C1" from-slice="TS.260820.16" state="met" \
         text="binding an unclosed iteration is refused, naming the iteration and its unsettled claims" \
         settled-by="a negative test asserting the iteration id and the claim ids in the diagnostic" \
-        evidence="tests/binding_work.rs::c1_binding_an_unclosed_iteration_is_refused_naming_it_and_its_unsettled_claims \
+        evidence="binding an unclosed iteration is refused naming it and its unsettled claims \
             — and it asserts the SETTLED claim is not named, because a refusal that lists \
             everything tells you nothing"
     claim "C2" from-slice="TS.260820.16" state="met" \
         text="an iteration already bound to another version is refused" \
         settled-by="a negative test with a double bind" \
-        evidence="tests/binding_work.rs::c2_an_iteration_already_bound_elsewhere_is_refused — the \
+        evidence="an iteration already bound elsewhere is refused — the \
             refusal says WHERE it is already bound"
     claim "C3" from-slice="TS.260820.16" state="met" \
         text="the proposed bump follows the configured rules from what is bound" \
         settled-by="one test per bump rule in config, each asserting the proposal" \
-        evidence="tests/binding_work.rs::c3_the_proposed_bump_follows_the_configured_rules — all \
-            five rules — plus ::c3_the_highest_bump_among_what_is_bound_wins and a test that a \
+        evidence="the proposed bump follows the configured rules — all \
+            five rules — plus the highest bump among what is bound wins and a test that a \
             scheme the engine does not know still applies the RULES, since it is only the ranking \
             between positions that a scheme decides"
     claim "C4" from-slice="TS.260820.16" state="met" \
         text="unbinding is possible before cut and refused after" \
         settled-by="a positive test before cut and a negative test after" \
-        evidence="tests/binding_work.rs::c4_unbinding_is_possible_before_cut, \
-            ::c4_unbinding_after_cut_is_refused, and ::c4_binding_into_a_cut_release_is_refused_too \
+        evidence="unbinding is possible before cut, \
+            unbinding after cut is refused, and binding into a cut release is refused too \
             — a cut release does not change in either direction"
 
     vet "start" state="done" at="2026-08-21T14:20:00Z" {
         condition "the tree is clean and current" verdict="passed" found="HEAD cb8494b"
         condition "the slice's scope is unchanged" verdict="passed" found="four claims, read line by line"
         condition "C3 is computable from the record" verdict="admitted-on-condition" \
-            found="config.kdl declares five bump rules and nothing in the record says which rule a \
+            found="the config declares five bump rules and nothing in the record says which rule a \
                 given iteration matches. The proposal has an input the record does not hold" \
             resolved-by="`contributes` declared on the iteration, and the seven closed iterations \
                 amended to carry it. Declared by the iteration rather than inferred from a diff, \
@@ -73,16 +73,16 @@ iteration "ITER.260821.07" {
 
     frozen {
         pins "the entity-and-field schema" at="NA.260820.01/schema" at-commit="cb8494b"
-        pins "the versioning binding" at="praxis/config.kdl — versioning/bump-proposal" at-commit="cb8494b"
+        pins "the versioning binding" at="the config — versioning/bump-proposal" at-commit="cb8494b"
         rule "a schema change while this iteration is open is a FINDING, not an edit" \
             exception="declaring the shape of `release` and the `contributes` field is the mechanism \
                 this slice depends on. Amending `refusal` to accept on-version was NOT planned and \
                 is recorded as W1"
     }
 
-    layer "doctrine"    state="evidenced" evidence="skills/bind-work-to-a-version/SKILL.md, registered in the router" reaches="the skill teaches binding as the moment scope for a version becomes fact"
+    layer "doctrine"    state="evidenced" evidence="surface.skill.bind-work-to-a-version, registered in the router" reaches="the skill teaches binding as the moment scope for a version becomes fact"
     layer "enforcement" state="evidenced" evidence="64 tests pass; an unclosed iteration, a double bind, and any change to a cut release are all refused" reaches="only closed iterations may bind, and an iteration binds exactly once"
-    layer "docs"        state="evidenced" evidence="praxis/releases/REL.0.8.0.kdl — seven iterations bound, with the proposed bump and the rule that decided it" reaches="what a version will contain is readable before it is cut"
+    layer "docs"        state="evidenced" evidence="REL.0.8.0 — seven iterations bound, with the proposed bump and the rule that decided it" reaches="what a version will contain is readable before it is cut"
     layer-set sealed=#true at="2026-08-21T14:20:00Z"
 
     phase "design-ux" state="complete" required-by="docs" \
@@ -101,7 +101,7 @@ iteration "ITER.260821.07" {
             `contributes` field, and ten tests"
     phase "learn" state="complete" required-by="always" produced="five findings, one of them a gap in the record's own vocabulary" \
         note="never skippable — it is the phase that judges the others"
-    phase "teach" state="skipped" required-by="doctrine" produced="skills/bind-work-to-a-version/SKILL.md" \
+    phase "teach" state="skipped" required-by="doctrine" produced="surface.skill.bind-work-to-a-version" \
         skipped-because="it produced doctrine for an AGENT, which is the doctrine LAYER and is recorded there. Teaching an end user the feature's why and how did not happen — and the record already serves the next agent, whose own persona judges success by NOT needing a document (TS.260821.19, ITER.260822.15/BA1)"
 
     finding "W1" state="open" size="owed-work" \
@@ -122,7 +122,7 @@ iteration "ITER.260821.07" {
             content. Worth stating as doctrine before a third command has to guess"
 
     finding "W3" state="open" size="owed-work" \
-        text="the bump proposal had an input the record did not hold. config.kdl declares five bump \
+        text="the bump proposal had an input the record did not hold. the config declares five bump \
             rules and nothing said which rule an iteration matched, so `contributes` was added and \
             seven closed iterations amended to carry it" \
         note="it is DECLARED rather than inferred on purpose. A diff cannot tell an added outcome \
@@ -163,8 +163,8 @@ iteration "ITER.260821.07" {
             wrote it, on the real tree rather than in a fixture"
 
     finding "W5" state="open" size="observation" \
-        text="bind refusals are written into praxis/releases/, beside the release index that \
-            config.kdl describes as `an index into git, not a copy of it`. They are neither" \
+        text="bind refusals are written into the release index, beside the release index that \
+            the config describes as `an index into git, not a copy of it`. They are neither" \
         note="defensible by the same placement rule that put pick-up refusals beside iterations — a \
             container is named for what its contents ARE to the owner, and these are the outcomes \
             of release-binding's commands. But `releases/` is named for a kind, which that rule \

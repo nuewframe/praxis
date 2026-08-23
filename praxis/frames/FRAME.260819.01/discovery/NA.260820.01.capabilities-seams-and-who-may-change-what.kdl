@@ -133,7 +133,7 @@ notional-architecture "NA.260820.01" {
         // The gate moved to the method (TS.260821.10). Admission conditions are NORMATIVE:
         // a repository that could rewrite its own has no gate, and this one had them sitting
         // in its own discovery folder where every adopter would have had to copy them.
-        // See crates/praxis-core/src/method/DELIVERY-GRAPH.v1.kdl.
+        // See the method document the engine carries and the plugin ships.
     }
 
     capability-role "claim-settlement" {
@@ -318,7 +318,7 @@ notional-architecture "NA.260820.01" {
         because="seventeen of eighteen slices name a slice, which is what made the backlog a chain \
             eight deep rather than a fan. The shape of the edge is what makes the work serial"
     owes "retire thin-slice.state — delivery is derived and a stored copy can only disagree" from="S4"
-    owes "reconcile the harness layer: config.kdl says the six install manifests, TS.260820.11 says the CI path" from="Z3"
+    owes "reconcile the harness layer: the config says the six install manifests, TS.260820.11 says the CI path" from="Z3"
     owes "read the archival root from config rather than composing it in the engine" from="Y5" \
         because="the same class as the bump rules before W3, and as AD1 — a binding the record \
             declares and the engine does not consult"
@@ -398,7 +398,7 @@ notional-architecture "NA.260820.01" {
         entity "invariant" is="one property the plugin GUARANTEES about code it is loaded into" \
             states="enforced advisory" \
             owned-by="delivery-record" \
-            note="declared by TS.260821.05. config.kdl has said `enable-all-fail-closed #true` and \
+            note="declared by TS.260821.05. the config has said `enable-all-fail-closed #true` and \
                 omitted three probes BY NAME since the binding was written, and neither the \
                 enabling nor the omitting referred to anything the record held — the ids were \
                 strings, and what actually enforced them was fourteen shell scripts and their \

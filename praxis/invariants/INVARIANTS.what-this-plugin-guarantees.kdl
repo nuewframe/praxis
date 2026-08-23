@@ -1,6 +1,6 @@
 // What this plugin GUARANTEES about code it is loaded into, and what keeps each guarantee.
 //
-// Declared by TS.260821.05. praxis/config.kdl has said `enable-all-fail-closed #true` and
+// Declared by TS.260821.05. the config has said `enable-all-fail-closed #true` and
 // omitted three probes by name since the binding was written, and neither the enabling nor
 // the omitting referred to anything the record held. The ids were strings. What actually
 // enforced them was ten shell scripts and their header comments, and no version of this
@@ -60,7 +60,7 @@ invariant "remote-config-externalization" {
     language "csharp"
     language "php"
     language "rust"
-    note "the id config.kdl already omits by name. It comes from the ADR.260725 seam-conformance lineage, decision D1"
+    note "the id the config already omits by name. It comes from the ADR.260725 seam-conformance lineage, decision D1"
 }
 
 invariant "http-observability" {

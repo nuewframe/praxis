@@ -136,39 +136,39 @@ iteration "ITER.260821.19" {
     claim "C1" from-slice="TS.260821.02" state="met" \
         text="a declared rule that no witness makes refuse is reported, naming the rule" \
         settled-by="a test declaring a rule with a witness that does not violate it" \
-        evidence="tests/proving.rs::c1_a_rule_whose_witness_refuses_nothing_is_reported_by_name, and \
-            ::c1_a_rule_with_no_witness_at_all_reads_differently — `never demonstrated` and \
+        evidence="a rule whose witness refuses nothing is reported by name, and \
+            a rule with no witness at all reads differently — `never demonstrated` and \
             `demonstrated and nothing happened` are different problems and must not read alike"
     claim "C2" from-slice="TS.260821.02" state="met" \
         text="a witness proves the rule by producing a refusal the engine computed, never by asserting one exists" \
         settled-by="a test asserting the report is derived from running the checker over the witness" \
-        evidence="tests/proving.rs::c2_a_witness_proves_a_rule_by_producing_a_refusal_the_engine_computed, \
-            ::c2_a_refusal_enforcing_a_different_rule_does_not_witness_this_one, and \
-            ::c2_a_witness_the_codec_cannot_read_is_reported_as_such. The second is the strong \
+        evidence="a witness proves a rule by producing a refusal the engine computed, \
+            a refusal enforcing a different rule does not witness this one, and \
+            a witness the codec cannot read is reported as such. The second is the strong \
             half — without it one malformed record would witness every rule"
     claim "C3" from-slice="TS.260821.02" state="met" \
         text="a rule whose refusals are computed and then dropped has no witness" \
         settled-by="a test reintroducing AG1 and asserting the rule loses its witness" \
-        evidence="tests/proving.rs::c3_a_rule_whose_refusals_are_computed_and_dropped_has_no_witness \
-            and ::c3_the_same_rule_with_a_witness_that_reaches_it_is_proven. The prover runs each \
+        evidence="a rule whose refusals are computed and dropped has no witness \
+            and the same rule with a witness that reaches it is proven. The prover runs each \
             witness through the SAME functions that check the tree"
     claim "C4" from-slice="TS.260821.02" state="met" \
         text="an-immutable-record-carries-a-seal gains a witness, and sealing this record settles what it refuses" \
         settled-by="a witness for the seal rule, plus every accepted decision in this record sealed" \
-        evidence="tests/proving.rs::c4_an_immutable_record_with_no_seal_is_refused and \
-            ::c4_a_sealed_decision_raises_nothing. On the real tree the rule refused seven records, \
+        evidence="an immutable record with no seal is refused and \
+            a sealed decision raises nothing. On the real tree the rule refused seven records, \
             `praxis accept` sealed all seven, and editing a sealed decision's body was verified to \
             break its seal and refuse"
 
     claim "C1" from-slice="TS.260820.18" state="met" \
         text="resolving against a release that does not exist is refused" \
         settled-by="settled by ITER.260821.17 and carried into this commitment unchanged" \
-        evidence="tests/symptoms.rs::c1_resolving_against_a_release_that_does_not_exist_is_refused, \
+        evidence="resolving against a release that does not exist is refused, \
             and now witnessed on the record — resolution-names-a-release is one of the sixteen"
     claim "C2" from-slice="TS.260820.18" state="met" \
         text="resolving against a release that bound no slice attacking this symptom is refused" \
         settled-by="settled by ITER.260821.17 and carried into this commitment unchanged" \
-        evidence="tests/symptoms.rs::c2_a_release_that_bound_no_attacking_slice_is_refused"
+        evidence="a release that bound no attacking slice is refused"
     claim "C3" from-slice="TS.260820.18" state="met" \
         text="a resolved symptom cannot silently return to present" \
         settled-by="a seal over the symptom's state and what resolved it, refused when absent" \
@@ -204,7 +204,7 @@ iteration "ITER.260821.19" {
                 this iteration opened, which is why it is triage and not an edit under freeze"
     }
 
-    layer "doctrine"    state="evidenced" evidence="skills/witness-a-rule/SKILL.md, registered in the router" reaches="the skill teaches that declaring a rule includes writing the record that violates it"
+    layer "doctrine"    state="evidenced" evidence="surface.skill.witness-a-rule, registered in the router" reaches="the skill teaches that declaring a rule includes writing the record that violates it"
     layer "enforcement" state="evidenced" evidence="183 tests pass; sixteen rules are witnessed, twenty-four are named as not, and three ways of having no witness read differently" reaches="a-rule-has-a-witness, reported over the whole declared rule set"
     layer "docs"        state="evidenced" evidence="`praxis prove` prints the witnessed and the unwitnessed, and exits zero — the number is the point, not a gate" reaches="the unwitnessed set is readable"
     layer-set sealed=#true at="2026-08-21T20:32:00Z"
@@ -227,7 +227,7 @@ iteration "ITER.260821.19" {
             `praxis prove`, `praxis accept`, and eleven tests"
     phase "learn" state="complete" required-by="always" produced="four findings, three of them defects the prover found in its first hour" \
         note="never skippable — it is the phase that judges the others"
-    phase "teach" state="skipped" required-by="doctrine" produced="skills/witness-a-rule/SKILL.md" \
+    phase "teach" state="skipped" required-by="doctrine" produced="surface.skill.witness-a-rule" \
         skipped-because="it produced doctrine for an AGENT, which is the doctrine LAYER and is recorded there. Teaching an end user the feature's why and how did not happen — and the record already serves the next agent, whose own persona judges success by NOT needing a document (TS.260821.19, ITER.260822.15/BA1)"
 
     finding "AJ1" state="open" size="frame-sized" \
@@ -267,13 +267,13 @@ iteration "ITER.260821.19" {
         note="every test calls the CORE. The binary had no test at all, so the one surface a user \
             actually touches was the one surface nothing checked. Found by running the tool on a \
             different project, which is the first time in this frame it has been run anywhere but \
-            here. crates/praxis-cli/tests/the_binary_runs.rs now builds every subcommand"
+            here. The binary-runs tests now build every subcommand"
 
     finding "AK2" state="open" size="frame-sized" \
         text="a new project cannot use the engine without copying two disjoint blocks out of this \
             repository's own architecture: the 729-line `schema` block, and the `admits` block that \
             lives inside a capability-role. Neither has a portable home" \
-        obliges="ADR.260819.01 and praxis/config.kdl — `governed-by` has had no target since \
+        obliges="ADR.260819.01 and the config — `governed-by` has had no target since \
             ADR.260819.02 was withdrawn, and the comment there already says the binding is restored \
             when the schema has a home that is not a decision. It still does not" \
         note="the schema is the METHOD's vocabulary — entity kinds, rules, cardinalities — and has \
@@ -285,7 +285,7 @@ iteration "ITER.260821.19" {
         text="the router still describes the sprint-era spine — create-wave, start-thin-slice, \
             create-sprint, intake, close-sprint — and none of those commands exist. The twelve \
             skills this frame wrote are registered in the index below a spine that contradicts them" \
-        obliges="skills/using-praxis/SKILL.md — the spine is the first thing an arriving agent \
+        obliges="surface.skill.using-praxis — the spine is the first thing an arriving agent \
             reads, and it points at a workflow that was replaced" \
         note="found by asking what a NEW project would do and reading the router as a newcomer \
             would. Eighteen iterations of building the graph, and the front door still opens onto \

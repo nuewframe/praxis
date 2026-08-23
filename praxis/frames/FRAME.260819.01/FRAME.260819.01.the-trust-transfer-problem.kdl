@@ -65,7 +65,7 @@ frame "FRAME.260819.01" {
         that a capability record reflects something that shipped, or that a tier was
         classified honestly.
 
-        The consequence is the three-tier split in `docs/product.md`: script-enforced gates
+        The consequence is the three-tier split in the Markdown dashboard: script-enforced gates
         fail closed, human-signed gates do not, and the agent-attested tier — the largest —
         is trusted because the agent was asked. Every symptom still marked `present` above
         sits in that third tier, and no amount of further prose discipline moves them out

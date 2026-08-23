@@ -38,21 +38,21 @@ iteration "ITER.260821.14" {
     claim "C1" from-slice="TS.260820.12" state="met" \
         text="a read model with no declared lifetime is refused" \
         settled-by="a negative test asserting the read-model name in the diagnostic" \
-        evidence="tests/lifetimes.rs::c1_a_read_model_with_no_declared_lifetime_is_refused — the \
+        evidence="a read model with no declared lifetime is refused — the \
             refusal names the view and says there is no repository-wide default, because the reader \
             who hits it will want to know whether one exists"
     claim "C2" from-slice="TS.260820.12" state="met" \
         text="a publishable declaration with no reason is refused" \
         settled-by="a negative test with publishable set and no because" \
-        evidence="tests/lifetimes.rs::c2_a_publishable_declaration_with_no_reason_is_refused, and \
-            ::an_on_demand_declaration_needs_a_reason_too — the rule runs in BOTH directions, \
+        evidence="a publishable declaration with no reason is refused, and \
+            an on demand declaration needs a reason too — the rule runs in BOTH directions, \
             because deciding not to publish is as much a judgement about perishability as deciding to"
     claim "C3" from-slice="TS.260820.12" state="met" \
         text="the published set equals exactly the publishable declarations — a hand-listed set is refused" \
         settled-by="a test asserting the generated set matches the declarations, plus a negative test on a hand-edited list" \
-        evidence="tests/lifetimes.rs::c3_the_published_set_equals_exactly_the_publishable_declarations, \
-            ::c3_the_paths_come_from_the_record_not_from_the_engine, and \
-            ::c3_a_declared_view_the_engine_cannot_compose_refuses_the_whole_publish — a set that \
+        evidence="the published set equals exactly the publishable declarations, \
+            the paths come from the record not from the engine, and \
+            a declared view the engine cannot compose refuses the whole publish — a set that \
             quietly omits a declared member is a hand-maintained list with extra steps"
 
     vet "start" state="done" at="2026-08-21T19:47:00Z" {
@@ -77,7 +77,7 @@ iteration "ITER.260821.14" {
     contributes "slice-outcome-added" \
         because="declare-what-gets-published, and a published set derived from declared lifetimes"
 
-    layer "doctrine"    state="evidenced" evidence="skills/declare-a-lifetime/SKILL.md, registered in the router" reaches="the skill teaches the publication test and its two outcomes"
+    layer "doctrine"    state="evidenced" evidence="surface.skill.declare-a-lifetime, registered in the router" reaches="the skill teaches the publication test and its two outcomes"
     layer "enforcement" state="evidenced" evidence="133 tests pass; an undeclared lifetime, an unjustified one in either direction, and a publishable view with nowhere to land are each refused" reaches="publish-only-what-survives-freezing, refusing an undeclared or unjustified lifetime"
     layer "docs"        state="evidenced" evidence="`praxis publish` now composes its set from the declarations, at the paths the declarations name" reaches="the published set is derived from these declarations and from nothing else"
     layer-set sealed=#true at="2026-08-21T19:47:00Z"
@@ -96,15 +96,15 @@ iteration "ITER.260821.14" {
             in praxis-core::publish, and nine tests"
     phase "learn" state="complete" required-by="always" produced="three findings, one of them about a decision the engine had quietly taken" \
         note="never skippable — it is the phase that judges the others"
-    phase "teach" state="skipped" required-by="doctrine" produced="skills/declare-a-lifetime/SKILL.md" \
+    phase "teach" state="skipped" required-by="doctrine" produced="surface.skill.declare-a-lifetime" \
         skipped-because="it produced doctrine for an AGENT, which is the doctrine LAYER and is recorded there. Teaching an end user the feature's why and how did not happen — and the record already serves the next agent, whose own persona judges success by NOT needing a document (TS.260821.19, ITER.260822.15/BA1)"
 
     finding "AD1" state="open" size="frame-sized" \
         text="the record had been carrying the right answer the whole time and nothing read it. \
             ES.260819.01 declares every read model's lifetime, its reason, and its `publishes-to` \
             path — and ITER.260821.09 built publish with a hardcoded list of two documents at paths \
-            it made up. The declared paths are release-notes.md and capabilities/; the engine wrote \
-            what-shipped.md and capabilities.md" \
+            it made up. The declared paths are the release notes and capabilities/; the engine wrote \
+            the what-shipped document and the capabilities document" \
         note="this is A4's failure mode arriving from the other side. A4 says the engine may not \
             hold a rule the record does not state; the subtler version is the engine holding a \
             DECISION the record already stated, where nothing is contradicted and nothing refuses. \

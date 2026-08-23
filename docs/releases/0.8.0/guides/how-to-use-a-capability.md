@@ -39,6 +39,10 @@ _Nothing here — every capability this version bound work for carries usage pro
 
 `praxis truth` — what this repository already knows, so an arriving agent does not re-derive it. Read the last section: it names what the answer does not cover.
 
+Adopting on a repository that already shipped: the record is built NEW, and what is already there is discovery data. Capability docs, ADRs and release history are stormed, walked and argued with — a claim transcribed is a claim imported without its evidence, and a record that looks checked from its first commit is worth less than an empty one.
+
+`what did this come from` is answered by the record's own derivation, never by a pointer at the document it was read from. A capability names the cluster it came from and the storm that cluster is in; a slice names its storm; a decision names what it rejected and what would show it wrong. Every one of those is an id the checker follows and refuses when it dangles. There is deliberately no `informed-by`: a path is the half guaranteed not to survive, and a dead pointer outlives the file as a confident lie.
+
 ### document-projection
 
 `praxis publish <VERSION> [--dry-run]` — regenerate the published set whole, before the cut. Membership comes from the lifetime declarations and the paths come with it.

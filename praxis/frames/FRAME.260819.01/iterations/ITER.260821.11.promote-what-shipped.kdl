@@ -38,7 +38,7 @@ iteration "ITER.260821.11" {
     claim "C1" from-slice="TS.260820.17" state="met" \
         text="promotion is atomic — a failure part-way leaves the record byte-unchanged" \
         settled-by="the change set computed whole before any write, and every written file restored on failure" \
-        evidence="tests/promoting.rs::c1_the_whole_change_set_is_computed_before_anything_is_applied \
+        evidence="the whole change set is computed before anything is applied \
             — `promote` returns every change as values, so there is no shape in which half of them \
             exist. The shell holds every original and restores them in reverse on any write failure" \
         note="two layers, and the second is not a rename. Multi-file atomicity is compose-all, \
@@ -48,16 +48,16 @@ iteration "ITER.260821.11" {
     claim "C2" from-slice="TS.260820.17" state="met" \
         text="promoted truth is derived from bound work, and a hand-edit outside promotion is refused" \
         settled-by="a negative test editing a capability's current truth directly" \
-        evidence="tests/promoting.rs::c2_a_hand_edited_capability_is_refused and \
-            ::c2_promoted_truth_is_derived_from_bound_work. The rule promoted-truth-is-derived \
+        evidence="a hand edited capability is refused and \
+            promoted truth is derived from bound work. The rule promoted-truth-is-derived \
             recomputes every capability's block and refuses any disagreement — the command and the \
             check call the SAME derivation, so there is no second place to disagree from"
     claim "C3" from-slice="TS.260820.17" state="met" \
         text="promoting twice for the same release is a no-op, not a double application" \
         settled-by="an idempotence test" \
-        evidence="tests/promoting.rs::c3_promoting_twice_is_a_no_op returns AlreadyPromoted — not a \
+        evidence="promoting twice is a no op returns AlreadyPromoted — not a \
             refusal and not a second application — and \
-            ::c3_an_interrupted_promotion_is_repaired_by_running_it_again shows the second run \
+            an interrupted promotion is repaired by running it again shows the second run \
             finishing what the first started"
 
     vet "start" state="done" at="2026-08-21T15:50:00Z" {
@@ -81,7 +81,7 @@ iteration "ITER.260821.11" {
     contributes "slice-outcome-added" \
         because="promote-what-shipped, and derived truth that a rule recomputes rather than trusts"
 
-    layer "doctrine"    state="evidenced" evidence="skills/promote-what-shipped/SKILL.md, registered in the router" reaches="the skill teaches promotion as part of releasing, never as a follow-up task"
+    layer "doctrine"    state="evidenced" evidence="surface.skill.promote-what-shipped, registered in the router" reaches="the skill teaches promotion as part of releasing, never as a follow-up task"
     layer "enforcement" state="evidenced" evidence="108 tests pass; promoted-truth-is-derived refuses a capability whose block is not what the record derives, in either direction" reaches="atomic promotion, and a refusal when a capability's truth was edited outside it"
     layer "docs"        state="evidenced" evidence="a promoted capability carries `shipped <version> by=<iteration> slice=<slice>`, which is what a guide publishes against" reaches="capability records carry what shipped, and guides may then publish against it"
     layer-set sealed=#true at="2026-08-21T15:50:00Z"
@@ -103,7 +103,7 @@ iteration "ITER.260821.11" {
             `shipped` field, and ten tests"
     phase "learn" state="complete" required-by="always" produced="four findings, one of which changes when praxis check can pass" \
         note="never skippable — it is the phase that judges the others"
-    phase "teach" state="skipped" required-by="doctrine" produced="skills/promote-what-shipped/SKILL.md" \
+    phase "teach" state="skipped" required-by="doctrine" produced="surface.skill.promote-what-shipped" \
         skipped-because="it produced doctrine for an AGENT, which is the doctrine LAYER and is recorded there. Teaching an end user the feature's why and how did not happen — and the record already serves the next agent, whose own persona judges success by NOT needing a document (TS.260821.19, ITER.260822.15/BA1)"
 
     finding "AA1" state="open" size="answered" \

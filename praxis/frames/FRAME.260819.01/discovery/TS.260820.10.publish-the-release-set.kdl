@@ -23,7 +23,7 @@ thin-slice "TS.260820.10" {
              regenerated cannot.
         """#
 
-    step "1" does="generate every publishable view whole, from the record, into docs/releases/<version>/"
+    step "1" does="generate every publishable view whole, from the record, into the archival projection"
     step "2" does="stamp each one with the release it depicts"
     step "3" does="commit the set with the tag. The release index records the commit"
     step "4" does="it is written once. A later release publishes a new document; it never rewrites this one"
@@ -39,7 +39,7 @@ thin-slice "TS.260820.10" {
     claim "C1" text="publishing regenerates whole and performs no in-place edit" \
         settled-by="a test asserting each output file is byte-identical to a fresh render, plus a check that no regex substitution path exists"
     claim "C2" text="every published document names its release, and lands under that release's directory" \
-        settled-by="a test asserting a stamp on every file, and that no file is written outside docs/releases/<version>/"
+        settled-by="a test asserting a stamp on every file, and that no file is written outside the archival projection"
     claim "C4" text="publishing never writes outside the current release's directory" \
         settled-by="a test asserting prior release directories are byte-unchanged after a publish"
     claim "C3" text="rendering needs no code path specific to any one read model, AND no emitted cell contains markup" \

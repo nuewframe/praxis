@@ -5,7 +5,7 @@
 // plugin-conformance-and-validation-probes are what somebody installs. The first set is in
 // KDL and published; the second is in Markdown and published by nobody.
 //
-// So `docs/releases/0.8.0/capabilities/` hands a reader the guts of the tool that produced
+// So the 0.8.0 published capabilities hands a reader the guts of the tool that produced
 // the document instead of the product the document is about.
 
 thin-slice "TS.260821.06" {
@@ -35,19 +35,19 @@ thin-slice "TS.260821.06" {
     step "1" does="port the three Markdown capability records to the record, keeping their names"
     step "2" does="each declares its cluster, its owned events, its gate tests and its exclusion — name-a-capability applies to the product's own capabilities or it applies to nobody's"
     step "3" does="what each has shipped is DERIVED from bound releases, never restated. promoted-truth-is-derived already refuses a hand-written one"
-    step "4" does="retire docs/capabilities/*.md — a living record kept in two places has one that is wrong and no way to say which"
+    step "4" does="retire the Markdown capability records — a living record kept in two places has one that is wrong and no way to say which"
     step "5" does="the five engine capabilities stay, and the published view distinguishes them: a reader is told which are the product and which are how it is built"
 
     excludes "inventing capabilities. The three are the three the product already claims; this makes \
         them checkable, and if one turns out to fail its own gate tests that is a finding, not a rewrite"
     excludes "the ADRs and RFCs under docs/. Those are ARGUMENT — a human's reasoning at a date — \
         and generating an argument from state would be inventing one"
-    excludes "docs/product.md. The dashboard is a WORKING projection, composed on demand and never \
+    excludes "the Markdown dashboard. The dashboard is a WORKING projection, composed on demand and never \
         committed (TS.260820.13). That it is committed today is a separate contradiction"
 
     layer "doctrine"    reaches="name-a-capability is what the product's own capabilities are held to, the same as any adopter's"
     layer "enforcement" reaches="the three are subject to every capability rule — gate tests, cluster trace, derived promotion"
-    layer "docs"        reaches="docs/releases/<version>/capabilities/ describes the product at that version"
+    layer "docs"        reaches="the archival projection's capabilities describes the product at that version"
 
     claim "C1" text="the three product capabilities are records the checker reads, each passing the four gate tests" \
         settled-by="praxis check over the ported records, with the refusals it raised on the first run recorded in the iteration"
@@ -55,7 +55,7 @@ thin-slice "TS.260821.06" {
         settled-by="promoted-truth-is-derived, already implemented, exercised against a ported record"
     claim "C3" text="the published capability set separates what the product does from how it is built" \
         settled-by="a test asserting the view carries both sets and labels them, and that a reader asking `what can 0.8.0 do` is not answered with the engine's internals"
-    claim "C4" text="docs/capabilities/*.md are retired, so no capability is stated in two places" \
+    claim "C4" text="the Markdown capability records are retired, so no capability is stated in two places" \
         settled-by="the absence of the files, plus a test that a capability named in the record and in a Markdown file under docs/ is reported"
 
     depends-on "TS.260821.03 — the retirement shape (state · retired-at · stands-at) is declared on the schema there"

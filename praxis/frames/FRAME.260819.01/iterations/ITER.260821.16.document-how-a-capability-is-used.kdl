@@ -38,20 +38,20 @@ iteration "ITER.260821.16" {
     claim "C1" from-slice="TS.260820.15" state="met" \
         text="publishing a guide for a release that did not promote the truth it describes is refused" \
         settled-by="a negative test asserting the capability name in the diagnostic" \
-        evidence="tests/guides.rs::c1_a_guide_for_a_version_that_did_not_ship_it_is_refused, and \
-            ::c1_the_composed_guide_carries_only_what_the_release_promoted. Verified against the \
+        evidence="a guide for a version that did not ship it is refused, and \
+            the composed guide carries only what the release promoted. Verified against the \
             real record: `praxis guide work-admission 0.8.0` refuses, because 0.8.0 is not cut and \
             has promoted nothing"
     claim "C2" from-slice="TS.260820.15" state="met" \
         text="usage prose is stored in the record, not in a file the record points at" \
         settled-by="a test asserting the guide renders with no filesystem read outside the state root" \
-        evidence="tests/guides.rs::c2_usage_prose_comes_from_the_record_and_nowhere_else — `guides` \
+        evidence="usage prose comes from the record and nowhere else — `guides` \
             takes a Corpus and nothing else, so there is no path in the signature and nowhere to \
             read a file from. The prose is data, not a pointer to data"
     claim "C3" from-slice="TS.260820.15" state="met" \
         text="a capability with a usable surface and no usage prose is reported, not omitted" \
         settled-by="a test asserting the gap is named rather than the guide silently missing" \
-        evidence="tests/guides.rs::c3_a_shipped_capability_with_no_usage_is_reported_not_omitted — \
+        evidence="a shipped capability with no usage is reported not omitted — \
             in the composed document as a section, and by name when asked directly"
 
     decision "prose written before its truth ships is named, not dropped" \
@@ -82,9 +82,9 @@ iteration "ITER.260821.16" {
     contributes "slice-outcome-added" \
         because="document-how-a-capability-is-used, and the last composer the published set needed"
 
-    layer "doctrine"    state="evidenced" evidence="skills/document-usage/SKILL.md, registered in the router" reaches="the skill teaches documenting usage inside the iteration, not after it"
+    layer "doctrine"    state="evidenced" evidence="surface.skill.document-usage, registered in the router" reaches="the skill teaches documenting usage inside the iteration, not after it"
     layer "enforcement" state="evidenced" evidence="150 tests pass; a guide for unpromoted truth is refused by name, and a shipped capability with no usage is reported" reaches="guide-follows-promoted-truth, and a report on capabilities with a usable surface and no usage"
-    layer "docs"        state="evidenced" evidence="docs/releases/0.8.0/guides/how-to-use-a-capability.md — and all four publishable views now compose, so 0.8.0 publishes for the first time since AD2" reaches="published under docs/releases/<version>/guides/"
+    layer "docs"        state="evidenced" evidence="the 0.8.0 capability guide — and all four publishable views now compose, so 0.8.0 publishes for the first time since AD2" reaches="published under the archival projection's guides"
     layer-set sealed=#true at="2026-08-21T19:58:00Z"
 
     phase "design-ux" state="complete" required-by="docs" \
@@ -101,13 +101,13 @@ iteration "ITER.260821.16" {
             all five capabilities, and eight tests"
     phase "learn" state="complete" required-by="always" produced="three findings" \
         note="never skippable — it is the phase that judges the others"
-    phase "teach" state="skipped" required-by="doctrine" produced="skills/document-usage/SKILL.md" \
+    phase "teach" state="skipped" required-by="doctrine" produced="surface.skill.document-usage" \
         skipped-because="it produced doctrine for an AGENT, which is the doctrine LAYER and is recorded there. Teaching an end user the feature's why and how did not happen — and the record already serves the next agent, whose own persona judges success by NOT needing a document (TS.260821.19, ITER.260822.15/BA1)"
 
     finding "AF1" state="open" size="answered" \
         text="AD2 is cleared. All four declared publishable views now compose, and \
             `praxis publish 0.8.0` writes four documents at the paths the record declares — \
-            release-notes.md, capabilities/, decisions/ and guides/" \
+            the release notes, capabilities/, decisions/ and guides/" \
         note="the refusal AD2 introduced held for exactly two iterations and named the two slices \
             that would clear it. The record derived that sequencing and a human had independently \
             chosen the same one, which is the only time in this frame those two have been compared"

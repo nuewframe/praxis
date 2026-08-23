@@ -35,10 +35,10 @@ iteration "ITER.260822.11" {
     // does not remove it from here — it makes the two disagree, and that is
     // refused.
     claim "C1" from-slice="TS.260821.15" state="met" \
-        evidence="tests/personas.rs::a_persona_nobody_could_be_wrong_about_is_refused — \
+        evidence="a persona nobody could be wrong about is refused — \
             `judges-by` is required, and it is the field that turns a description into a claim"
     claim "C2" from-slice="TS.260821.15" state="met" \
-        evidence="tests/personas.rs::a_view_needed_by_nobody_the_record_holds_dangles. \
+        evidence="a view needed by nobody the record holds dangles. \
             ES.260819.01's eleven `needed-by` values now name personas, so dangling-relationship \
             carries it without a rule of its own"
     claim "C3" from-slice="TS.260821.15" state="carried" \
@@ -49,23 +49,23 @@ iteration "ITER.260822.11" {
             so all seven name somebody — S1 through S5 the team, S6 the reader of a release, S7 \
             the next agent. Optional, because every symptom predates the kind"
     claim "C5" from-slice="TS.260821.15" state="met" \
-        evidence="tests/personas.rs::one_persona_is_enough_and_none_is_reported — one primary is a \
+        evidence="one persona is enough and none is reported — one primary is a \
             complete answer, none is REPORTED at Severity::Report, and the test asserts the \
             severity so nothing pushes anybody toward enumerating personas upfront"
     claim "C6" from-slice="TS.260821.15" state="met" \
-        evidence="tests/personas.rs::an_emergent_persona_with_no_origin_is_refused. `found-by` is \
+        evidence="an emergent persona with no origin is refused. `found-by` is \
             required WHEN emergent, enforced by entity-without-a-required-field rather than by a \
             rule of its own — a second rule saying the same thing is a second thing to keep in step"
 
     layer "doctrine"    state="evidenced" \
-        evidence="skills/name-a-persona/SKILL.md, anchored and registered. 51 of 51 surfaces anchored" \
+        evidence="surface.skill.name-a-persona, anchored and registered. 51 of 51 surfaces anchored" \
         reaches="discovery names the person before it names the system"
     layer "enforcement" state="evidenced" \
         evidence="a-record-names-somebody-it-is-for reports; needed-by dangles on a persona the \
             record does not hold; found-by is required when emergent. 22 of 51 rules witnessed" \
         reaches="needed-by references persona; a record naming nobody is reported"
     layer "docs"        state="evidenced" \
-        evidence="praxis/personas/PERSONAS.who-this-is-for.kdl holds four, and docs/product.md \
+        evidence="PERSONAS.who-this-is-for holds four, and the Markdown dashboard \
             names the primary one as the anchor" \
         reaches="`who is this for` is answerable from the record"
 
@@ -81,7 +81,7 @@ iteration "ITER.260822.11" {
     phase "learn" state="complete" required-by="always" worked-by="agent:principal-engineer" \
         produced="two findings, and one claim carried rather than met"
     phase "teach" state="skipped" required-by="doctrine" worked-by="agent:principal-engineer" \
-        produced="skills/name-a-persona/SKILL.md" \
+        produced="surface.skill.name-a-persona" \
         skipped-because="it produced doctrine for an AGENT, which is the doctrine LAYER and is recorded there. Teaching an end user the feature's why and how did not happen — and the record already serves the next agent, whose own persona judges success by NOT needing a document (TS.260821.19, ITER.260822.15/BA1)"
 
     finding "AV1" state="open" size="observation" \

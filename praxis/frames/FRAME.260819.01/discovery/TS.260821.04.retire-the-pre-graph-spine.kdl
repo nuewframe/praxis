@@ -33,7 +33,7 @@ thin-slice "TS.260821.04" {
     step "2" does="retire by removing the file and recording the surface as retired, naming v0.7.1 as where it stands"
     step "3" does="rewrite the router's spine, personas, tier branching and enforcement table to the commands that exist"
     step "4" does="flip every-shipped-surface-is-anchored from report to refuse, once the count is zero"
-    step "5" does="the README, docs/product.md and validate-plugin.sh reference sets follow — they cross-check a surface list that just changed"
+    step "5" does="the README, the Markdown dashboard and the plugin validator reference sets follow — they cross-check a surface list that just changed"
 
     excludes "a compatibility shim or a deprecation window. v0.7.1 is tagged; recovery is `git \
         checkout v0.7.1 -- skills/<name>`. Keeping both spines loaded would mean an arriving agent \
@@ -45,7 +45,7 @@ thin-slice "TS.260821.04" {
 
     layer "doctrine"    reaches="the router is the front door and is now a projection of what the record holds"
     layer "enforcement" reaches="every-shipped-surface-is-anchored at refuse — re-adding an unanchored surface fails the check"
-    layer "docs"        reaches="README and docs/product.md name only surfaces that exist and are asked for"
+    layer "docs"        reaches="README and the Markdown dashboard name only surfaces that exist and are asked for"
 
     claim "C1" text="the audit from TS.260821.03 reports zero unanchored surfaces" \
         settled-by="`praxis check` over this record, with the count in the iteration's evidence"
@@ -54,7 +54,7 @@ thin-slice "TS.260821.04" {
     claim "C3" text="the rule refuses. Adding an unanchored surface after this slice fails the check" \
         settled-by="a witness declaring a shipped surface with no anchor, asserting a refusal — the witness a-rule-has-a-witness requires"
     claim "C4" text="the router's spine names only commands the CLI has" \
-        settled-by="a test comparing every command named in skills/using-praxis/SKILL.md against the binary's subcommand list"
+        settled-by="a test comparing every command named in surface.skill.using-praxis against the binary's subcommand list"
 
     depends-on "TS.260821.03 — nothing can be taken to zero before it can be counted"
 

@@ -1,4 +1,4 @@
-// Cut from praxis/.usage/cli-invocations.md, one session's worth of evidence.
+// Cut from the recorded CLI invocations, one session's worth of evidence.
 //
 // Eight questions were asked with grep because the CLI could not answer them, and every one
 // was a traversal of a graph the engine already holds in memory. Four commands were run
@@ -77,7 +77,7 @@ thin-slice "TS.260821.11" {
 
     attacks "S7"
 
-    cut-from "praxis/.usage/cli-invocations.md" \
+    cut-from "the recorded CLI invocations" \
         note="cut from a usage log rather than from the storm or a finding, which is a third source \
             this frame has not used before. The log is one session and says so; what makes it \
             cuttable is that its findings are structural — `four processes to print four integers` \

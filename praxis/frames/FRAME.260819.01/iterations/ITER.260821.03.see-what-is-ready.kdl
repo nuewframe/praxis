@@ -76,7 +76,7 @@ iteration "ITER.260821.03" {
         text="the view and the gate evaluate identical conditions" \
         settled-by="a test asserting the projection's ready set IS the assessment's ready set, so \
             the view computes no condition of its own" \
-        evidence="tests/ready_view.rs::c1_the_view_shows_exactly_what_the_assessment_admits — the \
+        evidence="the view shows exactly what the assessment admits — the \
             ready section is derived from assess(), not recomputed beside it" \
         residue="that the GATE also calls assess() cannot be shown until the gate exists. Owed \
             against TS.260820.05, recorded as S1. Drift is prevented by construction — there is one \
@@ -84,7 +84,7 @@ iteration "ITER.260821.03" {
     claim "C2" from-slice="TS.260820.04" state="met" \
         text="every excluded slice names its blocking condition" \
         settled-by="a test asserting no exclusion has an empty reason" \
-        evidence="tests/ready_view.rs::c2_no_exclusion_has_an_empty_reason — and it asserts the \
+        evidence="no exclusion has an empty reason — and it asserts the \
             reason is SPECIFIC, naming the undelivered slice or the iteration in flight, because a \
             reason that names only its own category tells the reader nothing they did not know"
 
@@ -100,7 +100,7 @@ iteration "ITER.260821.03" {
             record stays consistent without duplicating anything" \
         owed="the three slices that do carry it, and the schema field that allows it (S4)" seal=fnv1a64:f53af813d9c456c9
 
-    layer "doctrine"    state="evidenced" evidence="skills/see-what-is-ready/SKILL.md, registered in the router under PLAN" reaches="the skill tells an agent to ask this before choosing, and to read the uncomputed conditions FIRST"
+    layer "doctrine"    state="evidenced" evidence="surface.skill.see-what-is-ready, registered in the router under PLAN" reaches="the skill tells an agent to ask this before choosing, and to read the uncomputed conditions FIRST"
     layer "enforcement" state="evidenced" evidence="30 tests pass; the conditions are declared on the record and evaluated in one place" reaches="one implementation of the conditions, so the view cannot drift from the gate"
     layer "docs"        state="evidenced" evidence="`praxis ready` renders on demand through a renderer whose whole input is &ReadModel" reaches="rendered on demand as a working projection, never committed"
     layer-set sealed=#true at="2026-08-21T04:10:00-05:00"
@@ -131,7 +131,7 @@ iteration "ITER.260821.03" {
         produced="six findings, one of which corrected this iteration's own design before close" \
         note="never skippable — it is the phase that judges the others"
     phase "teach" state="skipped" required-by="doctrine" \
-        produced="skills/see-what-is-ready/SKILL.md, whose longest section is how to read a SHORT \
+        produced="surface.skill.see-what-is-ready, whose longest section is how to read a SHORT \
             ready set — because the first real answer produced one, and the instinct it invites is \
             to weaken a condition" \
         skipped-because="it produced doctrine for an AGENT, which is the doctrine LAYER and is recorded there. Teaching an end user the feature's why and how did not happen — and the record already serves the next agent, whose own persona judges success by NOT needing a document (TS.260821.19, ITER.260822.15/BA1)"
@@ -233,7 +233,7 @@ iteration "ITER.260821.03" {
 
     contributes "slice-outcome-added" \
         because="see-what-is-ready — the first answer the engine computes rather than refuses" \
-        note="the bump rule this work matches, from config.kdl. Declared by the iteration \
+        note="the bump rule this work matches, from the config. Declared by the iteration \
             because only whoever did the work knows what kind of change it was"
 
     trail {

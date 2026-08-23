@@ -37,18 +37,18 @@ iteration "ITER.260821.06" {
     claim "C1" from-slice="TS.260820.07" state="met" \
         text="closing with an unmet claim and no finding is refused, naming the claim" \
         settled-by="a negative test asserting the refusal names the claim" \
-        evidence="tests/closing.rs::c1_closing_with_an_unmet_claim_and_no_finding_is_refused_naming_the_claim, \
-            and ::c1_the_refusal_leaves_the_iteration_open — the refusal is a REF record and the \
+        evidence="closing with an unmet claim and no finding is refused naming the claim, \
+            and the refusal leaves the iteration open — the refusal is a REF record and the \
             iteration keeps its state"
     claim "C2" from-slice="TS.260820.07" state="met" \
         text="closing with an unmet claim AND a recorded finding succeeds" \
         settled-by="a positive test asserting the close and the finding both persist" \
-        evidence="tests/closing.rs::c2_closing_with_an_unmet_claim_and_a_recorded_finding_succeeds \
+        evidence="closing with an unmet claim and a recorded finding succeeds \
             — and the close records all-met=#false rather than rounding up"
     claim "C3" from-slice="TS.260820.07" state="met" \
         text="deleting a claim to make a close succeed is itself refused" \
         settled-by="a negative test mutating the slice to remove a claim mid-iteration" \
-        evidence="tests/closing.rs::c3_deleting_a_claim_to_make_a_close_succeed_is_itself_refused \
+        evidence="deleting a claim to make a close succeed is itself refused \
             — the claims are frozen into the iteration at open, so the deletion does not remove \
             the claim, it makes the two disagree"
 
@@ -71,7 +71,7 @@ iteration "ITER.260821.06" {
                 this slice depends on. Both have been policies since the storm was held"
     }
 
-    layer "doctrine"    state="evidenced" evidence="skills/close-an-iteration/SKILL.md, registered in the router" reaches="the skill teaches that a shortfall is recorded, never quietly dropped"
+    layer "doctrine"    state="evidenced" evidence="surface.skill.close-an-iteration, registered in the router" reaches="the skill teaches that a shortfall is recorded, never quietly dropped"
     layer "enforcement" state="evidenced" evidence="54 tests pass; no-silent-drop fails closed and names each unaccounted claim" reaches="no-silent-drop, failing closed and naming each unaccounted claim"
     layer "docs"        state="evidenced" evidence="the accounting block is written at close, computed rather than asserted, and every carried claim names the finding that carries it" reaches="unmet claims and their findings survive into the release record"
     layer-set sealed=#true at="2026-08-21T14:12:00Z"
@@ -91,7 +91,7 @@ iteration "ITER.260821.06" {
             eight tests"
     phase "learn" state="complete" required-by="always" produced="five findings" \
         note="never skippable — it is the phase that judges the others"
-    phase "teach" state="skipped" required-by="doctrine" produced="skills/close-an-iteration/SKILL.md" \
+    phase "teach" state="skipped" required-by="doctrine" produced="surface.skill.close-an-iteration" \
         skipped-because="it produced doctrine for an AGENT, which is the doctrine LAYER and is recorded there. Teaching an end user the feature's why and how did not happen — and the record already serves the next agent, whose own persona judges success by NOT needing a document (TS.260821.19, ITER.260822.15/BA1)"
 
     finding "V1" state="open" size="observation" \
@@ -158,7 +158,7 @@ iteration "ITER.260821.06" {
 
     contributes "slice-outcome-added" \
         because="close-an-iteration, and no-silent-drop enforced" \
-        note="the bump rule this work matches, from config.kdl. Declared by the iteration \
+        note="the bump rule this work matches, from the config. Declared by the iteration \
             because only whoever did the work knows what kind of change it was"
 
     trail {

@@ -542,10 +542,10 @@ event-storm "ES.260819.01" {
         obliges="a second storm, or an explicit out-of-scope declaration on this frame"
 
     finding "E12" \
-        text="every record file now carries `<KIND>.<YYMMDD>.<NN>.<slug>.kdl`, the ADR version pattern applied to all record kinds. CAP is the deliberate exception: a capability is permanent and identified by what it DOES, so a date stamp would imply a later-dated capability supersedes it, which contradicts permanence. RELEASE.<version>.kdl is exempt for the same reason with a different identity — semver IS the name, and a date beside it would be a second ordering. config.kdl is also exempt — it is a binding, not a record" \
+        text="every record file is now named for its kind, its date, an ordinal and a slug — the ADR version pattern applied to all record kinds. CAP is the deliberate exception: a capability is permanent and identified by what it DOES, so a date stamp would imply a later-dated capability supersedes it, which contradicts permanence. the release index node is exempt for the same reason with a different identity — semver IS the name, and a date beside it would be a second ordering. the config is also exempt — it is a binding, not a record" \
         obliges="no ADR declares this rule. It is applied but undeclared, and the checker may not enforce an invariant the record does not declare" \
         note="the rule governs RECORD FILES. A container directory is named by its id alone — \
-            `frames/FRAME.260819.01/` — because the record file inside already carries the full \
+            FRAME.260819.01 — because the record file inside already carries the full \
             name and repeating the slug on the directory says nothing the file does not"
 
     finding "E13" \
@@ -567,11 +567,11 @@ event-storm "ES.260819.01" {
         obliges="none — now carried by publish-only-what-survives-freezing"
 
     finding "E17" \
-        text="docs/product.md stops being published. A dashboard stamped 0.8.0 while 0.9.0 is in flight serves nobody: the maintainer wants where they are now, and an external reader wants what 0.8.0 DOES, which the capability records and release notes already carry. The dashboard has no external reader — a stronger argument than perishability alone" \
-        obliges="retire docs/product.md as a published artifact. It ships today, so this REMOVES a v0.6.0 feature rather than declining to build one"
+        text="the Markdown dashboard stops being published. A dashboard stamped 0.8.0 while 0.9.0 is in flight serves nobody: the maintainer wants where they are now, and an external reader wants what 0.8.0 DOES, which the capability records and release notes already carry. The dashboard has no external reader — a stronger argument than perishability alone" \
+        obliges="retire the Markdown dashboard as a published artifact. It ships today, so this REMOVES a v0.6.0 feature rather than declining to build one"
 
     finding "E18" \
-        text="applying the publication test exposed two views Praxis publishes today that appeared nowhere in this storm: decisions (docs/architecture/adr/) and user guides (docs/guides/). The storm swept the timeline of DOING work and missed the artifacts that outlive it" \
+        text="applying the publication test exposed two views Praxis publishes today that appeared nowhere in this storm: decisions (the Markdown ADR directory) and user guides (the Markdown guides). The storm swept the timeline of DOING work and missed the artifacts that outlive it" \
         obliges="none — both are now read models" \
         note="a breadth activity that missed two of four published artifact classes is worth remembering. Sweeping the timeline is not the same as sweeping the outputs"
 
@@ -580,13 +580,13 @@ event-storm "ES.260819.01" {
         obliges="document-projection composes an ordered list of results, not exactly one"
 
     finding "E20" \
-        text="published documents live at versioned paths — docs/releases/<version>/ — with every publishable view under its own release directory. Each release directory is then independently verifiable against the commit its index node names, and verification is a git comparison rather than a re-render, so W4's rules-change problem never arises" \
+        text="published documents live at versioned paths — the archival projection — with every publishable view under its own release directory. Each release directory is then independently verifiable against the commit its index node names, and verification is a git comparison rather than a re-render, so W4's rules-change problem never arises" \
         obliges="amend TS.260820.09, .10 and .11, and WALK.260820.01/W4" \
         supersedes="the one-path-per-document layout argued in WALK.260820.01, and the result-hash and renderer-version machinery proposed with it. Under one-path-per-document a past release exists only in history, so a working-tree comparison is meaningless — HEAD holds a different release at the same path. Versioned paths make every release independently checkable, which is what the earlier argument missed"
 
     finding "E21" \
         text="a release is recorded as an INDEX into git, never as a copy of what git holds: version, tag, commit, when it was cut, what it binds, what it resolves. One node per release, written once. A mirror of history in the graph would be a second clock, and ES.260819.01 already declares git as the only clock the record has — a KDL history whose fidelity to git is unverifiable-without-checking-git is this frame's root cause reproduced one level up" \
-        obliges="release index nodes at praxis/releases/RELEASE.<version>.kdl, written once and never edited"
+        obliges="release index nodes at one release index node per version, written once and never edited"
 
     finding "E22" \
         text="the two publishable views found by E18 did not need publishing slices — publishing is generic over read models by construction (TS.260820.10 C3). What was missing is CONTENT: `record-decision` had a command in this storm and no slice, and documenting usage had no command at all" \
@@ -734,7 +734,8 @@ event-storm "ES.260819.01" {
         rule "on a repository that already shipped, the record is built NEW. What is already there is discovery data"
         rule "existing docs, ADRs and release history are STORMED, walked and argued with — they enter as evidence and leave as whatever survives"
         rule "a claim transcribed is a claim imported without its evidence. The record then looks checked from its first commit, which is worth less than an empty one"
-        rule "provenance is recorded and is not traceability. `informed-by` says where something came from and is deliberately not an edge the checker follows"
+        rule "what prior work TAUGHT is restated in the record's own words. WHERE it lived is not recorded at all — a pointer outside the record rots while looking deliberate, and a dead pointer outlives the file as a confident lie"
+        rule "the same rule applies inward. A claim's evidence states WHAT was shown, never where to look, so a rename cannot silently orphan it"
         because "an artifact looks identical whether somebody reasoned hard or pattern-matched a \
             template — that is S2, and a transcription is the same sentence about a whole \
             repository. The record looks identical whether it was derived or copied, and the \

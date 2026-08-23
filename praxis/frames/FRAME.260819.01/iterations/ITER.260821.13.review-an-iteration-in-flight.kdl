@@ -38,26 +38,26 @@ iteration "ITER.260821.13" {
     claim "C1" from-slice="TS.260820.08" state="met" \
         text="a preview is never mistakable for a record — the header says which it is" \
         settled-by="a golden test on the preview header" \
-        evidence="tests/reviewing.rs::c1_a_preview_declares_itself_a_preview asserts it in the \
-            RESULT, and crates/praxis-cli/tests::reviewing_leaves_the_published_tree_byte_unchanged \
+        evidence="a preview declares itself a preview asserts it in the \
+            RESULT, and reviewing leaves the published tree byte-unchanged \
             asserts the rendered header. Both, because a marker only the renderer applies is one a \
             second renderer can forget"
     claim "C2" from-slice="TS.260820.08" state="met" \
         text="composing a preview writes nothing to the published tree" \
         settled-by="a test asserting the published tree is unchanged after a preview" \
-        evidence="crates/praxis-cli/tests::reviewing_leaves_the_published_tree_byte_unchanged — a \
+        evidence="reviewing leaves the published tree byte-unchanged — a \
             real repository with a real published document, byte-compared before and after" \
         note="the stronger half is structural: `review` returns a ReadModel and nothing else, so a \
             preview has no path in its type and nowhere in the published tree to land"
     claim "C3" from-slice="TS.260820.08" state="met" \
         text="the preview reflects state at the moment it was asked, with no regeneration step" \
         settled-by="a test that mutates state between two previews and asserts they differ" \
-        evidence="tests/reviewing.rs::c3_a_preview_reflects_the_moment_it_was_asked"
+        evidence="a preview reflects the moment it was asked"
 
     claim "C2" from-slice="TS.260820.06" state="met" \
         text="a declared layer with no evidence is visible as unevidenced, not absent" \
         settled-by="the review view listing the layer with no artifact rather than omitting it" \
-        evidence="tests/reviewing.rs::u3_a_declared_layer_with_no_evidence_is_listed_not_omitted — \
+        evidence="a declared layer with no evidence is listed not omitted — \
             layers come from the SLICE, so one the iteration never touched appears as unevidenced \
             rather than vanishing from the table" \
         note="the residue U3, carried from ITER.260821.05. It was settled there against the claim's \
@@ -82,8 +82,8 @@ iteration "ITER.260821.13" {
     contributes "slice-outcome-added" \
         because="review-an-iteration-in-flight, and the gap between promised and shown in one answer"
 
-    layer "doctrine"    state="evidenced" evidence="skills/review-in-flight/SKILL.md, registered in the router" reaches="the skill teaches reviewing in flight rather than at a checkpoint"
-    layer "enforcement" state="evidenced" evidence="124 tests pass; praxis/.render/ is gitignored, and the composing function has no path in its type" reaches="the working projection path is gitignored, so a preview cannot be committed by accident"
+    layer "doctrine"    state="evidenced" evidence="surface.skill.review-in-flight, registered in the router" reaches="the skill teaches reviewing in flight rather than at a checkpoint"
+    layer "enforcement" state="evidenced" evidence="124 tests pass; the working projection is gitignored, and the composing function has no path in its type" reaches="the working projection path is gitignored, so a preview cannot be committed by accident"
     layer "docs"        state="evidenced" evidence="the Markdown preview carries `PREVIEW — not a record` above anything a reader might quote" reaches="the preview itself, marked and discarded"
     layer-set sealed=#true at="2026-08-21T19:40:00Z"
 
@@ -101,7 +101,7 @@ iteration "ITER.260821.13" {
             Markdown renderer, the gitignore entry, and nine tests"
     phase "learn" state="complete" required-by="always" produced="three findings" \
         note="never skippable — it is the phase that judges the others"
-    phase "teach" state="skipped" required-by="doctrine" produced="skills/review-in-flight/SKILL.md" \
+    phase "teach" state="skipped" required-by="doctrine" produced="surface.skill.review-in-flight" \
         skipped-because="it produced doctrine for an AGENT, which is the doctrine LAYER and is recorded there. Teaching an end user the feature's why and how did not happen — and the record already serves the next agent, whose own persona judges success by NOT needing a document (TS.260821.19, ITER.260822.15/BA1)"
 
     finding "AC1" state="open" size="answered" \

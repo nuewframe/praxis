@@ -43,7 +43,7 @@ iteration "ITER.260821.09" {
             resolved-by="the trigger amended to `about to be cut`, with the argument recorded on the \
                 slice as `amended-by`. The four claims are untouched. Recorded as Y1"
         condition "what this will write is known before it writes" verdict="known-and-recorded" \
-            found="two documents under docs/releases/0.8.0/ — the first files this engine has \
+            found="two documents under the 0.8.0 archival projection — the first files this engine has \
                 written outside the state root. Nothing enforces that boundary (Y5)"
     }
 
@@ -57,34 +57,34 @@ iteration "ITER.260821.09" {
     claim "C1" from-slice="TS.260820.10" state="met" \
         text="publishing regenerates whole and performs no in-place edit" \
         settled-by="a test asserting each output file is byte-identical to a fresh render, plus a check that no regex substitution path exists" \
-        evidence="tests/publishing.rs::c1_publishing_twice_produces_the_same_documents and \
-            ::c1_composition_happens_before_any_write. `publish` returns the whole set as VALUES, so \
+        evidence="publishing twice produces the same documents and \
+            composition happens before any write. `publish` returns the whole set as VALUES, so \
             a caller cannot splice — it can only write what it was handed. There is no substitution \
             path to check for because there is nowhere to put one"
     claim "C2" from-slice="TS.260820.10" state="met" \
         text="every published document names its release, and lands under that release's directory" \
-        settled-by="a test asserting a stamp on every file, and that no file is written outside docs/releases/<version>/" \
-        evidence="tests/publishing.rs::c2_every_document_names_its_release_and_lands_under_that_version"
+        settled-by="a test asserting a stamp on every file, and that no file is written outside the archival projection" \
+        evidence="every document names its release and lands under that version"
     claim "C3" from-slice="TS.260820.10" state="met" \
         text="rendering needs no code path specific to any one read model, AND no emitted cell contains markup" \
         settled-by="a test rendering a newly declared read model with no renderer change, plus a check rejecting markup in any cell" \
-        evidence="tests/publishing.rs::c3_a_newly_declared_read_model_renders_with_no_renderer_change \
-            and ::c3_no_emitted_cell_contains_markup. There are now TWO renderers over the one result \
+        evidence="a newly declared read model renders with no renderer change \
+            and no emitted cell contains markup. There are now TWO renderers over the one result \
             type — terminal and Markdown — with no branch on a view's name in either, which is a \
             harder test of E10's falsifier than the walkthrough could run (Y4)"
     claim "C4" from-slice="TS.260820.10" state="met" \
         text="publishing never writes outside the current release's directory" \
         settled-by="a test asserting prior release directories are byte-unchanged after a publish" \
-        evidence="tests/publishing.rs::c4_publishing_writes_nothing_outside_this_release_directory — \
+        evidence="publishing writes nothing outside this release directory — \
             asserted on the composed paths rather than by publishing twice and diffing, because the \
             paths are what a future change would get wrong"
 
     claim "C3" from-slice="TS.260820.09" state="met" \
         text="the recorded commit resolves in git and contains that release's published directory" \
         settled-by="cut-release refusing until the published directory exists AND is committed" \
-        evidence="crates/praxis-cli — published_and_committed() refuses the cut when \
-            docs/releases/<version>/ is absent or has uncommitted changes, verified against the real \
-            tree: `praxis cut-release 0.8.0 --confirm` refused with `?? docs/releases/0.8.0/`" \
+        evidence="published_and_committed() refuses the cut when \
+            the archival projection is absent or has uncommitted changes, verified against the real \
+            tree: `praxis cut-release 0.8.0 --confirm` refused with `?? the 0.8.0 archival projection`" \
         note="the residue X1 carried from ITER.260821.08. It is settled by making the containment \
             true BY CONSTRUCTION rather than by asserting it after the fact — the cut cannot happen \
             until the commit it will name contains the documents"
@@ -92,9 +92,9 @@ iteration "ITER.260821.09" {
     contributes "slice-outcome-added" \
         because="publish-the-release-set, and the archival surface made byte-reproducible"
 
-    layer "doctrine"    state="evidenced" evidence="skills/publish-the-release-set/SKILL.md, registered in the router" reaches="the skill forbids editing a published document toward a new state"
+    layer "doctrine"    state="evidenced" evidence="surface.skill.publish-the-release-set, registered in the router" reaches="the skill forbids editing a published document toward a new state"
     layer "enforcement" state="evidenced" evidence="85 tests pass; publishing after a cut is refused, and cutting before a publish is refused" reaches="stamp-on-publish, and archival immutability"
-    layer "docs"        state="evidenced" evidence="docs/releases/0.8.0/what-shipped.md and capabilities.md — the first archival documents this engine has produced" reaches="this slice IS the docs layer"
+    layer "docs"        state="evidenced" evidence="the 0.8.0 what-shipped document and the capabilities document — the first archival documents this engine has produced" reaches="this slice IS the docs layer"
     layer-set sealed=#true at="2026-08-21T14:40:00Z"
 
     phase "design-ux" state="complete" required-by="docs" \
@@ -111,7 +111,7 @@ iteration "ITER.260821.09" {
             `praxis publish`, the containment check at cut, and eleven tests"
     phase "learn" state="complete" required-by="always" produced="five findings, one of them a contradiction between two slices" \
         note="never skippable — it is the phase that judges the others"
-    phase "teach" state="skipped" required-by="doctrine" produced="skills/publish-the-release-set/SKILL.md" \
+    phase "teach" state="skipped" required-by="doctrine" produced="surface.skill.publish-the-release-set" \
         skipped-because="it produced doctrine for an AGENT, which is the doctrine LAYER and is recorded there. Teaching an end user the feature's why and how did not happen — and the record already serves the next agent, whose own persona judges success by NOT needing a document (TS.260821.19, ITER.260822.15/BA1)"
 
     finding "Y1" state="open" size="frame-sized" \
@@ -154,8 +154,8 @@ iteration "ITER.260821.09" {
             read-side split is real that this frame has produced"
 
     finding "Y5" state="open" size="owed-work" \
-        text="publish is the first command to write OUTSIDE the state root, into docs/. config.kdl \
-            declares archival-projection as `docs/releases/`, and nothing reads that declaration or \
+        text="publish is the first command to write OUTSIDE the state root, into docs/. the config \
+            declares archival-projection as the archival projection, and nothing reads that declaration or \
             enforces the boundary — the path is composed in the engine" \
         obliges="read the archival root from config like the bump rules are read, and refuse a write \
             outside it" \

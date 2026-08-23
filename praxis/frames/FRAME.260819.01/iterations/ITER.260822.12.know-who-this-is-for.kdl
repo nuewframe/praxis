@@ -38,24 +38,24 @@ iteration "ITER.260822.12" {
     // settle the one it carried, and re-states the others against the evidence that met them
     // rather than pretending they were done here.
     claim "C1" from-slice="TS.260821.15" state="met" \
-        evidence="settled by ITER.260822.11 — tests/personas.rs::a_persona_nobody_could_be_wrong_about_is_refused"
+        evidence="settled by ITER.260822.11 — a persona nobody could be wrong about is refused"
     claim "C2" from-slice="TS.260821.15" state="met" \
-        evidence="settled by ITER.260822.11 — ::a_view_needed_by_nobody_the_record_holds_dangles"
+        evidence="settled by ITER.260822.11 — a view needed by nobody the record holds dangles"
     claim "C3" from-slice="TS.260821.15" state="met" \
         evidence="a-claim-of-value-names-whose reports and is WITNESSED. \
-            tests/personas.rs::a_slice_saying_what_you_get_without_saying_who_gets_it_is_reported \
+            a slice saying what you get without saying who gets it is reported \
             asserts it fires on the slice that claims value and names nobody, stays silent on one \
             that claims none, and reports rather than refuses. Thirty-four slices were annotated \
             FIRST, so the rule landed on a count of zero"
     claim "C4" from-slice="TS.260821.15" state="met" \
         evidence="settled by ITER.260822.11 — felt-by on all seven symptoms"
     claim "C5" from-slice="TS.260821.15" state="met" \
-        evidence="settled by ITER.260822.11 — ::one_persona_is_enough_and_none_is_reported"
+        evidence="settled by ITER.260822.11 — one persona is enough and none is reported"
     claim "C6" from-slice="TS.260821.15" state="met" \
-        evidence="settled by ITER.260822.11 — ::an_emergent_persona_with_no_origin_is_refused"
+        evidence="settled by ITER.260822.11 — an emergent persona with no origin is refused"
 
     layer "doctrine"    state="evidenced" \
-        evidence="skills/name-a-persona/SKILL.md, unchanged — the doctrine was right and the \
+        evidence="surface.skill.name-a-persona, unchanged — the doctrine was right and the \
             enforcement was missing" \
         reaches="a slice states whose value it claims"
     layer "enforcement" state="evidenced" \

@@ -40,23 +40,23 @@ iteration "ITER.260822.10" {
             clean afterwards with no hand-edit. Doing it by hand had cost three edits across \
             seven files with check inconsistent in between"
     claim "C2" from-slice="TS.260821.13" state="met" \
-        evidence="tests/withdrawing.rs::withdrawing_unwinds_only_its_own_promotion — entries from \
+        evidence="withdrawing unwinds only its own promotion — entries from \
             OTHER cut releases survive, or withdrawing one version rewrites the history of every other"
     claim "C3" from-slice="TS.260821.13" state="met" \
-        evidence="tests/withdrawing.rs::a_withdrawal_with_no_reason_is_refused, over None, empty \
+        evidence="a withdrawal with no reason is refused, over None, empty \
             and whitespace; the refusal names `--because` rather than a rule. Refused live before \
             the test existed"
     claim "C4" from-slice="TS.260821.13" state="met" \
-        evidence="praxis/releases/REL.0.8.0.kdl carries `previously-cut` with the tag, commit, \
+        evidence="REL.0.8.0 carries `previously-cut` with the tag, commit, \
             cut-at and confirmed-bump of what WAS cut; `previously-cut` is 0..n so a version cut, \
             withdrawn and cut again keeps every one"
     claim "C5" from-slice="TS.260821.13" state="met" \
         evidence="a-state-vocabulary-is-declared-once refuses and is WITNESSED (21 of 49). \
-            tests/withdrawing.rs::a_kind_declaring_its_states_twice_differently_is_refused asserts \
+            a kind declaring its states twice differently is refused asserts \
             the message names what is only in each, and that agreement is silent"
 
     layer "doctrine"    state="evidenced" \
-        evidence="skills/cut-the-version and the release node's own header say a cut is a pointer; \
+        evidence="surface.skill.cut-the-version and the release node's own header say a cut is a pointer; \
             `praxis withdraw --help` says what taking it back does" \
         reaches="a cut is a pointer, and the skill says what taking it back costs"
     layer "enforcement" state="evidenced" \
@@ -65,7 +65,7 @@ iteration "ITER.260822.10" {
         reaches="a withdrawal with no reason is refused; a capability asserting a withdrawn release's truth is recomputed away"
     layer "docs"        state="evidenced" \
         evidence="REL.0.8.0's `withdrawn-because` carries the reason in full, and \
-            praxis/.usage/baseline/ holds what the withdrawn cut had frozen" \
+            the usage baseline holds what the withdrawn cut had frozen" \
         reaches="`why is this version not cut any more` is answered by the release itself"
 
     phase "design-ux" state="complete" required-by="docs" worked-by="agent:principal-engineer" \
@@ -74,7 +74,7 @@ iteration "ITER.260822.10" {
         produced="both halves move together or neither does — the pointer and the promoted truth \
             the cut wrote elsewhere are one operation"
     phase "implement" state="complete" required-by="enforcement · docs" worked-by="agent:principal-engineer" \
-        produced="withdraw.rs, the withdraw command, `previously-cut`, and the split-vocabulary rule"
+        produced="the withdrawal path, the withdraw command, `previously-cut`, and the split-vocabulary rule"
     phase "learn" state="complete" required-by="always" worked-by="agent:principal-engineer" \
         produced="AS9 and AT1 — two more declarations that nothing read"
     phase "teach" state="skipped" required-by="doctrine" worked-by="agent:principal-engineer" \

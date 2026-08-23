@@ -38,21 +38,21 @@ iteration "ITER.260821.17" {
     claim "C1" from-slice="TS.260820.18" state="met" \
         text="resolving against a release that does not exist is refused" \
         settled-by="a negative test with a dangling resolved-by" \
-        evidence="tests/symptoms.rs::c1_resolving_against_a_release_that_does_not_exist_is_refused, \
-            and ::c1_a_release_that_is_only_planned_does_not_resolve_anything — binding work to a \
+        evidence="resolving against a release that does not exist is refused, \
+            and a release that is only planned does not resolve anything — binding work to a \
             version is not shipping it, so the frame shrinks at the cut and not at the intent. \
             Verified against the real record: it refused this repository's own S1"
     claim "C2" from-slice="TS.260820.18" state="met" \
         text="resolving against a release that bound no slice attacking this symptom is refused" \
         settled-by="a negative test with a real release and no attacking slice" \
-        evidence="tests/symptoms.rs::c2_a_release_that_bound_no_attacking_slice_is_refused, and \
-            ::c2_an_attacking_slice_in_a_different_release_does_not_count — the attack has to be in \
+        evidence="a release that bound no attacking slice is refused, and \
+            an attacking slice in a different release does not count — the attack has to be in \
             THIS release, because a slice that attacks S1 and shipped elsewhere says nothing about \
             what this version did"
     claim "C3" from-slice="TS.260820.18" state="met-in-part" \
         text="a resolved symptom cannot silently return to present" \
         settled-by="a negative test reverting a resolution without a new frame or an amendment" \
-        evidence="tests/symptoms.rs::a_withdrawn_claim_leaves_the_symptom_present_and_the_record_clean \
+        evidence="a withdrawn claim leaves the symptom present and the record clean \
             — a withdrawal that records `previously-claimed` and `withdrawn-because` passes, and the \
             withdrawal this repository performed on its own S1 is the worked example" \
         residue="nothing REFUSES a silent revert. A symptom edited from resolved back to present \
@@ -92,7 +92,7 @@ iteration "ITER.260821.17" {
     contributes "slice-outcome-added" \
         because="resolve-a-symptom, and a frame that can only shrink by something that shipped"
 
-    layer "doctrine"    state="evidenced" evidence="skills/resolve-a-symptom/SKILL.md, registered in the router" reaches="the skill teaches that a frame shrinks only by a release, never by an opinion"
+    layer "doctrine"    state="evidenced" evidence="surface.skill.resolve-a-symptom, registered in the router" reaches="the skill teaches that a frame shrinks only by a release, never by an opinion"
     layer "enforcement" state="evidenced" evidence="158 tests pass; a dangling release, a planned one, and one that bound no attacking slice are each refused" reaches="resolution-names-a-release, extended to require an attacking slice in that release"
     layer "docs"        state="evidenced" evidence="a cut release derives `resolves` from the symptoms that name it, and the release notes carry them" reaches="the release notes carry which symptoms it closed"
     layer-set sealed=#true at="2026-08-21T20:05:00Z"
@@ -111,7 +111,7 @@ iteration "ITER.260821.17" {
             tests, and the fix for AG1"
     phase "learn" state="complete" required-by="always" produced="three findings, one of them a bug that hid every nested refusal" \
         note="never skippable — it is the phase that judges the others"
-    phase "teach" state="skipped" required-by="doctrine" produced="skills/resolve-a-symptom/SKILL.md" \
+    phase "teach" state="skipped" required-by="doctrine" produced="surface.skill.resolve-a-symptom" \
         skipped-because="it produced doctrine for an AGENT, which is the doctrine LAYER and is recorded there. Teaching an end user the feature's why and how did not happen — and the record already serves the next agent, whose own persona judges success by NOT needing a document (TS.260821.19, ITER.260822.15/BA1)"
 
     finding "AG1" state="open" size="frame-sized" \

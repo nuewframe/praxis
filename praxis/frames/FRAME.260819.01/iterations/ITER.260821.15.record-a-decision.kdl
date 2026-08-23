@@ -38,25 +38,25 @@ iteration "ITER.260821.15" {
     claim "C1" from-slice="TS.260820.14" state="met" \
         text="editing the body of an accepted decision is refused; appending an amendment is not" \
         settled-by="a negative test mutating an accepted body, and a positive test appending an amendment" \
-        evidence="tests/decisions.rs::c1_editing_the_body_of_an_accepted_decision_is_refused and \
-            ::c1_appending_an_amendment_is_not_an_edit — the seal covers the body and deliberately \
+        evidence="editing the body of an accepted decision is refused and \
+            appending an amendment is not an edit — the seal covers the body and deliberately \
             NOT the amendments, because otherwise the only way to correct a decision would be to \
             break its seal and append-only would be unusable"
     claim "C2" from-slice="TS.260820.14" state="met" \
         text="a decision with no alternatives and no falsifier is refused" \
         settled-by="two negative tests, one per missing field" \
-        evidence="tests/decisions.rs::c2_a_decision_with_no_alternatives_is_refused and \
-            ::c2_a_decision_with_no_falsifier_is_refused"
+        evidence="a decision with no alternatives is refused and \
+            a decision with no falsifier is refused"
     claim "C3" from-slice="TS.260820.14" state="met" \
         text="a decision not bound to an iteration is refused" \
         settled-by="a negative test with a dangling iteration reference" \
-        evidence="tests/decisions.rs::c3_a_decision_bound_to_no_iteration_is_refused — binding is by \
+        evidence="a decision bound to no iteration is refused — binding is by \
             NESTING rather than by reference, so a dangling reference is not the failure mode; a \
             decision at the root is, and that is what the test builds"
     claim "C4" from-slice="TS.260820.14" state="met" \
         text="findings that tested a decision are reachable from it" \
         settled-by="a test asserting the traversal from a decision to the findings raised against it" \
-        evidence="tests/decisions.rs::c4_findings_that_tested_a_decision_are_reachable_from_it — a \
+        evidence="findings that tested a decision are reachable from it — a \
             finding says `tests=<the decision's title>` and the composed document walks from the \
             decision to it. T3 in ITER.260821.04 now carries that edge, which is the first one"
 
@@ -90,9 +90,9 @@ iteration "ITER.260821.15" {
     contributes "slice-outcome-added" \
         because="record-a-decision, and every decision in the frame made falsifiable"
 
-    layer "doctrine"    state="evidenced" evidence="skills/record-a-decision/SKILL.md, registered in the router" reaches="the skill teaches append-only correction and the falsifier requirement"
+    layer "doctrine"    state="evidenced" evidence="surface.skill.record-a-decision, registered in the router" reaches="the skill teaches append-only correction and the falsifier requirement"
     layer "enforcement" state="evidenced" evidence="142 tests pass; a decision with no alternative, no falsifier, no iteration, or a body that moved after acceptance is refused" reaches="an edit to an accepted decision's body is refused; an amendment is not"
-    layer "docs"        state="evidenced" evidence="the-decisions-that-shaped-this composes from the record, and publish now has three of the four composers it needs" reaches="published under docs/releases/<version>/decisions/, composed with the options discovery rejected"
+    layer "docs"        state="evidenced" evidence="the-decisions-that-shaped-this composes from the record, and publish now has three of the four composers it needs" reaches="published under the archival projection's decisions, composed with the options discovery rejected"
     layer-set sealed=#true at="2026-08-21T19:52:00Z"
 
     phase "design-ux" state="complete" required-by="doctrine" \
@@ -110,7 +110,7 @@ iteration "ITER.260821.15" {
             edge, and nine tests"
     phase "learn" state="complete" required-by="always" produced="three findings" \
         note="never skippable — it is the phase that judges the others"
-    phase "teach" state="skipped" required-by="doctrine" produced="skills/record-a-decision/SKILL.md" \
+    phase "teach" state="skipped" required-by="doctrine" produced="surface.skill.record-a-decision" \
         skipped-because="it produced doctrine for an AGENT, which is the doctrine LAYER and is recorded there. Teaching an end user the feature's why and how did not happen — and the record already serves the next agent, whose own persona judges success by NOT needing a document (TS.260821.19, ITER.260822.15/BA1)"
 
     finding "AE1" state="open" size="frame-sized" \

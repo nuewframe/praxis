@@ -38,32 +38,32 @@ iteration "ITER.260822.02" {
     // twenty-five to the frame would have satisfied it and made the rule worthless.
     claim "C1" from-slice="TS.260821.04" state="unmet" carried-by="AM1"
     claim "C2" from-slice="TS.260821.04" state="met" \
-        evidence="praxis/surfaces/SURFACES.retired.kdl — twenty retirements, each naming v0.7.1 as \
+        evidence="the retired surfaces — twenty retirements, each naming v0.7.1 as \
             where the file stands, and each with an argument for why it is superseded rather than \
-            merely old. tests/doctrine_surfaces.rs::a_retired_surface_still_in_the_tree_refuses \
+            merely old. a retired surface still in the tree refuses \
             asserts the record cannot say retired and leave the file where an agent will read it"
     claim "C3" from-slice="TS.260821.04" state="unmet" carried-by="AM1" \
         note="the flip to refuse waits on the count reaching zero, which waits on TS.260821.05"
     claim "C4" from-slice="TS.260821.04" state="met" \
-        evidence="tests/the_router_matches_the_binary.rs — every backticked or fenced `praxis \
+        evidence="the the router matches the binary tests — every backticked or fenced `praxis \
             <verb>` in the router is checked against the binary's own subcommand list, and the \
             seven retired skill names are asserted absent. It failed on its first run, on `praxis \
             --help`, which is how it was shown to be looking"
 
     layer "doctrine"    state="evidenced" \
-        evidence="skills/using-praxis/SKILL.md — spine, skill index, personas, guardrails and \
+        evidence="surface.skill.using-praxis — spine, skill index, personas, guardrails and \
             enforcement model rewritten; twenty skills, two guardrails and three probes removed; \
-            agents/principal-engineer.agent.md's tier workflow replaced by the phase/layer model" \
+            surface.agent.principal-engineer's tier workflow replaced by the phase/layer model" \
         reaches="the router is a projection of what the record holds"
     layer "enforcement" state="evidenced" \
         evidence="every-shipped-surface-is-anchored took 68 to 48 shipped and 23 anchored; the \
             router test fails closed on a stale spine; 196 tests pass" \
         reaches="re-adding the retired spine to the router fails the suite. The audit rule stays at REPORT — see AM1"
     layer "docs"        state="evidenced" \
-        evidence="README.md gained the delivery-graph skill inventory it never had and lost twenty \
-            dead rows, the composition diagram and the quick start; docs/product.md gained both \
+        evidence="the README gained the delivery-graph skill inventory it never had and lost twenty \
+            dead rows, the composition diagram and the quick start; the Markdown dashboard gained both \
             inventories" \
-        reaches="README and docs/product.md name only surfaces that exist"
+        reaches="README and the Markdown dashboard name only surfaces that exist"
 
     phase "design-ux" state="complete" required-by="docs" \
         produced="the router now opens on a spine of commands that exist, and says so — the first \
@@ -73,7 +73,7 @@ iteration "ITER.260822.02" {
             where the file still stands, which is what licenses removing it instead of shimming it"
     phase "implement" state="complete" required-by="enforcement · docs" \
         produced="twenty surfaces retired and removed, the router and README rewritten, \
-            tests/the_router_matches_the_binary.rs"
+            the the router matches the binary tests"
     phase "learn" state="complete" required-by="always" \
         produced="three findings, one of which is a slice — TS.260821.05, cut mid-iteration when \
             the count would not go to zero honestly"
@@ -112,7 +112,7 @@ iteration "ITER.260822.02" {
             repository currently declares which a file is"
 
     finding "AM3" state="open" size="observation" \
-        text="scripts/gen-tier-table.sh generated a tier table into three surfaces, two of which \
+        text="the tier-table generator generated a tier table into three surfaces, two of which \
             were retired here. Deleting a skill silently broke a generator and a CI step" \
         note="the tier table was itself an anti-drift mechanism — one fact rendered into three \
             documents so they could not disagree. It worked, and it kept three documents agreeing \

@@ -13,7 +13,7 @@ persona "the-team-building-a-digital-product" {
     does-not-care "how the engine is built, which crate holds what, or why any of it is in KDL"
     judges-by "they can pick up work somebody else left, and act on the record without asking them"
     state "primary"
-    note "named before the frame, and it is the reason the frame exists. docs/product.md has \
+    note "named before the frame, and it is the reason the frame exists. the Markdown dashboard has \
         said so in prose since before the delivery graph — `an engineer, product designer, or \
         product manager working through an LLM coding agent` — and no record has held it"
 }
@@ -37,7 +37,7 @@ persona "the-reader-of-a-release" {
     judges-by "they can say what the product is for and run the first command, without opening a second file"
     state "emergent"
     found-by "WALK.260822.02"
-    note "surfaced by reading docs/releases/0.8.0 as somebody who had not built it. The set was \
+    note "surfaced by reading the archival projection0.8.0 as somebody who had not built it. The set was \
         correct and not worth reading: a hundred and seventy lines of iteration ids, and a guide \
         that said nothing shipped while five capabilities were active"
 }

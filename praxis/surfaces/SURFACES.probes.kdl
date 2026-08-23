@@ -75,7 +75,7 @@ doctrine-surface "surface.guardrail.capability-driven" {
 
 // Retired here rather than in TS.260821.04, which missed it: the sweep classified by
 // filename and this one is called check-contract-freshness. Its subject is `each active
-// sprint's Sprint Footprint block` and it reads docs/product/sprints/, which no longer
+// sprint's Sprint Footprint block` and it reads the sprint directory, which no longer
 // exists. A retirement sweep that reads names finds the files that were named for the thing.
 doctrine-surface "surface.retired.check-contract-freshness" {
     path "scripts/check-contract-freshness.sh"

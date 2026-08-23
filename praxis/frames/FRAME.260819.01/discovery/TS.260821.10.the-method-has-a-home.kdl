@@ -7,11 +7,11 @@
 // forks the method and drifts from it silently, which is the second-copy problem this frame
 // exists to attack, turned on the frame's own definition of itself.
 //
-// config.kdl already names the three levels and has done since it was written:
+// the config already names the three levels and has done since it was written:
 //
 //     argument   — why a decision was made        an adr's body
 //     normative  — what the decision made true    (homeless)
-//     binding    — how THIS repository applies it config.kdl
+//     binding    — how THIS repository applies it the config
 //
 // The schema is NORMATIVE. It was carried on ADR.260819.02, which was withdrawn because an
 // ADR is a technical decision and what a frame or a slice IS belongs to the record itself.
@@ -73,7 +73,7 @@ thin-slice "TS.260821.10" {
     claim "C4" text="the shipped vocabulary is a record the engine parses, not a shape it knows" \
         settled-by="a test that the embedded method parses through the same reader and passes praxis check's own rules, plus a test that the embedded copy is byte-identical to the file humans edit"
     claim "C5" text="governed-by names the method and its version, and an unknown one is refused" \
-        settled-by="a test with governed-by naming a method the engine does not carry, asserting a refusal — and praxis/config.kdl's binding restored after six days pointing at nothing"
+        settled-by="a test with governed-by naming a method the engine does not carry, asserting a refusal — and the config's binding restored after six days pointing at nothing"
 
     depends-on "TS.260821.01 — declaring a kind is an amendment to the record, and this is where the record it amends comes from"
 

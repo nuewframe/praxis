@@ -118,10 +118,29 @@ because everything in it was already agreed before it arrived.
 | release history | what shipped, and what was claimed about it | bind what the record can compute; **withdraw** what it cannot |
 | tickets, RFCs, READMEs | discovery data | walk one path through them and see what survives |
 
-Record where something came from with `informed-by`. That is **provenance, and deliberately
-not an edge the checker follows** — it points outside the record at a file that may be deleted
-or rewritten. `W16` is thirty-four citations into unfollowable Markdown; this must not be the
-thirty-fifth.
+### Restate what it taught. Do not record where it lived.
+
+**There is no `informed-by`, and there deliberately is not one.** The obvious move — keep a
+pointer to the document each fact came from — records the half guaranteed not to survive. A
+path rots; a path marked as provenance rots while looking deliberate, and a dead pointer
+outlives the file it named as a confident lie.
+
+So the substance goes into the record in the record's own words, and the location goes
+nowhere:
+
+| Instead of | Write |
+|---|---|
+| `informed-by=` pointing at the old queueing ADR | the decision itself, with what it rejected and what would show it wrong |
+| `evidence=` naming a test file and the function inside it | `evidence="a refund replayed twice moves the balance once"` |
+| "see the capability doc" | the capability's `doing`, its `not`, and the four gate tests it passes |
+
+`W16` was thirty-four citations into unfollowable Markdown, read as a documentation problem.
+It was the same fault one level down, and `the-record-cites-what-it-holds` now **refuses** a
+field naming a file — a hundred and fifty-six of them stood in this repository's own record.
+
+What the record may cite is **its own ids**. `TS.260821.17`, `AG1` and `surface.skill.cut-a-slice`
+are followable, because `dangling-relationship` refuses one the record does not hold. That is
+exactly the check a path cannot have.
 
 ### The evidence, from this repository
 
@@ -156,3 +175,5 @@ not claim it.
 - `declare-an-entity-kind` — the shape of an extension, once you need one
 - `ask-what-is-true` — the first thing to run in a repository you did not set up
 - `cut-a-slice` — what the method wants a slice to carry
+- `attach-evidence` — the same rule, said about one claim at a time
+- `write-durable-comments` — a citation and a story, told apart

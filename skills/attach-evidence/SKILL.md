@@ -38,19 +38,38 @@ afterwards those two look identical.
 
 ## Attach it when you reach it, not at close
 
-Evidence written at close is written from memory of what the work meant. Evidence written at the moment
-the layer is reached names the artifact that exists right then:
+Evidence written at close is written from memory of what the work meant. Evidence written at the
+moment the layer is reached says what was shown, while you are still looking at it:
 
 ```kdl
 layer "enforcement" state="evidenced" \
-    evidence="tests/evidence_layers.rs — six tests, and one asserting the rule goes silent \
-        when the record stops declaring it" \
+    evidence="six tests, one of them asserting the rule goes silent when the record stops \
+        declaring it" \
     reaches="evidence-names-its-layer, failing closed on an undeclared layer"
 ```
 
-`evidence` names **something that exists** — a test, a diagnostic, a generated file, a skill. Not a
-description of work done. If you cannot point at the artifact, the layer is not evidenced yet, and
-saying so is the honest close.
+## Evidence states WHAT was shown, never where to look
+
+**A path is not a citation this record can follow.** `the-record-cites-what-it-holds` refuses a
+field naming a file, and `evidence` is where it used to happen most:
+
+| Refused | Write instead |
+|---|---|
+| `evidence="tests/evidence_layers.rs::c1_evidence_naming_an_undeclared_layer_is_refused"` | `evidence="evidence naming an undeclared layer is refused"` |
+| `evidence="skills/attach-evidence/SKILL.md, registered"` | `evidence="surface.skill.attach-evidence, registered"` |
+| `evidence="docs/releases/0.8.0/guides/how-to-use-a-capability.md"` | `evidence="the 0.8.0 capability guide"` |
+
+The rename that breaks the first column is invisible: the claim goes on reading as settled while
+pointing at nothing. The second column survives it, and says what the test proved rather than
+where somebody can go to watch it pass. The repository already knows where things live, and git
+knows when they moved — the copy the record keeps is the one that rots.
+
+**What you MAY cite is an id.** `TS.260821.17`, `AG1`, `C3`, `surface.skill.attach-evidence` — the
+record holds those, and `dangling-relationship` refuses one it does not. That is exactly the check
+a path cannot have.
+
+If you cannot say what was shown, the layer is not evidenced yet, and saying so is the honest
+close.
 
 ---
 
@@ -72,4 +91,4 @@ measuring here.
   layer; whether it is a good test is a review question, at close.
 - **It does not produce the evidence.** That is the work itself.
 
-Related: `pick-up-a-slice` · `cut-a-slice` · `see-what-is-ready`.
+Related: `pick-up-a-slice` · `cut-a-slice` · `see-what-is-ready` · `adopt-the-method` (why a path is never a citation) · `write-durable-comments` (the same test, for comments).

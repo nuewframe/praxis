@@ -35,15 +35,15 @@ iteration "ITER.260822.06" {
     // does not remove it from here — it makes the two disagree, and that is
     // refused.
     claim "C1" from-slice="TS.260821.09" state="met" \
-        evidence="praxis-cli/tests/the_close_is_attested.rs::a_close_nobody_attested_is_refused — \
+        evidence="a close nobody attested is refused — \
             through the BINARY, and asserting the refusal says `--attested-by` rather than naming \
             a rule. `--attested-by` has no clap default"
     claim "C2" from-slice="TS.260821.09" state="met" \
-        evidence="::an_agent_attesting_its_own_work_is_refused and ::a_distinct_attester_closes, \
+        evidence="an agent attesting its own work is refused and a distinct attester closes, \
             both through the binary. This is the claim TS.260821.08 could not make: it compared \
             `by` — the tool — against a phase worker, and those can never be equal"
     claim "C3" from-slice="TS.260821.09" state="met" \
-        evidence="::a_distinct_attester_closes asserts the written record carries \
+        evidence="a distinct attester closes asserts the written record carries \
             `attested-by \"human:someone-else\"` in the close block AND `by=\"agent:praxis\"` in the \
             trail. Two facts, never compared to each other"
     claim "C4" from-slice="TS.260821.09" state="met" \
@@ -52,7 +52,7 @@ iteration "ITER.260822.06" {
             compliant is the move this frame exists to make impossible"
 
     layer "doctrine"    state="evidenced" \
-        evidence="skills/close-an-iteration/SKILL.md documents both refusals and states plainly \
+        evidence="surface.skill.close-an-iteration documents both refusals and states plainly \
             that this is not forgery-proof; the router's self-approval paragraph says --attested-by \
             has no default" \
         reaches="closing is something somebody does, and the skill says who"
@@ -77,7 +77,7 @@ iteration "ITER.260822.06" {
     phase "learn" state="complete" required-by="always" worked-by="agent:principal-engineer" \
         produced="two findings, one of them about the test harness itself"
     phase "teach" state="skipped" required-by="doctrine" worked-by="agent:principal-engineer" \
-        produced="skills/close-an-iteration/SKILL.md, rewritten around who attests" \
+        produced="surface.skill.close-an-iteration, rewritten around who attests" \
         skipped-because="it produced doctrine for an AGENT, which is the doctrine LAYER and is recorded there. Teaching an end user the feature's why and how did not happen — and the record already serves the next agent, whose own persona judges success by NOT needing a document (TS.260821.19, ITER.260822.15/BA1)"
 
     finding "AQ1" state="open" size="frame-sized" \

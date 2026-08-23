@@ -27,7 +27,7 @@ thin-slice "TS.260820.13" {
     step "2" does="each owning capability emits its own result. Nothing crosses ownership"
     step "3" does="compose them, in declared order, into one document"
     step "4" does="mark it as of now, not as of a release"
-    step "5" does="discard. docs/releases/ is untouched"
+    step "5" does="discard. the archival projection is untouched"
 
     excludes "committing it. This is the view the publication test rejects, and it is rejected \
         by name (ES.260819.01/E17)"
@@ -36,7 +36,7 @@ thin-slice "TS.260820.13" {
 
     layer "doctrine"    reaches="the skill teaches asking for the dashboard rather than reading a stale committed one"
     layer "enforcement" reaches="the working path is gitignored, so a dashboard cannot be committed by accident"
-    layer "docs"        reaches="none by design — this slice's output never enters docs/releases/"
+    layer "docs"        reaches="none by design — this slice's output never enters the archival projection"
 
     claim "C1" text="composing needs no code path specific to any one read model, and no owner appears in more than one result" \
         settled-by="a test composing three results from three capabilities with no renderer change, plus an ownership check"
@@ -44,12 +44,12 @@ thin-slice "TS.260820.13" {
         settled-by="a golden test on the header"
     claim "C3" text="asking twice across a state change gives two different answers, with no regeneration step" \
         settled-by="a test mutating state between two asks"
-    claim "C4" text="nothing is written under docs/releases/" \
+    claim "C4" text="nothing is written under the archival projection" \
         settled-by="a test asserting the published tree is byte-unchanged after composing"
 
     depends-on "TS.260820.03 and TS.260820.04 — the composed views must exist to be composed"
 
-    useful-alone "docs/product.md can be retired without losing anything, because the answer it \
+    useful-alone "the Markdown dashboard can be retired without losing anything, because the answer it \
         was approximating is now available whenever anyone asks for it"
     useful-to "the-team-building-a-digital-product"
 

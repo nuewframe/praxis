@@ -1,4 +1,4 @@
-// Ported from docs/capabilities/CAP.plugin-conformance-and-validation-probes.md by
+// Ported from surface.retired.cap-conformance-md by
 // TS.260821.06, and narrowed on the way: the Markdown record claimed the probes AND the
 // plugin validator AND the version audit AND the cross-reference scanner AND the test
 // fixtures. That is a list of scripts, not a consistency boundary.

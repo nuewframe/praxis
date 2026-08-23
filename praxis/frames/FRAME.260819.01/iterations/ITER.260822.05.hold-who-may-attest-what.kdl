@@ -35,26 +35,26 @@ iteration "ITER.260822.05" {
     // does not remove it from here — it makes the two disagree, and that is
     // refused.
     claim "C1" from-slice="TS.260821.08" state="met" \
-        evidence="tests/attestation.rs::an_agent_closing_work_it_did_itself_is_refused — and it \
+        evidence="an agent closing work it did itself is refused — and it \
             refuses BEFORE any claim is examined, because an iteration whose accounting is \
             perfect and whose reviewer is its author is not a review that came out clean"
     claim "C2" from-slice="TS.260821.08" state="met" \
-        evidence="tests/attestation.rs::a_different_identity_closing_the_same_work_is_accepted, \
-            ::a_phase_the_role_does_not_reserve_is_not_refused, and \
-            ::a_phase_whose_worker_nobody_recorded_does_not_refuse — absence is not a violation, \
+        evidence="a different identity closing the same work is accepted, \
+            a phase the role does not reserve is not refused, and \
+            a phase whose worker nobody recorded does not refuse — absence is not a violation, \
             or every iteration written before this rule would be unclosable"
     claim "C3" from-slice="TS.260821.08" state="met" \
-        evidence="tests/doctrine_surfaces.rs::a_surface_cannot_anchor_to_the_root — the frame is \
+        evidence="a surface cannot anchor to the root — the frame is \
             IN the record and a surface still cannot anchor to it, because the vocabulary does not \
             admit it. praxis check clean at 48 of 48 with no surface naming the frame"
     claim "C4" from-slice="TS.260821.08" state="met" \
-        evidence="praxis/roles/ROLES.who-may-attest-what.kdl — three roles, each naming the phases \
+        evidence="ROLES.who-may-attest-what — three roles, each naming the phases \
             it owns and the phases it may not attest for its own work; three persona files \
             carrying praxis-role in their frontmatter and anchored to those roles"
 
     layer "doctrine"    state="evidenced" \
         evidence="the router's self-approval paragraph now says what refuses and what does not; \
-            agents/principal-engineer.agent.md says `this is no longer on your honour` and names \
+            surface.agent.principal-engineer says `this is no longer on your honour` and names \
             its own never-for-own phases" \
         reaches="a persona file says which role it is, and the role says what that means to the engine"
     layer "enforcement" state="evidenced" \

@@ -6,11 +6,11 @@
 // silently, the second-copy problem this frame exists to attack, applied to the frame's own
 // definition of itself (ITER.260821.19/AK2).
 //
-// praxis/config.kdl has named the three levels since the day it was written:
+// the config has named the three levels since the day it was written:
 //
 //     argument   — why a decision was made        an adr's body
 //     normative  — what the decision made true    THIS FILE
-//     binding    — how a repository applies it    that repository's config.kdl
+//     binding    — how a repository applies it    that repository's the config
 //
 // The middle row was empty from the withdrawal of ADR.260819.02 until now. `governed-by`
 // pointed at nothing, and the comment beside it promised the binding would be restored when
@@ -968,6 +968,47 @@ method "delivery-graph" {
             note="reported, not refused. Thirty-four slices were annotated before this landed so \
                 the count is zero on arrival — the same order TS.260821.04 had to use, and the \
                 reason AV1 carried rather than being forced"
+
+        rule "the-record-cites-what-it-holds"        refuses="a field naming a file the checker cannot follow" \
+            because="a citation is an appeal to something that carries the weight of the claim. \
+                An `evidence=` naming a test file and a function inside it says GO HERE \
+                AND SEE — and the moment that function is renamed the claim is orphaned, silently, \
+                while still reading as settled. A hundred and fifty-six of them stood in this \
+                record. The record says WHAT was shown; the repository says where it lives; git \
+                says when it moved. The copy that rots is the one the record keeps" \
+            found-by="TS.260821.17, from W16 — thirty-four citations into unfollowable Markdown, \
+                which was the same fault one level up and was read as a documentation problem" \
+            note="what the record MAY cite is its own ids. `TS.260821.17`, `AG1`, `C3` and \
+                `ITER.260822.14` are followable — dangling-relationship refuses one the record does \
+                not hold, which is exactly the check a path cannot have" \
+            note="not refused: the record's assertions about its own tree, because none of them \
+                can rot silently. `doctrine-surface.path` is checked by a-declared-surface-ships; \
+                `layer.owns` and the `paths` block are read by the tool, which fails when they are \
+                wrong; `publishes-to` is where the record WRITES; `given-shipped` and `witness` \
+                declare a synthetic world for a witness and name files that deliberately do not \
+                exist. If that distinction is wrong, the seventy-eight surfaces are the next thing \
+                to rework" \
+            still-owed="the KDL comments. A path in a comment is invisible to a parser and rots \
+                the same way — `write-durable-comments` is the only thing standing over it, and it \
+                is doctrine with no probe" \
+            witness=#"""
+                thin-slice "TS.witness-citing" {
+                    slug "cites-a-path"
+                    title "a slice whose claim points outside the record"
+                    kind "command"
+                    realizes "CAP.delivery-record"
+                    from-storm "ES.260819.01"
+                    command "witness"
+                    actor "somebody"
+                    produces-event "Witnessed"
+                    trigger "a witness is needed"
+                    outcome "the rule fires"
+                    layer "doctrine" reaches="nothing"
+                    claim "C1" text="something is true" settled-by="tests/witness.rs::it_is_true"
+                    useful-alone "a witness"
+                    useful-to "the-maintainer"
+                }
+                """#
 
         rule "a-state-vocabulary-is-declared-once"    refuses="a kind whose `states=` and whose `state` field's `one-of=` disagree" \
             because="`withdrawn` had to be added to `release` in two places, and the first edit \

@@ -66,7 +66,7 @@ thin-slice "TS.260821.17" {
         A second rule would be enforcing what the schema already enforces"
 
     layer "doctrine"    reaches="adopt-the-method says what to do with what is already there, which is the first question a brownfield adopter has"
-    layer "enforcement" reaches="`informed-by` is declared as provenance and explicitly not traceability, so nobody mistakes it for a checked edge"
+    layer "enforcement" reaches="a field naming a file the checker cannot follow is refused, so nothing in the record can point outward and go stale unnoticed"
     layer "docs"        reaches="`what did this come from` is answerable for a record built on prior work"
 
     claim "C1" text="no record cites a path the checker cannot follow" \

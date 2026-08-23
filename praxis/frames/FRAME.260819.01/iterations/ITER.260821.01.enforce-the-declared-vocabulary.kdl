@@ -47,7 +47,7 @@ iteration "ITER.260821.01" {
         condition "what turning this rule on will refuse is known BEFORE it is turned on" \
             verdict="known-and-recorded" \
             found="`config` is a root kind the schema does not declare. Enabling the rule refuses \
-                praxis/config.kdl immediately" \
+                the config immediately" \
             note="surveyed at open rather than discovered by a red build. The first thing this \
                 slice does is prove itself against a real omission that was already there"
     }
@@ -64,26 +64,26 @@ iteration "ITER.260821.01" {
     claim "C1" from-slice="TS.260821.01" state="met" \
         text="a node whose kind the schema does not declare is refused, naming the kind" \
         settled-by="a negative test with an undeclared kind, asserting the kind appears in the diagnostic" \
-        evidence="tests/declared_vocabulary.rs::c1_an_undeclared_root_kind_is_refused_by_name"
+        evidence="an undeclared root kind is refused by name"
     claim "C2" from-slice="TS.260821.01" state="met" \
         text="declaring the kind on the schema admits it, with no engine change" \
         settled-by="a test that adds a kind to a schema fixture and asserts the same record then passes" \
-        evidence="tests/declared_vocabulary.rs::c2_declaring_the_kind_admits_it_with_no_engine_change, \
+        evidence="declaring the kind admits it with no engine change, \
             and the record itself — 254 refusals became zero by declaring the vocabulary, with no engine change"
     claim "C3" from-slice="TS.260821.01" state="met" \
         text="a kind declared with no fields is admitted and reported, never silently accepted" \
         settled-by="a test asserting a report rather than a refusal, and asserting it is not silent" \
-        evidence="tests/declared_vocabulary.rs::c3_a_shapeless_kind_is_reported_not_refused_and_not_silent; \
+        evidence="a shapeless kind is reported not refused and not silent; \
             8 reports on every run of the real record"
     claim "C4" from-slice="TS.260821.01" state="met" \
         text="the three kinds that went undeclared — iteration, read-model, phase — would each have been caught" \
         settled-by="a regression test replaying each against the schema with that kind removed" \
-        evidence="tests/declared_vocabulary.rs::c4_the_three_kinds_that_went_missing_would_have_been_caught" \
+        evidence="the three kinds that went missing would have been caught" \
         note="only satisfiable because this iteration declared `iteration` and `event-storm` in full, \
             and added `holds` — two of the three are CONTAINED entities, invisible until their \
             container had a shape"
 
-    layer "doctrine"    state="evidenced" evidence="skills/declare-an-entity-kind/SKILL.md, registered in the router" reaches="the skill teaches declaring the kind before writing records of it"
+    layer "doctrine"    state="evidenced" evidence="surface.skill.declare-an-entity-kind, registered in the router" reaches="the skill teaches declaring the kind before writing records of it"
     layer "enforcement" state="evidenced" evidence="12 tests pass; praxis check reports 8 shapeless kinds and refuses undeclared ones" reaches="undeclared-entity-kind, declared since NA.260820.01 and never enforced"
     layer "docs"        state="evidenced" evidence="the refusal names the kind and says to declare it on the architecture's schema block" reaches="the refusal names the kind and points at where declaring it belongs"
     layer-set sealed=#true at="2026-08-21T01:40:00-05:00"
@@ -92,7 +92,7 @@ iteration "ITER.260821.01" {
     phase "design-system" state="complete" produced="severity split — refuse versus report — and `holds` to separate a contained entity from a value"
     phase "implement"     state="complete" produced="root and contained kind checking, optional cardinalities, and the vocabulary the record itself named"
     phase "learn"         state="complete" produced="five findings, four of which changed the record or the engine while the iteration was open"
-    phase "teach"         state="skipped" produced="skills/declare-an-entity-kind/SKILL.md" \
+    phase "teach"         state="skipped" produced="surface.skill.declare-an-entity-kind" \
         skipped-because="it produced doctrine for an AGENT, which is the doctrine LAYER and is recorded there. Teaching an end user the feature's why and how did not happen — and the record already serves the next agent, whose own persona judges success by NOT needing a document (TS.260821.19, ITER.260822.15/BA1)"
 
     finding "Q1" state="open" size="owed-work" \
@@ -147,7 +147,7 @@ iteration "ITER.260821.01" {
 
     contributes "slice-outcome-added" \
         because="declare-an-entity-kind, and the record enumerating its own vocabulary" \
-        note="the bump rule this work matches, from config.kdl. Declared by the iteration \
+        note="the bump rule this work matches, from the config. Declared by the iteration \
             because only whoever did the work knows what kind of change it was"
 
     trail {

@@ -93,7 +93,7 @@ iteration "ITER.260820.01" {
 
     frozen {
         pins "the capability record format" at-commit="82c8f42" \
-            shape="the five CAP.<name>.kdl records as committed — doing · not · state · derived-from · \
+            shape="the five a capability record records as committed — doing · not · state · derived-from · \
                 from-cluster · owns-event · owns-read-model · enforces · attacks · gate-test · \
                 keeps-consistent · trail" \
             note="frozen for this iteration only. An iteration freezes; it does not legislate"
@@ -137,7 +137,7 @@ iteration "ITER.260820.01" {
             and passes on the committed record"
 
     phase "teach" state="skipped" \
-        produced="skills/cut-a-slice/SKILL.md, registered in the using-praxis router" \
+        produced="surface.skill.cut-a-slice, registered in the using-praxis router" \
         evidence="the skill teaches naming the command, the one actor, the declared layers and the \
             claims-with-evidence, and teaches that a refusable command names its refusal too" \
         note="it deliberately does NOT restate the field list. Doctrine that duplicates a fact the \
@@ -159,18 +159,18 @@ iteration "ITER.260820.01" {
     claim "C1" from-slice="TS.260820.01" state="met" \
         text="a slice missing any of command/actor/event/layer is refused at write time" \
         settled-by="one negative test per missing field" \
-        evidence="crates/praxis-core/tests/slice_shape.rs::c1_every_required_field_is_refused_when_absent" \
+        evidence="every required field is refused when absent" \
         note="the test enumerates the required fields FROM THE SCHEMA rather than listing them, so a \
             field added to the record is covered without editing the test"
     claim "C2" from-slice="TS.260820.01" state="met" \
         text="the refusal names which field is missing, not that the file is invalid" \
         settled-by="a test asserting the field name appears in the diagnostic" \
-        evidence="crates/praxis-core/tests/slice_shape.rs::c2_the_refusal_names_the_missing_field, \
+        evidence="the refusal names the missing field, \
             plus the rendered CLI diagnostic naming actor, layer and produces-event with spans"
     claim "C3" from-slice="TS.260820.01" state="met" \
         text="a slice that names a capability which does not exist is refused" \
         settled-by="a negative test naming an absent capability" \
-        evidence="crates/praxis-core/tests/slice_shape.rs::c3_a_slice_naming_an_absent_capability_is_refused"
+        evidence="a slice naming an absent capability is refused"
 
     // ================================================================
     // LAYERS — declared by the slice, sealed at this first iteration. Evidence attaches per
@@ -179,7 +179,7 @@ iteration "ITER.260820.01" {
     // ================================================================
 
     layer "doctrine"    state="evidenced" reaches="the skill teaches naming the command, the actor and the layers before writing the slice" \
-        evidence="skills/cut-a-slice/SKILL.md, registered in skills/using-praxis/SKILL.md"
+        evidence="surface.skill.cut-a-slice, registered in surface.skill.using-praxis"
     layer "enforcement" state="evidenced" reaches="slice-shape, refusing at write time and naming the missing field" \
         evidence="cargo test — 7 passed; praxis check exits 1 with 4 refusals on a malformed slice"
     layer "docs"        state="evidenced" reaches="a refused slice and its reason are readable off the record" \
@@ -229,7 +229,7 @@ iteration "ITER.260820.01" {
         size="owed-work" \
         note="consistent with ES.260819.01/E11 — the storm modelled work moving through a \
             repository, not Praxis being installed — and with WALK.260820.02/W15. It is evidence \
-            the layer vocabulary in config.kdl is wider than this frame, not that the slices are thin"
+            the layer vocabulary in the config is wider than this frame, not that the slices are thin"
 
     finding "P2" state="open" \
         text="seventeen of eighteen slices declare depends-on another slice, which NA.260820.01's \
@@ -344,7 +344,7 @@ iteration "ITER.260820.01" {
 
     contributes "slice-outcome-added" \
         because="the first slice delivered — cut-a-slice, and the shape check behind it" \
-        note="the bump rule this work matches, from config.kdl. Declared by the iteration \
+        note="the bump rule this work matches, from the config. Declared by the iteration \
             because only whoever did the work knows what kind of change it was"
 
     trail {

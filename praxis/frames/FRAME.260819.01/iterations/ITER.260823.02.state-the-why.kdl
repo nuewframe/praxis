@@ -35,20 +35,20 @@ iteration "ITER.260823.02" {
     // does not remove it from here — it makes the two disagree, and that is
     // refused.
     claim "C1" from-slice="TS.260821.16" state="met" \
-        evidence="tests/the_anchor.rs::a_mission_with_no_test_is_refused_and_a_vision_needs_none — \
+        evidence="a mission with no test is refused and a vision needs none — \
             the mission carries `delivered-when` and the vision carries none, because a world \
             state cannot be tested and asking whether it is true is the category error that kept \
             all three out of the record"
     claim "C2" from-slice="TS.260821.16" state="met" \
-        evidence="tests/the_anchor.rs::the_chain_upward_is_checked_by_the_edges_it_already_has and \
-            ::a_frame_under_no_strategy_is_reported_and_not_refused. frame → strategy → mission → \
+        evidence="the chain upward is checked by the edges it already has and \
+            a frame under no strategy is reported and not refused. frame → strategy → mission → \
             vision dangles without a rule of its own; the missing-strategy case REPORTS, because \
             one frame exists and it predates all three kinds"
     claim "C3" from-slice="TS.260821.16" state="met" \
         evidence="settled by ITER.260822.11 — felt-by on all seven symptoms, each naming a persona"
     claim "C4" from-slice="TS.260821.16" state="met" \
-        evidence="tests/the_anchor.rs::the_published_concepts_open_with_why asserts `why this \
-            exists` is the FIRST section. docs/releases/0.8.0/concepts/ now opens with the world \
+        evidence="the published concepts open with why asserts `why this \
+            exists` is the FIRST section. the 0.8.0 published concepts now opens with the world \
             if this succeeds, what this does about it, and what would count as delivered"
 
     claim "C5" from-slice="TS.260821.16" state="carried" \
@@ -62,7 +62,7 @@ iteration "ITER.260823.02" {
             by TS.260821.18 and neither needed a rule of its own"
 
     layer "doctrine"    state="evidenced" \
-        evidence="skills/anchor-the-work/SKILL.md, anchored and registered. 55 of 55 anchored" \
+        evidence="surface.skill.anchor-the-work, anchored and registered. 55 of 55 anchored" \
         reaches="discovery states the why before it frames anything"
     layer "enforcement" state="evidenced" \
         evidence="a-frame-is-worked-under-a-strategy reports; the upward chain is carried by \

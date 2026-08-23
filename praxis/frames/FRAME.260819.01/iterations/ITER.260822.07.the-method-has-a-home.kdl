@@ -35,30 +35,30 @@ iteration "ITER.260822.07" {
     // does not remove it from here — it makes the two disagree, and that is
     // refused.
     claim "C1" from-slice="TS.260821.10" state="met" \
-        evidence="tests/the_method_travels.rs::a_project_that_copied_nothing_is_still_governed, \
+        evidence="a project that copied nothing is still governed, \
             and a real scratch repository: acme/checkout with a config and a frame, no schema \
             document anywhere, and `praxis check` refused a frame field the method does not \
             declare. `praxis ready` ran, so the gate travelled too"
     claim "C2" from-slice="TS.260821.10" state="met" \
-        evidence="tests/the_method_travels.rs::this_repository_extends_rather_than_redefines. \
+        evidence="this repository extends rather than redefines. \
             NA.260820.01 went from 1487 lines to 541: invariant and doctrine-surface stayed as \
             extensions, everything else is the method's. praxis check clean at 21 kinds — 19 from \
             the method, 2 from here"
     claim "C3" from-slice="TS.260821.10" state="met" \
-        evidence="tests/the_method_travels.rs::extending_adds_and_redefining_refuses — a new kind \
+        evidence="extending adds and redefining refuses — a new kind \
             lands, a redefinition does not, and the redefined field is asserted ABSENT so the rule \
             is shown to discriminate rather than to refuse everything local"
     claim "C4" from-slice="TS.260821.10" state="met" \
-        evidence="tests/the_method_travels.rs::the_method_is_data_and_passes_its_own_rules — it \
+        evidence="the method is data and passes its own rules — it \
             parses through the ordinary reader, passes its own rules, and include_str! points at \
             the SHIPPED file so the byte-identity assertion is true by construction rather than by \
             a test that hopes"
     claim "C5" from-slice="TS.260821.10" state="met" \
-        evidence="tests/the_method_travels.rs::a_config_bound_to_a_method_the_engine_lacks_is_refused, \
-            plus praxis/config.kdl carrying `governed-by \"delivery-graph@v1\"` for the first time"
+        evidence="a config bound to a method the engine lacks is refused, \
+            plus the config carrying `governed-by \"delivery-graph@v1\"` for the first time"
 
     layer "doctrine"    state="evidenced" \
-        evidence="skills/adopt-the-method/SKILL.md and skills/write-durable-comments/SKILL.md, both \
+        evidence="surface.skill.adopt-the-method and surface.skill.write-durable-comments, both \
             anchored and registered" \
         reaches="adopting means installing, and the skill says what a project may add and what it may not touch"
     layer "enforcement" state="evidenced" \
@@ -82,7 +82,7 @@ iteration "ITER.260822.07" {
     phase "learn" state="complete" required-by="always" worked-by="agent:principal-engineer" \
         produced="three findings, two of them from the maintainer reading the work as it landed"
     phase "teach" state="skipped" required-by="doctrine" worked-by="agent:principal-engineer" \
-        produced="skills/adopt-the-method/SKILL.md" \
+        produced="surface.skill.adopt-the-method" \
         skipped-because="it produced doctrine for an AGENT, which is the doctrine LAYER and is recorded there. Teaching an end user the feature's why and how did not happen — and the record already serves the next agent, whose own persona judges success by NOT needing a document (TS.260821.19, ITER.260822.15/BA1)"
 
     finding "AR1" state="open" size="frame-sized" \

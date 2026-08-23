@@ -74,25 +74,25 @@ iteration "ITER.260821.04" {
     claim "C1" from-slice="TS.260820.05" state="met" \
         text="a refused pickup writes a PickupRefused event naming the failing condition" \
         settled-by="one test per condition, each asserting the record exists and names that condition" \
-        evidence="tests/the_gate.rs — three conditions, three tests, each asserting the refusal \
+        evidence="the the gate tests — three conditions, three tests, each asserting the refusal \
             names the SPECIFIC thing: which dependency, which iteration holds it, which iteration \
             delivered it. A refusal naming only its category is a refusal you cannot act on"
     claim "C2" from-slice="TS.260820.05" state="met" \
         text="a refused pickup opens nothing" \
         settled-by="a test asserting no iteration exists after refusal" \
-        evidence="tests/the_gate.rs::c2_a_refused_pickup_opens_nothing — no iteration node is \
+        evidence="a refused pickup opens nothing — no iteration node is \
             composed, the id is REF rather than ITER, and the shell writes exactly one file"
     claim "C3" from-slice="TS.260820.05" state="met" \
         text="a second iteration on a live slice is refused" \
         settled-by="a negative test with an iteration already open" \
-        evidence="tests/the_gate.rs::c3_a_second_iteration_on_a_live_slice_is_refused — and the \
+        evidence="a second iteration on a live slice is refused — and the \
             refusal names which iteration holds it, because the reader's next question is who"
 
     claim "C1" from-slice="TS.260820.04" state="met" \
         text="the view and the gate evaluate identical conditions" \
         settled-by="a property test asserting every slice the view calls ready is admitted by the \
             gate, and every slice it excludes is refused" \
-        evidence="tests/the_gate.rs::ts_260820_04_c1_the_view_and_the_gate_evaluate_identical_conditions \
+        evidence="the view and the gate evaluate identical conditions \
             — both directions, over a record containing ready, blocked and delivered slices" \
         note="the residue ITER.260821.03 recorded as S1 and could not settle. It is settled here \
             because settling it required the gate, and the gate required the view. Carrying it \
@@ -111,7 +111,7 @@ iteration "ITER.260821.04" {
             should do both" \
         owed="a `start` command, and the rule iteration-worked-without-start-vet enforced (T3)" seal=fnv1a64:5e6c6d97477d24df
 
-    layer "doctrine"    state="evidenced" evidence="skills/pick-up-a-slice/SKILL.md, registered in the router under ITERATE" reaches="the skill teaches that selection IS the commitment, and that refusals are recorded"
+    layer "doctrine"    state="evidenced" evidence="surface.skill.pick-up-a-slice, registered in the router under ITERATE" reaches="the skill teaches that selection IS the commitment, and that refusals are recorded"
     layer "enforcement" state="evidenced" evidence="40 tests pass; the gate refuses on every declared condition and opens nothing when it does" reaches="the one gate — the only place in the method that refuses at open"
     layer "docs"        state="evidenced" evidence="REF.260821.01 is a record in the tree, checked by praxis check like any other" reaches="refusals appear in the iteration record and survive into the release projection"
     layer-set sealed=#true at="2026-08-21T08:40:00-05:00"
@@ -131,11 +131,11 @@ iteration "ITER.260821.04" {
         produced="praxis-core::pickup, `praxis pick-up`, the `refusal` kind, and ten tests"
     phase "learn" state="complete" required-by="always" produced="five findings" \
         note="never skippable — it is the phase that judges the others"
-    phase "teach" state="skipped" required-by="doctrine" produced="skills/pick-up-a-slice/SKILL.md" \
+    phase "teach" state="skipped" required-by="doctrine" produced="surface.skill.pick-up-a-slice" \
         skipped-because="it produced doctrine for an AGENT, which is the doctrine LAYER and is recorded there. Teaching an end user the feature's why and how did not happen — and the record already serves the next agent, whose own persona judges success by NOT needing a document (TS.260821.19, ITER.260822.15/BA1)"
 
     finding "T1" state="open" size="owed-work" \
-        text="the gate wrote a correct record to the wrong place — praxis/iterations/ rather than \
+        text="the gate wrote a correct record to the wrong place — the iterations container rather than \
             under the frame — because it composed the path from the state root. Caught by looking \
             at the output, not by any check. The placement rules are prose in ADR.260819.01 and \
             nothing enforces them" \
@@ -196,7 +196,7 @@ iteration "ITER.260821.04" {
 
     contributes "slice-outcome-added" \
         because="the one gate, and the first command that writes to the record" \
-        note="the bump rule this work matches, from config.kdl. Declared by the iteration \
+        note="the bump rule this work matches, from the config. Declared by the iteration \
             because only whoever did the work knows what kind of change it was"
 
     trail {

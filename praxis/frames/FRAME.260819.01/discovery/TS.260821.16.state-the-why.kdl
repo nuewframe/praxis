@@ -4,7 +4,7 @@
 // cause, one principle. `root-cause` says why the PROBLEM exists. Nothing says why the
 // PRODUCT exists, or for whom, or what would count as it having worked.
 //
-// Praxis states its own purpose in docs/product.md §1 — "make an LLM coding agent execute
+// Praxis states its own purpose in the Markdown dashboard §1 — "make an LLM coding agent execute
 // disciplined delivery with fidelity, producing trustworthy artifacts a human team can build
 // on without re-deriving the reasoning" — in prose, in a Markdown file, checked by nothing.
 // The frame that governs eighteen iterations of work does not contain it.
@@ -93,7 +93,7 @@ thin-slice "TS.260821.16" {
 
     note "amended on the maintainer's correction. The first cut EXCLUDED vision, mission and \
         strategy as unfalsifiable — which applies this record's discipline one layer too high. \
-        They are the pillars of docs/product.md and the anchor for everything under them; what is \
+        They are the pillars of the Markdown dashboard and the anchor for everything under them; what is \
         checkable is not whether a vision is true but whether anything traces to it"
 
     principle-note "this frame computes fidelity from the record, and the fact every other fact \

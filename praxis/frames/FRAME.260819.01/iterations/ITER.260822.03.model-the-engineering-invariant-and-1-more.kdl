@@ -49,33 +49,33 @@ iteration "ITER.260822.03" {
     // does not remove it from here — it makes the two disagree, and that is
     // refused.
     claim "C1" from-slice="TS.260821.05" state="met" \
-        evidence="tests/invariants.rs::a_guarantee_nothing_keeps_is_reported_by_name — total over \
+        evidence="a guarantee nothing keeps is reported by name — total over \
             the DECLARED set, at report severity, naming the invariant"
     claim "C2" from-slice="TS.260821.05" state="met" \
-        evidence="tests/invariants.rs::a_probe_anchors_by_naming_what_it_enforces, plus \
+        evidence="a probe anchors by naming what it enforces, plus \
             `praxis audit-surfaces` at 35 of 48 anchored — the ten probes and the surviving \
             guardrail left the unanchored set, which was 25 and is now 13"
     claim "C3" from-slice="TS.260821.05" state="met" \
-        evidence="tests/invariants.rs::config_omitting_an_invariant_the_record_does_not_hold_is_refused \
+        evidence="config omitting an invariant the record does not hold is refused \
             — profile.omit-probe references invariant, so dangling-relationship refuses an invented id"
     claim "C1" from-slice="TS.260821.06" state="met" \
-        evidence="praxis/capabilities/CAP.multi-harness-distribution.kdl and CAP.conformance-probes.kdl, \
+        evidence="CAP.multi-harness-distribution and CAP.conformance-probes, \
             both passing praxis check with four gate tests and a keeps-consistent each — neither \
             stated in the Markdown originals"
     claim "C2" from-slice="TS.260821.06" state="met" \
         evidence="promoted-truth-is-derived is unchanged and applies to the ported records; both \
             show `nothing yet` under shipped, derived from bound releases rather than written"
     claim "C3" from-slice="TS.260821.06" state="met" \
-        evidence="publish.rs::capabilities emits `what the product can do` and `how it is built` as \
-            two sections; docs/releases/0.8.0/capabilities/ now lists 2 product capabilities above \
+        evidence="the capabilities renderer emits `what the product can do` and `how it is built` as \
+            two sections; the 0.8.0 published capabilities now lists 2 product capabilities above \
             5 engine ones. The `facet` field defaults to engine when undeclared, so the failure \
             mode is under-claiming rather than overselling"
     claim "C4" from-slice="TS.260821.06" state="met" \
-        evidence="docs/capabilities/ is removed; three retired doctrine-surfaces name v0.7.1, and \
+        evidence="the Markdown capability records are removed; three retired doctrine-surfaces name v0.7.1, and \
             a-declared-surface-ships refuses a retirement whose file is still in the tree"
 
     layer "doctrine"    state="evidenced" \
-        evidence="skills/declare-an-invariant/SKILL.md, registered and anchored" \
+        evidence="surface.skill.declare-an-invariant, registered and anchored" \
         reaches="declaring what a probe is FOR is part of writing the probe"
     layer "enforcement" state="evidenced" \
         evidence="an-enabled-invariant-is-enforced, witnessed. profile.omit-probe references \
@@ -84,7 +84,7 @@ iteration "ITER.260822.03" {
         reaches="what the plugin guarantees is checked against what enforces it"
     layer "docs"        state="evidenced" \
         evidence="`praxis check-invariants` prints the three states separately; \
-            docs/releases/0.8.0/capabilities/ separates the product from the engine" \
+            the 0.8.0 published capabilities separates the product from the engine" \
         reaches="a reader of a release is told what the product does"
 
     phase "design-ux" state="complete" required-by="docs" \
@@ -94,18 +94,18 @@ iteration "ITER.260822.03" {
         produced="invariant and profile as kinds, and `facet` on capability. The default for facet \
             is `engine`, so an untagged capability under-claims rather than oversells"
     phase "implement" state="complete" required-by="enforcement · docs" \
-        produced="invariant.rs, check_invariants, the check-invariants command, ten invariants, \
+        produced="the invariant model, check_invariants, the check-invariants command, ten invariants, \
             eleven probe anchors, two ported capability records, the split published view"
     phase "learn" state="complete" required-by="always" \
         produced="four findings, two of them things the retirement sweep had missed"
     phase "teach" state="skipped" required-by="doctrine" \
-        produced="skills/declare-an-invariant/SKILL.md" \
+        produced="surface.skill.declare-an-invariant" \
         skipped-because="it produced doctrine for an AGENT, which is the doctrine LAYER and is recorded there. Teaching an end user the feature's why and how did not happen — and the record already serves the next agent, whose own persona judges success by NOT needing a document (TS.260821.19, ITER.260822.15/BA1)"
 
     finding "AN1" state="open" size="observation" \
-        text="check-contract-freshness.sh should have been retired by TS.260821.04 and was not. Its \
+        text="surface.retired.check-contract-freshness should have been retired by TS.260821.04 and was not. Its \
             subject is `each active sprint's Sprint Footprint block` and it reads \
-            docs/product/sprints/, which nothing ships. The sweep classified by FILENAME and this \
+            the sprint directory, which nothing ships. The sweep classified by FILENAME and this \
             one is not called check-sprint-anything" \
         note="a retirement sweep that reads names finds the files that were named for the thing. \
             It was caught here only because anchoring a probe to an invariant forces someone to \

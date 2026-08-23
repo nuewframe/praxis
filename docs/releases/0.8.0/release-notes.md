@@ -187,7 +187,7 @@ usage stops being written from memory at release time, which is when it is least
 
 ### See where the product stands right now, without committing a document that ages
 
-docs/product.md can be retired without losing anything, because the answer it was approximating is now available whenever anyone asks for it
+the Markdown dashboard can be retired without losing anything, because the answer it was approximating is now available whenever anyone asks for it
 
 ### Report any declared rule that nothing in the record demonstrates refusing
 

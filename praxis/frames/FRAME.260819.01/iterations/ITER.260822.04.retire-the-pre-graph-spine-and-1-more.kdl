@@ -59,31 +59,31 @@ iteration "ITER.260822.04" {
             here (contract-freshness, and the two generators TS.260821.07 retired)"
     claim "C3" from-slice="TS.260821.04" state="met" \
         evidence="every-shipped-surface-is-anchored is now `refuses`. \
-            tests/doctrine_surfaces.rs::a_shipped_file_nobody_declared_is_named_by_path asserts \
+            a shipped file nobody declared is named by path asserts \
             Severity::Refuse, so a silent flip back fails the suite"
     claim "C4" from-slice="TS.260821.04" state="met" \
-        evidence="settled by ITER.260822.02 — tests/the_router_matches_the_binary.rs"
+        evidence="settled by ITER.260822.02 — the the router matches the binary tests"
 
     claim "C1" from-slice="TS.260821.07" state="met" \
-        evidence="tests/published_doctrine.rs::the_shipped_set_is_derived_and_regenerates_identically, \
+        evidence="the shipped set is derived and regenerates identically, \
             plus publishing 0.8.0 twice with `git diff --exit-code` clean. CI now does exactly that \
             instead of running two --check generators"
     claim "C2" from-slice="TS.260821.07" state="met" \
-        evidence="tests/published_doctrine.rs::a_gate_and_a_notice_are_published_differently — \
+        evidence="a gate and a notice are published differently — \
             severity and language coverage both come from the invariant record, and a structural \
             probe says so rather than being listed against nine languages it does not scan"
     claim "C3" from-slice="TS.260821.07" state="met" \
-        evidence="gen-coverage-matrix.sh and gen-doctrine-index.sh are removed and recorded as \
-            retired; docs/coverage-matrix.md is gone. publish() reads the Corpus and nothing else"
+        evidence="surface.retired.gen-coverage-matrix and surface.retired.gen-doctrine-index are removed and recorded as \
+            retired; the coverage matrix is gone. publish() reads the Corpus and nothing else"
     claim "C4" from-slice="TS.260821.07" state="met" \
-        evidence="tests/published_doctrine.rs::an_older_version_is_not_described_by_the_current_tree \
+        evidence="an older version is not described by the current tree \
             — each surface carries the release derived from what IT serves, so two versions publish \
             different documents from one record. This is the claim neither generator could make at \
             all: both read the tree, so both answered the same way whichever version you asked"
 
     layer "doctrine"    state="evidenced" \
         evidence="the router's guardrail section no longer carries a scraped table and points at \
-            the published set; docs/architecture/README.md and docs/product.md stop describing \
+            the published set; the Markdown architecture README and the Markdown dashboard stop describing \
             three Markdown capability records that no longer exist" \
         reaches="what a version shipped is stated by the record"
     layer "enforcement" state="evidenced" \
@@ -91,7 +91,7 @@ iteration "ITER.260822.04" {
             kept with 3 omitted and 0 unkept; CI publishes and fails on a diff. 212 tests pass" \
         reaches="no generator applies a pattern to a Markdown file to learn what this plugin contains"
     layer "docs"        state="evidenced" \
-        evidence="docs/releases/0.8.0/doctrine/what-this-plugin-ships.md — 48 surfaces with what \
+        evidence="the 0.8.0 doctrine document — 48 surfaces with what \
             asked for each and which release shipped it, ten guarantees with their severity and \
             language coverage, and the retired set with where each still stands" \
         reaches="`what did 0.8.0 ship` stops being a question about the working tree"

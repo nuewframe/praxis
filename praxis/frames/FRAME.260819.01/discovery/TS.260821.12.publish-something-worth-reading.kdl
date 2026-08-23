@@ -6,7 +6,7 @@
 // and `usage`.
 //
 // The Slice the corpus builds holds id, slug, kind, realizes, layers, depends-on, claims and
-// attacks. All accounting, none of the prose. So docs/releases/0.8.0/release-notes.md is a
+// attacks. All accounting, none of the prose. So the 0.8.0 release notes are a
 // hundred and seventy lines of `ITER.260821.19 | TS.260821.02 — prove-every-rule-can-refuse
 // | slice-outcome-added`, with the last column identical on all twenty-seven rows.
 //
@@ -60,7 +60,7 @@ thin-slice "TS.260821.12" {
 
     layer "doctrine"    reaches="a slice's `outcome` and `useful-alone` are written knowing they will be published, which changes how they get written"
     layer "enforcement" reaches="a slice whose outcome or useful-alone is missing is already refused by the shape check; this makes the refusal earn its keep"
-    layer "docs"        reaches="docs/releases/<version>/ is the first thing to hand somebody, rather than the last thing anybody opens"
+    layer "docs"        reaches="the archival projection is the first thing to hand somebody, rather than the last thing anybody opens"
 
     claim "C1" text="the published set says what the version lets somebody do, in the record's own sentences" \
         settled-by="a test asserting a slice's `useful-alone` and `outcome` appear in the published document, and that its ITERATION id does not appear above them"
@@ -79,14 +79,14 @@ thin-slice "TS.260821.12" {
 
     depends-on "TS.260820.10 — the publisher exists; what it reads is what this changes"
 
-    useful-alone "docs/releases/<version>/ becomes the thing you hand somebody who has read \
+    useful-alone "the archival projection becomes the thing you hand somebody who has read \
         nothing — concepts, then architecture, then what changed, then how to start. Today it is a hundred and seventy lines that answer a question nobody asked, and \
         one document that says nothing shipped while five capabilities are active"
     useful-to "the-reader-of-a-release"
 
     attacks "S6"
 
-    cut-from "the maintainer reading docs/releases/0.8.0 as a product artifact, minutes after it was cut" \
+    cut-from "the maintainer reading the archival projection0.8.0 as a product artifact, minutes after it was cut" \
         note="found by asking what the artifact OFFERS rather than whether it is correct. It is \
             correct. Every row is true, the seal verifies, and nobody would read it twice"
 

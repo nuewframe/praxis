@@ -35,19 +35,19 @@ iteration "ITER.260823.01" {
     // does not remove it from here — it makes the two disagree, and that is
     // refused.
     claim "C1" from-slice="TS.260821.20" state="met" \
-        evidence="tests/agreement.rs::following_an_approach_nobody_recorded_is_refused — the case \
+        evidence="following an approach nobody recorded is refused — the case \
             that passed before this slice. The refusal says an account of a choice nobody made is \
             worse than no plan, because a reader has no reason to distrust it"
     claim "C2" from-slice="TS.260821.20" state="met" \
-        evidence="tests/agreement.rs::an_approach_that_was_planned_and_not_taken_is_named — named, \
+        evidence="an approach that was planned and not taken is named — named, \
             and the message says how to fix it rather than which rule fired"
     claim "C3" from-slice="TS.260821.20" state="met" \
-        evidence="tests/agreement.rs::an_abandoned_approach_satisfies_the_rule_and_remains — the \
+        evidence="an abandoned approach satisfies the rule and remains — the \
             exit is one field, and the abandoned approach stays in the record because the \
             alternative considered is why the plan was worth writing"
 
     layer "doctrine"    state="evidenced" \
-        evidence="skills/plan-before-building/SKILL.md gains the abandonment half — abandoning is \
+        evidence="surface.skill.plan-before-building gains the abandonment half — abandoning is \
             expected, and the approach is not deleted" \
         reaches="abandoning a plan is a recorded act rather than a failure"
     layer "enforcement" state="evidenced" \

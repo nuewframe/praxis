@@ -35,7 +35,7 @@ thin-slice "TS.260820.14" {
 
     layer "doctrine"    reaches="the skill teaches append-only correction and the falsifier requirement"
     layer "enforcement" reaches="an edit to an accepted decision's body is refused; an amendment is not"
-    layer "docs"        reaches="published under docs/releases/<version>/decisions/, composed with the options discovery rejected"
+    layer "docs"        reaches="published under the archival projection's decisions, composed with the options discovery rejected"
 
     claim "C1" text="editing the body of an accepted decision is refused; appending an amendment is not" \
         settled-by="a negative test mutating an accepted body, and a positive test appending an amendment"

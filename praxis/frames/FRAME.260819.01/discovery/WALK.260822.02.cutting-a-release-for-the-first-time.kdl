@@ -45,8 +45,8 @@ walkthrough "WALK.260822.02" {
     step "10" did="withdrew the cut rather than adding a flag to republish over it" \
         found="the seal is only checked at state=released, so withdrawal is clean — but promotion \
             had no inverse (AS6), and `withdrawn` needed declaring twice (AS7). The prior \
-            artifacts are archived at praxis/.usage/baseline/ as the thing the replacement has to beat"
-    step "9" did="opened docs/releases/0.8.0 and read it as somebody who had read nothing else" \
+            artifacts are archived at the usage baseline as the thing the replacement has to beat"
+    step "9" did="opened the archival projection0.8.0 and read it as somebody who had read nothing else" \
         found="it is correct and not worth reading. That is AS4, and it is the finding of this walk"
 
     finding "AS1" \
@@ -67,7 +67,7 @@ walkthrough "WALK.260822.02" {
 
     finding "AS3" \
         text="verify-published compares the tree against the commit its release names, and passed \
-            — while how-to-use-a-capability.md said `this release promoted no capability's truth` \
+            — while the capability guide said `this release promoted no capability's truth` \
             and five capabilities had just been promoted" \
         obliges="AO2 — the published set depicts the record AT PUBLISH TIME, and the version stamp \
             is not the guarantee its wording implies" \
@@ -76,7 +76,7 @@ walkthrough "WALK.260822.02" {
             so the chain has a step it does not state"
 
     finding "AS4" state="open" size="frame-sized" \
-        text="the published set is correct and not worth reading. release-notes.md is a hundred \
+        text="the published set is correct and not worth reading. the release notes is a hundred \
             and seventy lines of iteration ids with one bump category repeated on every row; the \
             guide says nothing shipped while twelve `usage` lines sit unused in the capability \
             records" \
@@ -114,8 +114,8 @@ walkthrough "WALK.260822.02" {
             something it also permits"
 
     finding "AS9" state="open" size="observation" \
-        text="`audit_excludes` in scripts/bump-version.sh was defined and never called, so the \
-            exclude list in .version-bump.json read to nothing. Adding an entry to it changed \
+        text="`audit_excludes` in the version-bump script was defined and never called, so the \
+            exclude list in .the bump-proposal artifact read to nothing. Adding an entry to it changed \
             no behaviour, which looked like the entry being wrong" \
         note="third instance today of a declaration nothing reads — `when-state` on schema fields \
             (AS2), `needed-by` on read models, and now an audit exclude list. Each looks honoured \

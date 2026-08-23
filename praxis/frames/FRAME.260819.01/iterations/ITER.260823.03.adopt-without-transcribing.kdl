@@ -1,0 +1,218 @@
+// Opened by `praxis pick-up`. Every condition below was evaluated against the
+// tree as it stood at 2026-08-23T02:00:08Z, and the verdicts are recorded
+// rather than summarised: a gate whose reasoning is not on the record is a gate
+// you have to trust.
+
+iteration "ITER.260823.03" {
+    slug "adopt-without-transcribing"
+    on-slice "TS.260821.17"
+    state "closed"
+    opened-at "2026-08-23T02:00:08Z"
+    opened-by "agent:praxis"
+
+    approval "admission" {
+        status "signed"
+        signer "human:wael"
+        at "2026-08-23T02:00:08Z"
+        signed-by "the ask to pick up this slice"
+    }
+
+    vet "create" state="done" at="2026-08-23T02:00:08Z" on-slice="TS.260821.17" {
+        condition "slice-is-shaped" verdict="passed"
+        condition "dependencies-delivered" verdict="passed"
+        condition "no-iteration-in-flight" verdict="passed"
+        condition "nothing-left-to-admit" verdict="passed"
+        condition "work-is-disjoint" verdict="not-computed" \
+            found="no seam manifest exists, so what two iterations would touch cannot be compared. Disjointness is half of what this capability says it judges, and half of what it judges is currently not computed at all"
+        condition "the-slice-is-the-best-available" verdict="left-to-the-maintainer"
+    }
+
+    // 2 of the declared conditions were not decided by the gate. They are
+    // recorded above rather than omitted: an admission that does not say what
+    // it left undecided claims more than it checked.
+
+    // Frozen at open, from the slices. Removing one from a slice now
+    // does not remove it from here — it makes the two disagree, and that is
+    // refused.
+    claim "C1" from-slice="TS.260821.17" state="met" \
+        evidence="a claim evidenced by a path is refused and the path is named, and the count over \
+            the whole tree went 334 to zero. the-record-cites-what-it-holds refuses on arrival \
+            rather than reporting first, because the count reached zero inside the iteration that \
+            wrote it — the same order every-shipped-surface-is-anchored had to use"
+    claim "C2" from-slice="TS.260821.17" state="met" \
+        evidence="a transcribed capability is refused for what it cannot have — a name and a doing \
+            and nothing else, refused for from-cluster, gate-test and not, by \
+            entity-without-a-required-field with no rule added. The derived one passes the same \
+            rule, so the test says something about DERIVATION rather than about strictness"
+    claim "C4" from-slice="TS.260821.17" state="met" \
+        evidence="evidence that states what was shown passes, and an id is a citation and a slash \
+            is not a path. 189 evidence strings were rewritten to say what each test demonstrates \
+            — a hundred and thirty-five when the slice was cut, and the record grew. What the \
+            record may cite is its own ids, which dangling-relationship already refuses when they \
+            dangle"
+    claim "C3" from-slice="TS.260821.17" state="met" \
+        evidence="surface.skill.adopt-the-method carries the brownfield half and now says there is \
+            no informed-by and why; surface.skill.attach-evidence teaches evidence that states what \
+            was shown, with the three refused shapes beside what to write instead. 55 of 55 \
+            anchored, and the plugin validator caught the one example path in the new prose"
+
+    layer "doctrine"    state="evidenced" \
+        evidence="surface.skill.adopt-the-method and surface.skill.attach-evidence, both anchored \
+            and cross-linked to surface.skill.write-durable-comments, which was already telling a \
+            citation from a story one level down" \
+        reaches="adopt-the-method says what to do with what is already there, which is the first \
+            question a brownfield adopter has"
+    layer "enforcement" state="evidenced" \
+        evidence="the-record-cites-what-it-holds refuses, witnessed by a slice whose claim points \
+            at a test file; six tests, one of them asserting the rule goes silent when the record \
+            stops declaring it" \
+        reaches="a field naming a file the checker cannot follow is refused, so nothing in the \
+            record can point outward and go stale unnoticed"
+    layer "docs"        state="evidenced" \
+        evidence="CAP.delivery-record gains two usage entries — what a brownfield adopter does with \
+            prior work, and what answers `what did this come from` now that nothing records where \
+            anything was read from. Both compose into the published capability guide" \
+        reaches="`what did this come from` is answerable for a record built on prior work"
+    layer-set sealed=#true at="2026-08-23T02:00:08Z"
+
+    phase "design-system" state="complete" worked-by="agent:principal-engineer" {
+        approach "the rule checks every field, and the exemption is the record's assertions about its own tree" {
+            over "an allowlist of the fields that carry WARRANT — evidence, settled-by, produced — \
+                leaving prose free to name whatever it likes"
+            because "what makes a path dangerous is that it rots SILENTLY, and that is as true of \
+                a note naming a script as of an evidence naming a test. The allowlist also has to \
+                be maintained per field forever, and it gets the common case wrong: a `note` \
+                naming a probe is read by exactly the person deciding whether the finding still \
+                applies"
+            note "the cost is real and was paid: 148 prose mentions were rewritten, and each one \
+                was a chance to lose a true fact. What came back is better — `the version-bump \
+                script's exclude list was defined and never called` says what broke, where the \
+                path said where to look for it"
+        }
+
+        approach "a closed suffix list, and nothing cleverer" {
+            over "a token containing a slash, which is what a path looks like"
+            because "`ITER.260821.17/AG1` is the record's OWN citation form and contains a slash. \
+                A discriminator that fires on one refuses the thing the rule exists to encourage, \
+                on the day somebody writes a slug with a dot in it. The suffix list is predictable \
+                by a writer, which is the property that matters more than completeness"
+            note "the price is a known miss: a directory path with no trailing slash — \
+                `skills/adopt-the-method` — goes unflagged. Carried as BD2 rather than closed with \
+                a cleverer regex"
+        }
+
+        approach "refuse on arrival, because the count reaches zero in the same iteration" {
+            over "report first and flip when the count is zero, which is what every other \
+                enforcement in this frame had to do"
+            because "the walk-back happened because those rules landed on a record that already \
+                violated them by the hundred and could not be fixed in the same hour. This one \
+                could: the rewrite IS the slice, so the rule and the clean record land together \
+                and there is no window in which it reports what nobody is fixing"
+        }
+
+        approach "the substance is restated and the location is not recorded at all" {
+            over "`informed-by` as declared provenance, explicitly not a checked edge"
+            because "a path rots; a path MARKED as provenance rots while looking deliberate. \
+                Recording where a fact was read from records the half guaranteed not to survive, \
+                and W16 is thirty-four citations into unfollowable Markdown — this must not be the \
+                thirty-fifth. What the record keeps is what the prior work TAUGHT, in the record's \
+                own words"
+            note "the slice excluded informed-by and its enforcement layer still described it. \
+                That contradiction is BD4"
+        }
+    }
+
+    phase "implement" state="complete" required-by="enforcement · docs" \
+        worked-by="agent:principal-engineer" {
+        followed "the rule checks every field, and the exemption is the record's assertions about its own tree"
+        followed "a closed suffix list, and nothing cleverer"
+        followed "refuse on arrival, because the count reaches zero in the same iteration"
+        followed "the substance is restated and the location is not recorded at all"
+    }
+    phase "learn" state="complete" required-by="always" worked-by="agent:principal-engineer" \
+        produced="five findings. One of them is that the bulk rewrite disarmed this rule's own \
+            witness and only `praxis prove` noticed"
+    phase "teach" state="complete" required-by="doctrine" worked-by="agent:principal-engineer" \
+        taught="the-adopter" \
+        produced="the brownfield half of adopt-the-method now says what replaces a provenance \
+            pointer, and attach-evidence carries the three refused shapes beside what to write \
+            instead. Both are read by somebody putting this method on a repository that already \
+            shipped, which is the persona the slice was cut for"
+
+    finding "BD1" state="open" size="frame-sized" \
+        text="the bulk rewrite reached INSIDE this rule's own witness and disarmed it. The \
+            witness declares a slice whose claim is settled by a test file — that path is the \
+            whole point of the witness — and the pass that rewrote every citation in the record \
+            rewrote that one too, into prose. `praxis check` stayed green, every test passed, and \
+            the rule silently stopped being demonstrable" \
+        obliges="a witness is a synthetic record and a bulk edit over the corpus must not treat it \
+            as one. Either witnesses are excluded from any sweep, or a sweep reports what it \
+            changed inside one" \
+        note="caught by `praxis prove` alone, which is exactly what TS.260821.02 cut it for: a \
+            rule that has never been shown to refuse is indistinguishable from one that CANNOT. \
+            The AG1 family again, and this time the disarming edit was mine"
+
+    finding "BD2" state="open" size="observation" \
+        text="the detector is a closed suffix list plus a token ending in a slash with a separator \
+            inside it. A directory path with no trailing slash is missed — this slice's own C3 \
+            says `skills/adopt-the-method gains the brownfield half` and nothing flags it" \
+        obliges="either name a bare directory path too, or record why the miss is acceptable \
+            rather than leaving it as a gap the rule does not mention" \
+        note="the miss is deliberate for now. Widening the discriminator to any token containing a \
+            slash refuses ITER.260821.17/AG1, which is the citation form the rule exists to \
+            encourage — so the choice was a predictable rule with a known hole over a complete one \
+            with an unpredictable edge"
+
+    finding "BD3" state="open" size="owed-work" \
+        text="a path in a KDL COMMENT is invisible to a parser and rots identically. The record's \
+            file headers cite paths freely, and one of them was left ungrammatical by this \
+            rewrite before anybody noticed, because nothing reads them" \
+        obliges="either the comments are swept the way the fields were, or comments-state-meaning \
+            gains a probe and this is part of what it checks" \
+        note="comments-state-meaning is declared with no probe and `praxis check-invariants` \
+            reports it as unkept — accurately. This is the second thing it would catch"
+
+    finding "BD4" state="open" size="observation" \
+        text="the slice contradicted itself. `excludes` rejected `informed-by` in any form and the \
+            enforcement layer's `reaches` described it as a declared field — two statements of the \
+            same decision, made at different moments, and only one of them was updated. The \
+            `outcome` line still says `where it informed something is visible`" \
+        obliges="nothing compares a slice's layers against its exclusions, and both are prose. A \
+            slice that excludes a thing and reaches for it is a plan that disagrees with itself \
+            before any code exists" \
+        note="the-plan-and-the-code-agree checks approaches against what an iteration produced. \
+            This is the same fault one document earlier — inside the slice, between two of its own \
+            fields — and there is no rule for it"
+
+    finding "BD5" state="open" size="frame-sized" \
+        text="`publishes-to` is exempt from this rule on the grounds that it is where the record \
+            WRITES and the tool fails when it is wrong. Nothing in the engine reads it. The bulk \
+            rewrite clobbered all seven of them and every check stayed green — it was caught by \
+            reading the diff" \
+        obliges="the publisher composes its paths in code while the record declares them beside \
+            each read model. Either publish reads publishes-to, or the field is a decoration and \
+            the exemption is resting on a reason that is not true" \
+        note="Y5 said this in ITER.260821.09 as `the archival root is the engine's opinion` and it \
+            was read as a containment question. It is sharper than that: the field is declared, \
+            checked for PRESENCE by publish-only-what-survives-freezing, and its value is read by \
+            nothing at all"
+    closed-at "2026-08-23T02:27:49Z"
+    outcome "continue"
+
+    close {
+        claims-settled "C1" how="met"
+        claims-settled "C2" how="met"
+        claims-settled "C4" how="met"
+        claims-settled "C3" how="met"
+        all-met #true
+        attested-by "human:waelrabadi"
+        note "the accounting above was computed at close, not asserted. It says every claim is either met or carried by a finding that names it, and nothing about whether the work is any good"
+    }
+
+    trail {
+        entry at="2026-08-23T02:27:49Z" by="agent:praxis" action="state-changed" from="open" to="closed" note="closed by `praxis close`. The accounting was computed; the conclusion is not the machine's to draw"
+
+        entry at="2026-08-23T02:00:08Z" by="agent:praxis" action="created" \
+            note="opened by the gate, on the ask of human:wael"
+    }
+}

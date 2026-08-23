@@ -35,23 +35,23 @@ iteration "ITER.260822.01" {
     // does not remove it from here — it makes the two disagree, and that is
     // refused.
     claim "C1" from-slice="TS.260821.03" state="met" \
-        evidence="tests/doctrine_surfaces.rs::a_shipped_file_nobody_declared_is_reported_by_path — \
+        evidence="a shipped file nobody declared is reported by path — \
             asserts the report names the PATH and not a count, and that the severity is Report"
     claim "C2" from-slice="TS.260821.03" state="met" \
-        evidence="tests/doctrine_surfaces.rs::a_declared_surface_that_does_not_ship_refuses and \
-            ::a_retired_surface_still_in_the_tree_refuses — both directions of the failing-closed \
+        evidence="a declared surface that does not ship refuses and \
+            a retired surface still in the tree refuses — both directions of the failing-closed \
             half, plus the assertion that a retirement actually carried out is silent"
     claim "C3" from-slice="TS.260821.03" state="met" \
-        evidence="tests/doctrine_surfaces.rs::a_surface_serving_nothing_the_record_holds_is_already_dangling \
+        evidence="a surface serving nothing the record holds is already dangling \
             — `serves` references five kinds and dangling-relationship refuses without a second rule"
     claim "C4" from-slice="TS.260821.03" state="met" \
-        evidence="tests/doctrine_surfaces.rs::the_audit_is_pure_and_total_over_its_input asserts \
-            every shipped path lands in exactly one bucket; the enumeration is main.rs::shipped_doctrine, \
-            and tests/the_binary_runs.rs::audit_surfaces_separates_the_record_from_the_tree asserts \
+        evidence="the audit is pure and total over its input asserts \
+            every shipped path lands in exactly one bucket; the enumeration is shipped doctrine, \
+            and audit surfaces separates the record from the tree asserts \
             the two trees stay two flags"
 
     layer "doctrine"    state="evidenced" \
-        evidence="skills/anchor-a-doctrine-surface/SKILL.md, registered in the router" \
+        evidence="surface.skill.anchor-a-doctrine-surface, registered in the router" \
         reaches="declaring a surface is part of writing one"
     layer "enforcement" state="evidenced" \
         evidence="a-declared-surface-ships refuses and every-shipped-surface-is-anchored reports; \
@@ -70,12 +70,12 @@ iteration "ITER.260822.01" {
             The world is handed IN, and a rule about the world is witnessed by a rule that declares \
             the world it assumes (given-shipped)"
     phase "implement" state="complete" required-by="enforcement · docs" \
-        produced="surface.rs, check_surfaces, the audit-surfaces command, and 23 anchored surfaces"
+        produced="the surface reader, check_surfaces, the audit-surfaces command, and 23 anchored surfaces"
     phase "learn" state="complete" required-by="always" \
         produced="four findings — two defects the record caught in this iteration's first hour, one \
             widening that had to be argued rather than made, and one honest count"
     phase "teach" state="skipped" required-by="doctrine" \
-        produced="skills/anchor-a-doctrine-surface/SKILL.md" \
+        produced="surface.skill.anchor-a-doctrine-surface" \
         skipped-because="it produced doctrine for an AGENT, which is the doctrine LAYER and is recorded there. Teaching an end user the feature's why and how did not happen — and the record already serves the next agent, whose own persona judges success by NOT needing a document (TS.260821.19, ITER.260822.15/BA1)"
 
     finding "AL1" state="open" size="frame-sized" \
@@ -107,7 +107,7 @@ iteration "ITER.260822.01" {
 
     finding "AL4" state="open" size="observation" \
         text="the plugin ships 68 instruction surfaces and the record justifies 23. scripts/ \
-            validate-plugin.sh already fails on three unrelated checks — dangling doc links and \
+            the plugin validator already fails on three unrelated checks — dangling doc links and \
             version literals — so the doctrine tree was drifting on two independent axes at once" \
         note="not fixed here. TS.260821.04 owns taking the count to zero; the validate-plugin \
             failures predate this iteration and belong to whatever slice owns the harness layer"

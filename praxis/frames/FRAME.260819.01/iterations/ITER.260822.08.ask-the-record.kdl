@@ -35,27 +35,27 @@ iteration "ITER.260822.08" {
     // does not remove it from here — it makes the two disagree, and that is
     // refused.
     claim "C1" from-slice="TS.260821.11" state="met" \
-        evidence="tests/asking.rs::it_answers_over_a_vocabulary_this_repository_does_not_have — \
+        evidence="it answers over a vocabulary this repository does not have — \
             the fixture's kinds are `cohort`, `experiment` and `receipt`, none of which this \
             engine has ever heard of, and the same code path answers"
     claim "C2" from-slice="TS.260821.11" state="met" \
-        evidence="tests/asking.rs::an_undeclared_kind_or_field_is_refused_and_names_what_is_declared \
+        evidence="an undeclared kind or field is refused and names what is declared \
             — refused rather than answered empty, because a filter on a field that does not exist \
             matches nothing and looks exactly like a filter that matched nothing"
     claim "C3" from-slice="TS.260821.11" state="met" \
-        evidence="tests/asking.rs::the_count_is_the_rows_of_the_same_question — the integer alone \
+        evidence="the count is the rows of the same question — the integer alone \
             on stdout, no prose. Four commands were run twenty-five times to read four integers, \
             two with their framing stripped by sed"
     claim "C4" from-slice="TS.260821.11" state="met" \
-        evidence="tests/asking.rs::unreferenced_by_follows_a_declared_edge, and live: \
+        evidence="unreferenced by follows a declared edge, and live: \
             `praxis ask iteration --where state=closed --unreferenced-by release.binds` is the \
-            `for f in ITER.*.kdl` pipeline that produced this slice"
+            `for f in an iteration record` pipeline that produced this slice"
     claim "C5" from-slice="TS.260821.11" state="met" \
         evidence="ask() takes documents and a schema and returns an Answer — there is no path in \
             the signature, so there is nowhere to write. The CLI reads with load() and prints"
 
     layer "doctrine"    state="evidenced" \
-        evidence="skills/ask-the-record/SKILL.md, anchored and registered. 52 of 52 anchored" \
+        evidence="surface.skill.ask-the-record, anchored and registered. 52 of 52 anchored" \
         reaches="asking the record is the first move in a repository you did not set up"
     layer "enforcement" state="evidenced" \
         evidence="an undeclared kind or field refuses; an undeclared edge refuses; a kind that is \
@@ -72,11 +72,11 @@ iteration "ITER.260822.08" {
         produced="A4 forbade the obvious design — a set of named questions — and left only the \
             portable one. The same constraint that made adoption possible makes this generic"
     phase "implement" state="complete" required-by="enforcement · docs" worked-by="agent:principal-engineer" \
-        produced="ask.rs, the ask command, and the nested-kind refusal"
+        produced="the ask projection, the ask command, and the nested-kind refusal"
     phase "learn" state="complete" required-by="always" worked-by="agent:principal-engineer" \
         produced="AW1 — an exclusion that produced a wrong-looking answer rather than a refusal"
     phase "teach" state="skipped" required-by="doctrine" worked-by="agent:principal-engineer" \
-        produced="skills/ask-the-record/SKILL.md" \
+        produced="surface.skill.ask-the-record" \
         skipped-because="it produced doctrine for an AGENT, which is the doctrine LAYER and is recorded there. Teaching an end user the feature's why and how did not happen — and the record already serves the next agent, whose own persona judges success by NOT needing a document (TS.260821.19, ITER.260822.15/BA1)"
 
     finding "AW1" state="open" size="observation" \

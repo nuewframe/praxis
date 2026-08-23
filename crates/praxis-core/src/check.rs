@@ -105,6 +105,10 @@ pub enum Refusal {
     /// A layer the slice declared that the iteration has not evidenced. Reported: it must
     /// be visible as unevidenced rather than absent, which is C2.
     UnevidencedLayer { layer: String, slice: String },
+    /// A field naming a file outside the record. The record cannot follow it, so nothing
+    /// notices when it is renamed and the claim it backs is orphaned while still reading
+    /// as settled.
+    UnfollowableCitation { field: String, cited: String },
 }
 
 impl Refusal {
@@ -163,6 +167,7 @@ impl Refusal {
             Self::FollowedNothing { .. } | Self::ApproachNotTaken { .. } => {
                 "the-plan-and-the-code-agree"
             }
+            Self::UnfollowableCitation { .. } => "the-record-cites-what-it-holds",
         }
     }
 
@@ -202,6 +207,7 @@ impl Refusal {
             Self::FollowedNothing { .. } => "followed",
             Self::ApproachNotTaken { .. } => "approach",
             Self::UnjustifiedLifetime { missing, .. } => missing,
+            Self::UnfollowableCitation { field, .. } => field,
         }
     }
 
@@ -335,6 +341,13 @@ impl Refusal {
                 "`{field}` matured to {matured_to:?} and the record holds {holds:?}. One of the \
                  two is wrong and a reader cannot tell which — which is worse than not recording \
                  the change, because it reads as an account of what happened"
+            ),
+            Self::UnfollowableCitation { field, cited } => format!(
+                "`{field}` cites {cited:?}, which is a file and not something the record holds. \
+                 Nothing notices when it is renamed, so the claim it backs is orphaned while \
+                 still reading as settled. State WHAT was shown; the repository already knows \
+                 where it lives. To point at something, point at an id — the record holds those, \
+                 and a dangling one is refused"
             ),
             Self::ValueWithNoJudge { slice } => format!(
                 "{slice} says what you get and not who gets it. Value is not a property of a \
@@ -1122,6 +1135,13 @@ pub fn check_corpus_given(
         }
     }
 
+    // A field naming a file the checker cannot follow. Refuses on arrival rather than
+    // reporting first: the count was taken to zero inside the iteration that wrote the rule,
+    // the way `every-shipped-surface-is-anchored` had to earn its severity.
+    if schema.declares_rule("the-record-cites-what-it-holds") {
+        out.extend(check_citations(docs));
+    }
+
     // A record with no persona at all. Checked only where the kind is declared: a repository
     // whose method predates it is not missing something it never had.
     if schema.entity("persona").is_some()
@@ -1157,6 +1177,137 @@ pub fn check_corpus_given(
         None => true,
     });
     out.extend(split);
+    out
+}
+
+/// `TS.260821.17`/C1 and C4. A field naming a file the checker cannot follow.
+///
+/// The record says WHAT was shown, the repository says where it lives, and git says when it
+/// moved. A path in the record is a fourth copy of the second one, and it is the copy that
+/// rots without anybody noticing — a renamed test leaves the claim it backed reading as
+/// settled and pointing at nothing.
+///
+/// What the record MAY cite is its own ids: `dangling-relationship` refuses one it does not
+/// hold, which is exactly the check a path cannot have.
+fn check_citations(docs: &[KdlDocument]) -> Vec<Violation> {
+    let mut out = Vec::new();
+    for doc in docs {
+        for node in doc.nodes() {
+            let kind = node.name().value().to_owned();
+            let id = string_arg(node);
+            walk_citations(node, &kind, &id, &mut out);
+        }
+    }
+    out
+}
+
+/// The record's own assertions about its tree, which this rule does not touch. None of them
+/// can rot silently, which is the property that makes a citation dangerous:
+///
+/// - `path` is checked by `a-declared-surface-ships`, which refuses when the file is absent
+/// - `owns` and the `paths` block are READ by the tool, which fails when they are wrong
+/// - `publishes-to` is where the record writes rather than what it reads
+/// - `given-shipped` and `witness` declare a synthetic world for a witness, and name files
+///   that deliberately do not exist
+const CITES_ITS_OWN_TREE: &[&str] = &[
+    "path",
+    "owns",
+    "publishes-to",
+    "given-shipped",
+    "witness",
+    "product-root",
+    "state-root",
+    "archival-projection",
+    "release-index",
+    "working-projection",
+    "cache",
+];
+
+fn walk_citations(
+    node: &KdlNode,
+    owner_kind: &str,
+    owner_id: &Option<String>,
+    out: &mut Vec<Violation>,
+) {
+    let name = node.name().value();
+    if CITES_ITS_OWN_TREE.contains(&name) {
+        return;
+    }
+    let mut flag = |field: &str, value: &str| {
+        for cited in cited_files(value) {
+            out.push(Violation {
+                entity_kind: owner_kind.to_owned(),
+                entity_id: owner_id.clone(),
+                refusal: Refusal::UnfollowableCitation { field: field.to_owned(), cited },
+                span: node.span(),
+            });
+        }
+    };
+    // A child field written as a bare node — `excludes "…"`, `step "1" does="…"`. The
+    // first argument of an ENTITY is its id and never a citation; ids hold no dots that
+    // read as an extension, so scanning them costs nothing and misses nothing.
+    for value in string_args(node) {
+        flag(name, &value);
+    }
+    for entry in node.entries() {
+        let Some(key) = entry.name() else { continue };
+        if CITES_ITS_OWN_TREE.contains(&key.value()) {
+            continue;
+        }
+        let Some(value) = entry.value().as_string() else { continue };
+        flag(key.value(), value);
+    }
+    if let Some(body) = body(node) {
+        for child in body.nodes() {
+            walk_citations(child, owner_kind, owner_id, out);
+        }
+    }
+}
+
+/// Every suffix this scanner will call a file. A CLOSED list, and deliberately so: the
+/// discriminator has to be one a writer can predict. A rule that guesses at what looks like
+/// a path refuses `ITER.260821.17/AG1` — the record's own citation form — the first time
+/// somebody writes a slug with a dot in it.
+const FILE_SUFFIXES: &[&str] = &[
+    "rs", "md", "kdl", "sh", "toml", "json", "yaml", "yml", "py", "ts", "tsx", "js", "jsx",
+    "lock", "cs", "java", "go", "rb", "sql", "xml", "html", "css", "txt", "cfg", "ini", "bash",
+    "zsh", "sql", "proto", "gradle", "csproj",
+];
+
+/// The files a value names. Two shapes, and nothing else:
+///
+/// - a token ending in a known suffix — `docs/product.md`, `config.kdl`, `Cargo.toml`,
+///   and `tests/proving.rs::a_rule_with_no_witness` with the function trimmed off
+/// - a directory — a token ending in `/` with a separator inside it, so `and/or` and
+///   `ITER.260821.17/AG1` are left alone
+///
+/// A trailing-slash directory with no inner separator — `docs/` — is missed. Stated rather
+/// than fixed: the only places it occurs are the two fields that declare where the tool
+/// writes, and both are exempt.
+fn cited_files(value: &str) -> Vec<String> {
+    let mut out = Vec::new();
+    for raw in value.split(|c: char| {
+        c.is_whitespace()
+            || matches!(c, '`' | '(' | ')' | '"' | '\'' | ',' | ';' | '[' | ']' | '{' | '}' | '·')
+    }) {
+        let token = raw.trim_matches(|c: char| matches!(c, '.' | ':' | '—' | '*' | '?' | '!' | '='));
+        if token.is_empty() {
+            continue;
+        }
+        // A test citation carries the function after `::`. The file is what rots; the
+        // function is what rots faster.
+        let head = token.split("::").next().unwrap_or(token);
+        let named = match head.rsplit_once('.') {
+            Some((stem, suffix)) if !stem.is_empty() && FILE_SUFFIXES.contains(&suffix) => true,
+            _ => {
+                let inner = token.trim_end_matches('/');
+                token.ends_with('/') && inner.contains('/')
+            }
+        };
+        if named && !out.contains(&token.to_owned()) {
+            out.push(token.to_owned());
+        }
+    }
     out
 }
 

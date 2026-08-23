@@ -1,4 +1,4 @@
-// Ported from docs/capabilities/CAP.multi-harness-distribution.md by TS.260821.06.
+// Ported from surface.retired.cap-multi-harness-md by TS.260821.06.
 //
 // The Markdown record was correct as far as anyone could tell, and nobody could tell: it
 // traced to no storm, declared no gate tests, and named nothing it keeps consistent. This

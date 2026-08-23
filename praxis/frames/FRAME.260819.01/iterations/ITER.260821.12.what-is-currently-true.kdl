@@ -38,12 +38,12 @@ iteration "ITER.260821.12" {
     claim "C1" from-slice="TS.260820.03" state="met" \
         text="the answer is computed from the record, never from a cached or written summary" \
         settled-by="a test that mutates state and asserts the answer changes with no regeneration step" \
-        evidence="tests/current_truth.rs::c1_the_answer_changes_with_the_record_and_has_no_regeneration_step \
+        evidence="the answer changes with the record and has no regeneration step \
             — the only input is the corpus, so there is no cache to invalidate and nowhere to put one"
     claim "C2" from-slice="TS.260820.03" state="met" \
         text="an empty area answers 'nothing recorded' rather than returning nothing" \
         settled-by="a test on a repository with no releases" \
-        evidence="tests/current_truth.rs::c2_an_empty_area_says_nothing_recorded_rather_than_returning_nothing \
+        evidence="an empty area says nothing recorded rather than returning nothing \
             — asserted across four sections on a record that holds nothing at all"
 
     vet "start" state="done" at="2026-08-21T19:35:00Z" {
@@ -64,7 +64,7 @@ iteration "ITER.260821.12" {
     contributes "slice-outcome-added" \
         because="what-is-currently-true, and an arriving agent that asks instead of re-deriving"
 
-    layer "doctrine"    state="evidenced" evidence="skills/ask-what-is-true/SKILL.md, registered first under PLAN" reaches="the skill tells an arriving agent to ask before deriving"
+    layer "doctrine"    state="evidenced" evidence="surface.skill.ask-what-is-true, registered first under PLAN" reaches="the skill tells an arriving agent to ask before deriving"
     layer "enforcement" state="evidenced" evidence="115 tests pass; `praxis truth` is a command, so a stale hand-written summary has nothing to stand in for" reaches="the query is a first-class command, so a stale hand-written summary cannot stand in for it"
     layer "docs"        state="skipped" \
         because="the slice declares this layer reaches `none — this slice is deliberately \
@@ -85,7 +85,7 @@ iteration "ITER.260821.12" {
         produced="praxis-core::truth, `praxis truth`, seven tests, and the fix for AB1"
     phase "learn" state="complete" required-by="always" produced="two findings, one of them a fact the record had been reporting wrongly" \
         note="never skippable — it is the phase that judges the others"
-    phase "teach" state="skipped" required-by="doctrine" produced="skills/ask-what-is-true/SKILL.md" \
+    phase "teach" state="skipped" required-by="doctrine" produced="surface.skill.ask-what-is-true" \
         skipped-because="it produced doctrine for an AGENT, which is the doctrine LAYER and is recorded there. Teaching an end user the feature's why and how did not happen — and the record already serves the next agent, whose own persona judges success by NOT needing a document (TS.260821.19, ITER.260822.15/BA1)"
 
     finding "AB1" state="open" size="frame-sized" \

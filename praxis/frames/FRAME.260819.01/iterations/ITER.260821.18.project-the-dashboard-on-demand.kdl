@@ -38,23 +38,23 @@ iteration "ITER.260821.18" {
     claim "C1" from-slice="TS.260820.13" state="met" \
         text="composing needs no code path specific to any one read model, and no owner appears in more than one result" \
         settled-by="a test composing three results from three capabilities with no renderer change, plus an ownership check" \
-        evidence="tests/dashboard.rs::c1_three_results_from_three_capabilities_compose_with_no_renderer_change \
-            and ::c1_no_owner_appears_in_more_than_one_result. render_composed writes a heading per \
+        evidence="three results from three capabilities compose with no renderer change \
+            and no owner appears in more than one result. render_composed writes a heading per \
             part and calls the SAME renderer every other view uses — composition is ordering, not \
             interpretation"
     claim "C2" from-slice="TS.260820.13" state="met" \
         text="the dashboard is marked as of a moment, never as of a release" \
         settled-by="a golden test on the header" \
-        evidence="tests/dashboard.rs::c2_the_dashboard_is_marked_as_of_a_moment_never_as_of_a_release \
-            and ::c2_the_release_part_carries_the_moment_even_though_published_it_would_carry_the_version"
+        evidence="the dashboard is marked as of a moment never as of a release \
+            and the release part carries the moment even though published it would carry the version"
     claim "C3" from-slice="TS.260820.13" state="met" \
         text="asking twice across a state change gives two different answers, with no regeneration step" \
         settled-by="a test mutating state between two asks" \
-        evidence="tests/dashboard.rs::c3_asking_twice_across_a_state_change_gives_two_different_answers"
+        evidence="asking twice across a state change gives two different answers"
     claim "C4" from-slice="TS.260820.13" state="met" \
-        text="nothing is written under docs/releases/" \
+        text="nothing is written under the archival projection" \
         settled-by="a test asserting the published tree is byte-unchanged after composing" \
-        evidence="tests/dashboard.rs::c4_composing_produces_no_file_at_all — structural, like the \
+        evidence="composing produces no file at all — structural, like the \
             preview: `dashboard` returns values, so there is no path in the type and nothing under \
             the archival root can be reached from here"
 
@@ -77,11 +77,11 @@ iteration "ITER.260821.18" {
     contributes "slice-outcome-added" \
         because="project-the-dashboard-on-demand — the last of the eighteen slices this frame cut"
 
-    layer "doctrine"    state="evidenced" evidence="skills/see-the-dashboard/SKILL.md, registered in the router" reaches="the skill teaches asking for the dashboard rather than reading a stale committed one"
+    layer "doctrine"    state="evidenced" evidence="surface.skill.see-the-dashboard, registered in the router" reaches="the skill teaches asking for the dashboard rather than reading a stale committed one"
     layer "enforcement" state="evidenced" evidence="167 tests pass; a capability contributing two parts is refused, and the composing function has no path in its type" reaches="the working path is gitignored, so a dashboard cannot be committed by accident"
     layer "docs"        state="skipped" \
         because="the slice declares this layer reaches `none by design — this slice's output never \
-            enters docs/releases/`. Skipped with the slice's own words, the third time a slice has \
+            enters the archival projection`. Skipped with the slice's own words, the third time a slice has \
             declared a layer it does not reach"
     layer-set sealed=#true at="2026-08-21T20:12:00Z"
 
@@ -98,7 +98,7 @@ iteration "ITER.260821.18" {
         produced="praxis-core::dashboard, render_composed, `praxis dashboard`, and nine tests"
     phase "learn" state="complete" required-by="always" produced="three findings, one of them about the frame rather than the slice" \
         note="never skippable — it is the phase that judges the others"
-    phase "teach" state="skipped" required-by="doctrine" produced="skills/see-the-dashboard/SKILL.md" \
+    phase "teach" state="skipped" required-by="doctrine" produced="surface.skill.see-the-dashboard" \
         skipped-because="it produced doctrine for an AGENT, which is the doctrine LAYER and is recorded there. Teaching an end user the feature's why and how did not happen — and the record already serves the next agent, whose own persona judges success by NOT needing a document (TS.260821.19, ITER.260822.15/BA1)"
 
     finding "AH1" state="open" size="observation" \

@@ -116,7 +116,7 @@ adr "ADR.260819.01" {
             Matured 2026-08-20, from named-in-passing to decided.
 
             Language and edition: Rust, 2024 edition, on rustc 1.97.1 pinned exactly in
-            rust-toolchain.toml so every agent and every CI run compile with the same compiler — an unpinned toolchain reintroduces the BSD-versus-GNU class of
+            the pinned toolchain so every agent and every CI run compile with the same compiler — an unpinned toolchain reintroduces the BSD-versus-GNU class of
             defect this decision exists to remove, one layer up.
 
             Crate topology: praxis-core (pure) and praxis-cli (shell), one workspace.
@@ -210,7 +210,7 @@ adr "ADR.260819.01" {
             derived-from="ES.260819.01/E12"
 
         rule "node-id-is-the-filename-prefix" refuses="a record file whose name does not begin with its node id" \
-            note="a record file is <KIND>.<YYMMDD>.<NN>.<slug>.kdl. The slug is what makes a \
+            note="a record file is named for its node id, then its slug. The slug is what makes a \
                 directory listing readable without opening every file"
         rule "markdown-in-the-state-root" refuses="a Markdown source under the state root" \
             because="every Markdown file in this repository is generated. A state root holding two \
@@ -266,10 +266,10 @@ adr "ADR.260819.01" {
     }
 
     amendment "A5" raised-by="ITER.260820.01" {
-        change "the toolchain pin is exact: rustc 1.97.1, in rust-toolchain.toml"
+        change "the toolchain pin is exact: rustc 1.97.1, in the pinned toolchain"
         change "the channel is never `stable`. A floating channel means two agents compile with two compilers"
         why "the version was held open rather than guessed. Read off the toolchain on 2026-08-21 — rustc 1.97.1 (8bab26f4f 2026-07-14) — which is what `written by whoever runs the toolchain` asked for. It clears the 1.85 floor the 2024 edition needs"
-        note "rustup installs from rust-toolchain.toml, so pinning exact costs a contributor nothing and buys one compiler for everyone"
+        note "rustup installs from the pinned toolchain, so pinning exact costs a contributor nothing and buys one compiler for everyone"
     }
 
     trail {

@@ -19,7 +19,7 @@ walkthrough "WALK.260822.01" {
     // What happened, in order. The value of a walk is that someone can walk it again.
     step "1" did="ran the engine on an empty state root" \
         found="`no .kdl files under praxis` — correct, and the whole of what a newcomer is told"
-    step "2" did="wrote config.kdl and a frame, then ran check" \
+    step "2" did="wrote the config and a frame, then ran check" \
         found="`the record declares no schema — nothing to check against`. The engine is inert \
             until the record declares its own vocabulary, which is A4 working exactly as designed \
             and also the wall (AK2)"

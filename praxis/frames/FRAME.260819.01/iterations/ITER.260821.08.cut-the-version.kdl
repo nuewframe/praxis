@@ -38,18 +38,18 @@ iteration "ITER.260821.08" {
     claim "C1" from-slice="TS.260820.09" state="met" \
         text="cutting with an unclosed bound iteration is refused, naming the iteration" \
         settled-by="a negative test asserting the iteration id in the diagnostic" \
-        evidence="tests/cutting.rs::c1_cutting_with_an_unclosed_bound_iteration_is_refused_naming_it"
+        evidence="cutting with an unclosed bound iteration is refused naming it"
     claim "C2" from-slice="TS.260820.09" state="met" \
         text="the cut and the index node are one operation — a failure leaves neither" \
         settled-by="a test asserting neither exists without the other" \
-        evidence="tests/cutting.rs::c2_the_cut_and_the_index_are_one_record — atomicity BY \
+        evidence="the cut and the index are one record — atomicity BY \
             CONSTRUCTION rather than by cleanup: the whole record is composed before anything is \
             written, so there is no half-cut state for a fault to leave behind. The slice asked \
             for fault injection; what it got is a shape in which the fault it names cannot occur"
     claim "C3" from-slice="TS.260820.09" state="met-in-part" \
         text="the recorded commit resolves in git and contains that release's published directory" \
         settled-by="a test asserting the index records the commit it was cut at" \
-        evidence="tests/cutting.rs::c3_the_index_records_the_commit_it_was_cut_at, and the shell \
+        evidence="the index records the commit it was cut at, and the shell \
             refuses to cut when git yields no commit rather than writing an index that points \
             nowhere" \
         residue="that the commit CONTAINS the release's published directory cannot be shown until \
@@ -57,9 +57,9 @@ iteration "ITER.260821.08" {
     claim "C4" from-slice="TS.260820.09" state="met" \
         text="editing a cut release's index node is refused" \
         settled-by="a negative test mutating an existing index node" \
-        evidence="tests/cutting.rs::c4_editing_a_cut_release_changes_its_seal — every field the seal \
+        evidence="editing a cut release changes its seal — every field the seal \
             covers moves it, including adding a binding after the cut, and \
-            ::the_seal_does_not_depend_on_the_order_things_were_bound_in so that a rewrite which \
+            the seal does not depend on the order things were bound in so that a rewrite which \
             reorders is not mistaken for tampering. cut-release-is-immutable refuses the mismatch"
 
     vet "start" state="done" at="2026-08-21T14:35:00Z" {
@@ -75,7 +75,7 @@ iteration "ITER.260821.08" {
 
     frozen {
         pins "the entity-and-field schema" at="NA.260820.01/schema" at-commit="7c86dd2"
-        pins "the release shape and the bump rules" at="NA.260820.01/schema · praxis/config.kdl" at-commit="7c86dd2"
+        pins "the release shape and the bump rules" at="NA.260820.01/schema · the config" at-commit="7c86dd2"
         rule "a schema change while this iteration is open is a FINDING, not an edit" \
             exception="declaring cut-release-is-immutable and the index/seal fields is the mechanism \
                 this slice depends on"
@@ -84,7 +84,7 @@ iteration "ITER.260821.08" {
     contributes "slice-outcome-added" \
         because="cut-the-version, and a cut release that can be checked against what was cut"
 
-    layer "doctrine"    state="evidenced" evidence="skills/cut-the-version/SKILL.md, registered in the router" reaches="the skill teaches truth promotion as part of releasing, not after it"
+    layer "doctrine"    state="evidenced" evidence="surface.skill.cut-the-version, registered in the router" reaches="the skill teaches truth promotion as part of releasing, not after it"
     layer "enforcement" state="evidenced" evidence="74 tests pass; an unclosed binding, an empty version, a second cut and an unconfirmed bump are each refused, and cut-release-is-immutable checks the seal" reaches="only closed iterations may bind, and resolution-names-a-release"
     layer "docs"        state="evidenced" evidence="the index node names tag, commit, cut-at, cut-by and the confirmed bump, and a release resolving nothing says so" reaches="capability records carry what shipped"
     layer-set sealed=#true at="2026-08-21T14:35:00Z"
@@ -105,13 +105,13 @@ iteration "ITER.260821.08" {
             derived from the symptoms that name it, and ten tests"
     phase "learn" state="complete" required-by="always" produced="four findings, one correcting an earlier finding's method" \
         note="never skippable — it is the phase that judges the others"
-    phase "teach" state="skipped" required-by="doctrine" produced="skills/cut-the-version/SKILL.md" \
+    phase "teach" state="skipped" required-by="doctrine" produced="surface.skill.cut-the-version" \
         skipped-because="it produced doctrine for an AGENT, which is the doctrine LAYER and is recorded there. Teaching an end user the feature's why and how did not happen — and the record already serves the next agent, whose own persona judges success by NOT needing a document (TS.260821.19, ITER.260822.15/BA1)"
 
     finding "X1" state="open" size="owed-work" carries="C3" \
         text="C3's second half — that the recorded commit CONTAINS the release's published directory \
             — cannot be settled here. Publishing is TS.260820.10, which depends on this slice" \
-        obliges="TS.260820.10 — assert the cut commit contains docs/releases/<version>/" \
+        obliges="TS.260820.10 — assert the cut commit contains the archival projection" \
         note="the same shape as S1, and the second residue carried forward rather than rounded up"
 
     finding "X2" state="open" size="frame-sized" \
