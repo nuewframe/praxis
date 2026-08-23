@@ -1,0 +1,198 @@
+// Opened by `praxis pick-up`. Every condition below was evaluated against the
+// tree as it stood at 2026-08-23T00:58:17Z, and the verdicts are recorded
+// rather than summarised: a gate whose reasoning is not on the record is a gate
+// you have to trust.
+
+iteration "ITER.260823.02" {
+    slug "state-the-why"
+    on-slice "TS.260821.16"
+    state "closed"
+    opened-at "2026-08-23T00:58:17Z"
+    opened-by "agent:praxis"
+
+    approval "admission" {
+        status "signed"
+        signer "human:wael"
+        at "2026-08-23T00:58:17Z"
+        signed-by "the ask to pick up this slice"
+    }
+
+    vet "create" state="done" at="2026-08-23T00:58:17Z" on-slice="TS.260821.16" {
+        condition "slice-is-shaped" verdict="passed"
+        condition "dependencies-delivered" verdict="passed"
+        condition "no-iteration-in-flight" verdict="passed"
+        condition "nothing-left-to-admit" verdict="passed"
+        condition "work-is-disjoint" verdict="not-computed" \
+            found="no seam manifest exists, so what two iterations would touch cannot be compared. Disjointness is half of what this capability says it judges, and half of what it judges is currently not computed at all"
+        condition "the-slice-is-the-best-available" verdict="left-to-the-maintainer"
+    }
+
+    // 2 of the declared conditions were not decided by the gate. They are
+    // recorded above rather than omitted: an admission that does not say what
+    // it left undecided claims more than it checked.
+
+    // Frozen at open, from the slices. Removing one from a slice now
+    // does not remove it from here — it makes the two disagree, and that is
+    // refused.
+    claim "C1" from-slice="TS.260821.16" state="met" \
+        evidence="tests/the_anchor.rs::a_mission_with_no_test_is_refused_and_a_vision_needs_none — \
+            the mission carries `delivered-when` and the vision carries none, because a world \
+            state cannot be tested and asking whether it is true is the category error that kept \
+            all three out of the record"
+    claim "C2" from-slice="TS.260821.16" state="met" \
+        evidence="tests/the_anchor.rs::the_chain_upward_is_checked_by_the_edges_it_already_has and \
+            ::a_frame_under_no_strategy_is_reported_and_not_refused. frame → strategy → mission → \
+            vision dangles without a rule of its own; the missing-strategy case REPORTS, because \
+            one frame exists and it predates all three kinds"
+    claim "C3" from-slice="TS.260821.16" state="met" \
+        evidence="settled by ITER.260822.11 — felt-by on all seven symptoms, each naming a persona"
+    claim "C4" from-slice="TS.260821.16" state="met" \
+        evidence="tests/the_anchor.rs::the_published_concepts_open_with_why asserts `why this \
+            exists` is the FIRST section. docs/releases/0.8.0/concepts/ now opens with the world \
+            if this succeeds, what this does about it, and what would count as delivered"
+
+    claim "C5" from-slice="TS.260821.16" state="carried" \
+        evidence="not done. The strategy is a declared sequence and nothing checks work against \
+            it — a frame written before any persona exists is out of order, and the record cannot \
+            say so"
+    claim "C6" from-slice="TS.260821.16" state="met" \
+        evidence="`strategy` carries `matured`, whose `taught-by` is required and whose `to` is \
+            checked against the value held — so a revision citing nothing is refused by the shape \
+            check and one contradicting itself by a-value-agrees-with-its-maturation. Both shipped \
+            by TS.260821.18 and neither needed a rule of its own"
+
+    layer "doctrine"    state="evidenced" \
+        evidence="skills/anchor-the-work/SKILL.md, anchored and registered. 55 of 55 anchored" \
+        reaches="discovery states the why before it frames anything"
+    layer "enforcement" state="evidenced" \
+        evidence="a-frame-is-worked-under-a-strategy reports; the upward chain is carried by \
+            dangling-relationship with no rule of its own; a mission with no delivered-when is \
+            refused by the shape check" \
+        reaches="a frame with nothing above it is reported"
+    layer "docs"        state="evidenced" \
+        evidence="the published concepts open with why, before the problem and before the glossary" \
+        reaches="a release opens with why, and the reader decides whether to keep reading"
+
+    phase "implement" state="complete" required-by="enforcement · docs" \
+        worked-by="agent:principal-engineer" {
+        followed "three kinds, not one — vision, mission, strategy are different things"
+        followed "the check is traceability, never truth"
+        followed "strategy is an ordering, and adherence is the check"
+        followed "report, do not refuse, on everything the existing record lacks"
+    }
+    phase "learn" state="complete" required-by="always" worked-by="agent:principal-engineer" \
+        produced="BC1 and BC2 — a silent no-op edit, and an attribution bug that printed one report five times"
+    phase "teach" state="skipped" required-by="doctrine" worked-by="agent:principal-engineer" \
+        skipped-because="it produced doctrine for an agent, which is the doctrine LAYER and is \
+            recorded there. The published concepts DO now teach a reader why the product exists — \
+            but that is TS.260821.12's document, improved here rather than authored here, and \
+            claiming it would be taking credit for somebody else's phase"
+
+    finding "BC3" state="open" size="observation" \
+        carries="C5" \
+        text="the strategy declares a six-step order and nothing checks work against it. \
+            Conformance to a declared sequence is computable — that was the argument for strategy \
+            needing no falsifier — and the computation is not written" \
+        obliges="a report over work that is out of sequence: a frame whose symptoms name personas \
+            the record does not hold, a slice cut before its capability was derived" \
+        note="carried rather than forced. The check needs a way to compare a record's position in \
+            the sequence against what exists, and that is a slice rather than an afternoon"
+
+    finding "BC4" state="open" size="observation" \
+        text="`praxis close` accepted this iteration and `praxis check` then refused it, because \
+            the slice gained two claims after the commitment was opened and \
+            a-commitment-carries-every-claim is a CHECK rule rather than a close rule" \
+        note="both are right and they disagree about when. The close accounts for what the \
+            iteration holds; the check accounts for what the SLICE declares. AJ6 cut the rule for \
+            exactly this and put it in the checker — so a close can succeed on a commitment the \
+            record will refuse a second later, which is a narrow window and a real one"
+
+    finding "BC1" state="open" size="observation" \
+        text="the edit hanging the frame from its strategy silently did nothing. The replace \
+            matched `Trust in an artifact is unearned` and the record says `Trust in an AGENT'S \
+            artifact` — so the frame stayed orphaned and the tool reported it correctly while I \
+            read the report as a bug in the rule" \
+        note="caught only because the rule had just been written and its output was being read \
+            closely. A no-op edit is the quietest failure available: nothing errors, nothing \
+            changes, and the next check tells the truth about a change that never happened"
+
+    finding "BC2" state="open" size="frame-sized" \
+        text="one report about FRAME.260819.01 printed FIVE times. `belongs` matches kind AND id \
+            at any depth, and `frame \"FRAME.260819.01\"` appears as a FIELD in the storm, the \
+            architecture and two walkthroughs — so a violation about the ENTITY was attributed to \
+            every document that merely references it" \
+        obliges="attribution distinguishes a node that IS the entity from a field that names it" \
+        note="the S7 / AG1 / AG2 family, fourth occurrence. Every previous one was a refusal \
+            LOST on the way out; this is the same confusion producing duplicates instead. The \
+            shape is identical — `is this document about that entity` is answered by pattern \
+            rather than by structure"
+
+    phase "design-system" state="complete" worked-by="agent:principal-engineer" {
+        matured "approach" {
+            from "no falsifier on the vision OR the mission"
+            to "no falsifier on the vision; `delivered-when` required on the mission"
+            at "2026-08-23"
+            because "the slice's C1 requires a test for the outcome, and reading it against the \
+                plan showed the two were not the same claim. A VISION is a world state and cannot \
+                be tested. A MISSION is what this product does toward it, and `what would count as \
+                delivered` is exactly what makes it a mission rather than an aspiration"
+            taught-by "ITER.260823.02"
+        }
+
+        approach "three kinds, not one — vision, mission, strategy are different things" {
+            over "one `purpose` kind carrying all three"
+            over "fields on the frame, so the frame stays the root"
+            because "they change on different schedules and answer different questions. A vision \
+                outlives every mission under it; a strategy is revised by findings while the \
+                mission holds. Collapsing them into one kind would mean amending the vision every \
+                time the approach changed, and the record would stop being able to say which one \
+                moved"
+            note "fields on the frame was tempting and wrong for a specific reason: a product has \
+                one vision and many frames. Hanging the vision off a frame would give a second \
+                frame a second vision"
+        }
+
+        approach "the check is traceability, never truth" {
+            over "requiring a falsifier on the vision"
+            over "leaving them unchecked entirely, as prose in the record"
+            because "vision and mission are not claims about delivery — they are what claims get \
+                judged against, and asking whether a vision is TRUE is the category error that \
+                excluded them from the record in the first place. What is checkable is the thing \
+                this record checks everywhere else: that nothing is orphaned"
+        }
+
+        approach "strategy is an ordering, and adherence is the check" {
+            over "a falsifier on the strategy, like purpose carries"
+            because "a strategy says how we go about it and never how it is built, which makes it \
+                a declared SEQUENCE. Conformance to a sequence is computable — a frame written \
+                before any persona exists is out of order, and being out of order is a fact"
+        }
+
+        approach "report, do not refuse, on everything the existing record lacks" {
+            over "refusing a frame that traces to no strategy"
+            because "one frame exists and it predates all three kinds. Every enforcement in this \
+                frame that failed closed on arrival had to be walked back, and this one lands on a \
+                record where the count is one — which is small enough to fix and still not a \
+                reason to fail closed on it"
+        }
+    }
+    closed-at "2026-08-23T01:06:18Z"
+    outcome "continue"
+
+    close {
+        claims-settled "C1" how="met"
+        claims-settled "C2" how="met"
+        claims-settled "C3" how="met"
+        claims-settled "C4" how="met"
+        all-met #true
+        attested-by "human:waelrabadi"
+        note "the accounting above was computed at close, not asserted. It says every claim is either met or carried by a finding that names it, and nothing about whether the work is any good"
+    }
+
+    trail {
+        entry at="2026-08-23T01:06:18Z" by="agent:praxis" action="state-changed" from="open" to="closed" note="closed by `praxis close`. The accounting was computed; the conclusion is not the machine's to draw"
+
+        entry at="2026-08-23T00:58:17Z" by="agent:praxis" action="created" \
+            note="opened by the gate, on the ask of human:wael"
+    }
+}

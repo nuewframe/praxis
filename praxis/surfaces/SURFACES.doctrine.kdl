@@ -227,3 +227,9 @@ doctrine-surface "surface.skill.plan-before-building" {
     kind "skill"
     serves "TS.260821.19"
 }
+
+doctrine-surface "surface.skill.anchor-the-work" {
+    path "skills/anchor-the-work/SKILL.md"
+    kind "skill"
+    serves "TS.260821.16"
+}

@@ -8,6 +8,7 @@
 frame "FRAME.260819.01" {
     slug "the-trust-transfer-problem"
     title "Trust in an agent's artifact is unearned, because fidelity is invisible"
+    under "name-the-person-before-the-system"
 
     // ---- Symptoms. Each resolves on its own schedule, by naming a release. ----
     symptom "S1" state="present" \

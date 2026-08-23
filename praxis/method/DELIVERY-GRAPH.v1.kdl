@@ -48,6 +48,42 @@ method "delivery-graph" {
             because="two agents naming two things at the same moment must not have to agree first" \
             note="the literal id FORMAT is a layout decision and lives on ADR.260819.01"
 
+        entity "vision" is="the world if this succeeds" \
+            owned-by="delivery-record" \
+            note="declared by TS.260821.16. Not checked for TRUTH — it is what truth is checked \
+                against. Excluding it from the record for being unfalsifiable applied this \
+                record's discipline one layer too high, and left the frame as the root with \
+                nothing above it" {
+            field "is"   each="1" because="the world state, in a sentence somebody could disagree with"
+            field "note" each="0..n"
+        }
+
+        entity "mission" is="what this product does to move toward the vision" \
+            owned-by="delivery-record" \
+            note="declared by TS.260821.16" {
+            field "is"             each="1"
+            field "toward"         each="1" references="vision" because="a mission serving no vision is a direction with no destination"
+            field "delivered-when" each="1" \
+                because="what would count as having delivered it. The vision carries none — a \
+                    world state cannot be tested — and this is what separates a mission from an \
+                    aspiration. A mission nobody could be wrong about is a slogan"
+            field "note"           each="0..n"
+        }
+
+        entity "strategy" is="the ordered approach — how we go about it, never how it is built" \
+            owned-by="delivery-record" \
+            note="declared by TS.260821.16. It carries no falsifier because it is an ORDERING, and \
+                conformance to a declared sequence is computable: a frame written before any \
+                persona exists is out of order, and being out of order is a fact" {
+            field "serves"  each="1" references="mission"
+            field "step"    each="1..n" because="the order. A strategy with no sequence is a preference"
+            field "matured" each="0..n" holds="matured" \
+                because="the work within a frame informs the strategy, and a revision is an append \
+                    naming what taught it. A strategy the work can always revise constrains \
+                    nothing; one it can never revise is a slogan nobody revisits"
+            field "note"    each="0..n"
+        }
+
         entity "frame" is="a problem — symptoms, one root cause, one principle" \
             completes="never; its symptoms resolve individually, each naming a release" \
             note="only one frame exists, so every cardinality here is inferred from a sample of ONE. \
@@ -56,6 +92,10 @@ method "delivery-graph" {
             field "slug"             each="1"
             field "title"            each="1"
             field "symptom"          each="1..n" holds="symptom" because="a frame with no symptom cannot resolve, and resolution is per symptom"
+            field "under"      each="0..1" references="strategy" \
+                because="which strategy this problem is being solved under. Optional because the \
+                    one frame in this record predates the kind — a rule failing closed on arrival \
+                    is one this frame has had to walk back twice"
             field "root-cause"       each="1" because="the convergence gate — symptoms that do not reduce to one cause were more than one problem"
             field "principle"        each="1"
             field "trail"            each="1"
@@ -822,6 +862,14 @@ method "delivery-graph" {
                     }
                 }
                 """#
+
+        rule "a-frame-is-worked-under-a-strategy"     reports="a frame naming no strategy" \
+            because="everything this record holds descends from a frame, and the frame was the \
+                root with nothing above it. A problem nobody can trace to a strategy is work \
+                nobody can justify — and the check is the one this record makes everywhere else, \
+                that nothing is orphaned, rather than whether any of it is true" \
+            found-by="the maintainer: vision, mission and strategy are the pillars, and the record \
+                held none of them"
 
         rule "the-plan-and-the-code-agree"            refuses="an approach the record says was taken that the iteration never produced, or one it produced and neither followed nor abandoned" \
             because="an approach recorded and not taken is a decision the record CLAIMS was made. \

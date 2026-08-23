@@ -311,6 +311,19 @@ pub struct Config {
     pub omitted: Vec<String>,
 }
 
+/// Why the product exists. Not checked for truth — it is what truth is checked against.
+#[derive(Debug, Clone, PartialEq, Eq, Default)]
+pub struct Anchor {
+    /// The world if this succeeds.
+    pub vision: String,
+    /// What this product does to move toward it.
+    pub mission: String,
+    /// What would count as having delivered the mission.
+    pub delivered_when: String,
+    /// The ordered approach — how we go about it, never how it is built.
+    pub strategy: Vec<String>,
+}
+
 /// A problem, as the record states it.
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
 pub struct Frame {
@@ -393,6 +406,8 @@ pub struct Corpus {
     pub roles: Vec<Role>,
     /// The problems this repository is working on.
     pub frames: Vec<Frame>,
+    /// Why the product exists, above the problem it attacks (TS.260821.16).
+    pub anchor: Anchor,
     /// Kind → what it means, from the schema's own `is=`. Carried on the corpus so a
     /// projection can publish a glossary without the schema being threaded through every
     /// composer, and so a kind an adopting project declares appears in ITS glossary.
@@ -563,6 +578,21 @@ impl Corpus {
                             .flat_map(string_args)
                             .collect(),
                     }),
+                    "vision" => {
+                        corpus.anchor.vision = child_arg(node, "is").unwrap_or_default();
+                    }
+                    "mission" => {
+                        corpus.anchor.mission = child_arg(node, "is").unwrap_or_default();
+                        corpus.anchor.delivered_when =
+                            child_arg(node, "delivered-when").unwrap_or_default();
+                    }
+                    "strategy" => {
+                        corpus.anchor.strategy = node
+                            .iter_children()
+                            .filter(|c| c.name().value() == "step")
+                            .filter_map(|c| prop(c, "is"))
+                            .collect();
+                    }
                     "config" => corpus.config = config_from(node),
                     _ => {}
                 }

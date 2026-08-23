@@ -130,6 +130,7 @@ retired, not left where an agent will read it.
 | | `plan-before-building` | Produce the approach before the implementation and record what it was chosen over — a design written at close is a summary of what was built |
 | | `mature-a-value` | Record a value that changed as a change rather than overwriting it — the third of the three moves an iteration makes, and the one that usually leaves no trace |
 | | `ask-the-record` | Ask the record about any declared kind instead of reaching for grep — generic by necessity, and it refuses rather than answering empty |
+| | `anchor-the-work` | State the vision, mission and strategy a frame is worked under — the check is traceability, never truth |
 | | `name-a-persona` | Name who the product is for, before anything is framed — one persona is enough to start, and the rest emerge from the work and cite what surfaced them |
 | | `adopt-the-method` | Put a repository under the delivery graph without copying it — what the method carries, what you may add, and what you may never redefine |
 | | `declare-an-invariant` | Declare what this plugin guarantees about code it is loaded into, and anchor the probe that keeps it — `enabled` and `enforced` are different facts |

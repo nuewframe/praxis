@@ -287,6 +287,26 @@ pub(crate) fn published_set(version: &str, corpus: &Corpus) -> ReadModel {
 /// The glossary is generated from whatever the schema declares, so a kind an adopting
 /// project adds appears in ITS release notes without this function being touched.
 fn concepts(version: &str, corpus: &Corpus) -> ReadModel {
+    // Why, before what. A reader told what a tool does and never why it exists has been
+    // handed a manual for a decision they have not made yet.
+    let mut why = Section::new("why this exists", &["", ""])
+        .empty_because(
+            "the record holds no vision or mission, so this product states no reason for \
+             existing — only a problem it attacks",
+        );
+    if !corpus.anchor.vision.is_empty() {
+        why.push(vec!["the world if this succeeds".to_owned(), corpus.anchor.vision.clone()]);
+    }
+    if !corpus.anchor.mission.is_empty() {
+        why.push(vec!["what this does about it".to_owned(), corpus.anchor.mission.clone()]);
+    }
+    if !corpus.anchor.delivered_when.is_empty() {
+        why.push(vec![
+            "what would count as delivered".to_owned(),
+            corpus.anchor.delivered_when.clone(),
+        ]);
+    }
+
     let mut problem = Section::new("the problem this exists for", &["", ""])
         .empty_because("the record holds no frame, so this product states no problem");
     if let Some(frame) = corpus.frames.first() {
@@ -323,7 +343,7 @@ fn concepts(version: &str, corpus: &Corpus) -> ReadModel {
         version,
     );
     model.publishable = true;
-    model.section(problem).section(symptoms).section(glossary).define("depicts", version)
+    model.section(why).section(problem).section(symptoms).section(glossary).define("depicts", version)
 }
 
 /// `how-it-fits-together` — what each capability does, refuses, and holds true.

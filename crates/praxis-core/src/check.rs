@@ -71,6 +71,8 @@ pub enum Refusal {
     SplitStateVocabulary { kind: String, only_in_states: Vec<String>, only_in_field: Vec<String> },
     /// The record holds no persona at all, so nothing it contains says who it is for.
     NobodyItIsFor,
+    /// A frame naming no strategy it is worked under.
+    FrameWithNoStrategy { frame: String },
     /// A slice claiming value without naming whose value it is.
     ValueWithNoJudge { slice: String },
     /// A field disagreeing with the latest `matured` entry recorded for it.
@@ -153,6 +155,7 @@ impl Refusal {
             Self::UnknownMethod { .. } => "a-config-binds-a-method-the-engine-carries",
             Self::SplitStateVocabulary { .. } => "a-state-vocabulary-is-declared-once",
             Self::NobodyItIsFor => "a-record-names-somebody-it-is-for",
+            Self::FrameWithNoStrategy { .. } => "a-frame-is-worked-under-a-strategy",
             Self::ValueWithNoJudge { .. } => "a-claim-of-value-names-whose",
             Self::ContradictedMaturation { .. } => "a-value-agrees-with-its-maturation",
             Self::ImplementWithoutApproach { .. } => "implement-follows-an-approach",
@@ -191,6 +194,7 @@ impl Refusal {
             Self::UnknownMethod { .. } => "governed-by",
             Self::SplitStateVocabulary { .. } => "states",
             Self::NobodyItIsFor => "persona",
+            Self::FrameWithNoStrategy { .. } => "under",
             Self::ValueWithNoJudge { .. } => "useful-to",
             Self::ContradictedMaturation { field, .. } => field,
             Self::ImplementWithoutApproach { .. } => "followed",
@@ -214,6 +218,9 @@ impl Refusal {
             // absence of many — enumerating personas upfront is a week spent on people
             // nobody has met.
             | Self::NobodyItIsFor
+            // One frame exists and it predates the kind. Every enforcement in this frame
+            // that failed closed on arrival had to be walked back.
+            | Self::FrameWithNoStrategy { .. }
             // Reported: half this record predates the persona kind, and a rule failing closed
             // on the day it lands is one nobody adopts. It flips when the count is zero, the
             // way every enforcement in this frame has had to earn its severity.
@@ -333,6 +340,12 @@ impl Refusal {
                 "{slice} says what you get and not who gets it. Value is not a property of a \
                  change — it is a judgement somebody makes, and a record stating the change \
                  without the judge has recorded half of it. Name one with `useful-to`"
+            ),
+            Self::FrameWithNoStrategy { frame } => format!(
+                "{frame} names no strategy it is worked under. Everything this record holds \
+                 descends from a frame, and a frame with nothing above it is a problem nobody can \
+                 justify working on — the check is that nothing is orphaned, never whether the \
+                 strategy is right"
             ),
             Self::NobodyItIsFor => "the record names nobody it is for. Every fact it holds \
                  exists to serve somebody, and `useful-alone` — what you get if this ships — has \
@@ -1086,6 +1099,25 @@ pub fn check_corpus_given(
                     },
                     span: field_span(node, "useful-alone").unwrap_or_else(|| node.span()),
                 });
+            }
+        }
+    }
+
+    // A frame with nothing above it. Only where the kind is declared: a repository whose
+    // method predates `strategy` is not missing something it never had.
+    if schema.entity("strategy").is_some() {
+        for doc in docs {
+            for node in doc.nodes().iter().filter(|n| n.name().value() == "frame") {
+                if child_arg(node, "under").is_none() {
+                    out.push(Violation {
+                        entity_kind: "frame".to_owned(),
+                        entity_id: string_arg(node),
+                        refusal: Refusal::FrameWithNoStrategy {
+                            frame: string_arg(node).unwrap_or_default(),
+                        },
+                        span: node.span(),
+                    });
+                }
             }
         }
     }
