@@ -78,9 +78,9 @@ iteration "ITER.260822.05" {
             four re-anchored surfaces"
     phase "learn" state="complete" required-by="always" worked-by="agent:principal-engineer" \
         produced="two findings and an amendment to a sealed decision"
-    phase "teach" state="complete" required-by="doctrine" worked-by="agent:principal-engineer" \
+    phase "teach" state="skipped" required-by="doctrine" worked-by="agent:principal-engineer" \
         produced="the router and the engineer persona both now describe a rule that refuses" \
-        taught="the-next-agent"
+        skipped-because="it produced doctrine for an AGENT, which is the doctrine LAYER and is recorded there. Teaching an end user the feature's why and how did not happen — and the record already serves the next agent, whose own persona judges success by NOT needing a document (TS.260821.19, ITER.260822.15/BA1)"
 
     finding "AP1" state="open" size="frame-sized" \
         text="this iteration cannot legitimately close itself. Every phase above is worked-by \

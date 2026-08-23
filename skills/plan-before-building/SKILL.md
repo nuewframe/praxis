@@ -26,10 +26,18 @@ tools: [read_file, grep_search, replace_string_in_file, run_in_terminal]
 | `learn` | what the work taught, including where the approach turned out wrong |
 | `teach` | what the **end user** reads: the version's docs, the feature's why and how |
 
-## Why design-system only works before
+## Why the plan comes first
 
-An approach written at close is a **summary of what was built**. It cannot be argued with while
-there is still time to change what gets built, which is the only moment arguing helps.
+**The code is the decision.** The plan is the educated act before it — and what it buys is that
+the best approach was *considered* and taken, rather than arrived at.
+
+Chronology is not the point, and is not checkable from a record anyway. What matters is that
+the alternatives were **in view** when the decision was taken, and that the thing built is the
+thing chosen. A plan written at close that honestly names what was rejected still delivers
+that. A plan written first that nobody consulted delivers nothing.
+
+The failure worth fearing is not a late plan. It is an approach recorded and **not followed** —
+a decision the record claims was taken and was not, which is worse than no plan at all.
 
 This record proves it against itself. Every `design-system` entry in `FRAME.260819.01` is
 past-tense, written by whoever did the work, at close. `ITER.260822.13`'s said *"only the head

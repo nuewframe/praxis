@@ -81,11 +81,11 @@ iteration "ITER.260822.14" {
             field reading, and thirty-three back-filled teach phases"
     phase "learn" state="complete" required-by="always" worked-by="agent:principal-engineer" \
         produced="AZ1 and AZ2 — one about what the shape exposed, one about what it still cannot see"
-    phase "teach" state="complete" required-by="doctrine" worked-by="agent:principal-engineer" \
-        taught="the-next-agent" \
+    phase "teach" state="skipped" required-by="doctrine" worked-by="agent:principal-engineer" \
         produced="skills/plan-before-building/SKILL.md" \
         note="taught an AGENT and says so. The reader of a release gets nothing from this slice, \
-            which is now visible rather than hidden behind a skill counted twice"
+            which is now visible rather than hidden behind a skill counted twice" \
+        skipped-because="it produced doctrine for an AGENT, which is the doctrine LAYER and is recorded there. Teaching an end user the feature's why and how did not happen — and the record already serves the next agent, whose own persona judges success by NOT needing a document (TS.260821.19, ITER.260822.15/BA1)"
 
     finding "AZ1" state="open" size="frame-sized" \
         text="`phase` was called `deliberately shapeless` and it was not a choice — the schema \
@@ -99,14 +99,40 @@ iteration "ITER.260822.14" {
             shape: a limitation gets written down as an intention, and `deliberately shapeless` \
             is what that sounds like a year later"
 
+    finding "BA1" state="open" size="frame-sized" \
+        text="C4's evidence above is superseded and left standing, because a closed iteration is \
+            history. It says thirty-three teach phases were back-filled with \
+            taught=\"the-next-agent\". That was wrong twice over, and the record caught it" \
+        note="TAUTOLOGY. Every iteration teaches the next agent by existing — that is what the \
+            record IS, and S7 is the symptom about exactly this. A value true by construction \
+            discriminates nothing, which is the argument that removed `frame` from the `serves` \
+            vocabulary hours earlier. I reintroduced the defect I had just fixed" \
+        note="CONTRADICTION. The next-agent persona judges success by `asking the record and \
+            getting an answer it can act on, RATHER THAN A DOCUMENT IT MUST READ`. Every one of \
+            those phases produced a skill file. The back-fill claimed success against a criterion \
+            the artifact fails" \
+        note="corrected: those thirty-four teach phases are `skipped`, with the reason. They \
+            produced doctrine for an agent, which is the doctrine LAYER and is recorded there. \
+            Teaching an end user did not happen, and skipped-phase-without-rationale already \
+            existed for saying so. The teach phase has one reader and it is not the next agent"
+
     finding "AZ2" state="open" size="observation" \
         text="nothing checks that the approach was recorded BEFORE the code. A phase written at \
             close with an `over` clause satisfies every rule this slice adds" \
         note="the honest limit, and it is the same shape as AY2: order in time is not something a \
-            snapshot holds, and the obvious source is git, which is outside the record. What this \
-            buys is that the choice and its alternatives are legible at all — a summary written at \
-            close that names what it was chosen over is already better than the fourteen that \
-            named nothing"
+            snapshot holds, and the obvious source is git, which is outside the record" \
+        note="SUPERSEDED, and the framing above is the mistake. Chronology was never the point. \
+            The CODE is the decision — the plan is the educated act before it, and what it buys is \
+            that the alternatives were in view when the decision was taken. A plan written at close \
+            that accurately names what was rejected still delivers that; a plan written first that \
+            nobody consulted delivers nothing. `was it written before` is unverifiable and also \
+            not the question" \
+        note="the question it should have asked is whether the approach and the code AGREE. \
+            implement-follows-an-approach checks that implement NAMES one; nothing checks that the \
+            named one is what got built. An approach recorded and not followed is a decision the \
+            record claims was taken and was not — which is worse than no plan, and is the same \
+            shape as a-value-agrees-with-its-maturation one level up. That is the finding, and it \
+            is not the one AZ2 wrote"
 
     // Written BEFORE any code, which is the whole subject of the slice. If this iteration
     // records its approach at close like every other one in this frame, it has demonstrated

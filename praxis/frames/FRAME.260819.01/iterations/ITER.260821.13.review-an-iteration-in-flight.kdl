@@ -101,9 +101,8 @@ iteration "ITER.260821.13" {
             Markdown renderer, the gitignore entry, and nine tests"
     phase "learn" state="complete" required-by="always" produced="three findings" \
         note="never skippable — it is the phase that judges the others"
-    phase "teach" state="complete" required-by="doctrine" produced="skills/review-in-flight/SKILL.md" \
-        taught="the-next-agent" \
-        taught="the-next-agent"
+    phase "teach" state="skipped" required-by="doctrine" produced="skills/review-in-flight/SKILL.md" \
+        skipped-because="it produced doctrine for an AGENT, which is the doctrine LAYER and is recorded there. Teaching an end user the feature's why and how did not happen — and the record already serves the next agent, whose own persona judges success by NOT needing a document (TS.260821.19, ITER.260822.15/BA1)"
 
     finding "AC1" state="open" size="answered" \
         text="U3 is settled at the mechanism it named. ITER.260821.05 settled TS.260820.06/C2 \

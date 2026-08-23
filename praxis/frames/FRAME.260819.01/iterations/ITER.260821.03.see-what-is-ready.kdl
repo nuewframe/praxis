@@ -130,11 +130,11 @@ iteration "ITER.260821.03" {
     phase "learn" state="complete" required-by="always" \
         produced="six findings, one of which corrected this iteration's own design before close" \
         note="never skippable — it is the phase that judges the others"
-    phase "teach" state="complete" required-by="doctrine" \
+    phase "teach" state="skipped" required-by="doctrine" \
         produced="skills/see-what-is-ready/SKILL.md, whose longest section is how to read a SHORT \
             ready set — because the first real answer produced one, and the instinct it invites is \
             to weaken a condition" \
-        taught="the-next-agent"
+        skipped-because="it produced doctrine for an AGENT, which is the doctrine LAYER and is recorded there. Teaching an end user the feature's why and how did not happen — and the record already serves the next agent, whose own persona judges success by NOT needing a document (TS.260821.19, ITER.260822.15/BA1)"
 
     finding "S1" state="open" size="owed-work" carries="C1" \
         text="C1 cannot be settled by the slice that owns it. It asks for a property test against \

@@ -81,9 +81,9 @@ iteration "ITER.260822.07" {
             shell, the binding rule, and the praxis schema command"
     phase "learn" state="complete" required-by="always" worked-by="agent:principal-engineer" \
         produced="three findings, two of them from the maintainer reading the work as it landed"
-    phase "teach" state="complete" required-by="doctrine" worked-by="agent:principal-engineer" \
+    phase "teach" state="skipped" required-by="doctrine" worked-by="agent:principal-engineer" \
         produced="skills/adopt-the-method/SKILL.md" \
-        taught="the-next-agent"
+        skipped-because="it produced doctrine for an AGENT, which is the doctrine LAYER and is recorded there. Teaching an end user the feature's why and how did not happen — and the record already serves the next agent, whose own persona judges success by NOT needing a document (TS.260821.19, ITER.260822.15/BA1)"
 
     finding "AR1" state="open" size="frame-sized" \
         text="nothing pulls the binary. The plugin ships to six harnesses as a Markdown and \

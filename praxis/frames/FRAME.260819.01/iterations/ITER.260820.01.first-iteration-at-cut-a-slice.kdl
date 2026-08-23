@@ -136,14 +136,14 @@ iteration "ITER.260820.01" {
         evidence="cargo test — 7 passed; praxis check refuses 4 and exits 1 on a malformed slice, \
             and passes on the committed record"
 
-    phase "teach" state="complete" \
+    phase "teach" state="skipped" \
         produced="skills/cut-a-slice/SKILL.md, registered in the using-praxis router" \
         evidence="the skill teaches naming the command, the one actor, the declared layers and the \
             claims-with-evidence, and teaches that a refusable command names its refusal too" \
         note="it deliberately does NOT restate the field list. Doctrine that duplicates a fact the \
             graph owns becomes a second writer for it, so the skill points at `praxis check` and \
             says the answer is the checker's, not the document's" \
-        taught="the-next-agent"
+        skipped-because="it produced doctrine for an AGENT, which is the doctrine LAYER and is recorded there. Teaching an end user the feature's why and how did not happen — and the record already serves the next agent, whose own persona judges success by NOT needing a document (TS.260821.19, ITER.260822.15/BA1)"
 
     phase "learn" state="complete" \
         produced="nine findings. Four changed the record while the iteration was open — the missing \

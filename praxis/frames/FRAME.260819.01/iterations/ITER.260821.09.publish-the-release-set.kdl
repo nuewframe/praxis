@@ -111,9 +111,8 @@ iteration "ITER.260821.09" {
             `praxis publish`, the containment check at cut, and eleven tests"
     phase "learn" state="complete" required-by="always" produced="five findings, one of them a contradiction between two slices" \
         note="never skippable — it is the phase that judges the others"
-    phase "teach" state="complete" required-by="doctrine" produced="skills/publish-the-release-set/SKILL.md" \
-        taught="the-next-agent" \
-        taught="the-next-agent"
+    phase "teach" state="skipped" required-by="doctrine" produced="skills/publish-the-release-set/SKILL.md" \
+        skipped-because="it produced doctrine for an AGENT, which is the doctrine LAYER and is recorded there. Teaching an end user the feature's why and how did not happen — and the record already serves the next agent, whose own persona judges success by NOT needing a document (TS.260821.19, ITER.260822.15/BA1)"
 
     finding "Y1" state="open" size="frame-sized" \
         text="TS.260820.10 and TS.260820.09 contradicted each other and both were cut from the same \

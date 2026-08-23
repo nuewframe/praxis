@@ -75,9 +75,9 @@ iteration "ITER.260822.08" {
         produced="ask.rs, the ask command, and the nested-kind refusal"
     phase "learn" state="complete" required-by="always" worked-by="agent:principal-engineer" \
         produced="AW1 — an exclusion that produced a wrong-looking answer rather than a refusal"
-    phase "teach" state="complete" required-by="doctrine" worked-by="agent:principal-engineer" \
+    phase "teach" state="skipped" required-by="doctrine" worked-by="agent:principal-engineer" \
         produced="skills/ask-the-record/SKILL.md" \
-        taught="the-next-agent"
+        skipped-because="it produced doctrine for an AGENT, which is the doctrine LAYER and is recorded there. Teaching an end user the feature's why and how did not happen — and the record already serves the next agent, whose own persona judges success by NOT needing a document (TS.260821.19, ITER.260822.15/BA1)"
 
     finding "AW1" state="open" size="observation" \
         text="the slice excluded nested entities by name, and the exclusion produced `0` — \

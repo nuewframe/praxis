@@ -108,9 +108,9 @@ iteration "ITER.260822.04" {
             generators retired, CI rewired to publish-and-diff"
     phase "learn" state="complete" required-by="always" \
         produced="two findings and one decision"
-    phase "teach" state="complete" required-by="doctrine" \
+    phase "teach" state="skipped" required-by="doctrine" \
         produced="the published document is itself the teaching artifact for this slice" \
-        taught="the-next-agent"
+        skipped-because="it produced doctrine for an AGENT, which is the doctrine LAYER and is recorded there. Teaching an end user the feature's why and how did not happen — and the record already serves the next agent, whose own persona judges success by NOT needing a document (TS.260821.19, ITER.260822.15/BA1)"
 
     decision "what a persona serves" \
         chose="anchor the three personas to FRAME.260819.01, the weakest anchor in the vocabulary" \

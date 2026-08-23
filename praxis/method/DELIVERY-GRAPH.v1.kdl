@@ -383,7 +383,12 @@ method "delivery-graph" {
             field "taught"    each="0..n" references="persona" \
                 because="who the teach phase reached. A skill teaches an AGENT and is the doctrine \
                     layer; a version's docs teach the reader of a release. Every iteration in this \
-                    frame named one skill under both, which is how the difference stayed invisible"
+                    frame named one skill under both, which is how the difference stayed invisible" \
+                note="the RECORD teaches the next agent — that is what it is for, and S7 is the \
+                    symptom about it. So naming that reader here is true of every iteration by \
+                    construction and discriminates nothing, and their persona judges success by \
+                    not needing a document. A teach phase reaches somebody the record cannot \
+                    serve, or it was skipped (ITER.260822.14/BA1)"
             field "followed"  each="0..n" \
                 because="which approach implement built. An implement naming none against a \
                     design-system that produced one is a phase that did not read its own plan"

@@ -227,9 +227,8 @@ iteration "ITER.260821.19" {
             `praxis prove`, `praxis accept`, and eleven tests"
     phase "learn" state="complete" required-by="always" produced="four findings, three of them defects the prover found in its first hour" \
         note="never skippable — it is the phase that judges the others"
-    phase "teach" state="complete" required-by="doctrine" produced="skills/witness-a-rule/SKILL.md" \
-        taught="the-next-agent" \
-        taught="the-next-agent"
+    phase "teach" state="skipped" required-by="doctrine" produced="skills/witness-a-rule/SKILL.md" \
+        skipped-because="it produced doctrine for an AGENT, which is the doctrine LAYER and is recorded there. Teaching an end user the feature's why and how did not happen — and the record already serves the next agent, whose own persona judges success by NOT needing a document (TS.260821.19, ITER.260822.15/BA1)"
 
     finding "AJ1" state="open" size="frame-sized" \
         text="the engine was enforcing five rules the record never named. Writing Refusal::rule — \

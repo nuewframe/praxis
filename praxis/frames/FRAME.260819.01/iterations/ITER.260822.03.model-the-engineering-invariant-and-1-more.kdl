@@ -98,9 +98,9 @@ iteration "ITER.260822.03" {
             eleven probe anchors, two ported capability records, the split published view"
     phase "learn" state="complete" required-by="always" \
         produced="four findings, two of them things the retirement sweep had missed"
-    phase "teach" state="complete" required-by="doctrine" \
+    phase "teach" state="skipped" required-by="doctrine" \
         produced="skills/declare-an-invariant/SKILL.md" \
-        taught="the-next-agent"
+        skipped-because="it produced doctrine for an AGENT, which is the doctrine LAYER and is recorded there. Teaching an end user the feature's why and how did not happen — and the record already serves the next agent, whose own persona judges success by NOT needing a document (TS.260821.19, ITER.260822.15/BA1)"
 
     finding "AN1" state="open" size="observation" \
         text="check-contract-freshness.sh should have been retired by TS.260821.04 and was not. Its \
