@@ -1,0 +1,80 @@
+// 27 entity kinds · 158 distinct field names · 56 rules · 11 relation types · 41 skills.
+//
+// `docs/product.md` says this is for engineers, designers and product managers. A designer is
+// not going to learn `witness-kind`, and the honest reading is that the AGENT holds the
+// vocabulary while the humans read output — which is fine, and is not what the doctrine says.
+//
+// `adopt-the-method` opens by teaching what a repository may never redefine. That is the right
+// rule and the wrong first sentence: it answers a question nobody has yet, and the question
+// they do have — what is the least I must declare before this thing will check — has no answer
+// anywhere. So an adopter does the fast thing instead, which is to copy an existing record and
+// mutate it. That is transcription, the one move this method spends its longest argument against,
+// and the vocabulary's size is what makes it the rational choice.
+
+thin-slice "TS.260823.09" {
+    slug "the-vocabulary-you-need-to-start"
+    title "Say what the least is that a repository must declare, before teaching the rest"
+    kind "view"
+    realizes "CAP.delivery-record"
+    from-storm "ES.260819.01"
+
+    read-model "where-to-start"
+    content-owned-by "CAP.delivery-record"
+    actor "the-adopter"
+
+    trigger "somebody opens the method, counts twenty-seven kinds, and reaches for an existing record to copy"
+    outcome "the smallest declarable set is named as such, with every other kind arriving when the work asks for it"
+
+    scenario #"""
+        Given a repository under the method and nothing else
+        When the adopter asks what they must declare
+        Then they get the minimum that will check — and each remaining kind is named against
+             the moment that calls for it, rather than presented as a vocabulary to learn
+             before starting.
+        """#
+
+    step "1" does="the minimum is computed, not chosen. Which kinds a record must hold before `praxis check` passes is a fact about the schema, and a hand-written list of it is a second copy that drifts"
+    step "2" does="every other kind names its trigger — the moment in the work that calls for it. A kind with no stated trigger is one an adopter has to guess the use of"
+    step "3" does="the answer is a view, composed on demand. A tutorial goes stale against a schema that grows; a projection cannot"
+    step "4" does="`adopt-the-method` opens with this and reaches `may never redefine` afterwards, which is the order the questions actually arrive in"
+
+    excludes "reducing the vocabulary. Twenty-seven kinds may well be right for what this method \
+        computes, and shrinking it to be teachable would trade a real guarantee for a smaller \
+        first page"
+    excludes "a tiered or 'lite' profile that checks less. A method a repository can weaken \
+        locally reports whatever that repository wanted to hear, and this is that rule restated \
+        as a beginner mode"
+    excludes "teaching the vocabulary. This says which kinds and when; what each MEANS is what \
+        `praxis schema` already prints"
+
+    layer "doctrine"    reaches="`adopt-the-method` leads with the minimum and orders the rest by the moment that calls for it"
+    layer "docs"        reaches="`what is the least I must declare` is answerable, and the answer is derived from the schema rather than maintained beside it"
+
+    claim "C1" text="the minimum declarable set is derived from the schema, not listed by hand" \
+        settled-by="a test adding a required kind to the method and asserting the view includes it with no other change"
+    claim "C2" text="a record holding only the minimum checks clean" \
+        settled-by="a test building a record from exactly what the view names and asserting `praxis check` passes"
+    claim "C3" text="every kind outside the minimum names the moment that calls for it" \
+        settled-by="a test asserting a kind with no declared trigger is reported, since an adopter cannot act on it"
+
+    depends-on "TS.260823.04 — an adopter following the minimum has to be able to write each field without knowing the engine, or the shortest path is still to copy"
+
+    useful-alone "the fastest route into this method stops being transcription. Today the honest \
+        first instruction is `copy somebody's record and change the words`, which is precisely \
+        what `adopt-the-method` spends its longest section arguing nobody should do"
+
+    attacks "S7"
+
+    useful-to "the-adopter"
+
+    cut-from "the validation review of 2026-08-22, which built a first record by following the \
+        skills rather than copying, and measured what that cost"
+
+    principle-note "the next agent should not re-derive what is already known. An adopter facing \
+        an undifferentiated vocabulary re-derives which parts of it matter — every time, in every \
+        repository, and never into the record"
+
+    proves "the smallest set a repository must declare is stated and derived"
+    does-not-prove "that the vocabulary is learnable, or that an adopter will succeed with it. \
+        It removes the reason to start by copying"
+}

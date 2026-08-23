@@ -1,0 +1,85 @@
+// `TS.260821.04` retired the initiative-era spine. The record moved. The doctrine did not:
+//
+//     136 occurrences of `wave` · 118 of `sprint` · 36 of `initiative` · 15 of `TS-`
+//     across 41 shipped files, including all three persona files and the one always-on
+//     guardrail set
+//
+// `using-praxis` states the retirement and then ships beside thirteen top-level files that
+// teach what was retired. An agent loads both. It does not pick the newer one — it synthesises,
+// which is S1, produced by the doctrine surface that exists to prevent S1.
+//
+// The reason this could persist is that nothing checks it. `praxis check` refuses a record
+// naming a kind the schema does not declare. Nothing refuses a SKILL naming one.
+//
+// The purge is the work. This slice is the rule that makes the purge finishable and keeps it
+// finished — a cleanup with no check behind it is a cleanup that has to be done again.
+
+thin-slice "TS.260823.06" {
+    slug "a-surface-does-not-teach-a-retired-kind"
+    title "Refuse shipped doctrine that teaches a vocabulary the method retired"
+    kind "command"
+    realizes "CAP.delivery-record"
+    from-storm "ES.260819.01"
+
+    command "check"
+    actor "the maintainer, and every agent that loads this plugin at session start"
+    produces-event "SurfaceSpeaksTheMethod" "SurfaceTeachesARetiredKind"
+    needs-read-model "what-this-plugin-ships"
+
+    trigger "a skill tells an agent to create a sprint, in a method that has no sprints"
+    outcome "every shipped surface speaks the vocabulary the method currently declares, and one that does not is refused by name"
+
+    scenario #"""
+        Given a method that has retired a kind
+        When a shipped surface still names that kind as something to do
+        Then the check refuses and names the file and the retired kind — because doctrine and
+             record disagreeing is not a documentation lapse, it is two instructions in one
+             context window, and an agent handed both will invent a third.
+        """#
+
+    step "1" does="retirement becomes a declared fact with a vocabulary attached. `retired \"the initiative-era rules\"` already exists and names no words, so nothing can be checked against it"
+    step "2" does="a shipped surface naming a retired kind as an instruction is refused. Naming one to say it was retired is not — a surface must be able to explain what changed"
+    step "3" does="the thirteen top-level files are corrected. Personas, guardrails and the engineering skills stop describing a spine the record deleted two versions ago"
+    step "4" does="the fifty-three template files are handled by TS.260823.08, which decides which survive at all. This rule tells that slice when it is done"
+
+    excludes "the record's own history. The retired-surface declarations, the decisions and the \
+        archived release set describe what WAS, and a rule that refused them would delete the trail"
+    excludes "deciding what the corrected doctrine should say. Removing a contradiction is not \
+        the same as writing its replacement, and conflating them is how a cleanup becomes a rewrite"
+    excludes "prose style, tone or length. What is checked is whether a surface instructs an \
+        agent in a vocabulary the method no longer holds"
+
+    layer "doctrine"    reaches="thirteen shipped files stop teaching waves, sprints, initiatives and tiers; `anchor-a-doctrine-surface` says a surface speaks the current method"
+    layer "enforcement" reaches="a surface naming a retired kind as an instruction is refused, with the file and the kind both named"
+    layer "docs"        reaches="`does what we ship agree with what we record` is a question with a computed answer instead of a reading exercise"
+
+    claim "C1" text="a retired kind is declared with the vocabulary that retires with it" \
+        settled-by="a test asserting a retirement naming no vocabulary is reported, since it can enforce nothing"
+    claim "C2" text="a shipped surface instructing an agent in a retired kind is refused, naming the file and the kind" \
+        settled-by="a test over a surface containing a retired instruction, asserting the refusal names both"
+    claim "C3" text="a surface may name a retired kind while explaining that it was retired" \
+        settled-by="a test over a surface that names the kind in a retirement notice, asserting it checks clean"
+    claim "C4" text="no shipped surface teaches a retired kind" \
+        settled-by="the check running over this plugin's own shipped set and refusing nothing, which is the purge being finished rather than claimed"
+
+    depends-on "TS.260823.05 — the rule has to run over every shipped file, and until the audit sees the templates it runs over a third of them"
+
+    useful-alone "the always-on surface stops contradicting the record it ships beside. Today an \
+        agent loading this plugin is told in one file that sprints were retired and in three \
+        others how to create one"
+
+    attacks "S1"
+
+    useful-to "the-team-building-a-digital-product"
+
+    cut-from "the validation review of 2026-08-22, which counted the retired vocabulary still \
+        shipping in the always-loaded doctrine surface"
+
+    principle-note "the frame's first symptom is that agents improvise structure instead of \
+        following a method. Contradictory doctrine does not slow an agent down — it licenses \
+        the improvisation, because there is no single thing to follow"
+
+    proves "no shipped surface instructs an agent in a vocabulary the method has retired"
+    does-not-prove "that the remaining doctrine is correct, useful, or agrees with itself on \
+        anything beyond vocabulary. It closes the contradiction it can compute"
+}

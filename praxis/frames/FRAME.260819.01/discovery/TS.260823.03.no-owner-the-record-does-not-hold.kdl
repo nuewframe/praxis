@@ -1,0 +1,94 @@
+// `dangling-relationship` refuses an edge naming something the record does not hold. A
+// composed document's part owners bypass it, because they are not edges — they are string
+// literals in the engine:
+//
+//     parts = vec![Part { owner: "CAP.delivery-record", … }]
+//     Part { owner: "CAP.work-admission",   … }
+//     Part { owner: "CAP.release-binding",  … }
+//
+// Those are THIS repository's capability names, compiled into the tool every repository runs.
+// The validation review ran `praxis dashboard` in a repository whose only capability was
+// `payment`, and the dashboard attributed its views to `CAP.delivery-record` and
+// `CAP.work-admission` — capabilities that repository has never held.
+//
+// A4 (ADR.260819.01): an engine that encodes what the record declares can diverge from it and
+// nobody can tell. This is that, and the divergence is not hypothetical — it is every adopter's
+// dashboard, stamped with the author's record.
+//
+// `owners_are_distinct()` sits directly beneath those literals, checking the one-owner rule
+// against constants from a different repository.
+
+thin-slice "TS.260823.03" {
+    slug "no-owner-the-record-does-not-hold"
+    title "Refuse a composed document whose part names an owner the record never declared"
+    kind "command"
+    realizes "CAP.document-projection"
+    from-storm "ES.260819.01"
+
+    command "check"
+    actor "anyone composing a document in a repository that is not this one"
+    produces-event "OwnerResolved" "OwnerNotHeld"
+    needs-read-model "what-is-currently-true"
+
+    trigger "a document is composed from several read models and each part has to say who owns it"
+    outcome "every part's owner is a capability the record holds, resolved from the read model's declared ownership"
+
+    scenario #"""
+        Given a repository whose capabilities are its own
+        When it composes the dashboard
+        Then each part names the capability that owns the read model it rendered, taken from
+             the record — and a part naming an owner the record does not hold is refused the
+             way any dangling edge is, rather than printed as though it were true.
+        """#
+
+    step "1" does="a read model already declares `owned-by`. The composer reads it instead of carrying a parallel list, which is the second-copy problem inside the engine"
+    step "2" does="a part whose owner the record does not hold is refused. That is `dangling-relationship` reaching a place it could not see, not a new kind of rule"
+    step "3" does="`owners_are_distinct` keeps checking the one-owner rule, and starts checking it against owners this repository declared"
+    // Step 4 was the identity prefix, and it was cut here by mistake. See `excludes` below:
+    // it is the same claim TS.260823.04/C5 makes, and two slices claiming one outcome is
+    // the mis-cut the gate refused rather than a dependency between them.
+
+    excludes "deciding what a document contains, or which views belong in the dashboard. That \
+        composition is document-projection's and stays a decision; what changes is where the \
+        owner of each part comes from"
+    excludes "the read models' own content. `what-is-currently-true` still means what it means; \
+        this slice is about the attribution wrapped around it"
+    excludes "the identity PREFIX — `CAP.`, trimmed by string match in four engine call sites. \
+        It was cut here and belongs to TS.260823.04, which is about a field's form being the \
+        engine's secret; an identity FORMAT is that same question about the id. Carried here \
+        first, then moved: the gate refused picking both up together, and the reason was not a \
+        real coupling — it was this slice and that one claiming one outcome twice"
+    excludes "inventing an owner for a view that declares none. A view with no owner is a gap \
+        in the record and is reported as one — filling it in from the engine is exactly the \
+        fault being removed"
+
+    layer "doctrine"    reaches="`declare-a-lifetime` says a view names the capability that owns it, and why the composer may not supply one"
+    layer "enforcement" reaches="a composed part naming an owner the record does not hold is refused; no capability name is compiled into the engine"
+    layer "docs"        reaches="an adopter's dashboard names the adopter's capabilities, so `who owns this answer` is answerable in a repository that is not ours"
+
+    claim "C1" text="a composed part takes its owner from the read model's declared ownership" \
+        settled-by="a test composing a dashboard in a corpus whose capabilities are named differently, asserting the parts carry those names"
+    claim "C2" text="a part naming an owner the record does not hold is refused" \
+        settled-by="a test declaring a view owned by a capability nobody declared, asserting a refusal that names both"
+    claim "C3" text="no capability name appears as a literal in the engine" \
+        settled-by="a test over the engine's own source asserting no `CAP.`-prefixed literal remains, which is the only form of this check that cannot itself drift"
+
+    useful-alone "an adopter's dashboard stops reporting this repository's capabilities. Today \
+        every install of the tool carries seven capability names it did not ask for, and prints \
+        three of them as the owners of its own answers"
+
+    attacks "S7"
+
+    useful-to "the-adopter"
+
+    cut-from "the validation review of 2026-08-22, which composed a dashboard in a repository \
+        holding one capability and was told it was owned by three it did not have"
+
+    principle-note "the method is checked in this repository and RUN in others. A fault that is \
+        invisible where it is developed and unavoidable where it is used is the shape every \
+        self-applied method has to watch for, and A4 was written to catch exactly this"
+
+    proves "a composed document's attribution is derived from the record it was composed from"
+    does-not-prove "that the composition is the right one, or that the dashboard shows what a \
+        reader needs. It fixes who each part says it belongs to"
+}

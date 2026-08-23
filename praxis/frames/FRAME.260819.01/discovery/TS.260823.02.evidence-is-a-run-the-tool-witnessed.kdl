@@ -1,0 +1,100 @@
+// `attach-evidence` says it out loud: "It does not judge the evidence." So a claim settles on
+// a sentence, and a sentence is what the frame's S2 is ABOUT — an artifact looks identical
+// whether the agent reasoned hard or pattern-matched a template, and
+//
+//     evidence="46 tests pass; the rule fails closed on an undeclared layer"
+//
+// looks identical whether 46 tests pass or none exist. The validation review closed a slice
+// clean in a repository holding no application code at all.
+//
+// The no-paths rule is RIGHT and stays. `the-record-cites-what-it-holds` was learned from a
+// hundred and fifty-six dead pointers, and a path marked as provenance rots while looking
+// deliberate. But "a path rots" argues for something reproducible, not for prose — and prose
+// is a claim made by whoever produced the artifact, relocated into KDL.
+//
+// The third option is the one the record already uses for published documents: run it, and
+// hold what came back. `verify-published` diffs against the commit a release names and is
+// the best-grounded thing in this engine. This is that mechanism, arriving at the claim.
+//
+// The chain of evolution is the maturation, not a pointer: behaviour changes, the run is
+// re-witnessed, and `matured` holds what it was before.
+
+thin-slice "TS.260823.02" {
+    slug "evidence-is-a-run-the-tool-witnessed"
+    title "Settle a claim on a run the tool watched, not on a sentence about one"
+    kind "command"
+    realizes "CAP.claim-settlement"
+    from-storm "ES.260819.01"
+
+    command "evidence"
+    actor "whoever is working an iteration, at the moment a layer is reached"
+    produces-event "RunWitnessed" "RunRefused"
+    needs-read-model "what-this-iteration-claims-and-has-shown"
+
+    trigger "a claim is about to be marked met on the strength of a sentence the working agent wrote"
+    outcome "the claim carries a command the tool ran, the status it exited with, and a digest of what it printed"
+
+    scenario #"""
+        Given an iteration with a pending claim and a repository that declares how it verifies
+        When the working agent attaches evidence for that claim
+        Then praxis RUNS the named verification, records the command, the exit status and a
+             digest of its output, and refuses to mark the claim met if the run did not pass —
+             because the difference between having done the work and saying so is the whole
+             subject of this frame, and it is measurable exactly here.
+        """#
+
+    step "1" does="the config declares how this repository verifies — one entry point, named once, the way `paths` is named once. Without it the engine would have to guess a test runner, which is the engine encoding what the record declares"
+    step "2" does="`praxis evidence <iteration> --claim <id> --by <command>` runs it, in the repository, and captures exit status and an output digest into the claim"
+    step "3" does="a non-zero exit refuses. The claim stays pending and the refusal names the command and the status, so a failing run is a fact rather than an omission"
+    step "4" does="the digest is of the OUTPUT, not of a file. It survives a rename because it never names a location, and it cannot be written from memory because the agent does not know it until the run happens"
+    step "5" does="behaviour that evolves is re-witnessed. The new run is attached and `matured` holds what the claim settled on before — the latest is truth, and the chain back is the maturation rather than a pointer"
+
+    excludes "judging whether the verification is any good. A weak test that passes witnesses \
+        the run; whether it proves the behaviour is a review question, and the record has \
+        never claimed to answer it"
+    excludes "naming a file, a test function or a line. That is what `the-record-cites-what-it-holds` \
+        refuses and it is refused here too — what is held is a COMMAND and what came back, and \
+        a command that stops existing fails loudly on the next run instead of rotting quietly"
+    excludes "requiring a run per claim in a repository that declares no verification. Such a \
+        repository keeps prose evidence and the record SAYS so, so a reader can tell a witnessed \
+        claim from a reported one rather than having to assume"
+    excludes "re-running every claim at close. A witnessed run is a fact about a moment, and \
+        re-running the corpus is a CI concern that already exists"
+
+    layer "doctrine"    reaches="`attach-evidence` stops saying evidence is a sentence and says it is a run, with the prose fallback named as a fallback"
+    layer "enforcement" reaches="a claim marked met with no witnessed run in a repository that declares verification is refused; a non-zero exit refuses at attach time"
+    layer "docs"        reaches="`what settled this claim, and did anybody watch it` is answerable, and the answer distinguishes witnessed from reported"
+
+    claim "C1" text="attaching evidence runs the named command and records its exit status and output digest" \
+        settled-by="a test attaching evidence against a command that exits zero, asserting the claim holds the command, the status and a digest none of which the caller supplied"
+    claim "C2" text="a non-zero exit refuses and leaves the claim pending" \
+        settled-by="a test attaching a failing command and asserting the claim is unchanged and the refusal names the status"
+    claim "C3" text="a repository declaring no verification keeps prose evidence, and the record says the claim was reported rather than witnessed" \
+        settled-by="a test in a config with no verification entry point, asserting the claim settles and is marked as reported"
+    claim "C4" text="re-witnessing a claim records the previous run as matured rather than overwriting it" \
+        settled-by="a test attaching a second run to a settled claim and asserting both the new run and the superseded one are readable"
+
+    depends-on "TS.260821.18 — maturation is how the chain back is held, and it exists"
+
+    useful-alone "a claim stops being settleable by assertion. Today the strongest statement the \
+        record can make about a met claim is that somebody typed a sentence next to it, and the \
+        review reproduced a fully clean close over an empty repository"
+
+    attacks "S2"
+
+    useful-to "the-team-building-a-digital-product"
+
+    cut-from "the validation review of 2026-08-22, which closed an iteration with three evidenced \
+        layers and a met claim in a repository containing no application code, and the maintainer's \
+        correction that a record cannot hold an external reference but can hold a run"
+
+    principle-note "the record already runs something and holds what came back — `verify-published` \
+        does it against git. This is that same move made about a claim, and the gap between the two \
+        is the gap between a document that can prove it is unedited and a claim that cannot prove \
+        anything at all"
+
+    proves "the verification named by a settled claim was executed and passed at a stated moment"
+    does-not-prove "that the verification tests the behaviour the claim describes. It removes \
+        the ability to settle on nothing; choosing a run that proves the right thing stays the \
+        author's, and no checker can take it"
+}

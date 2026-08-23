@@ -1,0 +1,86 @@
+// The ask IS the permission — that was never in doubt, and this slice does not add a prompt.
+//
+// What it removes is the tool INVENTING who did the asking. `pick-up` runs
+// `git config user.email`, strips the domain, prefixes `human:`, and writes it into a
+// record that says `status "signed"`. Nothing was signed and nobody was asked by name.
+//
+// `close --attested-by` already argued this exactly right, in its own help text:
+//
+//     "An identity the tool supplied would prove the tool ran, which nobody doubted."
+//
+// That reasoning was applied to close by TS.260821.09 and never applied to pick-up, so the
+// gate at the START of an iteration is the one place in the method where the tool signs on
+// a human's behalf — and it is the gate every other rule assumes held.
+
+thin-slice "TS.260823.01" {
+    slug "the-admission-names-who-asked"
+    title "Stop the tool supplying the identity that admitted the work"
+    kind "command"
+    realizes "CAP.work-admission"
+    from-storm "ES.260819.01"
+
+    command "pick-up"
+    actor "whoever asks for a slice to be picked up"
+    produces-event "AdmissionAsked" "AdmissionWithoutAnAsker"
+    needs-read-model "what-is-ready-to-pick-up"
+
+    trigger "an agent runs `praxis pick-up` and the record gains a signed human approval nobody typed"
+    outcome "the admission names who asked, because they said so, and an admission with no asker opens nothing"
+
+    scenario #"""
+        Given a repository whose git identity is configured
+        When an agent runs `praxis pick-up` with no asker named
+        Then nothing opens and the refusal says an admission needs somebody to have asked —
+             because a git identity proves whose machine it is, which nobody doubted, and the
+             question the admission answers is who decided this work should start.
+        """#
+
+    step "1" does="`--asked-by` is required and has no default, exactly as `--attested-by` is on close. The two gates of an iteration stop disagreeing about whether the tool may name a person"
+    step "2" does="`status \"signed\"` becomes `status \"asked\"`. Nothing was signed — an ask is an ask, and the record calling it a signature is the overclaim, not the mechanism"
+    step "3" does="the git identity stops being read for this purpose. A value that is convenient and wrong is worse than an absent one, because it fills the field a reader would otherwise question"
+    step "4" does="`approval-signed-by-agent` keeps refusing an `agent:` namespace. It was never wrong — it was checking a string the tool itself wrote, and after this the string comes from outside"
+
+    excludes "adding an interactive prompt. The maintainer's position is that the ask through a \
+        prompt IS the permission, and a second confirmation inside the tool would be ceremony \
+        that proves the tool ran a second time"
+    excludes "verifying that the named asker is a real person, or that they authorised anything. \
+        The record holds who was named; it cannot hold whether they meant it, and pretending \
+        otherwise would repeat the fault this slice removes one level up"
+    excludes "the close side. `--attested-by` is already required with no default, and \
+        `an-attestation-is-not-self-issued` already reads it. This is the same rule arriving \
+        at the other end of the iteration, five slices late"
+
+    layer "doctrine"    reaches="`pick-up-a-slice` says the asker is named by whoever asks, and says why a git identity is not one"
+    layer "enforcement" reaches="pick-up with no `--asked-by` refuses and opens nothing; the written approval says `asked`, never `signed`"
+    layer "docs"        reaches="`who admitted this work, and on whose word` is answerable per iteration, and the answer is somebody's name rather than the tool's"
+
+    claim "C1" text="`praxis pick-up` with no `--asked-by` refuses and opens no iteration" \
+        settled-by="a test running pick-up without the flag and asserting no iteration file was written"
+    claim "C2" text="the written admission records `asked`, not `signed`, and names the asker given" \
+        settled-by="a test reading back the opened iteration and asserting the status and the asker match what was passed"
+    claim "C3" text="the git identity is never consulted for an admission" \
+        settled-by="a test running pick-up in a tree with a configured git identity and a different `--asked-by`, asserting the record holds the one that was passed"
+    claim "C4" text="an `agent:` asker is still refused" \
+        settled-by="a test passing an agent namespace and asserting the refusal names the namespace rather than the flag"
+
+    excludes "renaming the approval kind in the schema. `admission` stays what it is called; \
+        what changes is what its status claims"
+
+    useful-alone "the one human gate the whole method rests on stops being written by the agent \
+        it is meant to gate. Today an admission is indistinguishable from one the tool composed \
+        for itself, which is the frame's root cause with the method's own name on it"
+
+    attacks "S3"
+
+    useful-to "the-team-building-a-digital-product"
+
+    cut-from "the validation review of 2026-08-22, which reproduced the fault by running pick-up \
+        in a repository the maintainer had never opened and watching a human signature appear"
+
+    principle-note "fidelity is computed from the record, never claimed by whoever produced it. \
+        An identity the producer's own tool supplies is a claim wearing the shape of a computation"
+
+    proves "the identity in an admission came from outside the tool"
+    does-not-prove "that the named person asked, or agreed, or read the slice. It removes an \
+        invention; it does not add a witness, and no record can"
+}

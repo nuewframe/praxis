@@ -1,0 +1,81 @@
+// `praxis audit-surfaces` reports 55 of 55 anchored, and the number is true of the set it
+// looks at. That set is chosen by a glob in the engine:
+//
+//     skills/*/SKILL.md · instructions/*.instructions.md · agents/*.agent.md · scripts/check-*.sh
+//
+// Fifty-three further files ship as instruction and are outside it — every one of them under
+// `skills/provision-project-overlay/templates/`, which is the tree COPIED INTO an adopter's
+// repository. Eleven prompts, eleven instruction files, three agents, sixteen skills, a
+// verify script and a config template. They are not incidental: they are the largest body of
+// doctrine this plugin delivers to anybody who is not us, and the audit cannot see them.
+//
+// So the guarantee reads "every shipped surface is anchored" and means "every surface in the
+// four shapes the engine happens to glob is anchored." A denominator chosen by the thing being
+// measured is the trust-transfer problem with a percentage sign after it.
+
+thin-slice "TS.260823.05" {
+    slug "audit-what-actually-ships"
+    title "Count every file that reaches an agent, not the four shapes the engine globs"
+    kind "command"
+    realizes "CAP.delivery-record"
+    from-storm "ES.260819.01"
+
+    command "audit-surfaces"
+    actor "the maintainer asking how much of what this plugin ships the record can justify"
+    produces-event "SurfaceAnchored" "SurfaceUnanchored"
+    needs-read-model "what-this-plugin-ships"
+
+    trigger "the audit reports a complete number over an incomplete set"
+    outcome "the denominator is every file that reaches an agent as instruction, including the templates an overlay writes into somebody else's repository"
+
+    scenario #"""
+        Given a plugin that ships instruction both directly and as templates
+        When the surfaces are audited
+        Then the count covers both, and a template that lands in an adopter's repository is
+             anchored or reported like anything else — because a file becomes doctrine when an
+             agent reads it, and where it was read from is not the question.
+        """#
+
+    step "1" does="the shipped set is declared in the record rather than globbed in the engine. Which shapes count as instruction is a fact about this plugin, and A4 says the engine may not hold it"
+    step "2" does="a template counts. It is instruction with placeholders, read by an agent in a repository that trusted us to send it"
+    step "3" does="the number moves, sharply, and is reported honestly. An audit whose figure got worse because it started looking properly is the audit working"
+    step "4" does="a surface that is shipped and cannot be anchored is retired or removed, and `still_shipped` already names that case rather than counting it clean"
+
+    excludes "deciding what any of those files should SAY. That is TS.260823.06 and TS.260823.08; \
+        this slice makes them countable, which is what makes the other two finishable"
+    excludes "auditing generated output in an adopter's repository. What is audited is what this \
+        plugin ships, at the moment it ships it"
+    excludes "hooks and generators. `hooks/` wires and `scripts/gen-*` generates; neither tells \
+        an agent what to do, and the existing exclusion of them is correct"
+
+    layer "doctrine"    reaches="`anchor-a-doctrine-surface` says a template is a surface, and says why the copy destination does not change that"
+    layer "enforcement" reaches="the audit reads the shipped shapes from the record; templates are counted; the figure is whatever it is"
+    layer "harness"     reaches="what each of the six install paths actually delivers is inside the count for the first time"
+    layer "docs"        reaches="`how much of what we ship can the record justify` has an answer that does not depend on which glob was written"
+
+    claim "C1" text="the shapes that count as shipped instruction are read from the record, not globbed by the engine" \
+        settled-by="a test declaring an additional shape and asserting the audit counts it without an engine change"
+    claim "C2" text="a template under a skill is counted as a shipped surface" \
+        settled-by="a test over a skill carrying a template, asserting it appears in the audited set"
+    claim "C3" text="the reported total is the size of the audited set, and unanchored files are named individually" \
+        settled-by="a test asserting the count and the named list agree, so a summary can never be cleaner than its detail"
+
+    useful-alone "the plugin's headline honesty number stops being measured against a set that \
+        excludes its largest body of instruction. Today 55 of 55 is reported while 53 files of \
+        retired doctrine ship to every adopter unexamined"
+
+    attacks "S3"
+
+    useful-to "the-team-building-a-digital-product"
+
+    cut-from "the validation review of 2026-08-22, which read the engine's glob and counted what \
+        it could not see"
+
+    principle-note "an instrument that chooses its own denominator measures nothing. This is the \
+        same fault `praxis prove` was built to avoid — a rule never shown to refuse is \
+        indistinguishable from one that cannot — arriving at the audit beside it"
+
+    proves "the anchoring figure covers every file this plugin ships as instruction"
+    does-not-prove "that an anchored surface says anything correct. Anchoring traces a file to \
+        what asked for it; whether it still tells the truth is TS.260823.06's"
+}
