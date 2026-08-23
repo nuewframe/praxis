@@ -114,7 +114,8 @@ fn published(version: &str) -> ReadModel {
             .into_iter()
             .find(|d| d.file.contains("what-this-plugin-ships"))
             .expect("the view is declared publishable, so the publisher must have a composer")
-            .model,
+            .models
+            .remove(0),
         Publication::Refused(why) => panic!("publish refused: {why:?}"),
     }
 }

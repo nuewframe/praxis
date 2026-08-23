@@ -13,12 +13,26 @@
 use crate::admission::Corpus;
 use crate::view::{ReadModel, Section};
 
-/// One document to be written, and the result it depicts.
+/// One document to be written, and the results it depicts.
+///
+/// Several, because a release is ONE document read front to back rather than a set of
+/// sibling directories. A story's parts are models in declared order, and the renderer puts
+/// them under one heading each — so `where-to-start` opens with an index and every chapter
+/// after it carries its own view's question, verbatim (`TS.260821.14`).
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Document {
     /// Relative to the archival root — `docs/releases/<version>/<name>.md`.
     pub file: String,
-    pub model: ReadModel,
+    /// In the order they are read. A document that is not a story holds exactly one.
+    pub models: Vec<ReadModel>,
+}
+
+impl Document {
+    /// The document's own result — the first, which is the story's index when it has one.
+    /// Every document has at least one model; `publish` composes none without.
+    pub fn model(&self) -> &ReadModel {
+        &self.models[0]
+    }
 }
 
 /// Everything a publish would write, composed before anything is written.
@@ -64,32 +78,57 @@ pub fn publish(version: &str, corpus: &Corpus) -> Publication {
     // (TS.260820.12).
     let mut documents = Vec::new();
     let mut uncomposable = Vec::new();
+    // A view a story carries lands where the story lands. It is not published beside the
+    // story — that is the whole of TS.260821.14, and the reason it declares no
+    // `publishes-to` of its own.
+    let carried: Vec<String> = corpus
+        .views
+        .iter()
+        .flat_map(|v| v.parts.iter().map(|p| p.from.clone()))
+        .collect();
     for view in corpus.views.iter().filter(|v| v.publishable == Some(true)) {
+        if carried.contains(&view.name) {
+            continue;
+        }
         let Some(lands_at) = &view.publishes_to else {
             uncomposable.push(format!(
-                "{} is publishable and declares no `publishes-to`, so there is nowhere to put it",
+                "{} is publishable and declares no `publishes-to`, and no story carries it, so \
+                 there is nowhere to put it",
                 view.name
             ));
             continue;
         };
-        let model = match view.name.as_str() {
-            "the-published-set-for-a-release" => published_set(version, corpus),
-            "capabilities-and-what-they-own" => capabilities(version, corpus),
-            "the-decisions-that-shaped-this" => decisions(version, corpus),
-            "how-to-use-a-capability" => crate::guide::guides(version, corpus),
-            "what-this-plugin-ships" => shipped_doctrine(version, corpus),
-            "what-this-product-means" => concepts(version, corpus),
-            "how-it-fits-together" => architecture(version, corpus),
-            other => {
-                uncomposable.push(format!(
-                    "{other} is declared publishable and the engine has no composer for it. The \
-                     published set must equal the publishable declarations exactly, so this is a \
-                     refusal rather than a shorter set"
-                ));
-                continue;
-            }
+        let Some(model) = compose(&view.name, version, corpus) else {
+            uncomposable.push(format!(
+                "{} is declared publishable and the engine has no composer for it. The published \
+                 set must equal the publishable declarations exactly, so this is a refusal rather \
+                 than a shorter set",
+                view.name
+            ));
+            continue;
         };
-        documents.push(Document { file: landing(lands_at, version, &view.name), model });
+        // The story's chapters, composed in the order the record declares and never in the
+        // order they happen to sit in the storm. A part naming a view the engine cannot
+        // compose is a refusal, not a shorter document.
+        let mut models = vec![model];
+        for part in &view.parts {
+            match compose(&part.from, version, corpus) {
+                Some(chapter) => models.push(chapter),
+                None => uncomposable.push(format!(
+                    "{} is part {:?} of {} and the engine has no composer for it. A story with a \
+                     missing chapter is worse than none: it reads as complete",
+                    part.from, part.label, view.name
+                )),
+            }
+        }
+        // The glossary carries the words the STORY uses, and is narrowed only once there is
+        // a story to read. A release that never mentions a walkthrough does not owe its
+        // reader a definition of one — and the full vocabulary is `praxis schema --print`,
+        // which is a command rather than a release artifact.
+        if !view.parts.is_empty() {
+            narrow_glossary(&mut models);
+        }
+        documents.push(Document { file: landing(lands_at, version, &view.name), models });
     }
 
     if !uncomposable.is_empty() {
@@ -103,6 +142,73 @@ pub fn publish(version: &str, corpus: &Corpus) -> Publication {
     }
 
     Publication::Ready { version: version.to_owned(), documents }
+}
+
+/// Every view this engine can compose, by the name the record declares for it.
+///
+/// One table, shared by the published set and by a story's chapters — so a view cannot be
+/// composable as a document and missing as a chapter. `None` is the honest answer for a
+/// view the engine has no composer for, and both callers turn it into a refusal.
+///
+/// It is a match on a NAME and not on what a view means: every arm hands back the same
+/// type, and nothing downstream of here can tell them apart. That is `E10`'s falsifier
+/// still standing — the day one arm needs a different result type, the read-side split is
+/// fiction.
+pub fn compose(view: &str, version: &str, corpus: &Corpus) -> Option<ReadModel> {
+    Some(match view {
+        "the-published-set-for-a-release" => published_set(version, corpus),
+        "capabilities-and-what-they-own" => capabilities(version, corpus),
+        "the-decisions-that-shaped-this" => decisions(version, corpus),
+        "how-to-use-a-capability" => crate::guide::guides(version, corpus),
+        "what-this-plugin-ships" => shipped_doctrine(version, corpus),
+        "what-this-product-means" => concepts(version, corpus),
+        "how-it-fits-together" => architecture(version, corpus),
+        "where-to-start" => where_to_start(version, corpus),
+        _ => return None,
+    })
+}
+
+/// `where-to-start` — the index a release opens with.
+///
+/// A reader arrives with a reason. Seven sibling directories in alphabetical order ask them
+/// to already know the answer in order to find it, so this says what each part answers and
+/// who it is for — in the record's own words, never the engine's.
+///
+/// The question column is the view's own `answers`, copied and not paraphrased. A publisher
+/// that rewords its source is a second author, and the reader has no way to tell which of
+/// the two they are reading.
+fn where_to_start(version: &str, corpus: &Corpus) -> ReadModel {
+    let story = corpus.views.iter().find(|v| v.name == "where-to-start");
+    let parts = story.map(|s| s.parts.as_slice()).unwrap_or_default();
+
+    let mut index = Section::new("what is in here", &["", "it answers", "for"])
+        .empty_because("this story declares no part, so the release opens with nothing");
+    // A part whose view names no persona. Named, never dropped: a document nobody is for is
+    // one nobody will read, and hiding it from the index hides the fault with it.
+    let mut unaddressed = Section::new("addressed to nobody", &["part", "it answers"])
+        .empty_because("every part of this story names who it is for");
+
+    for part in parts {
+        let carried = corpus.views.iter().find(|v| v.name == part.from);
+        let answers = carried.map(|v| v.answers.clone()).unwrap_or_default();
+        let readers = carried.map(|v| v.needed_by.clone()).unwrap_or_default();
+        index.push(vec![
+            part.is.clone(),
+            answers.clone(),
+            if readers.is_empty() { "nobody named".to_owned() } else { readers.join(" · ") },
+        ]);
+        if readers.is_empty() {
+            unaddressed.push(vec![part.is.clone(), answers]);
+        }
+    }
+
+    let mut model = ReadModel::new(
+        "where-to-start",
+        "what is this, what can it do, and where do I begin?",
+        version,
+    );
+    model.publishable = true;
+    model.section(index).section(unaddressed)
 }
 
 /// `the-decisions-that-shaped-this` — what was decided, what the alternatives were, and
@@ -159,6 +265,80 @@ fn decisions(version: &str, corpus: &Corpus) -> ReadModel {
     );
     model.publishable = true;
     model.section(made).section(rejected).section(tested).section(amended)
+}
+
+/// Keep only the words the story says, in the order the record already put them in.
+///
+/// `TS.260821.14`/C4. The glossary was every kind the schema declares — twenty-seven of
+/// them for a story that names eight — and a reader looking up `walkthrough` after reading
+/// a release that never mentions one has been handed the schema instead of a document.
+///
+/// Read from the composed chapters rather than from the record, because what the STORY says
+/// is the question. The glossary's own rows are excluded from the reading: a definition
+/// mentioning a word is not the story using it, and counting it would keep every kind
+/// forever.
+fn narrow_glossary(models: &mut [ReadModel]) {
+    const GLOSSARY: &str = "what the words mean";
+
+    let mut said = String::new();
+    for model in models.iter() {
+        said.push_str(&model.answers);
+        said.push(' ');
+        for section in model.sections.iter().filter(|s| s.name != GLOSSARY) {
+            said.push_str(&section.name);
+            said.push(' ');
+            // Column headings are words the reader is shown, so they count. A ledger
+            // whose columns are `iteration` and `slice` has used both.
+            for column in &section.columns {
+                said.push_str(column);
+                said.push(' ');
+            }
+            for row in &section.rows {
+                for cell in row {
+                    said.push_str(cell);
+                    said.push(' ');
+                }
+            }
+        }
+        for (name, prose) in &model.defines {
+            said.push_str(name);
+            said.push(' ');
+            said.push_str(prose);
+            said.push(' ');
+        }
+    }
+    let said = said.to_lowercase();
+
+    for model in models.iter_mut() {
+        for section in model.sections.iter_mut().filter(|s| s.name == GLOSSARY) {
+            section.rows.retain(|row| row.first().is_some_and(|word| says(&said, word)));
+            section.empty_because = Some(
+                "this release's story uses none of the words the schema declares, which means                  either the story or the schema is about something else"
+                    .to_owned(),
+            );
+        }
+    }
+}
+
+/// Whether the story says this word.
+///
+/// Whole-word, so `frame` is not found inside `framework`. Three spellings of one kind, all
+/// of them written in this record: the hyphenated id, the words it is made of, and the last
+/// of those alone — a reader says *slice* and the schema says `thin-slice`, and a glossary
+/// that missed the word the story actually uses would be the definition of unhelpful.
+///
+/// It errs toward keeping. A definition nobody needed costs a row; a word used forty times
+/// and never defined is what this rule exists to prevent.
+fn says(said: &str, word: &str) -> bool {
+    let word = word.to_lowercase();
+    let boundary = |c: char| !c.is_alphanumeric() && c != '-' && c != '_';
+    let tail = word.rsplit('-').next().unwrap_or(&word).to_owned();
+    let spaced = word.replace('-', " ");
+    said.contains(&spaced)
+        || said.split(boundary).any(|token| {
+            let token = token.trim_end_matches('s');
+            token == word || token == tail
+        })
 }
 
 /// Where a view lands, from its own `publishes-to`. A path ending in `/` is a directory,

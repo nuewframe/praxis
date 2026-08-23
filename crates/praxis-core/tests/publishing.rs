@@ -93,7 +93,7 @@ fn c1_publishing_twice_produces_the_same_documents() {
     let second = ready(RECORD, "0.9.0");
     assert_eq!(first, second, "a publish an hour later is the same publish");
     assert!(
-        first.iter().all(|d| d.model.as_of == "0.9.0"),
+        first.iter().all(|d| d.model().as_of == "0.9.0"),
         "the `moment` of an archival result IS its version"
     );
 }
@@ -105,7 +105,7 @@ fn c1_composition_happens_before_any_write() {
     let documents = ready(RECORD, "0.9.0");
     assert_eq!(documents.len(), 2);
     for document in &documents {
-        assert!(document.model.flaws().is_empty(), "{:?}", document.model.flaws());
+        assert!(document.model().flaws().is_empty(), "{:?}", document.model().flaws());
     }
 }
 
@@ -117,7 +117,7 @@ fn c2_every_document_names_its_release_and_lands_under_that_version() {
             "under the release's own directory: {}",
             document.file
         );
-        assert!(document.model.publishable, "and declared archival");
+        assert!(document.model().publishable, "and declared archival");
     }
 }
 
@@ -154,7 +154,7 @@ fn c3_no_emitted_cell_contains_markup() {
     // The second half. WALK.260820.01/W2 found the first half passes even when the split
     // has become fiction, so both are required.
     for document in ready(RECORD, "0.9.0") {
-        for section in &document.model.sections {
+        for section in &document.model().sections {
             for row in &section.rows {
                 for cell in row {
                     assert!(
@@ -201,8 +201,8 @@ fn what_shipped_carries_the_findings_the_bound_work_left_owed() {
     let documents = ready(RECORD, "0.9.0");
     let shipped = documents
         .iter()
-        .find(|d| d.model.view == "the-published-set-for-a-release")
-        .map(|d| &d.model)
+        .find(|d| d.model().view == "the-published-set-for-a-release")
+        .map(|d| d.model())
         .expect("the release notes");
     // A release that hides its shortfalls is the artifact this frame distrusts, so a
     // carried finding reaches the reader — by id in the row, with what it SAYS defined
@@ -221,9 +221,9 @@ fn an_empty_section_in_a_published_document_still_says_why() {
     let documents = ready(RECORD, "0.9.0");
     let resolved = documents
         .iter()
-        .find(|d| d.model.view == "the-published-set-for-a-release")
+        .find(|d| d.model().view == "the-published-set-for-a-release")
         .expect("the release notes")
-        .model
+        .model()
         .sections
         .iter()
         .find(|s| s.name == "problems this version attacked")

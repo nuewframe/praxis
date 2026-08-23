@@ -368,25 +368,25 @@ pub fn prop(node: &KdlNode, key: &str) -> Option<String> {
         .map(str::to_owned)
 }
 
-/// Every value of a repeated property. KDL allows `one-of="a" "b"`, which arrives as
-/// one named entry followed by positional ones, so the positional tail is collected too.
-fn all_props(node: &KdlNode, key: &str) -> Vec<String> {
-    let entries = node.entries();
-    let Some(start) = entries
-        .iter()
-        .position(|e| e.name().is_some_and(|n| n.value() == key))
-    else {
-        return Vec::new();
-    };
+/// Every value of a repeated property, in two spellings the record uses interchangeably.
+///
+/// `one-of="a" "b"` arrives as one named entry followed by positional ones, so a positional
+/// tail belongs to the key before it. `needed-by="a" needed-by="b"` repeats the key. Both
+/// are written in this record and reading only the first spelling silently drops half of
+/// what a node says — which is how `needed-by` named two personas and answered for one.
+pub fn all_props(node: &KdlNode, key: &str) -> Vec<String> {
     let mut out = Vec::new();
-    if let Some(first) = entries[start].value().as_string() {
-        out.push(first.to_owned());
-    }
-    for entry in &entries[start + 1..] {
-        if entry.name().is_some() {
-            break;
+    let mut collecting = false;
+    for entry in node.entries() {
+        match entry.name() {
+            Some(name) => collecting = name.value() == key,
+            // A positional entry belongs to the last named one.
+            None if !collecting => continue,
+            None => {}
         }
-        if let Some(value) = entry.value().as_string() {
+        if collecting
+            && let Some(value) = entry.value().as_string()
+        {
             out.push(value.to_owned());
         }
     }

@@ -144,7 +144,7 @@ retired, not left where an agent will read it.
 | | `document-usage` | Write how a capability is used while building it, into the capability record — and a guide for behaviour a version never shipped is refused |
 | **CLOSE** | `close-an-iteration` | Close without dropping scope in silence — a shortfall is carried by a finding that names the claim, and deleting a claim to make the close succeed is itself refused |
 | **SHIP** | `bind-work-to-a-version` | Attach closed iterations to a version so its content is derived rather than hand-kept — only closed work binds, once, and the bump is proposed from configured rules |
-| | `declare-a-lifetime` | Decide whether a read model survives being frozen and record why — the publication test, refused in both directions without a reason |
+| | `declare-a-lifetime` | Decide whether a read model survives being frozen, who it is for, and where it lands — the publication test, a release published as one story, and `praxis view` for what the release does not carry |
 | | `publish-the-release-set` | Regenerate every published document whole for one version, before the cut — no splice path, no wall-clock stamp, and no renderer branch on what a view means |
 | | `cut-the-version` | Cut a planned version and write its index node in one operation — the index points at a commit rather than copying it, and the seal makes a later edit visible |
 | | `verify-the-published-tree` | Prove no published document was hand-edited — compared against the commit its release names, never against the record it is meant to outlive |
@@ -198,6 +198,12 @@ Two honest numbers, both printed by the tool rather than asserted here:
 
 Probes live in `scripts/` — wire them into the project's `verify` entry point. Rationale in
 `docs/product.md`.
+
+**A release is one document.** `docs/releases/<version>/README.md`, read front to back: why this
+exists, what it can do, how to start, what changed. The engineering views — the decisions, the
+architecture, the shipped-doctrine inventory — are **not published**, and are not less true for it:
+`praxis view <name>` composes any of them from the record, for the tree in front of you rather than
+for one frozen version.
 
 ---
 

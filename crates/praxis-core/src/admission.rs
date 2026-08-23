@@ -235,8 +235,28 @@ pub struct View {
     /// perishability is a property of the question, not of the file type.
     pub publishable: Option<bool>,
     pub because: Option<String>,
-    /// Where under the release directory it lands. Required of a publishable view.
+    /// Where under the release directory it lands. Required of a publishable view unless
+    /// a story names it as a part, in which case it lands where the story lands.
     pub publishes_to: Option<String>,
+    /// Who this view is for, by persona. Declared on every read model since the storm was
+    /// written and read by no projection until `TS.260821.14` — which is how a release
+    /// directory came to sort its documents alphabetically for a reader who arrived with
+    /// a reason.
+    pub needed_by: Vec<String>,
+    /// The story this view tells, in order, when it is one. Each part names the view whose
+    /// content it carries; the story is the document and the parts are its chapters.
+    pub parts: Vec<Part>,
+}
+
+/// One chapter of a story, and the view it carries.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Part {
+    /// The label the record gives it — an ordinal, or anything else that orders.
+    pub label: String,
+    /// What this part is, in the story's words rather than the view's.
+    pub is: String,
+    /// The view whose content it carries.
+    pub from: String,
 }
 
 /// A permanent doing the system must have, and the cluster it was derived from.
@@ -515,6 +535,16 @@ impl Corpus {
                                         .and_then(|v| v.as_bool()),
                                     because: prop(child, "because"),
                                     publishes_to: prop(child, "publishes-to"),
+                                    needed_by: crate::schema::all_props(child, "needed-by"),
+                                    parts: child
+                                        .iter_children()
+                                        .filter(|p| p.name().value() == "part")
+                                        .map(|p| Part {
+                                            label: string_arg(p).unwrap_or_default(),
+                                            is: prop(p, "is").unwrap_or_default(),
+                                            from: prop(p, "from").unwrap_or_default(),
+                                        })
+                                        .collect(),
                                 });
                             }
                         }
@@ -599,15 +629,89 @@ impl Corpus {
             }
         }
         corpus.slices.sort_by(|a, b| a.id.cmp(&b.id));
-        corpus.vocabulary = schema
-            .kinds()
-            .filter_map(|kind| {
-                schema.entity(kind).and_then(|s| s.is.clone()).map(|is| (kind.to_owned(), is))
-            })
-            .collect();
+        corpus.vocabulary = vocabulary_in_dependency_order(schema);
         corpus
     }
 
+}
+
+/// The declared kinds, each with what it IS, ordered so nothing is defined before the words
+/// it is defined in terms of.
+///
+/// `TS.260821.14`/C4. Two edges, and they run opposite ways for a reason:
+///
+/// - a kind that **holds** another comes first — a container introduces what it contains,
+///   which is how a reader meets `symptom` inside `frame` rather than out of nowhere;
+/// - a kind another **references** comes first — you cannot read `realizes "CAP.x"` until
+///   you know what a capability is.
+///
+/// Together they put `frame` before `symptom` before `thin-slice` before `iteration`, which
+/// is the order somebody learns them in. Cycles are real in this graph and are not an
+/// error: a kind this cannot place keeps its declared position, so the worst case is the
+/// order the schema was written in.
+fn vocabulary_in_dependency_order(schema: &Schema) -> Vec<(String, String)> {
+    let kinds: Vec<String> = schema.kinds().map(str::to_owned).collect();
+    let mut needs: Vec<(String, Vec<String>)> = Vec::new();
+    for kind in &kinds {
+        let Some(spec) = schema.entity(kind) else { continue };
+        let mut before: Vec<String> = Vec::new();
+        for field in &spec.fields {
+            // `references` points across the graph: the target has to be known first.
+            if let Some(target) = &field.references {
+                for one in target.split_whitespace() {
+                    if kinds.iter().any(|k| k == one) && !before.contains(&one.to_owned()) {
+                        before.push(one.to_owned());
+                    }
+                }
+            }
+        }
+        needs.push((kind.clone(), before));
+    }
+    // `holds` runs the other way: the HOLDER is introduced first, so what it contains
+    // depends on it rather than the reverse.
+    for kind in &kinds {
+        let Some(spec) = schema.entity(kind) else { continue };
+        for field in &spec.fields {
+            let Some(held) = &field.holds else { continue };
+            if let Some(slot) = needs.iter_mut().find(|(k, _)| k == held)
+                && !slot.1.contains(kind)
+            {
+                slot.1.push(kind.clone());
+            }
+        }
+    }
+
+    let mut placed: Vec<String> = Vec::new();
+    // One pass per kind is enough to settle any acyclic chain, and a cycle stops moving
+    // rather than looping: the pass that places nothing new is the last one.
+    for _ in 0..kinds.len() {
+        let before = placed.len();
+        for (kind, needed) in &needs {
+            if placed.contains(kind) {
+                continue;
+            }
+            if needed.iter().all(|n| placed.contains(n) || !kinds.iter().any(|k| k == n)) {
+                placed.push(kind.clone());
+            }
+        }
+        if placed.len() == before {
+            break;
+        }
+    }
+    // Whatever a cycle left behind, in the order the schema declares it.
+    for kind in &kinds {
+        if !placed.contains(kind) {
+            placed.push(kind.clone());
+        }
+    }
+
+    placed
+        .into_iter()
+        .filter_map(|kind| schema.entity(&kind).and_then(|s| s.is.clone()).map(|is| (kind, is)))
+        .collect()
+}
+
+impl Corpus {
     pub fn slice(&self, id: &str) -> Option<&Slice> {
         self.slices.iter().find(|s| s.id == id)
     }

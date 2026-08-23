@@ -1,0 +1,201 @@
+// Opened by `praxis pick-up`. Every condition below was evaluated against the
+// tree as it stood at 2026-08-23T03:38:25Z, and the verdicts are recorded
+// rather than summarised: a gate whose reasoning is not on the record is a gate
+// you have to trust.
+
+iteration "ITER.260823.05" {
+    slug "a-front-door-per-reader"
+    on-slice "TS.260821.14"
+    state "closed"
+    opened-at "2026-08-23T03:38:25Z"
+    opened-by "agent:praxis"
+
+    approval "admission" {
+        status "signed"
+        signer "human:wael"
+        at "2026-08-23T03:38:25Z"
+        signed-by "the ask to pick up this slice"
+    }
+
+    vet "create" state="done" at="2026-08-23T03:38:25Z" on-slice="TS.260821.14" {
+        condition "slice-is-shaped" verdict="passed"
+        condition "dependencies-delivered" verdict="passed"
+        condition "no-iteration-in-flight" verdict="passed"
+        condition "nothing-left-to-admit" verdict="passed"
+        condition "work-is-disjoint" verdict="not-computed" \
+            found="no seam manifest exists, so what two iterations would touch cannot be compared. Disjointness is half of what this capability says it judges, and half of what it judges is currently not computed at all"
+        condition "the-slice-is-the-best-available" verdict="left-to-the-maintainer"
+    }
+
+    // 2 of the declared conditions were not decided by the gate. They are
+    // recorded above rather than omitted: an admission that does not say what
+    // it left undecided claims more than it checked.
+
+    // Frozen at open, from the slices. Removing one from a slice now
+    // does not remove it from here — it makes the two disagree, and that is
+    // refused.
+    claim "C1" from-slice="TS.260821.14" state="met" \
+        evidence="a release is one document in the order the record declares — one file, four \
+            models, in the story's order and not the alphabet, and reversing the parts in the \
+            record reverses the document. A story with a chapter the engine cannot compose is \
+            refused, because a story with a hole in it reads as complete"
+    claim "C2" from-slice="TS.260821.14" state="met" \
+        evidence="the index quotes each view's own question, asserted equal to the declared \
+            `answers` for all three parts. Copied, never paraphrased: a publisher that rewords its \
+            source is a second author and a reader cannot tell which of the two they are reading"
+    claim "C3" from-slice="TS.260821.14" state="met" \
+        evidence="a view for nobody is reported and named in the index — the checker reports it \
+            under a-published-view-names-its-reader, the story lists it under `addressed to \
+            nobody`, and the index row says `nobody named` rather than dropping it. Both go quiet \
+            when a reader is named"
+    claim "C4" from-slice="TS.260821.14" state="met" \
+        evidence="the glossary carries the story's words in dependency order — `frame` before \
+            `thin-slice` before `iteration` over the whole vocabulary, the published glossary a \
+            subset of that order, and `walkthrough` absent because the story never says it. \
+            Eighteen words where there were twenty-seven"
+    claim "C5" from-slice="TS.260821.14" state="met" \
+        evidence="the engineering views are answerable and unpublished — none of the three is in \
+            the published set, each still declares its lifetime with a reason and a `matured` \
+            entry naming what taught it, and each still composes from the corpus. \
+            `praxis view <name>` is what reaches them"
+
+    layer "doctrine"    state="evidenced" \
+        evidence="surface.skill.declare-a-lifetime gains three sections — who a view is for, a \
+            release as one story with its parts, and what `publishable=#false` does NOT mean. The \
+            router says a release is one document and names the command that reaches the rest" \
+        reaches="declaring a read model includes declaring who needs it, and that declaration now decides where it lands"
+    layer "enforcement" state="evidenced" \
+        evidence="a-published-view-names-its-reader reports, witnessed; \
+            publish-only-what-survives-freezing now asks where a publishable view LANDS rather \
+            than whether it wrote a path, so a carried view needs none and an uncarried one still \
+            does. Seven tests" \
+        reaches="a publishable view with no `needed-by` is reported, because a document nobody is for is one nobody will read"
+    layer "docs"        state="evidenced" \
+        evidence="the 0.8.0 release is one file. Seven sibling directories removed, and what a \
+            reader meets first is an index saying what each part answers and who it is for — in \
+            the record's own words" \
+        reaches="the release directory answers `where do I start` before it answers anything else"
+    layer-set sealed=#true at="2026-08-23T03:38:25Z"
+
+    phase "design-ux" state="complete" required-by="docs" worked-by="agent:product-designer" \
+        produced="the reading order — why this exists, what it can do, how to start, what changed \
+            — and the index that names each part's question and its reader. A reader who stops \
+            after part one has the answer they came for"
+
+    phase "design-system" state="complete" worked-by="agent:principal-engineer" {
+        approach "`publishes-to` decides the file, and a story's parts declare none" {
+            over "flipping the four reader-facing views to `publishable=#false` so only the story \
+                is published"
+            because "`publishable` is a LIFETIME — whether the answer survives being frozen — and \
+                all four of those answers do. Saying `#false` to mean `not its own file` would put \
+                two unrelated facts in one field, and the next reader could not tell which one a \
+                declaration was about"
+            note "so the lifetime rule changed from `a publishable view wrote a path` to `a \
+                publishable view LANDS somewhere`. A story saying where its parts go is an answer \
+                to the same question"
+        }
+
+        approach "a document holds several results, and the renderer nests them" {
+            over "one flat result whose sections are every part's sections concatenated"
+            because "flat, the index entries point at nothing — there is no heading for `what it \
+                can do`, only the three section headings underneath it. The reader is back to \
+                scanning. Nesting costs one field on `Document` and gives every part a heading its \
+                own index row can name"
+            note "the renderer still branches on nothing. It knows a chapter comes after the one \
+                before it and that its headings sit one level deeper, which is ordering rather \
+                than interpretation — E10's falsifier under more load than before, not less"
+        }
+
+        approach "the glossary is narrowed by what the story SAYS, after the story is composed" {
+            over "narrowing by a list of words declared in the record"
+            over "leaving the full vocabulary, and tiering it by audience"
+            because "a declared list is a second copy of what the document contains, and it goes \
+                stale the first time a composer changes. Reading the composed chapters asks the \
+                only question that matters — does this release use this word — and it cannot \
+                disagree with the document it ships beside"
+            note "it errs toward keeping, and deliberately. A definition nobody needed costs a \
+                row; a word used forty times and never defined is the fault being fixed. Three \
+                spellings of every kind are matched, because a reader says `slice` and the schema \
+                says `thin-slice`"
+        }
+
+        approach "unpublished stays answerable, through a command" {
+            over "flipping the three engineering views and stopping there"
+            because "`it lives in the record` is a claim, and a claim with nothing behind it is \
+                what this frame exists to distrust. `praxis view` composes any declared read model \
+                on demand, so the three that left the release directory are reachable in one \
+                command — and answered for the tree in front of you rather than for one frozen \
+                version, which is the better answer to the question they were asked"
+        }
+    }
+
+    phase "implement" state="complete" required-by="enforcement · docs" \
+        worked-by="agent:principal-engineer" {
+        followed "`publishes-to` decides the file, and a story's parts declare none"
+        followed "a document holds several results, and the renderer nests them"
+        followed "the glossary is narrowed by what the story SAYS, after the story is composed"
+        followed "unpublished stays answerable, through a command"
+    }
+    phase "learn" state="complete" required-by="always" worked-by="agent:principal-engineer" \
+        produced="three findings. One is that nothing removes a document the publisher no longer \
+            writes, so seven stale files had to be deleted by hand and every check stayed green"
+    phase "teach" state="complete" required-by="doctrine" worked-by="agent:principal-engineer" \
+        taught="the-reader-of-a-release" \
+        produced="the release itself. A reader opening 0.8.0 now meets an index saying what each \
+            part answers and who it is for, where they used to meet seven directories in \
+            alphabetical order — and declare-a-lifetime teaches the agent how that is declared"
+
+    finding "BF1" state="open" size="frame-sized" \
+        text="nothing removes a published document the publisher no longer writes. Flipping three \
+            views to `publishable=#false` and folding four into a story left seven files in the \
+            release directory that no declaration asks for, and `praxis check`, \
+            `praxis publish` and the whole test suite stayed green. They were deleted by hand" \
+        obliges="publish knows exactly what it writes, so what is in the release directory and not \
+            in that set is computable. Either it removes them or it reports them — silence is the \
+            one answer that leaves a reader holding a document the record disowned" \
+        note="the same class as a-declared-surface-ships, which refuses a retired surface whose \
+            file is still in the tree. The published set has no equivalent, and it is the half of \
+            `regenerate whole` nobody wrote: whole means the SET, not each file in it"
+
+    finding "BF2" state="open" size="observation" \
+        text="`needed-by` was written two ways in one storm — a named property and a bare \
+            positional argument after it — and `all_props` read only the first spelling. Four \
+            views named two personas each and would have answered for one" \
+        obliges="the record should say a repeated fact one way. `attacks=\"S2\" \"S7\"` is still \
+            written in the second spelling and nothing objects" \
+        note="caught by writing the reader, not by anything checking. The two spellings are both \
+            valid KDL and both read as intentional, which is what makes it the quiet kind of \
+            fault — the reader that fixed it now accepts both, so the record can go on \
+            disagreeing with itself"
+
+    finding "BF3" state="open" size="observation" \
+        text="`where-to-start` composes an index over its parts, and nothing checks that a part \
+            names a view the record declares. A part naming an undeclared view produces an index \
+            row with an empty question and `nobody named` beside it, which reads as a view that \
+            forgot its reader rather than one that does not exist" \
+        obliges="`part.from` should reference `read-model` the way every other edge in this record \
+            does, so dangling-relationship refuses it" \
+        note="the publish refuses it a moment later — the engine has no composer for a view \
+            nobody declared — so the failure is caught. What is wrong is WHERE: the index is \
+            composed first and says something false about the record before the refusal lands"
+    closed-at "2026-08-23T03:39:42Z"
+    outcome "continue"
+
+    close {
+        claims-settled "C1" how="met"
+        claims-settled "C2" how="met"
+        claims-settled "C3" how="met"
+        claims-settled "C4" how="met"
+        claims-settled "C5" how="met"
+        all-met #true
+        attested-by "human:waelrabadi"
+        note "the accounting above was computed at close, not asserted. It says every claim is either met or carried by a finding that names it, and nothing about whether the work is any good"
+    }
+
+    trail {
+        entry at="2026-08-23T03:39:42Z" by="agent:praxis" action="state-changed" from="open" to="closed" note="closed by `praxis close`. The accounting was computed; the conclusion is not the machine's to draw"
+
+        entry at="2026-08-23T03:38:25Z" by="agent:praxis" action="created" \
+            note="opened by the gate, on the ask of human:wael"
+    }
+}

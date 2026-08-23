@@ -331,7 +331,7 @@ event-storm "ES.260819.01" {
         answers="what must the system be able to do, and which events does each keep consistent?" \
         publishable=#true \
         because="what the system could do at 0.8.0 is exactly what a reader pinned to 0.8.0 needs, and it does not decay — it becomes history" \
-        publishes-to="docs/releases/<version>/capabilities/"
+        note="no `publishes-to` of its own. It is part two of `where-to-start`, and lands where the story lands (TS.260821.14)"
 
     read-model "what-is-ready-to-pick-up" needed-by="the-next-agent" before="pick-up" \
         answers="which slices could be started right now, and what would refuse each of them?" \
@@ -355,42 +355,79 @@ event-storm "ES.260819.01" {
         attacks="S6" \
         publishable=#true \
         because="it is the archival record by construction — a release note is useful only frozen" \
-        publishes-to="docs/releases/<version>/release-notes.md"
+        note="no `publishes-to` of its own. It is part four of `where-to-start`, and lands where the story lands (TS.260821.14)"
+
+    // ---- The one document a release IS. Declared by TS.260821.14.
+    // ----
+    // ---- Seven sibling directories, alphabetical, no index — so a reader who wants outcomes
+    // ---- opened `architecture/` because it sorted first. The root cause was an ordering
+    // ---- error in how the documents were built: what the record could COMPUTE was published,
+    // ---- and who it was for was asked afterwards.
+
+    read-model "where-to-start" needed-by="the-reader-of-a-release" \
+        answers="what is this, what can it do, and where do I begin?" \
+        attacks="S6" \
+        publishable=#true \
+        because="it IS the release. A reader arrives with a reason and a release directory that \
+            asks them to already know the answer in order to find it has failed before they read \
+            a word" \
+        publishes-to="docs/releases/<version>/README.md" \
+        composes=#true \
+        content-owned-by="CAP.document-projection" {
+
+        // The order is the argument, and it is declared HERE rather than inferred from where
+        // the parts sit in this file. A reader who stops after part one has the answer they
+        // came for. `from` names the view whose content the part carries — the part does not
+        // restate it, and the index quotes that view's own `answers` verbatim.
+        part "1" is="why this exists"       from="what-this-product-means"
+        part "2" is="what it can do"        from="capabilities-and-what-they-own"
+        part "3" is="how to start"          from="how-to-use-a-capability"
+        part "4" is="what changed"          from="the-published-set-for-a-release"
+    }
 
     // ---- Found by applying the publication test. Both are published by Praxis today and
     // ---- neither appeared anywhere in this storm.
 
-    read-model "what-this-product-means" needed-by="the-reader-of-a-release" "the-next-agent"\
+    read-model "what-this-product-means" needed-by="the-reader-of-a-release" needed-by="the-next-agent"\
         answers="what problem does this exist for, and what does every word mean?" \
         attacks="S7" \
         publishable=#true \
         because="a reader who does not know what a slice IS cannot use a changelog about slices, \
             and the sentences are already written — the frame states its own problem and \
             principle, and the schema says what each kind is" \
-        publishes-to="docs/releases/<version>/concepts/" \
         content-owned-by="CAP.delivery-record" \
+        note="no `publishes-to` of its own. It is part one of `where-to-start`, and lands where the story lands (TS.260821.14)" \
         note="the glossary is generated from whatever the schema declares, so a kind an adopting \
             project adds appears in ITS release without the publisher being touched"
 
-    read-model "how-it-fits-together" needed-by="the-reader-of-a-release" "the-next-agent"\
+    read-model "how-it-fits-together" needed-by="the-reader-of-a-release" needed-by="the-next-agent"\
         answers="what does each part do, what does it refuse to do, and what does it keep true?" \
         attacks="S7" \
-        publishable=#true \
-        because="`not` and `keeps-consistent` are the sharpest things a capability record says and \
-            the published set has never carried either. A description that omits what a thing \
-            cannot do is the artifact this frame distrusts" \
-        publishes-to="docs/releases/<version>/architecture/" \
-        content-owned-by="CAP.delivery-record" "CAP.document-projection"
-
-    read-model "what-this-plugin-ships" needed-by="the-reader-of-a-release" "the-adopter"\
+        publishable=#false \
+        because="`not` and `keeps-consistent` are the sharpest things a capability record says, \
+            and a reader of a release did not come for them. Frozen at a version they are also \
+            the wrong answer: how the tool is built NOW is what anybody asking this wants, and \
+            the record has it. `praxis view how-it-fits-together` composes it on demand" \
+        content-owned-by="CAP.delivery-record" "CAP.document-projection" {
+        matured "publishable" {
+            from "#true, published as its own document in every release"
+            to "#false"
+            at "2026-08-23"
+            because "a release directory of seven siblings, four of them about how the tool is \
+                built, asks a reader to already know the answer in order to find it. This is not \
+                less true in the record — it is answerable there at any moment, which is better \
+                than frozen at one"
+            taught-by "TS.260821.14"
+        }
+    }
+    read-model "what-this-plugin-ships" needed-by="the-reader-of-a-release" needed-by="the-adopter"\
         answers="what doctrine did this version ship, what asked for each piece, and which guarantees fail closed?" \
         attacks="S6" \
-        publishable=#true \
+        publishable=#false \
         because="an adopter decides whether to install a version, and an existing adopter decides \
-            whether to upgrade. Both questions are about a VERSION, and every answer available \
-            before TS.260821.07 described the working tree — which is a different question wearing \
-            the same words" \
-        publishes-to="docs/releases/<version>/doctrine/" \
+            whether to upgrade — and both of them have the repository, where this is answerable \
+            for the tree in front of them rather than for one frozen version. \
+            `praxis view what-this-plugin-ships` composes the same document from the record" \
         composes=#true \
         content-owned-by="CAP.delivery-record" "CAP.conformance-probes" \
         note="composite, and the second one matters: delivery-record holds what ships and what \
@@ -398,26 +435,45 @@ event-storm "ES.260819.01" {
             guarantee. Which release shipped a surface is DERIVED — serves names a slice, an \
             iteration covers that slice, that iteration bound to a release. Storing a version on \
             the surface would be a second copy of a fact the record already holds, and the first \
-            thing to go stale"
-
-    read-model "the-decisions-that-shaped-this" needed-by="the-reader-of-a-release" "the-next-agent"\
+            thing to go stale" {
+        matured "publishable" {
+            from "#true, published as its own document in every release"
+            to "#false"
+            at "2026-08-23"
+            because "an inventory of what the plugin ships is engineering, and a release \
+                directory is what a reader opens. It stops being published and stays answerable"
+            taught-by "TS.260821.14"
+        }
+    }
+    read-model "the-decisions-that-shaped-this" needed-by="the-reader-of-a-release" needed-by="the-next-agent"\
         answers="what was decided, what were the alternatives, and what tested it?" \
         attacks="S2" "S7" \
-        publishable=#true \
-        because="a decision is frozen by nature. Reading it later is the entire point of writing it" \
-        publishes-to="docs/releases/<version>/decisions/" \
+        publishable=#false \
+        because="a decision is frozen by nature, and the RECORD is where it is frozen — an \
+            accepted decision is sealed and append-only, which is a stronger guarantee than a \
+            copy in a release directory. A reader of a release did not come for the decision log; \
+            `praxis view the-decisions-that-shaped-this` answers it for whoever did" \
         composes=#true \
         content-owned-by="CAP.claim-settlement" "CAP.delivery-record" \
         note="composite. claim-settlement carries the decision, its amendments and the findings \
             that tested it; delivery-record carries the discovery options that were rejected. \
-            Together they are what an ADR has always been"
-
+            Together they are what an ADR has always been" {
+        matured "publishable" {
+            from "#true, published as its own document in every release"
+            to "#false"
+            at "2026-08-23"
+            because "the seal already freezes it, so publishing was a second copy of a fact the \
+                record holds better. What was lost is a reader stumbling on it, and no reader of \
+                a release was ever looking for it"
+            taught-by "TS.260821.14"
+        }
+    }
     read-model "how-to-use-a-capability" needed-by="the-reader-of-a-release"\
         answers="how do I use what this version can do?" \
         publishable=#true \
         because="someone pinned to 0.8.0 needs 0.8.0's guide, not the current one" \
-        publishes-to="docs/releases/<version>/guides/" \
-        content-owned-by="CAP.delivery-record"
+        content-owned-by="CAP.delivery-record" \
+        note="no `publishes-to` of its own. It is part three of `where-to-start`, and lands where the story lands (TS.260821.14)"
 
     // ================================================================
     // CLUSTERS — events grouped by what must stay consistent together.

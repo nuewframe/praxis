@@ -107,9 +107,10 @@ fn published(view: &str) -> ReadModel {
     match publish("0.1.0", &corpus) {
         Publication::Ready { documents, .. } => documents
             .into_iter()
-            .find(|d| d.model.view == view)
+            .find(|d| d.model().view == view)
             .unwrap_or_else(|| panic!("{view} is declared publishable"))
-            .model,
+            .models
+            .remove(0),
         Publication::Refused(why) => panic!("publish refused: {why:?}"),
     }
 }

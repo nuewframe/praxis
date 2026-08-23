@@ -41,7 +41,7 @@ pub use prove::{
     NO_WITNESS, Proof, WITNESS_REFUSED_NOTHING, WITNESS_UNPARSEABLE, prove, unwitnessed,
 };
 pub use promote::{Change, Promotion, Shipped, derive, promote, undeclared_promotions};
-pub use publish::{Document, Publication, publish};
+pub use publish::{Document, Publication, compose as compose_view, publish};
 pub use schema::{Cardinality, EntitySpec, FieldSpec, Rule, Schema};
 pub use review::review;
 pub use truth::what_is_currently_true;

@@ -57,7 +57,7 @@ field naming a file, and `evidence` is where it used to happen most:
 |---|---|
 | `evidence="tests/evidence_layers.rs::c1_evidence_naming_an_undeclared_layer_is_refused"` | `evidence="evidence naming an undeclared layer is refused"` |
 | `evidence="skills/attach-evidence/SKILL.md, registered"` | `evidence="surface.skill.attach-evidence, registered"` |
-| `evidence="docs/releases/0.8.0/guides/how-to-use-a-capability.md"` | `evidence="the 0.8.0 capability guide"` |
+| `evidence=` naming a published Markdown file by path | `evidence="the 0.8.0 capability guide"` |
 
 The rename that breaks the first column is invisible: the claim goes on reading as settled while
 pointing at nothing. The second column survives it, and says what the test proved rather than

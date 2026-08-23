@@ -973,6 +973,24 @@ method "delivery-graph" {
                 the count is zero on arrival — the same order TS.260821.04 had to use, and the \
                 reason AV1 carried rather than being forced"
 
+        rule "a-published-view-names-its-reader"     reports="a publishable view naming no persona it is for" \
+            because="`needed-by` has been on every read model since the storm was written and no \
+                projection ever read it. So seven documents were published in alphabetical order, \
+                four of them about how the tool is built, and a reader who wanted outcomes opened \
+                the architecture because it sorted first. A document nobody is for is one nobody \
+                will read" \
+            found-by="TS.260821.14, from the maintainer reading the published set as two personas \
+                — and finding the record had already answered the question" \
+            note="reported, and NAMED. A view with no reader is left in the story's index under \
+                `addressed to nobody`, because hiding it from the reader hides the fault with it" \
+            witness=#"""
+                event-storm "ES.witness-unaddressed" {
+                    read-model "a-view-for-nobody" answers="what does this answer?" \
+                        publishable=#true because="it is frozen by nature" \
+                        publishes-to="docs/releases/<version>/a.md"
+                }
+                """#
+
         rule "work-follows-the-declared-sequence"    reports="work at a declared step while an earlier step the strategy declares is satisfied by nothing" \
             because="a strategy carries no falsifier because it is an ORDERING, and that argument \
                 only holds if the ordering is checked. It was declared with six steps and nothing \

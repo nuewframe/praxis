@@ -191,9 +191,9 @@ fn the_published_concepts_open_with_why() {
     };
     let model = &documents
         .iter()
-        .find(|d| d.model.view == "what-this-product-means")
+        .find(|d| d.model().view == "what-this-product-means")
         .expect("the concepts")
-        .model;
+        .model();
 
     assert_eq!(
         model.sections.first().map(|s| s.name.as_str()),

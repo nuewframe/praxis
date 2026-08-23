@@ -188,7 +188,7 @@ fn c4_findings_that_tested_a_decision_are_reachable_from_it() {
     let Publication::Ready { documents, .. } = publish("0.9.0", &corpus_of(RECORDED)) else {
         panic!("expected a publication")
     };
-    let model = &documents.iter().find(|d| d.model.view == "the-decisions-that-shaped-this").expect("the decisions document").model;
+    let model = &documents.iter().find(|d| d.model().view == "the-decisions-that-shaped-this").expect("the decisions document").model();
     let tested = model.sections.iter().find(|s| s.name == "what tested it").expect("a section");
     assert_eq!(tested.rows.len(), 1);
     assert_eq!(tested.rows[0], vec!["the machine does half", "F1", "ITER.1"]);
@@ -207,7 +207,7 @@ fn the_alternatives_appear_in_the_published_document() {
     let Publication::Ready { documents, .. } = publish("0.9.0", &corpus_of(RECORDED)) else {
         panic!("expected a publication")
     };
-    let model = &documents.iter().find(|d| d.model.view == "the-decisions-that-shaped-this").expect("a document").model;
+    let model = &documents.iter().find(|d| d.model().view == "the-decisions-that-shaped-this").expect("a document").model();
     let rejected = model.sections.iter().find(|s| s.name == "what it rejected").expect("a section");
     assert_eq!(rejected.rows[0][1], "all of it, as a formality");
     assert!(model.flaws().is_empty(), "{:?}", model.flaws());

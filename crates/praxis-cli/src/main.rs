@@ -157,6 +157,23 @@ enum Command {
         #[arg(default_value = "praxis")]
         root: PathBuf,
     },
+    /// Compose one declared read model from the record, now.
+    ///
+    /// The answer to "it lives in the record" for a view a release does not publish. The
+    /// decisions, the architecture and the doctrine inventory stopped being published at
+    /// `TS.260821.14` — they are engineering, and a reader of a release did not come for
+    /// them. This is where whoever DID come for them asks, and gets the answer for the
+    /// tree in front of them rather than for one frozen version.
+    View {
+        /// The read model to compose, by the name the record declares for it.
+        name: String,
+        /// Compose it as it would look for this version, rather than for now.
+        #[arg(long)]
+        at: Option<String>,
+        /// The state root to read.
+        #[arg(long, default_value = "praxis")]
+        root: PathBuf,
+    },
     /// Where the product stands right now. Composed on demand, never committed.
     Dashboard {
         /// The state root to read.
@@ -418,6 +435,14 @@ fn main() -> ExitCode {
                 }
             }
         }
+        Command::View { name, at, root } => match viewing(&name, at.as_deref(), &root) {
+            Ok(true) => ExitCode::SUCCESS,
+            Ok(false) => ExitCode::FAILURE,
+            Err(report) => {
+                eprintln!("{report:?}");
+                ExitCode::FAILURE
+            }
+        },
         Command::Dashboard { root } => match dashboarding(&root) {
             Ok(()) => ExitCode::SUCCESS,
             Err(report) => {
@@ -926,16 +951,24 @@ fn publishing(version: &str, root: &Path, dry_run: bool) -> miette::Result<bool>
             // and nothing outside this release's directory is touched.
             let mut rendered = Vec::new();
             for document in &documents {
-                let flaws = document.model.flaws();
-                if !flaws.is_empty() {
-                    for flaw in &flaws {
-                        eprintln!("praxis: read-model@v1 violated in {} — {flaw}", document.file);
+                // Every chapter, not only the document's own result. A story whose index
+                // satisfies the seam and whose fourth part does not is a document that
+                // passes on its cover.
+                for model in &document.models {
+                    let flaws = model.flaws();
+                    if !flaws.is_empty() {
+                        for flaw in &flaws {
+                            eprintln!(
+                                "praxis: read-model@v1 violated in {} ({}) — {flaw}",
+                                document.file, model.view
+                            );
+                        }
+                        miette::bail!("nothing published: a result does not satisfy read-model@v1");
                     }
-                    miette::bail!("nothing published: a result does not satisfy read-model@v1");
                 }
                 rendered.push((
                     PathBuf::from(&document.file),
-                    render::render_markdown(&document.model, version),
+                    render::render_story(&document.models, version),
                 ));
             }
 
@@ -1275,6 +1308,62 @@ fn guiding(capability: &str, version: &str, root: &Path) -> miette::Result<()> {
 
 /// `TS.260820.13`. One document from several read models, each still singly owned, thrown
 /// away after reading. There is no path under the archival root anywhere in this function.
+/// `praxis view` — one declared read model, composed from the record now.
+///
+/// It refuses a name the record does not declare rather than composing it anyway: a view
+/// nobody declared is a question nobody agreed was worth answering, and answering it here
+/// would put the decision in the engine.
+fn viewing(name: &str, at: Option<&str>, root: &Path) -> miette::Result<bool> {
+    let sources = load(root)?;
+    let docs: Vec<_> = sources.iter().map(|(_, _, d)| d.clone()).collect();
+    let (schema, _) = governing(docs.iter());
+    let corpus = Corpus::from_documents(&docs, &schema);
+
+    let Some(view) = corpus.views.iter().find(|v| v.name == name) else {
+        let declared: Vec<&str> = corpus.views.iter().map(|v| v.name.as_str()).collect();
+        eprintln!(
+            "praxis: `{name}` is no read model this record declares. It holds {}",
+            declared.join(" · ")
+        );
+        return Ok(false);
+    };
+
+    // The version a composer needs. A view that depicts a release wants one; a view about
+    // the tree does not, and the moment is what it says instead.
+    let version = at.map(str::to_owned).unwrap_or_else(|| {
+        corpus
+            .releases
+            .iter()
+            .rev()
+            .find(|r| r.cut())
+            .map(|r| r.version.clone())
+            .unwrap_or_else(|| "unreleased".to_owned())
+    });
+
+    let Some(mut model) = praxis_core::compose_view(&view.name, &version, &corpus) else {
+        eprintln!(
+            "praxis: `{name}` is declared and this engine has no composer for it — the record \
+             asks a question the tool cannot yet answer"
+        );
+        return Ok(false);
+    };
+    // Composed on demand, so it says WHEN rather than which version — even for a view that
+    // was archival until this release stopped publishing it. A result that claims to depict
+    // a version it was not frozen at is the second copy this whole frame distrusts.
+    model.publishable = false;
+    model.as_of = now();
+
+    let flaws = model.flaws();
+    if !flaws.is_empty() {
+        for flaw in &flaws {
+            eprintln!("praxis: read-model@v1 violated in {name} — {flaw}");
+        }
+        miette::bail!("the view does not satisfy read-model@v1");
+    }
+    print!("{}", render::render(&model));
+    Ok(true)
+}
+
 fn dashboarding(root: &Path) -> miette::Result<()> {
     let sources = load(root)?;
     let docs: Vec<_> = sources.iter().map(|(_, _, d)| d.clone()).collect();

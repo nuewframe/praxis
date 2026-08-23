@@ -115,6 +115,10 @@ pub enum Refusal {
     OutOfSequence { step: String, wants: Vec<String>, occupied: String, by: String },
     /// A step naming a kind the schema does not declare — a step nothing can ever satisfy.
     StepNamesNoKind { step: String, kind: String },
+    /// A publishable view naming no persona it is for. Reported: `needed-by` was declared
+    /// on every view and read by nothing, which is how a release came to sort its
+    /// documents alphabetically for a reader who arrived with a reason.
+    ViewForNobody { view: String },
 }
 
 impl Refusal {
@@ -177,6 +181,7 @@ impl Refusal {
             Self::OutOfSequence { .. } | Self::StepNamesNoKind { .. } => {
                 "work-follows-the-declared-sequence"
             }
+            Self::ViewForNobody { .. } => "a-published-view-names-its-reader",
         }
     }
 
@@ -218,6 +223,7 @@ impl Refusal {
             Self::UnjustifiedLifetime { missing, .. } => missing,
             Self::UnfollowableCitation { field, .. } => field,
             Self::OutOfSequence { .. } | Self::StepNamesNoKind { .. } => "satisfied-by",
+            Self::ViewForNobody { .. } => "needed-by",
         }
     }
 
@@ -250,6 +256,9 @@ impl Refusal {
             // the walk-back every enforcement in this frame has had to make.
             | Self::OutOfSequence { .. }
             | Self::StepNamesNoKind { .. }
+            // Reported and NAMED. The story's index carries it under `addressed to
+            // nobody`, because hiding the view hides the fault with it.
+            | Self::ViewForNobody { .. }
             | Self::UnevidencedLayer { .. } => Severity::Report,
             _ => Severity::Refuse,
         }
@@ -364,6 +373,12 @@ impl Refusal {
                  still reading as settled. State WHAT was shown; the repository already knows \
                  where it lives. To point at something, point at an id — the record holds those, \
                  and a dangling one is refused"
+            ),
+            Self::ViewForNobody { view } => format!(
+                "{view} is published and names no persona it is for. `needed-by` decides where a \
+                 view lands and whether it belongs in the story at all — a document nobody is for \
+                 is one nobody will read, and it goes out under `addressed to nobody` rather than \
+                 quietly"
             ),
             Self::OutOfSequence { step, wants, occupied, by } => format!(
                 "step {step:?} is satisfied by nothing, and step {occupied:?} is already occupied \
@@ -872,11 +887,46 @@ pub fn check_corpus_given(
 
     // `publish-only-what-survives-freezing`, if the record declares it. Membership of the
     // published set comes from these declarations and from nothing else.
-    if schema.declares_rule("publish-only-what-survives-freezing") {
+    let reader_rule = schema.declares_rule("a-published-view-names-its-reader");
+    let lifetime_rule = schema.declares_rule("publish-only-what-survives-freezing");
+    if lifetime_rule || reader_rule {
+        // A view a STORY carries lands where the story lands, so it needs no
+        // `publishes-to` of its own. Collected over the whole corpus first: the story and
+        // the part it names are siblings in the storm, and either may be written first.
+        let mut carried: Vec<String> = Vec::new();
+        for doc in docs {
+            for storm in doc.nodes().iter().filter(|n| n.name().value() == "event-storm") {
+                for view in children_named(storm, "read-model") {
+                    for part in children_named(view, "part") {
+                        if let Some(from) = prop(part, "from") {
+                            carried.push(from);
+                        }
+                    }
+                }
+            }
+        }
         for doc in docs {
             for storm in doc.nodes().iter().filter(|n| n.name().value() == "event-storm") {
                 for view in children_named(storm, "read-model") {
                     let Some(name) = string_arg(view) else { continue };
+                    // A published view that names nobody. Separate from the lifetime match
+                    // and reported alongside it: a view can be both unjustified and
+                    // unaddressed, and telling somebody only the first wastes the second
+                    // trip.
+                    if reader_rule
+                        && view.get("publishable").and_then(|v| v.as_bool()) == Some(true)
+                        && crate::schema::all_props(view, "needed-by").is_empty()
+                    {
+                        out.push(Violation {
+                            entity_kind: "read-model".to_owned(),
+                            entity_id: Some(name.clone()),
+                            refusal: Refusal::ViewForNobody { view: name.clone() },
+                            span: view.span(),
+                        });
+                    }
+                    if !lifetime_rule {
+                        continue;
+                    }
                     match view.get("publishable").and_then(|v| v.as_bool()) {
                         None => out.push(Violation {
                             entity_kind: "read-model".to_owned(),
@@ -885,9 +935,11 @@ pub fn check_corpus_given(
                             span: view.span(),
                         }),
                         Some(true) => {
-                            for (field, missing) in
-                                [("because", "because"), ("publishes-to", "publishes-to")]
-                            {
+                            let mut wanted = vec![("because", "because")];
+                            if !carried.contains(&name) {
+                                wanted.push(("publishes-to", "publishes-to"));
+                            }
+                            for (field, missing) in wanted {
                                 if prop(view, field).is_none() {
                                     out.push(Violation {
                                         entity_kind: "read-model".to_owned(),
