@@ -309,6 +309,43 @@ enum Command {
         #[arg(default_value = "praxis")]
         root: PathBuf,
     },
+    /// Put a repository under the method: a binding, a verify entry point, and the
+    /// engineering doctrine that survived the spine's retirement.
+    ///
+    /// Writes a CONFIG and nothing else about your product. The frame, the storm, the
+    /// capabilities and the slices are yours — deriving them from what the repository
+    /// already claims would import those claims without their evidence, which is the
+    /// longest argument `adopt-the-method` makes.
+    Adopt {
+        /// The repository this record is about, as `owner/name`. Required, and deliberately
+        /// without a default: a git remote names whose machine this is and knows nothing
+        /// about what the record is about.
+        #[arg(long)]
+        repository: String,
+        /// Where to write. Defaults to here.
+        #[arg(long, default_value = ".")]
+        into: PathBuf,
+        /// Where this repository's capabilities live.
+        #[arg(long, default_value = "src/")]
+        source_root: String,
+        /// The primary language, for the overlay's one project-specific paragraph.
+        #[arg(long, default_value = "unstated")]
+        language: String,
+        /// What `praxis evidence` runs to settle a claim. Left as a shell no-op when unset,
+        /// never guessed: a generated step that runs the wrong tool fails for a reason the
+        /// adopter did not cause, and the first thing they do is delete it.
+        #[arg(long)]
+        test: Option<String>,
+        #[arg(long)]
+        lint: Option<String>,
+        #[arg(long)]
+        format: Option<String>,
+        #[arg(long)]
+        typecheck: Option<String>,
+        /// Say what would be written and write nothing.
+        #[arg(long)]
+        dry_run: bool,
+    },
 }
 
 /// A refusal, rendered. The span points at the offending node so the reader is told
@@ -576,7 +613,130 @@ fn main() -> ExitCode {
                 ExitCode::FAILURE
             }
         },
+        Command::Adopt {
+            repository,
+            into,
+            source_root,
+            language,
+            test,
+            lint,
+            format,
+            typecheck,
+            dry_run,
+        } => {
+            let (_, method) = Schema::method();
+            let mut binding = praxis_core::adopt::Binding::new(&repository, &method);
+            binding.source_root = source_root;
+            binding.language = language;
+            if let Some(test) = test {
+                binding.runner.clone_from(&test);
+                binding.test = test;
+            }
+            if let Some(lint) = lint {
+                binding.lint = lint;
+            }
+            if let Some(format) = format {
+                binding.format = format;
+            }
+            if let Some(typecheck) = typecheck {
+                binding.typecheck = typecheck;
+            }
+            match adopting(&binding, &into, dry_run) {
+                Ok(()) => ExitCode::SUCCESS,
+                Err(report) => {
+                    eprintln!("{report:?}");
+                    ExitCode::FAILURE
+                }
+            }
+        }
     }
+}
+
+/// `TS.260823.08`. Write the binding, the gate, and the doctrine — and nothing else.
+///
+/// Every refusal is recorded as an outcome and named. A front door that half-wrote and
+/// stopped would leave a repository that reads as adopted and is not, which is the class of
+/// fault this slice exists to close.
+fn adopting(
+    binding: &praxis_core::adopt::Binding,
+    into: &Path,
+    dry_run: bool,
+) -> miette::Result<()> {
+    // A dry run never refuses on an existing binding. It writes nothing, and the reason to
+    // run one in an already-adopted repository is exactly to see what the current templates
+    // would produce — which is how an adopter diffs a plugin upgrade against their tree.
+    let bound = !dry_run && into.join("praxis/config.kdl").exists();
+    let written = praxis_core::adopt::adopt(binding, bound)
+        .map_err(|refused| miette::miette!("{}", refused.message()))?;
+
+    for file in &written {
+        let left = praxis_core::adopt::unresolved(&file.content);
+        if !left.is_empty() {
+            miette::bail!(
+                "{} would ship with {} unresolved: a file that reads as configured and is not \
+                 is worse than one that is obviously blank",
+                file.path,
+                left.join(", ")
+            );
+        }
+    }
+
+    if dry_run {
+        for file in &written {
+            println!("praxis: would write {} ({} bytes)", file.path, file.content.len());
+        }
+        println!(
+            "praxis: and nothing else. No frame, no storm, no capability — `praxis view \
+             what-you-must-declare` names the seven kinds you write next"
+        );
+        return Ok(());
+    }
+
+    for file in &written {
+        let target = into.join(&file.path);
+        if let Some(parent) = target.parent() {
+            fs::create_dir_all(parent)
+                .map_err(|e| miette::miette!("cannot create {}: {e}", parent.display()))?;
+        }
+        fs::write(&target, &file.content)
+            .map_err(|e| miette::miette!("cannot write {}: {e}", target.display()))?;
+        if file.executable {
+            executable(&target)?;
+        }
+        println!("praxis: wrote {}", file.path);
+    }
+
+    // The state root, empty. A directory with nothing in it is the honest starting state:
+    // `praxis check` passes over it, and every kind that belongs there is one the adopter
+    // has not needed yet.
+    fs::create_dir_all(into.join("praxis/frames"))
+        .map_err(|e| miette::miette!("cannot create the state root: {e}"))?;
+
+    println!(
+        "praxis: {} is bound to {}. Nothing else was written — the frame, the storm and the \
+         capabilities are yours, and deriving them from what this repository already claims \
+         would import those claims without their evidence",
+        binding.repository, binding.method
+    );
+    println!("praxis: next — `praxis check`, then `praxis view what-you-must-declare`");
+    Ok(())
+}
+
+/// Mark a generated script executable, where the platform has such a thing.
+fn executable(path: &Path) -> miette::Result<()> {
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::PermissionsExt;
+        let mut perms = fs::metadata(path)
+            .map_err(|e| miette::miette!("cannot read {}: {e}", path.display()))?
+            .permissions();
+        perms.set_mode(0o755);
+        fs::set_permissions(path, perms)
+            .map_err(|e| miette::miette!("cannot chmod {}: {e}", path.display()))?;
+    }
+    #[cfg(not(unix))]
+    let _ = path;
+    Ok(())
 }
 
 /// `TS.260823.02` — settle a claim on a run, and hold what came back.
@@ -1680,6 +1840,19 @@ fn collect_matching(dir: &Path, root: &Path, pattern: &str, out: &mut Vec<String
     }
 }
 
+/// What every shipped instruction file SAYS, as `(path, contents)`.
+///
+/// `TS.260823.06`. The core reasons about the words and never reads them: which files ship
+/// is already a fact the shell hands in, and what they contain is the same kind of fact one
+/// level in. A file that cannot be read is omitted rather than reported — the audit above
+/// already found it, and a second complaint about the same file names one fault twice.
+fn shipped_text(root: &Path, shipped: &[String]) -> Vec<(String, String)> {
+    shipped
+        .iter()
+        .filter_map(|path| Some((path.clone(), fs::read_to_string(root.join(path)).ok()?)))
+        .collect()
+}
+
 /// The shipped files whose ANCHORING a named slice owes, as `(path, slice)`.
 fn owed_anchors(root: &Path, docs: &[kdl::KdlDocument]) -> Vec<(String, String)> {
     let mut out = Vec::new();
@@ -2361,8 +2534,10 @@ fn check(root: &Path) -> miette::Result<usize> {
     // What the tree holds, for the rules the record alone cannot decide (TS.260821.03).
     // The shapes come from the record here too. A repository that declares none audits
     // nothing rather than falling back to a set the engine chose (`TS.260823.05`).
+    let shipped = shipped_doctrine(Path::new("."), &praxis_core::surface::declared_shapes(&docs));
     let facts = Facts {
-        shipped: shipped_doctrine(Path::new("."), &praxis_core::surface::declared_shapes(&docs)),
+        text: shipped_text(Path::new("."), &shipped),
+        shipped,
         owed: owed_anchors(Path::new("."), &docs),
     };
     let corpus = check_corpus_given(&docs, &schema, &facts);

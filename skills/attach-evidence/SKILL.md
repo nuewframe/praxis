@@ -51,7 +51,7 @@ layer "enforcement" state="evidenced" \
 ## Settle it on a run, not on a sentence
 
 ```
-praxis evidence <ITERATION> --claim <ID> [--slice <TS-ID>] [--by <selector>]
+praxis evidence <ITERATION> --claim <ID> [--slice <SLICE>] [--by <selector>]
 ```
 
 **Praxis runs your verification and records what came back** — the command, the exit status,

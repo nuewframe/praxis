@@ -100,14 +100,13 @@ config {
     // ====================================================================
     ships-doctrine {
         from "skills"       named="*SKILL.md"
-        from "skills"       named="*.tmpl" owed-to="TS.260823.08" \
-            note="the overlay templates — fifty-three files an adopter receives, outside every \
-                audit until now. COUNTED and REPORTED, not refused, because anchoring them is \
-                not what should happen to them: every one teaches waves and sprints, and \
-                TS.260823.08 retires or rewrites the lot. Anchoring doctrine that is about to \
-                be deleted would be work done to make a number green. `owed-to` names who \
-                owes the disposal, so the debt is in the record and in every audit run rather \
-                than in somebody's head — and when that slice lands, this line goes with it"
+        from "skills"       named="*.tmpl" \
+            note="the templates an adopter receives. Fifty-three of them were outside every \
+                audit until TS.260823.05 widened the shape, and the debt was DECLARED here \
+                rather than exempted: `owed-to=\"TS.260823.08\"` named who owed the disposal, \
+                and every run printed all fifty-one until that slice landed. It has. Fifty-one \
+                were retired with the overlay that emitted them and four remain, each anchored \
+                by name — so the shape stays and the debt beside it does not"
         from "skills"       named="*EXAMPLE.md"
         from "instructions" named="*.instructions.md"
         from "agents"       named="*.agent.md"

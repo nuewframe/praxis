@@ -36,6 +36,7 @@ fn violations(record: &str, shipped: &[&str]) -> Vec<praxis_core::Violation> {
         // No debt in these fixtures: `owed` is the case where the record NAMES who owes a
         // file's disposal, and every surface here is either anchored or genuinely orphaned.
         owed: Vec::new(),
+        text: Vec::new(),
     };
     check_corpus_given(&[schema_doc, record_doc], &schema, &facts)
 }
@@ -286,6 +287,7 @@ doctrine-surface "surface.kept" {
             "skills/orphan/SKILL.md".to_owned(),
         ],
         owed: vec![("skills/going/templates/thing.tmpl".to_owned(), "TS.999999.01".to_owned())],
+        text: Vec::new(),
     };
     let found = check_corpus_given(&[schema_doc.clone(), doc], &schema, &facts);
 

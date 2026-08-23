@@ -36,10 +36,9 @@
 # Exit codes:
 #   0 — always. This probe never fails the build, regardless of how many
 #       markers it finds, whether it's run outside a git repo, or whether
-#       the diff is empty. Unlike check-anti-dumping.sh and
-#       check-sprint-id-collision.sh (which do fail / increment a FAILED
-#       counter when wired into verify.sh), this script's job is to make
-#       escape-hatch usage visible, not to block on it.
+#       the diff is empty. Unlike check-anti-dumping.sh (which does fail /
+#       increment a FAILED counter when wired into verify.sh), this script's
+#       job is to make escape-hatch usage visible, not to block on it.
 #
 # Dependencies: bash 3.2+ (macOS default), git.
 

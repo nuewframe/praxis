@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+# .githooks/pre-commit — written by `praxis adopt`.
+#
+# Activate with: git config core.hooksPath .githooks
+#
+# Deliberately NOT the full verify run. A pre-commit hook people disable is worse than one
+# that checks less, so this is the cheap half: the record has to hold, and the structure has
+# to be capability-shaped. Everything slow lives in `scripts/verify.sh`.
+
+set -eu
+
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+cd "$REPO_ROOT"
+
+echo "pre-commit: the record"
+praxis check
+
+echo "pre-commit: structure"
+bash scripts/check-anti-dumping.sh
+
+echo "pre-commit: ok"

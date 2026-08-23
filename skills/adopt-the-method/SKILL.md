@@ -1,10 +1,11 @@
 ---
 name: adopt-the-method
 description: >
-  Put a repository under the delivery graph without copying it. Teaches what the method carries,
-  what a repository may add, what it may never redefine, and how the vocabulary reaches a project
-  through two carriers. Runs when a project first installs Praxis, or when a repository needs a
-  kind the method does not name.
+  The one front door. Put a repository under the delivery graph without copying it — `praxis adopt`
+  writes the binding, a verify entry point naming only probes that ship, a pre-commit hook and one
+  engineering-doctrine pointer, and nothing about the product. Teaches what the method carries, what
+  a repository may add, what it may never redefine, and why nothing else was written for you. Runs
+  when a project first installs Praxis, and on every new kind after that.
 user-invocable: true
 disable-model-invocation: false
 tools: [read_file, file_search, grep_search, replace_string_in_file, run_in_terminal]
@@ -15,10 +16,54 @@ tools: [read_file, file_search, grep_search, replace_string_in_file, run_in_term
 **Audience:** A repository that is not Praxis. **When:** on install, and on every new kind.
 
 ```
-praxis schema           what governs this repository
-praxis schema --print   the method's record, whole
-praxis check            with nothing copied
+praxis adopt --repository <owner>/<name>   put this repository under the method
+praxis check                               with nothing copied
+praxis view what-you-must-declare          the seven kinds you write next
+praxis schema --print                      the method's record, whole
 ```
+
+---
+
+## Run this first
+
+```console
+$ praxis adopt --repository acme/checkout \
+      --language typescript --test "npm test" --lint "eslint ." --format "prettier --check ."
+```
+
+Four files, and that is the whole of it:
+
+| File | What it is |
+|---|---|
+| `praxis/config.kdl` | the binding. `governed-by`, the layer vocabulary your slices may declare, how this repository verifies, where things live |
+| `scripts/verify.sh` | the gate. Its probe steps are **generated from the record of what this plugin ships**, so it cannot name one that is absent |
+| `.githooks/pre-commit` | the cheap half of that gate. Activate with `git config core.hooksPath .githooks` |
+| `.github/instructions/capability-structure.instructions.md` | the engineering doctrine, as a **pointer** to the plugin's skills plus the handful of facts true of your stack |
+
+Then `praxis check` passes, over a record that holds a binding and nothing else. That is the
+correct starting state, and `praxis view what-you-must-declare` names what comes next.
+
+`praxis adopt --dry-run` prints what the current templates would produce without writing. Run
+it after a plugin upgrade and diff it against your tree.
+
+**There was no greenfield/brownfield split, and the two skills that made one are retired.**
+`bootstrap-project` and `provision-project-overlay` scaffolded a wave directory (retired), a
+sprint placeholder (retired), fifty-one overlay templates, and a `verify.sh` calling two
+probes this plugin does not ship — one of them described in its own comment as hard-fail with no warn mode. Neither
+named the delivery graph once. The split was never the useful axis: what a repository needs on
+arrival is the same whether or not it already has code, and what differs is everything below,
+which is judgement rather than scaffolding.
+
+### What adoption will not do
+
+**It does not write your record.** No frame, no storm, no capability, no slice. Adoption
+produces the binding and the shape; the rest is the work, and a tool that derived it from what
+your repository already claims would import those claims without their evidence. The longest
+section of this skill is about exactly that.
+
+It also **will not migrate a repository already running the retired spine.** If you have wave
+and sprint documents from `v0.7.1`, those artifacts no longer map, and what to do with them is
+a separate question with its own evidence. Adopt beside them and let the record catch up.
 
 ---
 

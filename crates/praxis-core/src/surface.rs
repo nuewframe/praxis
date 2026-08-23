@@ -174,3 +174,71 @@ fn shapes_with(docs: &[kdl::KdlDocument], requiring: Option<&str>) -> Vec<(Strin
     }
     out
 }
+
+/// One line of shipped doctrine that instructs an agent in a word the method retired.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Teaching {
+    pub path: String,
+    /// 1-indexed, because the reader of a refusal opens the file at it.
+    pub line: usize,
+    pub word: String,
+    pub instead: Option<String>,
+}
+
+/// Every line of `text` that names a retired word without saying it was retired.
+///
+/// `TS.260823.06`. The unit is the LINE, and that is the whole distinction the rule can
+/// draw: a line that names a retired kind and does not say it was retired is an
+/// instruction, and a line that names it beside a retirement marker is an explanation. A
+/// surface must be able to explain what changed — a rule that refused every mention would
+/// make the history unwritable, and an agent reading a method with a silent hole in its past
+/// will fill the hole.
+///
+/// The markers come from the record, never from here. Which words mark an explanation is a
+/// fact about a method's prose, and A4 forbids the engine holding one.
+///
+/// One report per line, not per occurrence: a line saying "create a sprint, then close the
+/// sprint" is one thing to fix.
+#[must_use]
+pub fn teaching(path: &str, text: &str, words: &[&crate::schema::RetiredWord], markers: &[String]) -> Vec<Teaching> {
+    let mut out = Vec::new();
+    for (n, line) in text.lines().enumerate() {
+        let lowered = line.to_lowercase();
+        if markers.iter().any(|m| lowered.contains(m.as_str())) {
+            continue;
+        }
+        // Tokenised once per line, not once per word. Doing it inside the `find` made the
+        // scan quadratic in the retired vocabulary and re-allocated every token for every
+        // word — `praxis check` went from under a second to over two minutes across a
+        // hundred and seven files.
+        let tokens = tokens(&lowered);
+        if let Some(word) = words.iter().find(|w| tokens.iter().any(|t| w.matches(t))) {
+            out.push(Teaching {
+                path: path.to_owned(),
+                line: n + 1,
+                word: word.word.clone(),
+                instead: word.instead.clone(),
+            });
+        }
+    }
+    out
+}
+
+/// The words of a line, hyphenated compounds counted both whole and in parts.
+///
+/// `wave-based` has to yield `wave` — it is the exact phrase five manifests carry — and
+/// `TS-041` has to survive whole, because `TS-` is the head of an id form rather than a
+/// word. Splitting on the hyphen loses the second; keeping it loses the first; so both.
+fn tokens(lowered: &str) -> Vec<String> {
+    let mut out = Vec::new();
+    for raw in lowered.split(|c: char| !c.is_alphanumeric() && c != '-') {
+        if raw.is_empty() {
+            continue;
+        }
+        out.push(raw.to_owned());
+        if raw.contains('-') {
+            out.extend(raw.split('-').filter(|p| !p.is_empty()).map(str::to_owned));
+        }
+    }
+    out
+}

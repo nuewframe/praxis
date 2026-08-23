@@ -87,13 +87,13 @@ If you find yourself asserting the **same property** at two layers, delete the h
 
 ## Property over example at high-risk seams
 
-An example test proves the behavior holds for *one* input. At a high-risk seam that is not enough — the failure modes that matter (a retry that double-charges, two writers that interleave, a key that collides) live in the inputs you did not hand-pick. For an acceptance criterion that is **high-risk** (Impact = High in the sprint risk register) **and** exercises a seam, assert a **property**, not a single example:
+An example test proves the behavior holds for *one* input. At a high-risk seam that is not enough — the failure modes that matter (a retry that double-charges, two writers that interleave, a key that collides) live in the inputs you did not hand-pick. For an acceptance criterion that is **high-risk** (Impact = High in the iteration's recorded risks) **and** exercises a seam, assert a **property**, not a single example:
 
 - **Idempotency ∀ keys** — for any key, replaying the operation returns the stored response and causes no second effect.
 - **Retry-safe ∀ attempts** — for any number of retries within the budget, the observable outcome is the one successful application.
 - **Concurrent ops linearizable** — for any interleaving of two simultaneous operations, the result equals some sequential order the Port promises.
 
-Use a property-based runner (fast-check, Hypothesis, jqwik, QuickCheck, …) or a contract test that enumerates the equivalence classes. This **sharpens** the AC↔test matrix `create-sprint` produces — it does not replace it; ordinary ACs are still fine with example tests. `verify-and-assemble-pr`'s adversarial seam review is where a high-risk seam AC backed only by an example gets bounced back.
+Use a property-based runner (fast-check, Hypothesis, jqwik, QuickCheck, …) or a contract test that enumerates the equivalence classes. This **sharpens** the claim↔evidence mapping a slice is cut with — it does not replace it; ordinary claims are still fine with example tests. The adversarial seam review at `close-an-iteration` is where a high-risk seam claim backed only by an example gets bounced back.
 
 ---
 
@@ -180,7 +180,7 @@ Journey tests run against an Integration Env that may include systems you don't 
 (repeat)
 ```
 
-**Plan-first reminder:** before implementation, draft the test layer mapping (Logic / Composition / Adapter Contract / Integration / Journey) so each property has one home. This is what `create-quality-spec` produces at the wave level.
+**Plan-first reminder:** before implementation, draft the test layer mapping (Logic / Composition / Adapter Contract / Integration / Journey) so each property has one home. This is what a slice's claims declare before any of it is built — each claim names the evidence that settles it.
 
 ---
 
@@ -229,7 +229,7 @@ Every test name:
 - ❌ `BLOCKED` used as a permanent state to hide a real failure. Enforce the TTL rule.
 - ❌ Asserting business math in Composition (that's Logic), or asserting SQL semantics in Composition (that's Adapter Contract).
 - ❌ Co-locating Journey and Composition assertions in the same test.
-- ❌ Writing tests after implementation ("we'll add tests next sprint").
+- ❌ Writing tests after implementation ("we'll add tests in the next iteration").
 - ❌ `sleep()` / `waitForTimeout()` to "wait for state" instead of event-driven waits.
 
 ---

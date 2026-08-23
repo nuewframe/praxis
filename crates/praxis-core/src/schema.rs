@@ -152,6 +152,57 @@ pub struct EntitySpec {
 pub struct Schema {
     entities: BTreeMap<String, EntitySpec>,
     rules: Vec<Rule>,
+    retirements: Vec<Retirement>,
+    /// What lets a surface NAME a retired word without teaching it — see `Retirement`.
+    explained_by: Vec<String>,
+}
+
+/// Something the method retired, and the vocabulary that retired with it.
+///
+/// `TS.260823.06`. Before it, `retired` named three rules and no words, so the retirement
+/// was a fact the record stated and nothing could check: thirteen shipped files went on
+/// instructing agents to create sprints for two versions, and the surface that announces the
+/// retirement shipped beside them. A retirement carrying no vocabulary can enforce nothing,
+/// which is why one is REPORTED rather than passed over in silence.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Retirement {
+    /// What was retired, as the record names it.
+    pub what: String,
+    pub words: Vec<RetiredWord>,
+}
+
+/// One word the method no longer holds, and what a surface should say instead.
+///
+/// `instead` is what makes the refusal actionable: naming the file and the word says a
+/// surface is wrong, and naming the replacement says what would make it right. A refusal
+/// that only forbids leaves the author to guess, and guessing is the improvisation this
+/// frame is about.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct RetiredWord {
+    /// Matched as a whole token, case-insensitively, with an optional trailing `s`. A word
+    /// ending in `-` is a PREFIX instead: `TS-` is not a word, it is the head of an id form.
+    pub word: String,
+    pub instead: Option<String>,
+}
+
+impl RetiredWord {
+    /// Whether one token of prose is this retired word.
+    ///
+    /// Tokens arrive already lowercased and stripped of surrounding punctuation. Plurals
+    /// count — a surface that says `sprints` is teaching sprints — and nothing else does:
+    /// substring matching would refuse `waveform` and `initiative` inside `initiatives`
+    /// would need special-casing anyway.
+    #[must_use]
+    pub fn matches(&self, token: &str) -> bool {
+        let word = self.word.to_lowercase();
+        if word.ends_with('-') {
+            // The hyphen is PART of the prefix. Dropping it made `TS-` match `tsx`, and
+            // every probe script that greps `--include='*.tsx'` was refused for teaching an
+            // id form it never mentions.
+            return token.starts_with(&word) && token.len() > word.len();
+        }
+        token == word || token.strip_suffix('s') == Some(word.as_str())
+    }
 }
 
 /// A rule as the record declares it: its name, and the record that demonstrates it
@@ -169,6 +220,13 @@ pub struct Rule {
     /// declares the rule, which is what keeps a witness evidence rather than a second
     /// implementation of the same check.
     pub given_shipped: Vec<String>,
+    /// The shipped TEXT the witness assumes, as `(path, contents)`.
+    ///
+    /// `given-shipped` says a file exists; a rule about what a file SAYS needs its words. A
+    /// witness for `surface-teaches-a-retired-kind` is therefore a small shipped tree with
+    /// prose in it, written in the record beside the rule — same argument as `given-shipped`,
+    /// one level further in.
+    pub given_text: Vec<(String, String)>,
 }
 
 /// The method's own vocabulary, carried by the engine.
@@ -260,6 +318,8 @@ impl Schema {
     pub fn from_document(doc: &KdlDocument) -> Self {
         let mut entities = BTreeMap::new();
         let mut rules = Vec::new();
+        let mut retirements = Vec::new();
+        let mut explained_by = Vec::new();
         for node in doc.nodes() {
             let Some(children) = node.children() else {
                 continue;
@@ -298,11 +358,23 @@ impl Schema {
                             .filter(|e| e.name().map(|n| n.value()) == Some("given-shipped"))
                             .filter_map(|e| e.value().as_string().map(str::to_owned))
                             .collect(),
+                        given_text: given_text(rule),
                     });
                 }
             }
+            for retired in body.nodes().iter().filter(|n| n.name().value() == "retired") {
+                let Some(what) = string_arg(retired) else { continue };
+                retirements.push(Retirement { what, words: words_of(retired) });
+            }
+            for marker in
+                body.nodes().iter().filter(|n| n.name().value() == "a-retirement-may-be-explained")
+            {
+                explained_by.extend(
+                    all_props(marker, "marked-by").into_iter().map(|m| m.to_lowercase()),
+                );
+            }
         }
-        Self { entities, rules }
+        Self { entities, rules, retirements, explained_by }
     }
 
     /// Strip the prefix a kind declares for its references, if it declares one.
@@ -329,6 +401,28 @@ impl Schema {
     /// conditions on the architecture rather than in the gate.
     pub fn declares_rule(&self, name: &str) -> bool {
         self.rules.iter().any(|r| r.name == name)
+    }
+
+    /// Every retirement the method declares, with the vocabulary that retired with it.
+    #[must_use]
+    pub fn retirements(&self) -> &[Retirement] {
+        &self.retirements
+    }
+
+    /// Every retired word across every retirement, with what to say instead.
+    #[must_use]
+    pub fn retired_words(&self) -> Vec<&RetiredWord> {
+        self.retirements.iter().flat_map(|r| r.words.iter()).collect()
+    }
+
+    /// The markers that turn naming a retired word into explaining it.
+    ///
+    /// Declared by the record, never by the engine. Which words mark an explanation is a
+    /// fact about this method's prose — A4 forbids the engine holding it, and a repository
+    /// whose doctrine explains its own history differently must be able to say so.
+    #[must_use]
+    pub fn explained_by(&self) -> &[String] {
+        &self.explained_by
     }
 
     pub fn rules(&self) -> impl Iterator<Item = &Rule> {
@@ -496,4 +590,26 @@ pub fn all_props(node: &KdlNode, key: &str) -> Vec<String> {
         }
     }
     out
+}
+
+/// The files a rule's witness assumes, as `(path, contents)`.
+fn given_text(rule: &KdlNode) -> Vec<(String, String)> {
+    let Some(body) = rule.children() else { return Vec::new() };
+    body.nodes()
+        .iter()
+        .filter(|n| n.name().value() == "given-file")
+        .filter_map(|file| Some((string_arg(file)?, prop(file, "text")?)))
+        .collect()
+}
+
+/// The retired words a retirement carries.
+fn words_of(retired: &KdlNode) -> Vec<RetiredWord> {
+    let Some(body) = retired.children() else { return Vec::new() };
+    body.nodes()
+        .iter()
+        .filter(|n| n.name().value() == "word")
+        .filter_map(|word| {
+            Some(RetiredWord { word: string_arg(word)?, instead: prop(word, "instead") })
+        })
+        .collect()
 }

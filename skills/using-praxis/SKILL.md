@@ -52,15 +52,16 @@ Working two phases is normal and often better. **Attesting your own work is the 
 hand off, or record who did review it. Note what this does not claim: it refuses the one case
 that is definitionally not a review. A different mind rubber-stamping is still a rubber stamp.
 
-The three persona files describe roles the method still has, and their prose still carries
-sprint-era vocabulary in places. That is tracked, not hidden: they are among the surfaces
-`praxis audit-surfaces` reports as unanchored.
+The three persona files describe roles the method still has, and they now speak the method's
+current vocabulary. That is not a promise — it is checked. `surface-teaches-a-retired-kind`
+refuses any shipped surface that instructs an agent in a word the method retired, naming the
+file and the line, so the two cannot drift apart again without the check saying so.
 
 ---
 
 ## Always-on guardrails
 
-These ship as `applyTo`-scoped `.instructions.md` files. **Copilot** auto-applies each one whenever you edit a file matching its glob. **Claude Code and other harnesses have no `applyTo` mechanism** and do not auto-load `instructions/` — for those, the summary below is the always-on surface, and you must treat each rule set as in force whenever you touch the matching paths. In a provisioned repo, `provision-project-overlay` copies these into `.github/instructions/` so Copilot picks them up natively.
+These ship as `applyTo`-scoped `.instructions.md` files. **Copilot** auto-applies each one whenever you edit a file matching its glob. **Claude Code and other harnesses have no `applyTo` mechanism** and do not auto-load `instructions/` — for those, the summary below is the always-on surface, and you must treat each rule set as in force whenever you touch the matching paths. In an adopted repo, `praxis adopt` writes one `.github/instructions/` file that POINTS at these rather than copying them — a copy in the host tree is a second copy of doctrine, and it drifts.
 
 Which guardrails ship, what each applies to, and which invariants each states are sections of
 the published set: `docs/releases/<version>/doctrine/`, derived from the record by
@@ -79,7 +80,7 @@ described the working tree rather than any version (`TS.260821.07`).
 - Two units may be built concurrently only under the four-condition rule below.
 
 **Lean Delivery** and **Code Contribution Intake** were retired by `TS.260821.04`. Every rule
-in them was about waves, sprints, `TS-NNN` ids and `qa.md` — they contradicted the record
+in them named something the method had retired, and they contradicted the record
 they shipped beside. What replaced them is not a guardrail file: it is `praxis check`, which
 refuses rather than advises. They stand at `v0.7.1`.
 
@@ -126,6 +127,7 @@ retired, not left where an agent will read it.
 
 | Stage | Skill | Use when |
 |---|---|---|
+| **ADOPT** | `adopt-the-method` | **Run first, in a repository that has just installed this plugin.** `praxis adopt` writes a binding, a verify entry point naming only probes that ship, and one engineering-doctrine pointer — and nothing about your product, because deriving that from what the repository already claims would import those claims without their evidence |
 | **DISCOVER** | `ask-what-is-true` | Ask the record what this repository already knows before reconstructing it — run first, and read what the answer says it does not cover |
 | | `event-storming` | Upstream domain discovery — map business events to bounded contexts and candidate capabilities |
 | | `name-a-capability` | Derive a capability from a cluster of events — consistency boundaries, the four gate tests with their reasons, and the exclusion that makes the boundary real |
@@ -138,7 +140,6 @@ retired, not left where an agent will read it.
 | | `ask-the-record` | Ask the record about any declared kind instead of reaching for grep — generic by necessity, and it refuses rather than answering empty |
 | | `anchor-the-work` | State the vision, mission and strategy a frame is worked under — the check is traceability, never truth |
 | | `name-a-persona` | Name who the product is for, before anything is framed — one persona is enough to start, and the rest emerge from the work and cite what surfaced them |
-| | `adopt-the-method` | Put a repository under the delivery graph without copying it — what the method carries, what you may add, and what you may never redefine |
 | | `declare-an-invariant` | Declare what this plugin guarantees about code it is loaded into, and anchor the probe that keeps it — `enabled` and `enforced` are different facts |
 | | `anchor-a-doctrine-surface` | Declare what a shipped skill, guardrail, agent or probe exists to serve — instruction the record cannot trace is doctrine an agent follows on the plugin's authority alone |
 | **READY** | `see-what-is-ready` | Ask which slices could be started right now, and what would refuse each of the rest — including the conditions the gate declares and nobody computed |
@@ -159,15 +160,14 @@ retired, not left where an agent will read it.
 
 ### Engineering discipline — how the code itself is built
 
-This body of doctrine is **shipped and not yet modelled by the record**. It survived the
-retirement of the sprint spine because none of it was spine-bound: it is about code, not about
-process bookkeeping. `praxis audit-surfaces` reports every file below as unanchored, and that
-report is honest — see `TS.260821.05`.
+This body of doctrine is about **code**, and it survived the retirement of the sprint spine
+because none of it was spine-bound. Every file below is anchored to something the record
+holds — `praxis audit-surfaces` says 58 of 58, over a set the config declares rather than one
+the engine chose (`TS.260823.05`). It reaches a host repository as a POINTER, written by
+`praxis adopt`, never as sixteen copies in that repository's own tree.
 
 | Skill | Use when |
 |---|---|
-| `bootstrap-project` | Greenfield repo needs `.github/` + `.claude/` + capability-driven `src/` |
-| `provision-project-overlay` | Existing repo just installed Praxis; needs a project overlay (interview-driven, idempotent) |
 | `refactor-layered-to-capability` | Legacy `controllers/` + `services/` → vertical slices, one shippable slice at a time |
 | `prepare-project-for-ast` | A repository needs AST-backed seam and probe validation for its languages |
 | `design-system-architecture` | Topology, resilience, contract-first APIs, persistence, migrations |

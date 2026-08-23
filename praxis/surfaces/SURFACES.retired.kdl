@@ -293,3 +293,73 @@ doctrine-surface "surface.retired.gen-doctrine-index" {
         markers, and CI failed on a hand-edit within them. It kept one table honest about a set \
         of files nothing else could describe at all"
 }
+
+// ---------------------------------------------------------------------------------------
+// The two front doors, retired by TS.260823.08.
+//
+// They split greenfield from brownfield, and both installed the spine TS.260821.04 deleted:
+// a wave directory, a sprint placeholder, fifty-one overlay templates and a generated
+// verify.sh calling two probes this plugin does not ship. Neither named the delivery graph
+// once. `adopt-the-method` was correct and third in the index, so nobody reached it.
+//
+// The split was never the useful axis. What a repository needs on arrival is the same
+// whether or not it already has code: a binding, a gate that can run, and the engineering
+// doctrine that was never spine-bound. `praxis adopt` writes those three and nothing else.
+//
+// The files are removed, not shimmed. v0.7.1 is tagged; every one is recoverable by name
+// with `git checkout v0.7.1 -- <path>`.
+// ---------------------------------------------------------------------------------------
+
+doctrine-surface "surface.retired.bootstrap-project" {
+    path "skills/bootstrap-project/SKILL.md"
+    kind "skill"
+    serves "TS.260823.08"
+    state "retired"
+    retired-at "2026-08-23"
+    stands-at "v0.7.1"
+    because "it scaffolded a bootstrap wave directory, a sprint placeholder and a wave \
+        dashboard, in a method that has none of the three. Twenty of its lines instructed an \
+        agent in a kind the record had retired two versions earlier"
+}
+
+doctrine-surface "surface.retired.provision-project-overlay" {
+    path "skills/provision-project-overlay/SKILL.md"
+    kind "skill"
+    serves "TS.260823.08"
+    state "retired"
+    retired-at "2026-08-23"
+    stands-at "v0.7.1"
+    because "it emitted fifty-one template files — sixteen skill templates, eleven prompts, the \
+        persona overlays and a YAML config of its own — into an adopter's repository. The \
+        engineering half survived on its own merits and is rewritten as one pointer file; the \
+        spine half had nothing left to describe"
+}
+
+doctrine-surface "surface.retired.overlay-templates" {
+    path "skills/provision-project-overlay/templates/"
+    kind "skill"
+    serves "TS.260823.08"
+    state "retired"
+    retired-at "2026-08-23"
+    stands-at "v0.7.1"
+    because "the fifty-one files TS.260823.05 revealed and declared as debt on the \
+        `ships-doctrine` shape. They are retired as one act because they were written as one \
+        act: a tree copied whole into an adopter's repository, teaching waves, sprints, \
+        initiatives and TS-NNN ids in every file that had a verb in it"
+    note "one declaration for a directory, not fifty-one for its files. The engine anchors by \
+        PATH and no file at this path ships, so nothing here is a promise the record cannot \
+        keep — and fifty-one retirement stanzas saying the same sentence would bury the one \
+        fact a reader needs, which is that the tree is gone"
+}
+
+doctrine-surface "surface.retired.overlay-manifest" {
+    path "skills/provision-project-overlay/manifest.yaml"
+    kind "skill"
+    serves "TS.260823.08"
+    state "retired"
+    retired-at "2026-08-23"
+    stands-at "v0.7.1"
+    because "the managed-file list the overlay emitted from. What adoption writes is now four \
+        files named in the engine, derived from the record of what ships — a manifest is a \
+        second copy of that list, and the two would drift the way every other pair has"
+}

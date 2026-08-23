@@ -17,7 +17,7 @@ disable-model-invocation: false
 
 # Skill: Define Seam Contract
 
-Use this skill when a wave or slice crosses a **seam** — any boundary where one unit
+Use this skill when a slice crosses a **seam** — any boundary where one unit
 depends on another unit's promise — and that boundary needs to be honored by both sides
 *executably*, not asserted in prose.
 
@@ -152,7 +152,7 @@ file if it does not exist:
 }
 ```
 
-- `mode` — `warn` (default) until a wave closes with every declared seam in parity, then
+- `mode` — `warn` (default) until an iteration closes with every declared seam in parity, then
   promote to `enforce` (decision D3). Warn-first prevents a wall of legacy hits from
   making the team disable the gate.
 - `shape` / `behavior` — exact path or glob; at least one non-empty match must exist.

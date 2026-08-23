@@ -93,8 +93,7 @@ anchor.
 | `skills/design-system-architecture/`        | Phases 2 + 3 — topology, resilience patterns, contract-first APIs, polyglot persistence, expand/contract migrations. |
 | `skills/design-capability-layout/`          | Phase 4 — vertical-slice folder layout, functional core / imperative shell mapping.                                  |
 | `skills/implement-with-defensive-patterns/` | Phase 5 — composition over inheritance, shift-left security, structured telemetry.                                   |
-| `skills/bootstrap-project/`                 | Greenfield scaffolder — generates `.github/` + `.claude/` + capability-driven `src/` skeleton.                       |
-| `skills/provision-project-overlay/`         | Generate a project-specific `.github/` overlay (skills, agents, prompts, persona instructions) on an existing repo that just installed Praxis; interview-driven, idempotent. |
+| `skills/adopt-the-method/`                  | The one front door. `praxis adopt` writes a binding, a verify entry point naming only probes that ship, and one engineering-doctrine pointer — greenfield or not. |
 | `skills/prepare-project-for-ast/`           | Prepare a project or repository for polyglot AST seam parsing and probe validation (`ast-parser@v1`). |
 | `skills/refactor-layered-to-capability/`    | Migrate a legacy `controllers/` + `services/` + `utils/` codebase into vertical slices.                              |
 
@@ -124,7 +123,7 @@ These scripts check **shape and presence** — a file exists, a pattern matches,
 ```
 THE DELIVERY GRAPH (the record)                 ENGINEERING DISCIPLINE (principal engineer)
 ─────────────────────────────────               ──────────────────────────────────────────
-event-storming                                  bootstrap-project (greenfield)
+event-storming                                  praxis adopt (the front door)
 name-a-capability                               refactor-layered-to-capability (legacy)
 cut-a-slice                       ←──────────── design-system-architecture (cross-cutting)
   ↓                               ←──────────── test-by-ownership
@@ -279,7 +278,7 @@ The agent should name the three personas, the always-on guardrails, and at least
 ## How to use it from a new project
 
 1. Install the plugin once per machine.
-2. From an empty repo, ask Claude or Copilot: **"Bootstrap this project using the praxis plugin."** The `bootstrap-project` skill takes over.
+2. In the repository — empty or not — run `praxis adopt --repository <owner>/<name>`. It writes a binding, a verify entry point, a pre-commit hook and one engineering-doctrine pointer, and **nothing about your product**. Read `adopt-the-method` for why that last part is the important one.
 3. Ask the record what it already knows before reconstructing anything — `praxis truth`, and read what the answer says it does **not** cover.
 4. Frame the problem and cut the first slices: `event-storming` → `name-a-capability` → `cut-a-slice`.
 5. `praxis ready` says which slices could be started now, and what would refuse each of the rest.
@@ -288,9 +287,10 @@ The agent should name the three personas, the always-on guardrails, and at least
 8. `praxis close` refuses a close that drops a claim in silence. A shortfall is carried by a finding that names it.
 9. Wire `scripts/check-anti-dumping.sh` into the project's task runner and CI.
 
-> **Adoption is not yet complete.** A new project cannot obtain the schema the engine checks
-> against without copying it out of this repository — see `ITER.260821.19/AK2`. Steps 3
-> onward work; step 0, *getting a schema*, does not have an answer yet.
+> **Adoption still owes one thing.** The schema arrives with the engine (`TS.260821.10`) and
+> the front door writes a record that checks (`TS.260823.08`), so every step above runs. What
+> is still unproven is whether the rest of the loop survives contact with a repository nobody
+> here has seen — `adopt-the-method` says so, and this does not claim otherwise.
 
 ## Documentation
 

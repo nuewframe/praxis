@@ -196,6 +196,47 @@ doctrine-surface "surface.skill.adopt-the-method" {
     path "skills/adopt-the-method/SKILL.md"
     kind "skill"
     serves "TS.260821.10"
+    note "the ONE front door since TS.260823.08. `bootstrap-project` and `provision-project-overlay` \
+        split greenfield from brownfield and both installed the retired spine; the split was never \
+        the useful axis, and this skill already handled both cases in one section"
+}
+
+// The four files `praxis adopt` writes. Anchored individually rather than by directory: each
+// one is instruction an adopter receives and keeps, and which of the four they got is a
+// question the record should be able to answer.
+doctrine-surface "surface.template.adopt-config" {
+    path "skills/adopt-the-method/templates/config.kdl.tmpl"
+    kind "skill"
+    serves "TS.260823.08"
+    note "the binding, and the only file adoption writes that is about this repository rather \
+        than about how to work in one"
+}
+
+doctrine-surface "surface.template.adopt-verify" {
+    path "skills/adopt-the-method/templates/verify.sh.tmpl"
+    kind "skill"
+    serves "TS.260823.08"
+    note "the probe steps are GENERATED from the record of every probe this plugin ships, so \
+        this file cannot name one that is absent. Its predecessor named two that did not exist, \
+        one of them described in its own comment as hard-fail with no warn mode"
+}
+
+doctrine-surface "surface.template.adopt-hook" {
+    path "skills/adopt-the-method/templates/pre-commit.tmpl"
+    kind "skill"
+    serves "TS.260823.08"
+    note "deliberately the cheap half of verify. A pre-commit hook people disable is worse than \
+        one that checks less"
+}
+
+doctrine-surface "surface.template.adopt-overlay" {
+    path "skills/adopt-the-method/templates/capability-structure.instructions.md.tmpl"
+    kind "skill"
+    serves "TS.260823.08"
+    note "the engineering-discipline overlay, rewritten rather than retired. Capability layout, \
+        seams, the test pyramid and defensive patterns are about CODE and survived the spine's \
+        retirement on their own merits — what changed is that this is one pointer file instead \
+        of sixteen skill templates restating the plugin's own doctrine in an adopter's tree"
 }
 
 doctrine-surface "surface.skill.write-durable-comments" {

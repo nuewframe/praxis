@@ -233,9 +233,9 @@ PATH_RE = re.compile(
 # resolve file-relative and belong to check #14.
 LINK_RE = re.compile(r'\[[^\]]*\]\([^)]*\)')
 
-# Refs to project-bootstrapped files (created by bootstrap-project in target
-# repos, not shipped by the plugin itself). NOT an exemption for a path that
-# should exist here — this file genuinely never exists in this repo.
+# Refs to files `praxis adopt` writes into a TARGET repository, not files the
+# plugin ships. NOT an exemption for a path that should exist here — these
+# genuinely never exist in this repo.
 allowed_missing = {
     'scripts/verify.sh',
     'scripts/ast_parse.sh',
@@ -488,30 +488,31 @@ else
   echo "  ok"
 fi
 
-# 11. Template placeholder parity — every {{key.path}} in an overlay template
-#     must resolve against a key in praxis.config.yaml.tmpl. Permanent guard for
-#     the alias hyphen/underscore class of defect.
+# 11. Template placeholder parity — every {{key}} in an adoption template must be
+#     one the engine actually fills. Permanent guard for the class of defect where
+#     a template asks for something nothing supplies, so the file reaches an
+#     adopter reading as configured while carrying a literal `{{key}}`.
+#
+#     The authority is `placeholderKeys` in the canon, not one of the templates.
+#     It used to be the config template, on the premise that it declared every key
+#     — true while every key was a config key, false the moment the verify and
+#     overlay templates started carrying stack facts the config never holds.
 echo "validate-plugin: checking template placeholder parity..."
 PH_REPORT=$(python3 <<'PY'
 import json, os, re, sys
 if not os.path.isfile('.praxis-canon.json'):
     print('skipped (no .praxis-canon.json)'); sys.exit(0)
 canon = json.load(open('.praxis-canon.json'))
-cfg_path = canon['placeholderConfigTemplate']
 scan_root = canon['placeholderScanGlob']
-ph = re.compile(r'\{\{\s*([A-Za-z0-9_.]+)\s*\}\}')
-# The config template declares every substitutable key as `key: {{that.key}}`,
-# so its own placeholders enumerate exactly the valid dotted paths.
-valid = set(ph.findall(open(cfg_path, errors='replace').read()))
-valid |= set(canon.get('specialPlaceholders', []))  # runtime tokens (e.g. TODAY), not config keys
+ph = re.compile(r'\{\{\s*([A-Za-z0-9_.-]+)\s*\}\}')
+valid = set(canon['placeholderKeys'])
+valid |= set(canon.get('specialPlaceholders', []))  # runtime tokens (e.g. TODAY)
 problems = set()
 for path in sorted(p for p in os.popen("find %s -type f -name '*.tmpl'" % scan_root).read().splitlines() if p):
-    if os.path.abspath(path) == os.path.abspath(cfg_path):
-        continue
     for m in ph.finditer(open(path, errors='replace').read()):
         key = m.group(1)
         if key not in valid:
-            problems.add("%s: placeholder {{%s}} has no matching key in %s" % (path, key, os.path.basename(cfg_path)))
+            problems.add("%s: placeholder {{%s}} is not a key the engine fills (see placeholderKeys)" % (path, key))
 for p in sorted(problems):
     print(p)
 sys.exit(1 if problems else 0)

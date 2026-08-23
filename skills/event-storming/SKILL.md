@@ -2,7 +2,7 @@
 name: event-storming
 description: >
   Upstream domain discovery skill. Guides domain event storming from raw business requirements to bounded contexts,
-  domain commands, aggregate boundaries, candidate living capability records (CAP.<name>.md), and initial growth initiatives (INIT.<name>.md).
+  domain commands, aggregate boundaries, candidate capabilities, and the first thin-slices cut from the storm.
 user-invocable: true
 disable-model-invocation: false
 ---
@@ -12,15 +12,15 @@ disable-model-invocation: false
 Use this skill when exploring greenfield business requirements, discovering new product domains, or refactoring unmapped legacy systems into bounded contexts.
 
 **Audience:** Product Manager, Product Designer, Principal Engineer, Domain Experts.  
-**Purpose:** Bridge business requirements to capability boundaries before any initiative or wave is created. Prevents arbitrary feature grouping by deriving capabilities from business events and domain aggregates.
+**Purpose:** Bridge business requirements to capability boundaries before any slice is cut. Prevents arbitrary feature grouping by deriving capabilities from business events and domain aggregates.
 
 ---
 
 ## What This Skill Produces
 
 1. **Domain Event Map:** Visual/textual timeline of domain events, triggers, commands, and read models.
-2. **Bounded Context & Candidate Capabilities:** Candidate living capability record skeletons (`docs/capabilities/CAP.<capability-name>.md`).
-3. **Initial Growth Initiatives:** Initial initiative files (`docs/product/initiatives/INIT.<initiative-name>.md`) indexed on [`docs/product.md`](../../docs/product.md).
+2. **Bounded Context & Candidate Capabilities:** Candidate capability records, one per cluster, cut with `name-a-capability`.
+3. **The First Slices:** thin-slices cut from the storm with `cut-a-slice`, each realizing exactly one of those capabilities.
 
 ---
 
@@ -59,16 +59,16 @@ Translate bounded contexts directly into Praxis living capability record skeleto
 | Billing Domain | `docs/capabilities/CAP.<billing-and-payments>.md` | Finance Squad | `payment-gateway@v1` |
 | Fulfillment Domain | `docs/capabilities/CAP.<fulfillment>.md` | Logistics Squad | `fulfillment-api@v1` |
 
-Use `create-capability-record` to scaffold the candidate `CAP.<name>.md` files.
+Use `name-a-capability` to cut the candidate capability records. A capability that cannot pass its four gate tests is not one.
 
 ---
 
-## Step 5 — Scaffold Initial Initiatives (`INIT.`)
+## Step 5 — Cut the First Slices (`TS.`)
 
-Group high-value user outcomes across capability boundaries into single-file initiatives:
-- Use `create-initiative` to scaffold `docs/product/initiatives/INIT.<initiative-name>.md`.
-- Populate $Iteration_1$ with thin-slices (`TS-001`, `TS-002`) derived from the event storming timeline.
-- Register all initial initiatives on [`docs/product.md`](../../docs/product.md).
+Turn high-value user outcomes into slices, each realizing exactly one capability:
+- Use `cut-a-slice`. A slice names its command or its view, the capability it realizes, and the storm it came from.
+- Give each one a `scenario`, an `excludes`, and claims that name the evidence settling them — the shape check refuses a slice without them.
+- `praxis ready` then says which of them could be started now, and what would refuse the rest.
 
 ---
 

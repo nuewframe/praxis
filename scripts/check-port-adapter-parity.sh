@@ -95,7 +95,7 @@ while IFS= read -r -d '' port; do
     WARNINGS=$((WARNINGS + 1))
   fi
 
-  # AST Parity Verification (TS-031)
+  # AST Parity Verification (TS.260811.31)
   if [[ -x "$AST_PARSER" ]] && command -v python3 >/dev/null 2>&1; then
     target_adapter="${memory_file:-$prod_file}"
     if [[ -n "$target_adapter" && -f "$target_adapter" ]]; then

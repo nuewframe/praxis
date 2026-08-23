@@ -1,0 +1,118 @@
+---
+applyTo: "**"
+---
+
+# Engineering discipline in {{repository}}
+
+Written by `praxis adopt`. This file is a **pointer**, not a copy. It names the plugin skill
+that holds each rule, then states the handful of facts that are true of this repository and
+of no other. When the two disagree, the plugin skill wins — and if you find yourself
+restating a rule here, you have just created the second copy this whole method exists to
+prevent.
+
+The version this replaced was sixteen skill templates and eleven prompts copied into the
+host repository, every one of them describing a spine the method had already deleted. The
+doctrine below survived that deletion on its own merits: it is about **code**, and none of
+it was ever bound to how work was tracked.
+
+---
+
+## Structure — capability-driven, not layer-driven
+
+Read `design-capability-layout`. The short version, so you know whether you need it:
+
+Code is organised by **what the system can do**, not by what kind of thing a file is. A
+capability owns its own vertical slice — its domain logic, its ports, its adapters, its
+tests — and a change to one capability touches one directory.
+
+**There are no dumping grounds.** `utils/`, `helpers/`, `common/`, `shared/`, `misc/` are
+refused by `scripts/check-anti-dumping.sh`, which runs in `verify.sh` and in the pre-commit
+hook. A file that genuinely belongs to several capabilities belongs to a named one of them,
+or it is a capability nobody has named yet.
+
+Inside a capability, the **functional core** is pure and the **imperative shell** does the
+I/O. The core is where the decisions are and the shell is where the world is, and the reason
+to keep them apart is that only one of the two is cheap to test.
+
+**In this repository:**
+
+- Capabilities live under `{{source-root}}`
+- The language is `{{language}}`
+
+---
+
+## Boundaries — a seam is a promise, written down
+
+Read `define-seam-contract`. A **seam** is any boundary where one unit depends on another
+unit's promise: a module boundary, a network call, a queue, a database. A seam contract is
+that promise made executable — a machine-checkable **Shape** and a shared **Behavior** test
+suite both sides run.
+
+The point is not documentation. A frozen contract is what lets one slice build against
+another's promise instead of waiting for it to merge, which turns "wait, then find out the
+snapshot rotted" into "build against `<name>@v1`".
+
+`scripts/check-seam-contract-parity.sh` runs in `verify.sh`. It is warn-first: promote
+`.seam-contracts.json` to `enforce` once every declared seam is in parity, rather than
+starting with a wall of hits the team will switch off.
+
+---
+
+## Tests — organised by ownership
+
+Read `test-by-ownership`. Five layers, and the cardinal rule is **one property of a
+behaviour, at one layer**:
+
+| Layer | Owns |
+|---|---|
+| Logic | the functional core, in isolation |
+| Composition | several units of one capability, with in-memory adapters |
+| Adapter Contract | one adapter against the real thing it adapts |
+| Integration Boundary | one seam, both sides |
+| Journey | one user path, end to end |
+
+A behaviour asserted at two layers is a behaviour you will change in two places. Port and
+Adapter run the **same** suite, or the in-memory one you develop against is not the thing
+you deploy.
+
+**Environment Blocked ≠ Test Failed.** A test that could not run because the environment was
+unavailable is reported as blocked, by name, and never as a pass.
+
+**In this repository:** `{{test}}`.
+
+---
+
+## Defensive patterns
+
+Read `implement-with-defensive-patterns`. Composition over inheritance; security shifted
+left rather than reviewed at the end; every cross-process path emitting structured logs with
+a correlation id, plus latency, throughput and error metrics. Dependencies arrive through
+Ports, so the thing under test can be given a different world.
+
+`scripts/check-resilient-boundary.sh`, `check-observability-at-seams.sh`,
+`check-config-externalized.sh` and `check-stateless-request-path.sh` check the parts of this
+that are structural. They are warn-first for the same reason the seam gate is.
+
+---
+
+## Comments
+
+Read `write-durable-comments`. A comment says **why**, and a comment that says what the line
+already says is a second copy that will rot. A citation points at something the record
+holds — an id — never at a file path, because a path rots while looking deliberate.
+
+---
+
+## Where the work comes from
+
+This file is about how code is written. What gets written, in what order, and what it has to
+show is the delivery graph:
+
+```console
+$ praxis dashboard    # where this repository stands, composed from the record
+$ praxis ready        # what could be started now, and what would refuse the rest
+$ praxis pick-up <TS.…> --asked-by human:<who>
+```
+
+`using-praxis` is the index. `adopt-the-method` is the argument for why none of the above
+was written for you.

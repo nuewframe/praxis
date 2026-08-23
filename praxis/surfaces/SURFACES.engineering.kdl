@@ -77,21 +77,6 @@ doctrine-surface "surface.skill.prepare-project-for-ast" {
         without a parser. This skill is what gives them a parse tree to read"
 }
 
-doctrine-surface "surface.skill.bootstrap-project" {
-    path "skills/bootstrap-project/SKILL.md"
-    kind "skill"
-    serves "multi-harness-distribution"
-    note "scaffolds the .github/ and .claude/ trees a harness reads. multi-harness-distribution \
-        owns OverlayProvisioned; this is the greenfield half of producing one"
-}
-
-doctrine-surface "surface.skill.provision-project-overlay" {
-    path "skills/provision-project-overlay/SKILL.md"
-    kind "skill"
-    serves "multi-harness-distribution"
-    note "the brownfield half of the same event, on a repository that already has a shape"
-}
-
 doctrine-surface "surface.skill.ingest-operational-feedback" {
     path "skills/ingest-operational-feedback/SKILL.md"
     kind "skill"

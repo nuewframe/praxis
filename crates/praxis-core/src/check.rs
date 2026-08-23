@@ -65,6 +65,16 @@ pub enum Refusal {
     UnanchoredSurface { path: String },
     /// A shipped file nothing anchors, whose disposal a named slice owes. Reported.
     UnanchoredButOwed { path: String, owed_to: String },
+    /// A shipped surface instructing an agent in a word the method retired.
+    SurfaceTeachesARetiredKind {
+        path: String,
+        line: usize,
+        word: String,
+        instead: Option<String>,
+    },
+    /// A retirement that names no vocabulary, so nothing can be checked against it.
+    /// Reported: it is a gap in what the record says, not a malformed fact.
+    RetirementWithoutVocabulary { what: String },
     /// An invariant the config enables that no surface enforces.
     UnkeptInvariant { invariant: String, protects: String },
     /// The config binds to a method this engine does not carry.
@@ -175,6 +185,8 @@ impl Refusal {
             Self::UnanchoredSurface { .. } | Self::UnanchoredButOwed { .. } => {
                 "every-shipped-surface-is-anchored"
             }
+            Self::SurfaceTeachesARetiredKind { .. } => "surface-teaches-a-retired-kind",
+            Self::RetirementWithoutVocabulary { .. } => "a-retirement-names-its-vocabulary",
             Self::UnkeptInvariant { .. } => "an-enabled-invariant-is-enforced",
             Self::UnknownMethod { .. } => "a-config-binds-a-method-the-engine-carries",
             Self::SplitStateVocabulary { .. } => "a-state-vocabulary-is-declared-once",
@@ -223,7 +235,9 @@ impl Refusal {
             Self::SurfaceDoesNotShip { .. }
             | Self::RetiredSurfaceStillShips { .. }
             | Self::UnanchoredSurface { .. }
-            | Self::UnanchoredButOwed { .. } => "path",
+            | Self::UnanchoredButOwed { .. }
+            | Self::SurfaceTeachesARetiredKind { .. } => "path",
+            Self::RetirementWithoutVocabulary { .. } => "retired",
             Self::UnkeptInvariant { .. } => "protects",
             Self::UnknownMethod { .. } => "governed-by",
             Self::SplitStateVocabulary { .. } => "states",
@@ -280,7 +294,12 @@ impl Refusal {
             // Reported and NAMED. The story's index carries it under `addressed to
             // nobody`, because hiding the view hides the fault with it.
             | Self::ViewForNobody { .. }
-            | Self::UnevidencedLayer { .. } => Severity::Report,
+            | Self::UnevidencedLayer { .. }
+            // A gap in what the record SAYS, not a malformed fact. One retirement in this
+            // method named three rules and no words for two versions, and reporting it is
+            // how that stops being invisible — refusing would fail the record closed over
+            // an omission in the record's own history.
+            | Self::RetirementWithoutVocabulary { .. } => Severity::Report,
             _ => Severity::Refuse,
         }
     }
@@ -362,6 +381,24 @@ impl Refusal {
                  follows on the plugin's authority alone. Anchor it (`anchor-a-doctrine-surface`) \
                  or retire it; the count reached zero at 0.8.0 and this rule fails closed to keep \
                  it there"
+            ),
+            Self::SurfaceTeachesARetiredKind { path, line, word, instead } => {
+                let say = match instead {
+                    Some(what) => format!(". Say {what} instead"),
+                    None => String::new(),
+                };
+                format!(
+                    "{path}:{line} instructs an agent in `{word}`, which the method retired{say}. \
+                     Doctrine and record disagreeing is not a documentation lapse — it is two \
+                     instructions in one context window, and an agent handed both will invent a \
+                     third. Naming the word to say it was retired is allowed; teaching it is not"
+                )
+            }
+            Self::RetirementWithoutVocabulary { what } => format!(
+                "{what} is recorded as retired and names no vocabulary, so nothing can be checked \
+                 against it. A retirement that lists no words is a fact the record states and the \
+                 tree is free to contradict — which is how thirteen shipped files went on teaching \
+                 a spine the record had deleted"
             ),
             Self::UnkeptInvariant { invariant, protects } => format!(
                 "`{invariant}` is enabled and nothing enforces it — the plugin guarantees that \
@@ -828,6 +865,12 @@ pub struct Facts {
     /// exemption says a rule does not apply, and this says the rule applies and somebody owes
     /// the answer.
     pub owed: Vec<(String, String)>,
+    /// What the shipped files SAY, as `(path, contents)`.
+    ///
+    /// `TS.260823.06`. `shipped` answers whether a file exists; a rule about whether doctrine
+    /// contradicts the record needs its words. Handed in by the shell for the same reason
+    /// `shipped` is: a core that reads a file is a core whose answer depends on where it ran.
+    pub text: Vec<(String, String)>,
 }
 
 /// Rules that can only be decided by looking at the whole record at once: whether two
@@ -1131,6 +1174,7 @@ pub fn check_corpus_given(
     }
 
     out.extend(check_surfaces(docs, schema, facts));
+    out.extend(check_retired_vocabulary(docs, schema, facts));
     out.extend(check_invariants(docs, schema));
     out.extend(check_binding(docs));
     // `TS.260821.19`. What each phase produced, and whether the next one read it.
@@ -1502,13 +1546,16 @@ fn check_citations(docs: &[KdlDocument]) -> Vec<Violation> {
 /// - `path` is checked by `a-declared-surface-ships`, which refuses when the file is absent
 /// - `owns` and the `paths` block are READ by the tool, which fails when they are wrong
 /// - `publishes-to` is where the record writes rather than what it reads
-/// - `given-shipped` and `witness` declare a synthetic world for a witness, and name files
-///   that deliberately do not exist
+/// - `given-shipped`, `given-file` and `witness` declare a synthetic world for a witness, and
+///   name files that deliberately do not exist
 const CITES_ITS_OWN_TREE: &[&str] = &[
     "path",
     "owns",
     "publishes-to",
     "given-shipped",
+    // The path half of a witness's shipped tree. Its `text=` is prose the rule scans like
+    // any other, which is right: a witness may not smuggle a citation in through a fixture.
+    "given-file",
     "witness",
     "product-root",
     "state-root",
@@ -1794,6 +1841,100 @@ fn check_surfaces(docs: &[KdlDocument], schema: &Schema, facts: &Facts) -> Vec<V
         }
     }
 
+    out
+}
+
+/// `TS.260823.06`: shipped doctrine against the vocabulary the method currently holds.
+///
+/// The record moved and the doctrine did not. `TS.260821.04` retired the sprint-era spine
+/// eighteen iterations before anything objected, and the reason it could persist is that
+/// nothing checked it: `praxis check` refuses a RECORD naming a kind the schema does not
+/// declare, and nothing refused a SKILL naming one. So `using-praxis` announced the
+/// retirement and shipped beside thirteen files teaching what was retired — an agent loads
+/// both, does not pick the newer one, and synthesises a third.
+///
+/// Two rules, deliberately different in severity. A retirement carrying no vocabulary is
+/// REPORTED: it can enforce nothing, which is a gap in what the record says about its own
+/// history. A shipped surface instructing an agent in a retired word is REFUSED, by name and
+/// by line — the purge is the work, and a cleanup with no check behind it is a cleanup that
+/// has to be done again.
+fn check_retired_vocabulary(
+    docs: &[KdlDocument],
+    schema: &Schema,
+    facts: &Facts,
+) -> Vec<Violation> {
+    // Retirements from the documents in hand, then any the composed schema carries that the
+    // tree does not. Both, because neither alone is complete: a repository extending the
+    // method declares its own retirements in its own documents, and a binary running without
+    // the plugin tree has only the method embedded in it.
+    let mut retirements: Vec<(String, Vec<crate::schema::RetiredWord>, Option<SourceSpan>)> =
+        Vec::new();
+    // One parse per document, not one per retirement inside it.
+    let locals: Vec<crate::schema::Schema> =
+        docs.iter().map(crate::schema::Schema::from_document).collect();
+    for (doc, local) in docs.iter().zip(&locals) {
+        for node in doc.nodes() {
+            let Some(children) = node.children() else { continue };
+            let Some(block) = children.get("schema") else { continue };
+            let Some(body) = block.children() else { continue };
+            for retired in body.nodes().iter().filter(|n| n.name().value() == "retired") {
+                let Some(what) = string_arg(retired) else { continue };
+                let words = local
+                    .retirements()
+                    .iter()
+                    .find(|r| r.what == what)
+                    .map(|r| r.words.clone())
+                    .unwrap_or_default();
+                retirements.push((what, words, Some(retired.span())));
+            }
+        }
+    }
+    for retirement in schema.retirements() {
+        if !retirements.iter().any(|(what, _, _)| what == &retirement.what) {
+            retirements.push((retirement.what.clone(), retirement.words.clone(), None));
+        }
+    }
+
+    let mut out = Vec::new();
+    for (what, _, span) in retirements.iter().filter(|(_, words, _)| words.is_empty()) {
+        out.push(Violation {
+            entity_kind: "method".to_owned(),
+            entity_id: Some(what.clone()),
+            refusal: Refusal::RetirementWithoutVocabulary { what: what.clone() },
+            span: span.unwrap_or_else(|| SourceSpan::from(0..0)),
+        });
+    }
+
+    let words: Vec<&crate::schema::RetiredWord> =
+        retirements.iter().flat_map(|(_, words, _)| words.iter()).collect();
+    if words.is_empty() {
+        return out;
+    }
+    // The markers come from the record too, and a repository that declares none gets the
+    // method's — an explanation is explainable in every repository governed by this method.
+    let markers: Vec<String> = locals
+        .iter()
+        .flat_map(|local| local.explained_by().to_vec())
+        .chain(schema.explained_by().iter().cloned())
+        .collect();
+    for (path, text) in &facts.text {
+        for found in crate::surface::teaching(path, text, &words, &markers) {
+            out.push(Violation {
+                entity_kind: "doctrine-surface".to_owned(),
+                // Named by path and line. A refusal that said only "some surface teaches a
+                // retired kind" would leave the reader to run the audit by hand, which is
+                // the reading exercise this rule exists to replace.
+                entity_id: Some(format!("{}:{}", found.path, found.line)),
+                refusal: Refusal::SurfaceTeachesARetiredKind {
+                    path: found.path,
+                    line: found.line,
+                    word: found.word,
+                    instead: found.instead,
+                },
+                span: SourceSpan::from(0..0),
+            });
+        }
+    }
     out
 }
 

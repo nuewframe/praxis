@@ -2,7 +2,7 @@
 name: ingest-operational-feedback
 description: >
   Downstream human-in-the-loop operational feedback skill. Processes incident post-mortems, operator friction logs,
-  SLO review notes, and production failures to update living capability records (CAP.<name>.md) and trigger defect/enhancement initiatives.
+  SLO review notes, and production failures to update the capabilities they touch and cut the slices that remediate them.
 user-invocable: true
 disable-model-invocation: false
 ---
@@ -12,15 +12,15 @@ disable-model-invocation: false
 Use this skill when processing production incident post-mortems, operator friction logs, SLO review findings, or real-world operational feedback.
 
 **Audience:** Principal Engineer, Product Manager, Site Reliability Lead.  
-**Purpose:** Feed real-world runtime behavior and human operator feedback back into the Praxis `LEARN` loop. Guarantees production incidents directly update capability invariants and seed future growth initiatives.
+**Purpose:** Feed real-world runtime behaviour and human operator feedback back into the Praxis `LEARN` loop. Guarantees production incidents directly update capability invariants and seed the slices that answer them.
 
 ---
 
 ## What This Skill Produces
 
 1. **Capability Quality Invariant Updates:** Updates to `docs/capabilities/CAP.<capability-name>.md#quality-and-nfr-invariants` (adjusting timeouts, retries, fallbacks, circuit breakers, or SLO targets).
-2. **Defect / Resilience Initiatives:** New single-file initiatives (`docs/product/initiatives/INIT.<name>.md`) for recurring operational friction or architectural remediation.
-3. **Durable Architecture Decisions (Optional):** Triggers `create-adr` when incident resolution requires superseding a prior architectural decision.
+2. **Defect / Resilience Slices:** new thin-slices cut with `cut-a-slice` for recurring operational friction or architectural remediation, each attacking a named symptom.
+3. **Durable Architecture Decisions (Optional):** Triggers `record-a-decision` when incident resolution requires superseding a prior architectural decision.
 
 ---
 
@@ -63,20 +63,20 @@ Append the incident summary to the capability's **History & Lineage** section:
 
 ---
 
-## Step 4 — Scaffold Remediation Initiative (`INIT.`)
+## Step 4 — Cut the Remediation Slices (`TS.`)
 
-If remediation requires multi-sprint engineering work beyond an immediate hotfix:
-1. Invoke `create-initiative` to scaffold `docs/product/initiatives/INIT.<remediation-slug>.md`.
-2. Populate $Iteration_1$ with thin-slices (`TS-001`: Add circuit breaker fallback, `TS-002`: Externalize connection pool configuration).
-3. Register the initiative on [`docs/product.md`](../../docs/product.md).
+If remediation needs engineering work beyond an immediate hotfix:
+1. Record what was observed as a symptom on the frame it belongs to, with who felt it.
+2. Invoke `cut-a-slice` once per remediation — add a circuit breaker fallback; externalize the connection pool configuration — each realizing one capability and attacking that symptom.
+3. `praxis ready` then says which of them can be started now.
 
 ---
 
 ## Step 5 — Trigger ADR Supersession (If Required)
 
 If the incident reveals a fundamental flaw in a prior architectural decision:
-1. Invoke `create-adr` to author `ADR.<YYMMDD>.<seq>.md`.
-2. Explicitly mark the prior ADR as `Superseded by ADR.<YYMMDD>.<seq>`.
+1. Invoke `record-a-decision`, which binds the decision to the iteration that forced it.
+2. Amend the prior decision rather than rewriting it — `an-accepted-decision-is-append-only` refuses an edit to an accepted body and accepts an amendment.
 
 ---
 
@@ -85,4 +85,4 @@ If the incident reveals a fundamental flaw in a prior architectural decision:
 - [ ] Operational feedback grounded in real incident log, post-mortem, or SLO review
 - [ ] Impacted living capability record (`CAP.<name>.md`) updated directly
 - [ ] 4 Production Readiness anchors updated with explicit quantitative metrics
-- [ ] Remediation initiatives (`INIT.`) created for multi-sprint fixes
+- [ ] Remediation slices (`TS.`) cut for the work an immediate hotfix does not close

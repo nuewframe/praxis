@@ -1,0 +1,77 @@
+// {{repository}}'s BINDING to the delivery graph.
+//
+// Written by `praxis adopt`. Three levels of ownership, and this file is the third:
+//
+//   argument   — why a decision was made          a decision's `body`
+//   normative  — what is true of every repository the method the engine carries
+//   binding    — how THIS repository applies it   (here)
+//
+// A fact true of every repository governed by this method does not belong here. If it is
+// here, some other repository could legitimately choose differently.
+//
+// Nothing else was written for you. The frame, the storm, the capabilities and the slices
+// are yours, and deriving them from what this repository already claims would import those
+// claims without their evidence — see `adopt-the-method`.
+
+config {
+    repository "{{repository}}"
+
+    // `praxis check` refuses a version the engine does not carry. `praxis schema` prints
+    // what it means, and `praxis view what-you-must-declare` names the seven kinds you
+    // need before anything else.
+    governed-by "{{method}}"
+
+    // ====================================================================
+    // Profile — which layers a slice may declare.
+    //
+    // The layer VOCABULARY is a binding: a service's strata are not a library's. That a
+    // slice declares the layers it reaches, and that the set seals at the first iteration,
+    // is normative and not yours to change.
+    //
+    // These four are a starting point. Rename them, drop one, add one — a layer nothing in
+    // this repository has is a layer every slice will declare and nothing will evidence.
+    // ====================================================================
+    profile "{{profile}}" {
+        layer "product"       "What a user can do that they could not before" owns="src/"
+        layer "enforcement"   "What mechanically checks that it happened"     owns="tests/ scripts/"
+        layer "operations"    "What runs it, and what tells you it is running" owns="deploy/ observability/"
+        layer "docs"          "What a human reads"                            owns="docs/"
+    }
+
+    // ====================================================================
+    // Versioning. Read by the bump proposal rather than hardcoded, so a repository that
+    // versions differently is not misreported by its own tool.
+    // ====================================================================
+    versioning {
+        scheme "semver"
+        stage "{{stage}}"
+        bump-proposal {
+            breaking-seam-contract "major"
+            capability-added       "minor"
+            slice-outcome-added    "minor"
+            gap-remediation-only   "patch"
+            doctrine-only          "patch"
+        }
+        confirmation required=#true by="human"
+    }
+
+    // ====================================================================
+    // How this repository verifies. Declared ONCE, here, and never on the command line:
+    // `praxis evidence` runs what this names and `--by` selects within it. An engine that
+    // ran whatever the caller passed would be a command runner driven by the agent it
+    // exists to check — it could name `true` and settle every claim.
+    // ====================================================================
+    verification {
+        runner "{{runner}}"
+        select-with "{{select-with}}"
+    }
+
+    paths {
+        product-root "."
+        state-root "praxis/"
+        archival-projection "docs/releases/"   // <version>/ per release. Written once, never rewritten
+        release-index "praxis/releases/"       // an index into git, not a copy of it
+        working-projection "praxis/.render/"
+        cache "praxis/.cache/"
+    }
+}

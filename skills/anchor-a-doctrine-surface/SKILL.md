@@ -78,8 +78,8 @@ and the report is still the honest answer.
 A surface that is no longer justified does not vanish from the record. It is **retired**:
 
 ```kdl
-doctrine-surface "surface.skill.create-sprint" {
-    path "skills/create-sprint/SKILL.md"
+doctrine-surface "surface.retired.author-user-docs" {
+    path "skills/author-user-docs/SKILL.md"
     kind "skill"
     serves "TS.260821.04"
     state "retired"

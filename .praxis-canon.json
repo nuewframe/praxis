@@ -44,8 +44,24 @@
     "agents",
     "docs"
   ],
-  "placeholderConfigTemplate": "skills/provision-project-overlay/templates/praxis.config.yaml.tmpl",
-  "placeholderScanGlob": "skills/provision-project-overlay/templates",
+  "placeholderScanGlob": "skills/adopt-the-method/templates",
+  "_placeholderKeys": "TS.260823.08: the authority for what a template may substitute is the engine's adoption Binding, not one of the templates. It used to be the config template, on the premise that it declared every key \u2014 true while every key was a config key, and false the moment the verify and overlay templates started carrying stack facts the config never holds. Declared once here; the shell lint checks the templates against it and a Rust test checks the Binding against it, so a key added to one and not the other fails on both sides.",
+  "placeholderKeys": [
+    "repository",
+    "method",
+    "profile",
+    "stage",
+    "source-root",
+    "language",
+    "runner",
+    "select-with",
+    "format",
+    "lint",
+    "typecheck",
+    "test",
+    "probe-steps",
+    "probe-pipeline"
+  ],
   "specialPlaceholders": [
     "TODAY"
   ],
@@ -56,9 +72,9 @@
       "reason": "README's opening pitch must disclose that not every gate is equally binding, so an adopter does not over-trust a green check. The pattern is the honesty CLAIM rather than the list \u2014 the list was three kinds, is four since the delivery graph, and encoding a count in a check makes the check stale the next time the truth improves."
     },
     {
-      "file": "skills/provision-project-overlay/SKILL.md",
-      "pattern": "this repository is one \\*\\*part\\*\\*",
-      "reason": "ADR.260725.17: when paths.product_root is set the repository is a PART of a larger product, and its dashboard must declare that scope rather than presenting a fragment as the whole. This binds the overlay skill to state the rule it must apply. The failure mode is not a missing dashboard but a confident one, so the phrase is what the check can hold."
+      "file": "skills/adopt-the-method/SKILL.md",
+      "pattern": "would import those claims without their evidence",
+      "reason": "TS.260823.08: adoption writes a binding and a checkable empty record, and never a transcription of what the repository already claims. That is the longest argument this skill makes and the front door contradicted it for two versions \u2014 both entry points scaffolded a whole product tree. The phrase is what the check can hold; the failure mode is not a missing warning but a confident scaffold."
     }
   ]
 }

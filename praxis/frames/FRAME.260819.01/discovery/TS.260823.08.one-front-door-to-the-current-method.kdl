@@ -73,7 +73,26 @@ thin-slice "TS.260823.08" {
         settled-by="a test over the adoption output asserting the capability, seam and test guidance is present and no wave, sprint or initiative artifact is"
 
     depends-on "TS.260823.05 — the templates have to be inside the audited set before it can be said which of them survive"
-    depends-on "TS.260823.06 — what counts as a retired kind is that slice's, and C2 is its rule applied here"
+
+    amended-by "the coupling with TS.260823.06 is not a wait" raised-by="ITER.260823.09/F1" \
+        was="depends-on TS.260823.06 — what counts as a retired kind is that slice's, and C2 is its rule applied here" \
+        change="the dependency is withdrawn and the coupling is stated instead. What C2 needs from \
+            TS.260823.06 is its RULE, which exists the moment that slice is worked; what \
+            `depends-on` asserts is that the other slice is DELIVERED, which is a different and \
+            here a false claim — 06 refuses thirteen shipped files and fifty-one templates, and \
+            the fifty-one are what this slice disposes of. Neither can land green without the \
+            other" \
+        why="`depends-on` has one meaning and this is the second time in two commitments it has \
+            been asked to carry another. ITER.260823.09/F1 said it about the cut rather than the \
+            code: the vocabulary cannot say `these two land together`, and the gate refusing the \
+            pair was right both times. Withdrawing the edge rather than widening the word keeps \
+            the refusal meaningful and puts the coupling where a reader meets it — an edge the \
+            gate cannot honour is worse than no edge and a sentence"
+
+    note "lands with TS.260823.06 — one commitment, not an ordering. 06 makes a surface teaching a \
+        retired kind refusable and leaves the tree loud; this slice disposes of the fifty-one \
+        templates that are most of what it finds. Taken apart, either one is correct and the \
+        audit stays owed"
 
     useful-alone "the first hour of adoption stops installing the method this record retired. \
         Today it produces a wave directory, a sprint placeholder and a gate that cannot run, and \

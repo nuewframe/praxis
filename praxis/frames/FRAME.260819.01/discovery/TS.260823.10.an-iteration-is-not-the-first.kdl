@@ -1,0 +1,111 @@
+// Three findings, one shape underneath. Each was filed against a different rule and each
+// reads, on its own, like a rough edge:
+//
+//   ITER.260823.08/F1  the gate re-pinned all five claims as pending, though four had been
+//                      met and WITNESSED by ITER.260823.07 minutes earlier
+//   ITER.260823.08/F2  an iteration carrying out a decision a prior one sealed passed
+//                      `implement-follows-an-approach` by having NO design at all
+//   ITER.260823.06/F4  `the-plan-and-the-code-agree` refuses every approach of an iteration
+//                      whose design is done and whose implement is not — the normal in-flight
+//                      state of anything that did what TS.260821.19 asks
+//
+// They are one fault. Every completeness question in this engine — which claims are owed,
+// which approach was followed, which phase is done — is asked of ONE iteration, as though the
+// iteration's span and the slice's life were the same span. They are not. `a-slice-took-more-
+// than-one-iteration` is a fitness function this method declares and expects to fire; the
+// model it is a fitness function OF cannot represent the thing it measures.
+//
+// So the record answers "has this been shown?" with "not in this iteration", and an agent
+// reading that answer does the only thing available: it re-derives what the record already
+// holds. That is S7, produced by the mechanism that exists to end S7.
+//
+// The cost so far has been cheap and arguably good — four re-runs against a tree that had
+// moved. It stops being cheap the first time a claim is settled by something slow, and it is
+// already not cheap for F2 and F4, where the two routes past the rule are to under-declare
+// the design or to write the plan after the code.
+
+thin-slice "TS.260823.10" {
+    slug "an-iteration-is-not-the-first"
+    title "Ask what the slice has shown, not what this iteration has shown"
+    kind "command"
+    realizes "CAP.claim-settlement"
+    from-storm "ES.260819.01"
+
+    command "close"
+    actor "the maintainer taking a second iteration on a slice the first one did not finish"
+    produces-event "ClaimCarriedForward" "ContinuationRefused"
+    needs-read-model "what-this-iteration-claims-and-has-shown"
+
+    trigger "a second iteration on a slice re-owes every claim the first one already witnessed"
+    outcome "an iteration states what it continues, and every completeness question is answered from the slice's history rather than from one iteration's"
+
+    scenario #"""
+        Given a slice whose first iteration settled some of its claims and closed without
+             delivering it
+        When a second iteration opens on that slice
+        Then it names the one it continues, arrives owing the claims that are still open and
+             CARRYING the ones already witnessed — with the prior evidence cited, not copied —
+             and it can say which iteration's approach it is carrying out. Re-witnessing a
+             carried claim stays available and stays a choice, because the tree moved and
+             sometimes that is the point.
+        """#
+
+    step "1" does="an iteration declares what it continues. Today the only link between two iterations on one slice is that both name the slice, which is a set rather than an order, and nothing can be asked of it"
+    step "2" does="a claim a prior iteration on the same slice settled arrives CARRIED, citing that iteration's witness rather than restating it. `pending` is reserved for what has never been shown, so the two stop looking alike"
+    step "3" does="an iteration may name the approach it is carrying out. `implement-follows-an-approach` is then satisfied by NAMING the decision, not by having no design — F2's right outcome reached by the right route"
+    step "4" does="`the-plan-and-the-code-agree` distinguishes an approach not yet carried out from one abandoned. An in-flight implement is neither followed nor unfollowed, and saying so is different from refusing"
+    step "5" does="`a-slice-took-more-than-one-iteration` records WHY, not just that. A slice that took three because the first two were mis-cut and one that took three because the work was large are the same shape and different facts"
+
+    excludes "reopening a closed iteration, or amending its settled claims. Continuation is a \
+        NEW iteration standing on a prior one's record; editing the prior one would destroy the \
+        trail the continuation exists to stand on"
+    excludes "carrying evidence across slices. A claim is unique within its slice, and a witness \
+        for one slice's C1 says nothing about another's"
+    excludes "deciding when a slice SHOULD take a second iteration. That is the maintainer's \
+        judgement and the fitness function's subject; this makes the second one honest, not \
+        more or less likely"
+    excludes "the three findings' own wording. They are carried against the rules they were \
+        filed on and stay there — a finding rewritten to match the fix that closed it stops \
+        being evidence that the fix was needed"
+
+    layer "doctrine"    reaches="`pick-up-a-slice` and `close-an-iteration` say what a second iteration inherits and what it still owes; `plan-before-building` says an approach may be carried out by an iteration that did not make it"
+    layer "enforcement" reaches="a carried claim is distinguished from a pending one at open and at close; an in-flight approach is not reported as unfollowed; an iteration naming a continuation the record does not hold is refused"
+    layer "docs"        reaches="`what does this slice still owe` is answerable across every iteration it has had, instead of only the current one"
+
+    claim "C1" text="an iteration may name the iteration it continues, and one naming a continuation on a different slice — or none the record holds — is refused" \
+        settled-by="two negative tests, one naming an iteration on another slice and one naming nothing, each asserting the refusal names what was wrong"
+    claim "C2" text="a claim settled by a prior iteration on the same slice arrives carried, citing that iteration's witness" \
+        settled-by="a test opening a second iteration on a slice with one settled claim, asserting the claim is carried and the citation names the prior iteration rather than duplicating its digest"
+    claim "C3" text="a carried claim may be re-witnessed, and re-witnessing replaces the citation with a run against the tree as it now stands" \
+        settled-by="a test attaching evidence to a carried claim and asserting it settles on the new run, since the tree moving is the reason to re-run and the record must be able to say which happened"
+    claim "C4" text="an iteration carrying out a prior iteration's approach satisfies `implement-follows-an-approach` by naming it" \
+        settled-by="a test over an iteration with no design phase and a named approach, asserting it passes — and one with neither, asserting it does not, which is the case F2 says currently passes"
+    claim "C5" text="an approach whose implement phase is in flight is reported as neither followed nor abandoned" \
+        settled-by="a test over an iteration with a complete design and an incomplete implement, asserting no refusal — the state F4 says is currently refused, and the only state an iteration spends real time in"
+    claim "C6" text="a slice that took more than one iteration records why it did" \
+        settled-by="a test asserting a continuation with no stated reason is reported, so the fitness function reads a cause rather than inferring one from a count"
+
+    depends-on "TS.260821.19 — phases have to produce something before an iteration can inherit \
+        what a prior one produced"
+
+    useful-alone "the second iteration on any slice stops re-deriving what the record already \
+        holds. Every slice this frame has taken more than one pass at has paid this, and the \
+        method declares a fitness function that expects more of them, not fewer"
+
+    attacks "S7" "S3"
+
+    useful-to "the-next-agent" "the-team-building-a-digital-product"
+
+    cut-from "three findings raised in one session against three different rules — \
+        ITER.260823.08/F1, ITER.260823.08/F2 and ITER.260823.06/F4 — none of which is about the \
+        rule it was filed on"
+
+    principle-note "fidelity is computed from the record. A record that can only answer \
+        completeness questions about the current iteration computes a fidelity that is true of \
+        the iteration and false of the work, and the agent reading it cannot tell which it got"
+
+    proves "a completeness question about a slice is answered from every iteration the slice has had"
+    does-not-prove "that a slice taking several iterations is well cut. It makes the second one \
+        honest about what the first left; whether there should have been a second is a judgement \
+        the record still leaves to the maintainer"
+}

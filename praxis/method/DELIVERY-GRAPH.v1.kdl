@@ -1347,10 +1347,85 @@ method "delivery-graph" {
         rule "amendment-records-no-change"  refuses="an amendment that changes nothing"
         rule "slice-without-one-capability" refuses="a slice realizing zero or several capabilities"
 
+        // ------------------------------------------------------------------------------
+        // What this method no longer holds, and the words that went with it.
+        //
+        // Until TS.260823.06 a retirement named what was withdrawn and no VOCABULARY, so the
+        // fact was one the record stated and nothing could check. The consequence was not
+        // theoretical: `TS.260821.04` retired the sprint-era spine, `using-praxis` announced
+        // the retirement, and thirteen shipped files went on teaching waves and sprints
+        // beside it for two versions. An agent loads both and does not pick the newer one.
+        //
+        // A retirement carrying no words is REPORTED for exactly that reason — it can
+        // enforce nothing. A shipped surface instructing an agent in one of these words is
+        // REFUSED, by file and by line.
+        // ------------------------------------------------------------------------------
         retired "the initiative-era rules" \
             were="slice-under-unadmitted-initiative · slice-delivers-outside-initiative-ask · covers-unknown-obligation" \
             because="they name entities the model no longer has. The one that survived is \
-                slice-without-one-capability, which is the same rule against `realizes`"
+                slice-without-one-capability, which is the same rule against `realizes`" {
+            word "initiative" instead="a frame — a problem with symptoms and a root cause, worked under a strategy"
+        }
+
+        retired "the sprint-era spine" \
+            were="the PLAN · TRIAGE · BUILD · LEARN · TEACH pipeline, its documents and its tier gates" \
+            because="retired by TS.260821.04, eighteen iterations before anything objected. The \
+                vocabulary half is added here: the surfaces were removed and the words they \
+                taught were left loose in every file that had ever named them" {
+            word "wave"   instead="a frame, and the discovery cut from it"
+            word "sprint" instead="an iteration, opened by the gate on somebody's ask"
+            word "TS-"    instead="`TS.<yymmdd>.<n>` — a slice id the record allocates, not a ticket number"
+        }
+
+        // How a surface may NAME a retired word without teaching it.
+        //
+        // Per line, and that is the whole distinction the rule can draw: a line naming a
+        // retired kind and not saying it was retired is an instruction. A surface must be
+        // able to explain what changed — a rule refusing every mention would make the
+        // history unwritable, and an agent reading a method with a silent hole in its past
+        // will fill the hole. Declared here rather than in the engine because which words
+        // mark an explanation is a fact about this method's prose (A4).
+        a-retirement-may-be-explained \
+            marked-by="retire" marked-by="no longer" marked-by="replaced" \
+            marked-by="superseded" marked-by="removed" marked-by="was deleted" \
+            marked-by="used to" marked-by="formerly" marked-by="there are no" \
+            marked-by="pre-graph" marked-by="v0.7.1" \
+            note="`retire` rather than `retired`, because a line saying `the retirement of the \
+                sprint spine` is explaining as plainly as one saying `retired`. The markers are \
+                stems for that reason, and each is matched anywhere in the line" \
+            because="the retirement notice and the instruction are the same sentence shape, and \
+                only one of them belongs in shipped doctrine"
+
+        rule "a-retirement-names-its-vocabulary" refuses="a retirement that names no words, since it can enforce nothing" \
+            because="a retirement the tree is free to contradict is a fact stated and never kept. \
+                REPORTED rather than refused: it is a gap in what the record says about its own \
+                history, and failing the record closed over its history is a different mistake" \
+            witness=#"""
+                notional-architecture "NA.witness" {
+                    schema {
+                        retired "the witness-era rules" were="one rule nobody names"
+                    }
+                }
+                """#
+
+        rule "surface-teaches-a-retired-kind" refuses="shipped doctrine instructing an agent in a word the method retired" \
+            because="doctrine and record disagreeing is not a documentation lapse. It is two \
+                instructions in one context window, and an agent handed both will invent a third — \
+                which is S1, produced by the doctrine surface that exists to prevent S1" \
+            note="the purge is the work; this is the rule that makes the purge finishable and keeps \
+                it finished. A cleanup with no check behind it is a cleanup that has to be done again" \
+            given-shipped="skills/witness/SKILL.md" \
+            witness=#"""
+                doctrine-surface "surface.witness" {
+                    path "skills/witness/SKILL.md"
+                    kind "skill"
+                    serves "TS.witness"
+                    state "shipped"
+                }
+                """# {
+            given-file "skills/witness/SKILL.md" \
+                text="Create a sprint for this work, then close the sprint."
+        }
 
         // Whether this model is working, six months on. Two of these falsify rather than
         // confirm, and both fail quietly if the model is right on paper and unused in
