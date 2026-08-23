@@ -40,8 +40,13 @@ mission "fidelity-is-computed" {
 
 strategy "name-the-person-before-the-system" {
     serves "fidelity-is-computed"
-    step "1" is="purpose — the outcome this exists to deliver"
-    step "2" is="audience — the primary persona, named before anything is framed"
+    step "1" is="purpose — the outcome this exists to deliver" {
+        satisfied-by "mission"
+        satisfied-by "vision"
+    }
+    step "2" is="audience — the primary persona, named before anything is framed" {
+        satisfied-by "persona"
+    }
     …
 }
 ```
@@ -63,6 +68,33 @@ changed**, and the record would stop being able to say which one moved.
 else, that nothing is orphaned.
 
 > a frame tracing to no strategy is work nobody can justify
+
+---
+
+## A strategy earns adherence instead of a falsifier
+
+That is the whole reason a strategy carries none — and for a day it was an argument nothing
+backed. `work-follows-the-declared-sequence` is the backing.
+
+**Say what occupies each step.** `satisfied-by` names the *kinds*, and the rule reads them:
+
+> step `"2"` is satisfied by nothing, and step `"5"` is already occupied by `thin-slice`.
+> The strategy declares the order and this record is working it out of sequence.
+
+Three properties, each chosen over an obvious alternative:
+
+| | | Because |
+|---|---|---|
+| computed from what the record **holds** | not from when anything was written | a report derived from trail timestamps could never be cleared — this record's frame predates every persona by thirty iterations and always will. A state report clears the moment you write the missing thing, which is the only reason to tell somebody they are out of sequence |
+| **reported**, never refused | not a failing check | being out of sequence is a fact about a project's *state*. A greenfield repository working down the steps is legitimately incomplete, and failing its check there means failing it during the hour it is most needed |
+| the **strategy** declares the mapping | not the engine | an engine that knew what `audience` *meant* could diverge from the record and nobody could tell. Your strategy's steps are yours; declare their `satisfied-by` and the same rule works |
+
+**A step with no `satisfied-by` is not checked.** A strategy is prose you write first and map to
+kinds later. Requiring the mapping upfront would make declaring one a schema exercise, which is
+how a strategy ends up unwritten.
+
+**A step naming a kind the schema does not declare is reported too** — nothing can ever occupy
+it, so it reads as checked while checking nothing.
 
 ## The arrow runs both ways
 
@@ -89,3 +121,4 @@ any piece of work is ultimately for and get an answer — and disagree with it.
 - `name-a-persona` — the audience is step two, and the primary one is named before framing
 - `mature-a-value` — how a strategy is revised without losing what it used to say
 - `cut-a-slice` — everything downstream of a stated purpose and a named person
+- `declare-an-entity-kind` — what a `satisfied-by` may name

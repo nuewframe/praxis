@@ -109,6 +109,12 @@ pub enum Refusal {
     /// notices when it is renamed and the claim it backs is orphaned while still reading
     /// as settled.
     UnfollowableCitation { field: String, cited: String },
+    /// Work exists at a declared step while an earlier step is satisfied by nothing.
+    /// Reported: being out of sequence is a fact about a project's STATE, and a greenfield
+    /// project mid-sequence is legitimately incomplete rather than malformed.
+    OutOfSequence { step: String, wants: Vec<String>, occupied: String, by: String },
+    /// A step naming a kind the schema does not declare — a step nothing can ever satisfy.
+    StepNamesNoKind { step: String, kind: String },
 }
 
 impl Refusal {
@@ -168,6 +174,9 @@ impl Refusal {
                 "the-plan-and-the-code-agree"
             }
             Self::UnfollowableCitation { .. } => "the-record-cites-what-it-holds",
+            Self::OutOfSequence { .. } | Self::StepNamesNoKind { .. } => {
+                "work-follows-the-declared-sequence"
+            }
         }
     }
 
@@ -208,6 +217,7 @@ impl Refusal {
             Self::ApproachNotTaken { .. } => "approach",
             Self::UnjustifiedLifetime { missing, .. } => missing,
             Self::UnfollowableCitation { field, .. } => field,
+            Self::OutOfSequence { .. } | Self::StepNamesNoKind { .. } => "satisfied-by",
         }
     }
 
@@ -234,6 +244,12 @@ impl Refusal {
             // Reported: every teach phase in this record names a skill today, and a rule
             // failing closed on arrival names fourteen. Flips when the count is zero.
             | Self::TaughtNobody { .. }
+            // Being out of sequence is a fact about a project's STATE, not a malformed
+            // record. A greenfield repository working down the strategy is legitimately
+            // incomplete, and failing its check during the hour it most needs the tool is
+            // the walk-back every enforcement in this frame has had to make.
+            | Self::OutOfSequence { .. }
+            | Self::StepNamesNoKind { .. }
             | Self::UnevidencedLayer { .. } => Severity::Report,
             _ => Severity::Refuse,
         }
@@ -348,6 +364,17 @@ impl Refusal {
                  still reading as settled. State WHAT was shown; the repository already knows \
                  where it lives. To point at something, point at an id — the record holds those, \
                  and a dangling one is refused"
+            ),
+            Self::OutOfSequence { step, wants, occupied, by } => format!(
+                "step {step:?} is satisfied by nothing, and step {occupied:?} is already occupied \
+                 by {by}. The strategy declares the order and this record is working it out of \
+                 sequence — {step:?} wants {}. Being out of order is a fact, not a malformed \
+                 record: write what is missing and the report clears",
+                wants.join(" · ")
+            ),
+            Self::StepNamesNoKind { step, kind } => format!(
+                "step {step:?} is satisfied by {kind:?}, which the schema declares no kind for — \
+                 so nothing can ever occupy it and the step is unreachable by construction"
             ),
             Self::ValueWithNoJudge { slice } => format!(
                 "{slice} says what you get and not who gets it. Value is not a property of a \
@@ -1135,6 +1162,12 @@ pub fn check_corpus_given(
         }
     }
 
+    // Work out of the order the strategy declares. Only where the kind exists: a
+    // repository whose method predates `strategy` declared no sequence to be out of.
+    if schema.declares_rule("work-follows-the-declared-sequence") {
+        out.extend(check_sequence(docs, schema));
+    }
+
     // A field naming a file the checker cannot follow. Refuses on arrival rather than
     // reporting first: the count was taken to zero inside the iteration that wrote the rule,
     // the way `every-shipped-surface-is-anchored` had to earn its severity.
@@ -1177,6 +1210,110 @@ pub fn check_corpus_given(
         None => true,
     });
     out.extend(split);
+    out
+}
+
+/// `TS.260821.16`/C5. Work at a declared step while an earlier step is occupied by nothing.
+///
+/// A strategy carries no falsifier because it is an ORDERING, and that argument only holds
+/// if the ordering is checked. This computes conformance from what the record **holds** —
+/// never from when anything was written. A time-based report over this record could never
+/// be cleared, because the frame predates every persona by thirty iterations and always
+/// will; a state report clears the moment the missing record is written, which is the only
+/// reason to tell somebody they are out of sequence.
+///
+/// The strategy declares what satisfies each step and this computes the order. An engine
+/// that knew what `audience` MEANT could diverge from the record and nobody could tell,
+/// which is what `A4` forbids.
+fn check_sequence(docs: &[KdlDocument], schema: &Schema) -> Vec<Violation> {
+    let mut out = Vec::new();
+    // What the corpus holds, by kind. Presence is the whole question: one persona satisfies
+    // `audience` as completely as forty do, because the step asks whether anybody has been
+    // named rather than how many.
+    let mut held: Vec<String> = Vec::new();
+    for doc in docs {
+        for node in doc.nodes() {
+            let kind = node.name().value().to_owned();
+            if !held.contains(&kind) {
+                held.push(kind);
+            }
+        }
+    }
+
+    for doc in docs {
+        for strategy in doc.nodes().iter().filter(|n| n.name().value() == "strategy") {
+            // Declared order is DOCUMENT order. The step's argument is its label and reads
+            // as an ordinal, but nothing makes it one — a strategy numbering its steps
+            // "a", "b", "c" is legitimate and orders the same way.
+            let steps: Vec<(String, Vec<String>)> = children_named(strategy, "step")
+                .iter()
+                .map(|s| {
+                    let label = string_arg(s).unwrap_or_default();
+                    let wants: Vec<String> = children_named(s, "satisfied-by")
+                        .iter()
+                        .filter_map(|k| string_arg(k))
+                        .collect();
+                    (label, wants)
+                })
+                .collect();
+
+            for (label, wants) in &steps {
+                for kind in wants {
+                    if schema.entity(kind).is_none() {
+                        out.push(Violation {
+                            entity_kind: "strategy".to_owned(),
+                            entity_id: string_arg(strategy),
+                            refusal: Refusal::StepNamesNoKind {
+                                step: label.clone(),
+                                kind: kind.clone(),
+                            },
+                            span: strategy.span(),
+                        });
+                    }
+                }
+            }
+
+            // A step is OCCUPIED when the record holds any kind it names, and UNSATISFIED
+            // when it names kinds and holds none of them. A step naming nothing is neither:
+            // it is unmapped, and an unmapped step is not a gap in the work.
+            let occupied = |wants: &Vec<String>| wants.iter().any(|k| held.contains(k));
+
+            for (i, (label, wants)) in steps.iter().enumerate() {
+                if wants.is_empty() || occupied(wants) {
+                    continue;
+                }
+                // The FIRST later step that is occupied. Reporting every one of them would
+                // print the same gap four times over, which is the shape that made one
+                // report about a frame print five (ITER.260823.02/BC2).
+                let Some((later, _)) = steps
+                    .iter()
+                    .skip(i + 1)
+                    .find(|(_, w)| occupied(w))
+                    .map(|(l, w)| (l.clone(), w.clone()))
+                else {
+                    continue;
+                };
+                let by = steps
+                    .iter()
+                    .find(|(l, _)| *l == later)
+                    .map(|(_, w)| {
+                        w.iter().filter(|k| held.contains(k)).cloned().collect::<Vec<_>>().join(" · ")
+                    })
+                    .unwrap_or_default();
+                out.push(Violation {
+                    entity_kind: "strategy".to_owned(),
+                    entity_id: string_arg(strategy),
+                    refusal: Refusal::OutOfSequence {
+                        step: label.clone(),
+                        wants: wants.clone(),
+                        occupied: later,
+                        by,
+                    },
+                    span: strategy.span(),
+                });
+            }
+        }
+    }
     out
 }
 

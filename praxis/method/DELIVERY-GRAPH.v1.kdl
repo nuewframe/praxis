@@ -76,7 +76,11 @@ method "delivery-graph" {
                 conformance to a declared sequence is computable: a frame written before any \
                 persona exists is out of order, and being out of order is a fact" {
             field "serves"  each="1" references="mission"
-            field "step"    each="1..n" because="the order. A strategy with no sequence is a preference"
+            field "step"    each="1..n" because="the order. A strategy with no sequence is a preference" \
+                note="a step may carry `satisfied-by` child nodes naming the KINDS that occupy it, \
+                    and work-follows-the-declared-sequence reads them. A step with none is not \
+                    checked — the mapping is written when the author knows it, not when the \
+                    strategy is first stated"
             field "matured" each="0..n" holds="matured" \
                 because="the work within a frame informs the strategy, and a revision is an append \
                     naming what taught it. A strategy the work can always revise constrains \
@@ -968,6 +972,52 @@ method "delivery-graph" {
             note="reported, not refused. Thirty-four slices were annotated before this landed so \
                 the count is zero on arrival — the same order TS.260821.04 had to use, and the \
                 reason AV1 carried rather than being forced"
+
+        rule "work-follows-the-declared-sequence"    reports="work at a declared step while an earlier step the strategy declares is satisfied by nothing" \
+            because="a strategy carries no falsifier because it is an ORDERING, and that argument \
+                only holds if the ordering is checked. It was declared with six steps and nothing \
+                compared any work against them for a day — which made `conformance is computable` \
+                a claim of the same kind this frame exists to distrust" \
+            found-by="ITER.260823.02/BC3, carried from TS.260821.16/C5" \
+            note="computed from what the record HOLDS, never from when anything was written. This \
+                record's frame predates every persona by thirty iterations and always will, so a \
+                report derived from trail timestamps could never be cleared — and a report nobody \
+                can act on is noise. A state report clears the moment the missing record is \
+                written, which is the only reason to tell somebody they are out of sequence" \
+            note="the strategy declares what satisfies each step and the engine computes the \
+                order. An engine that KNEW what `audience` meant could diverge from the record and \
+                nobody could tell, which is what A4 forbids — so a repository whose strategy has \
+                different steps declares its own `satisfied-by` and this rule works unchanged" \
+            note="a step declaring no `satisfied-by` is not checked. A strategy is prose somebody \
+                writes first and maps to kinds later, and requiring the mapping upfront would make \
+                declaring one a schema exercise" \
+            witness=#"""
+                strategy "S.witness-out-of-order" {
+                    serves "M.witness"
+                    step "1" is="audience" {
+                        satisfied-by "persona"
+                    }
+                    step "2" is="work" {
+                        satisfied-by "thin-slice"
+                    }
+                }
+                thin-slice "TS.witness-early" {
+                    slug "cut-before-anybody-was-named"
+                    title "a slice under a strategy whose first step nothing satisfies"
+                    kind "command"
+                    realizes "CAP.delivery-record"
+                    from-storm "ES.260819.01"
+                    command "witness"
+                    actor "somebody"
+                    produces-event "Witnessed"
+                    trigger "a witness is needed"
+                    outcome "the rule fires"
+                    layer "doctrine" reaches="nothing"
+                    claim "C1" text="something" settled-by="a test"
+                    useful-alone "a witness"
+                    useful-to "the-maintainer"
+                }
+                """#
 
         rule "the-record-cites-what-it-holds"        refuses="a field naming a file the checker cannot follow" \
             because="a citation is an appeal to something that carries the weight of the claim. \

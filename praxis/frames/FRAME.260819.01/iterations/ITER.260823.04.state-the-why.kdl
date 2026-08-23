@@ -1,0 +1,180 @@
+// Opened by `praxis pick-up`. Every condition below was evaluated against the
+// tree as it stood at 2026-08-23T02:56:27Z, and the verdicts are recorded
+// rather than summarised: a gate whose reasoning is not on the record is a gate
+// you have to trust.
+
+iteration "ITER.260823.04" {
+    slug "state-the-why"
+    on-slice "TS.260821.16"
+    state "closed"
+    opened-at "2026-08-23T02:56:27Z"
+    opened-by "agent:praxis"
+
+    approval "admission" {
+        status "signed"
+        signer "human:wael"
+        at "2026-08-23T02:56:27Z"
+        signed-by "the ask to pick up this slice"
+    }
+
+    vet "create" state="done" at="2026-08-23T02:56:27Z" on-slice="TS.260821.16" {
+        condition "slice-is-shaped" verdict="passed"
+        condition "dependencies-delivered" verdict="passed"
+        condition "no-iteration-in-flight" verdict="passed"
+        condition "nothing-left-to-admit" verdict="passed"
+        condition "work-is-disjoint" verdict="not-computed" \
+            found="no seam manifest exists, so what two iterations would touch cannot be compared. Disjointness is half of what this capability says it judges, and half of what it judges is currently not computed at all"
+        condition "the-slice-is-the-best-available" verdict="left-to-the-maintainer"
+    }
+
+    // 2 of the declared conditions were not decided by the gate. They are
+    // recorded above rather than omitted: an admission that does not say what
+    // it left undecided claims more than it checked.
+
+    // Frozen at open, from the slices. Removing one from a slice now
+    // does not remove it from here — it makes the two disagree, and that is
+    // refused.
+    // Five of the six were settled by ITER.260823.02 and are carried here as met, naming
+    // it. The slice did not deliver, because C5 was carried — so the commitment reopens
+    // on the whole slice and accounts for all six rather than for the one left.
+    claim "C1" from-slice="TS.260821.16" state="met" \
+        evidence="settled by ITER.260823.02 — a mission with no test is refused and a vision needs none"
+    claim "C2" from-slice="TS.260821.16" state="met" \
+        evidence="settled by ITER.260823.02 — the chain upward is checked by the edges it already has, and a frame under no strategy is reported and not refused"
+    claim "C6" from-slice="TS.260821.16" state="met" \
+        evidence="settled by ITER.260822.13 — `strategy` carries `matured`, whose `taught-by` is required and whose `to` is checked against the value held"
+    claim "C3" from-slice="TS.260821.16" state="met" \
+        evidence="settled by ITER.260822.11 — felt-by on all seven symptoms, each naming a persona"
+    claim "C4" from-slice="TS.260821.16" state="met" \
+        evidence="settled by ITER.260823.02 — the published concepts open with why, before the problem and before the glossary"
+
+    claim "C5" from-slice="TS.260821.16" state="met" \
+        evidence="work before the step it depends on is reported, naming the persona kind the \
+            empty step wants and which later step is already occupied; naming the audience \
+            clears the sequence report; a record at the start of the sequence is not out of it; \
+            a step satisfied by no declared kind is reported; a step that names no kind is not \
+            checked. work-follows-the-declared-sequence is witnessed by a slice cut under a \
+            strategy whose audience step nothing satisfies"
+
+    layer "doctrine"    state="evidenced" \
+        evidence="surface.skill.anchor-the-work gains the half that says what a strategy earns \
+            instead of a falsifier — the three properties of the check, each beside the \
+            alternative it was chosen over, and what an unmapped step means" \
+        reaches="discovery states the why before it frames anything, and the skill says what makes a purpose falsifiable"
+    layer "enforcement" state="evidenced" \
+        evidence="work-follows-the-declared-sequence reports, witnessed; six tests on the anchor, \
+            five of them new. The strategy declares `satisfied-by` on all six steps and this \
+            record occupies every one, so the count is zero on arrival" \
+        reaches="a frame with no purpose is reported; a symptom naming no persona is reported; a purpose with no `delivered-when` is refused"
+    layer "docs"        state="skipped" \
+        because="reached by ITER.260823.02 and unchanged here. The published concepts already \
+            open with why; a strategy's step mapping is not published and should not be — it is \
+            how the record checks itself, which is not what a reader of a release came for. \
+            Claiming this layer again would be counting one document twice"
+    layer-set sealed=#true at="2026-08-23T02:56:27Z"
+
+    phase "design-system" state="complete" worked-by="agent:principal-engineer" {
+        approach "conformance is computed from what the record HOLDS" {
+            over "comparing trail timestamps — a frame created before any persona was created, \
+                which is what the strategy's own note literally describes"
+            because "this record's frame predates every persona by thirty iterations and always \
+                will. A time-based report over it could never be cleared, and a report nobody can \
+                act on is noise that teaches readers to skip the whole class. A state report \
+                clears the moment the missing record is written, which is the only reason to tell \
+                somebody they are out of sequence"
+            note "it also removes a dependency on trails, which are hand-written. A rule reading \
+                them would be resting on the least reliable field in the record"
+        }
+
+        approach "the strategy declares what satisfies each step, and the engine computes the order" {
+            over "the engine mapping step names to kinds — `audience` means `persona` and so on"
+            because "an engine that KNEW what `audience` meant could diverge from the record and \
+                nobody could tell, which is what A4 forbids. `satisfied-by` also makes the rule \
+                work unchanged for a repository whose strategy has different steps entirely — it \
+                declares its own mapping and is checked against its own order"
+            note "the price is a mapping that can be wrong. A step naming a kind the schema does \
+                not declare is reported for exactly that: it reads as checked while checking \
+                nothing"
+        }
+
+        approach "report, never refuse" {
+            over "failing closed, which the count on arrival would have allowed — this record \
+                occupies all six steps"
+            because "being out of sequence is a fact about a project's STATE rather than a \
+                malformed record. A greenfield repository working down the steps is legitimately \
+                incomplete, and a tool that fails its check there fails it during the hour it is \
+                most needed. That is the walk-back three enforcements in this frame have had to \
+                make, avoided by reading the shape of the fact rather than the count"
+        }
+
+        approach "an unmapped step is not a gap" {
+            over "requiring `satisfied-by` on every step, so the mapping is total"
+            because "a strategy is prose somebody writes first and maps to kinds later. Requiring \
+                the mapping upfront makes declaring a strategy a schema exercise, which is how a \
+                strategy ends up unwritten — and an unwritten strategy is what this whole slice \
+                exists to fix"
+        }
+    }
+
+    phase "implement" state="complete" required-by="enforcement" \
+        worked-by="agent:principal-engineer" {
+        followed "conformance is computed from what the record HOLDS"
+        followed "the strategy declares what satisfies each step, and the engine computes the order"
+        followed "report, never refuse"
+        followed "an unmapped step is not a gap"
+    }
+    phase "learn" state="complete" required-by="always" worked-by="agent:principal-engineer" \
+        produced="two findings. One is that C5's own settled-by describes a test that cannot be \
+            written, because a stronger rule already refuses the case it names"
+    phase "teach" state="complete" required-by="doctrine" worked-by="agent:principal-engineer" \
+        taught="the-team-building-a-digital-product" \
+        produced="anchor-the-work now says what a strategy earns instead of a falsifier, and what \
+            to write so the ordering is checkable at all. Read by whoever starts a product, which \
+            is the actor this slice names"
+
+    finding "BE1" state="open" size="observation" \
+        text="C5 said it would be settled by `a test asserting a frame whose symptoms name \
+            personas the record does not hold is reported as out of sequence`. That test cannot \
+            be written: `felt-by` references `persona`, so dangling-relationship REFUSES such a \
+            record before any sequence rule sees it. The claim's stated settlement was already \
+            covered by a stronger rule" \
+        obliges="a claim's `settled-by` is prose and nothing compares it against what the record \
+            already enforces. A claim that proposes a test an existing rule makes unreachable is \
+            a plan that agrees with itself and not with the code" \
+        note="settled on the computation C5's TEXT asks for — `strategy is an ordering, and work \
+            out of sequence is reported` — rather than on the example its settled-by chose. \
+            Recorded rather than quietly substituted: the difference between the two is the \
+            finding"
+
+    finding "BE2" state="open" size="observation" \
+        text="the declared order is DOCUMENT order, and the step's argument — `\"1\"`, `\"2\"` — is \
+            a label the rule ignores. A strategy whose steps are written out of numeric order is \
+            checked in the order they appear rather than the order they claim, and nothing says so" \
+        obliges="either the label IS the order and a non-numeric one is refused, or the two are \
+            reported when they disagree" \
+        note="document order was chosen because a strategy numbering its steps `a`, `b`, `c` is \
+            legitimate and orders the same way. The hole is that both are permitted and only one \
+            is read — the same shape as a state vocabulary declared twice, where the first edit \
+            alone changed nothing"
+    closed-at "2026-08-23T03:02:32Z"
+    outcome "continue"
+
+    close {
+        claims-settled "C1" how="met"
+        claims-settled "C2" how="met"
+        claims-settled "C6" how="met"
+        claims-settled "C3" how="met"
+        claims-settled "C4" how="met"
+        claims-settled "C5" how="met"
+        all-met #true
+        attested-by "human:waelrabadi"
+        note "the accounting above was computed at close, not asserted. It says every claim is either met or carried by a finding that names it, and nothing about whether the work is any good"
+    }
+
+    trail {
+        entry at="2026-08-23T03:02:32Z" by="agent:praxis" action="state-changed" from="open" to="closed" note="closed by `praxis close`. The accounting was computed; the conclusion is not the machine's to draw"
+
+        entry at="2026-08-23T02:56:27Z" by="agent:praxis" action="created" \
+            note="opened by the gate, on the ask of human:wael"
+    }
+}

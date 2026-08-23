@@ -27,12 +27,34 @@ mission "fidelity-is-computed" {
 strategy "name-the-person-before-the-system" {
     serves "fidelity-is-computed"
 
-    step "1" is="purpose — the outcome this exists to deliver, under the mission it serves"
-    step "2" is="audience — the PRIMARY persona, named before anything is framed. Who this is for is not a discovery output; it is the reason discovery is happening"
-    step "3" is="frame — the problem, with every symptom naming which persona feels it and how"
-    step "4" is="discovery data — four activities: STORM the timeline, ARCHITECT the capabilities and their boundaries, STRUCTURE the data shapes, integrations and commands, and VALIDATE"
-    step "5" is="work — capabilities, slices, iterations, all downstream of a stated purpose and a named person"
-    step "6" is="publish — the reader is told WHY and HOW. Not what was built, and never how it was built"
+    // `satisfied-by` names the KINDS that occupy each step, and
+    // work-follows-the-declared-sequence reads them. It reports a step nothing satisfies
+    // while a later one is occupied — computed from what the record HOLDS, so writing the
+    // missing thing clears it. A step listing no kind is unmapped and is not checked.
+
+    step "1" is="purpose — the outcome this exists to deliver, under the mission it serves" {
+        satisfied-by "mission"
+        satisfied-by "vision"
+    }
+    step "2" is="audience — the PRIMARY persona, named before anything is framed. Who this is for is not a discovery output; it is the reason discovery is happening" {
+        satisfied-by "persona"
+    }
+    step "3" is="frame — the problem, with every symptom naming which persona feels it and how" {
+        satisfied-by "frame"
+    }
+    step "4" is="discovery data — four activities: STORM the timeline, ARCHITECT the capabilities and their boundaries, STRUCTURE the data shapes, integrations and commands, and VALIDATE" {
+        satisfied-by "event-storm"
+        satisfied-by "notional-architecture"
+        satisfied-by "walkthrough"
+    }
+    step "5" is="work — capabilities, slices, iterations, all downstream of a stated purpose and a named person" {
+        satisfied-by "capability"
+        satisfied-by "thin-slice"
+        satisfied-by "iteration"
+    }
+    step "6" is="publish — the reader is told WHY and HOW. Not what was built, and never how it was built" {
+        satisfied-by "release"
+    }
 
     note "no falsifier, because this is an ORDERING. What it earns is adherence, and conformance \
         to a declared sequence is computable — a frame written before any persona exists is out \

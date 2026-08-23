@@ -43,7 +43,11 @@ notional-architecture "NA.test" {
         entity "thin-slice" {
             field "slug" each="1"
         }
+        entity "persona" {
+            field "wants" each="1"
+        }
         rule "a-frame-is-worked-under-a-strategy" reports="a frame naming no strategy"
+        rule "work-follows-the-declared-sequence" reports="work at a declared step while an earlier step is satisfied by nothing"
     }
 }
 "##;
@@ -59,8 +63,23 @@ mission "computed" {
 }
 strategy "person-first" {
     serves "computed"
-    step "1" is="purpose"
-    step "2" is="audience"
+    step "1" is="purpose" {
+        satisfied-by "mission"
+    }
+    step "2" is="audience" {
+        satisfied-by "persona"
+    }
+    step "3" is="work" {
+        satisfied-by "thin-slice"
+    }
+}
+"#;
+
+/// The one persona that satisfies step 2. Kept apart from `ANCHOR` so a test can leave it
+/// out and watch the sequence report fire.
+const AUDIENCE: &str = r#"
+persona "the-maintainer" {
+    wants "to know what happened without asking the person who did it"
 }
 "#;
 
@@ -86,7 +105,10 @@ fn violations(record: &str) -> Vec<praxis_core::Violation> {
 /// the category error that kept all three of these out of the record.
 #[test]
 fn a_mission_with_no_test_is_refused_and_a_vision_needs_none() {
-    assert!(violations(ANCHOR).is_empty(), "{:?}", violations(ANCHOR));
+    // With the audience, because a-record-names-somebody-it-is-for reports a record holding
+    // no persona at all — and that report is about a different fact than this one.
+    let anchored = format!("{ANCHOR}{AUDIENCE}");
+    assert!(violations(&anchored).is_empty(), "{:?}", violations(&anchored));
 
     let untested = ANCHOR.replace(
         "    delivered-when \"somebody who did not do the work can ask the record and act on the answer\"\n",
@@ -181,4 +203,103 @@ fn the_published_concepts_open_with_why() {
     let why = format!("{:?}", model.sections[0].rows);
     assert!(why.contains("a team can trust what an agent produced"));
     assert!(why.contains("what would count as delivered"));
+}
+
+/// C5 — a strategy is an ORDERING, and work out of sequence is reported.
+///
+/// This is what a strategy earns instead of a falsifier. It carries none because it is not a
+/// claim about delivery — and that argument only holds if the ordering is checked, which for
+/// a day it was not.
+///
+/// Computed from what the record HOLDS. A slice exists, nobody has been named, and the
+/// strategy says audience comes before work.
+#[test]
+fn work_before_the_step_it_depends_on_is_reported() {
+    let early = format!(
+        "{ANCHOR}\nthin-slice \"TS.1\" {{\n    slug \"cut-before-anybody-was-named\"\n}}\n"
+    );
+    let found: Vec<_> = violations(&early)
+        .into_iter()
+        .filter(|v| v.refusal.rule() == "work-follows-the-declared-sequence")
+        .collect();
+
+    assert_eq!(found.len(), 1, "one gap, one report: {found:?}");
+    assert_eq!(
+        found[0].severity(),
+        praxis_core::Severity::Report,
+        "being out of order is a fact about a project's state, not a malformed record"
+    );
+    let said = found[0].refusal.message();
+    assert!(said.contains("persona"), "the report names what the empty step wants: {said}");
+    assert!(said.contains("\"3\""), "and which later step is already occupied: {said}");
+}
+
+/// C5, the other half — naming the person clears it.
+///
+/// The whole reason to compute this from state rather than from trail timestamps: a report
+/// derived from when things were WRITTEN could never be cleared, and a report nobody can act
+/// on is noise.
+#[test]
+fn naming_the_audience_clears_the_sequence_report() {
+    let in_order = format!(
+        "{ANCHOR}{AUDIENCE}\nthin-slice \"TS.1\" {{\n    slug \"cut-after-somebody-was-named\"\n}}\n"
+    );
+    assert!(
+        !violations(&in_order)
+            .iter()
+            .any(|v| v.refusal.rule() == "work-follows-the-declared-sequence"),
+        "writing the missing record clears it: {:?}",
+        violations(&in_order)
+    );
+}
+
+/// C5 — a strategy alone reports nothing, however little the record holds.
+///
+/// The rule fires on work at a LATER step, never on a step being empty. A greenfield project
+/// that has stated its purpose and nothing else is at the start of the sequence rather than
+/// out of it, and a tool that failed it there would be failing it during the hour it is most
+/// needed.
+#[test]
+fn a_record_at_the_start_of_the_sequence_is_not_out_of_it() {
+    assert!(
+        !violations(ANCHOR)
+            .iter()
+            .any(|v| v.refusal.rule() == "work-follows-the-declared-sequence"),
+        "nothing later is occupied, so there is no gap: {:?}",
+        violations(ANCHOR)
+    );
+}
+
+/// C5 — a step naming a kind the schema does not declare is unreachable by construction.
+///
+/// The strategy declares what satisfies each step and the engine computes the order. The
+/// price of that is a mapping that can be wrong, and a step pointing at a kind nothing can
+/// ever be is worse than an unmapped one: it reads as checked.
+#[test]
+fn a_step_satisfied_by_no_declared_kind_is_reported() {
+    let typo = ANCHOR.replace("satisfied-by \"persona\"", "satisfied-by \"personna\"");
+    let found: Vec<_> = violations(&typo)
+        .into_iter()
+        .filter(|v| matches!(v.refusal, praxis_core::Refusal::StepNamesNoKind { .. }))
+        .collect();
+    assert_eq!(found.len(), 1, "{found:?}");
+    assert!(found[0].refusal.message().contains("personna"));
+}
+
+/// C5 — an unmapped step is not a gap.
+///
+/// A strategy is prose somebody writes first and maps to kinds later. Requiring the mapping
+/// upfront would make declaring one a schema exercise, which is how a strategy ends up
+/// unwritten.
+#[test]
+fn a_step_that_names_no_kind_is_not_checked() {
+    let unmapped = ANCHOR.replace("    step \"2\" is=\"audience\" {\n        satisfied-by \"persona\"\n    }", "    step \"2\" is=\"audience\"");
+    let record = format!("{unmapped}\nthin-slice \"TS.1\" {{\n    slug \"a-slice\"\n}}\n");
+    assert!(
+        !violations(&record)
+            .iter()
+            .any(|v| v.refusal.rule() == "work-follows-the-declared-sequence"),
+        "a step the author has not mapped declares nothing to check: {:?}",
+        violations(&record)
+    );
 }
