@@ -63,6 +63,8 @@ pub enum Refusal {
     RetiredSurfaceStillShips { path: String },
     /// A shipped instruction file no doctrine-surface declares.
     UnanchoredSurface { path: String },
+    /// A shipped file nothing anchors, whose disposal a named slice owes. Reported.
+    UnanchoredButOwed { path: String, owed_to: String },
     /// An invariant the config enables that no surface enforces.
     UnkeptInvariant { invariant: String, protects: String },
     /// The config binds to a method this engine does not carry.
@@ -170,7 +172,9 @@ impl Refusal {
             Self::SurfaceDoesNotShip { .. } | Self::RetiredSurfaceStillShips { .. } => {
                 "a-declared-surface-ships"
             }
-            Self::UnanchoredSurface { .. } => "every-shipped-surface-is-anchored",
+            Self::UnanchoredSurface { .. } | Self::UnanchoredButOwed { .. } => {
+                "every-shipped-surface-is-anchored"
+            }
             Self::UnkeptInvariant { .. } => "an-enabled-invariant-is-enforced",
             Self::UnknownMethod { .. } => "a-config-binds-a-method-the-engine-carries",
             Self::SplitStateVocabulary { .. } => "a-state-vocabulary-is-declared-once",
@@ -218,7 +222,8 @@ impl Refusal {
             Self::UnwitnessedRule { .. } => "witness",
             Self::SurfaceDoesNotShip { .. }
             | Self::RetiredSurfaceStillShips { .. }
-            | Self::UnanchoredSurface { .. } => "path",
+            | Self::UnanchoredSurface { .. }
+            | Self::UnanchoredButOwed { .. } => "path",
             Self::UnkeptInvariant { .. } => "protects",
             Self::UnknownMethod { .. } => "governed-by",
             Self::SplitStateVocabulary { .. } => "states",
@@ -245,6 +250,10 @@ impl Refusal {
             Self::ShapelessKind { .. }
             | Self::UnclaimedValue { .. }
             | Self::UnwitnessedRule { .. }
+            // A shipped file whose disposal a named slice owes. The rule applies and the
+            // answer is owed by somebody the record names — which is a debt, not an
+            // exemption, and it prints on every run until that slice lands.
+            | Self::UnanchoredButOwed { .. }
             // An invariant declared before its probe is written is a legitimate order of
             // work. What is not legitimate is nobody knowing which.
             | Self::UnkeptInvariant { .. }
@@ -342,6 +351,11 @@ impl Refusal {
             Self::RetiredSurfaceStillShips { path } => format!(
                 "is retired and `{path}` is still in the tree — the retirement was recorded and \
                  never carried out"
+            ),
+            Self::UnanchoredButOwed { path, owed_to } => format!(
+                "{path} ships and nothing anchors it — owed to {owed_to}, which decides what \
+                 happens to it. Counted and reported rather than refused: anchoring doctrine \
+                 that slice is going to delete would be work done to make a number green"
             ),
             Self::UnanchoredSurface { path } => format!(
                 "`{path}` ships and no doctrine-surface declares it — instruction an agent \
@@ -803,6 +817,17 @@ fn field_span(node: &KdlNode, field: &str) -> Option<SourceSpan> {
 pub struct Facts {
     /// Every instruction file the plugin ships, as the shell found them.
     pub shipped: Vec<String>,
+    /// Files whose ANCHORING is owed to a named slice, with the slice that owes it.
+    ///
+    /// Counted in the audit and reported unanchored; not refused. `TS.260823.05` widened the
+    /// shipped set from 55 files to 107, and the 52 it revealed are overlay templates that
+    /// every one of them teaches waves and sprints — `TS.260823.08` retires or rewrites the
+    /// lot. Anchoring doctrine about to be deleted would be work done to make a number green.
+    ///
+    /// The debt is DECLARED, attributed and printed on every run. It is not an exemption: an
+    /// exemption says a rule does not apply, and this says the rule applies and somebody owes
+    /// the answer.
+    pub owed: Vec<(String, String)>,
 }
 
 /// Rules that can only be decided by looking at the whole record at once: whether two
@@ -1491,6 +1516,14 @@ const CITES_ITS_OWN_TREE: &[&str] = &[
     "release-index",
     "working-projection",
     "cache",
+    // `named` is a PATTERN, not a citation. `*SKILL.md` names no file — it names the shape
+    // of a filename, and the set it selects is what `a-declared-surface-ships` then checks
+    // one by one. Scanning it reported three refusals for a config that cited nothing
+    // (`TS.260823.05`).
+    "named",
+    // `from` is a directory this repository owns and the tool walks, like the `paths` block
+    // above it: wrong values fail when it reads them, not when a checker reads them.
+    "from",
 ];
 
 fn walk_citations(
@@ -1742,10 +1775,20 @@ fn check_surfaces(docs: &[KdlDocument], schema: &Schema, facts: &Facts) -> Vec<V
     // second time as unanchored would name one fault twice.
     for path in &facts.shipped {
         if !declared.iter().any(|(p, _)| p == path) {
+            let owed = facts.owed.iter().find(|(p, _)| p == path).map(|(_, by)| by.clone());
             out.push(Violation {
                 entity_kind: "doctrine-surface".to_owned(),
-                entity_id: None,
-                refusal: Refusal::UnanchoredSurface { path: path.clone() },
+                // NAMED, by the path. Anonymous, it could only be placed by kind, and the
+                // shell attributed it to every file holding any doctrine-surface — four
+                // surfaces files, so fifty-one unanchored files printed two hundred and four
+                // times. The comment on `belongs` had already called an anonymous corpus
+                // violation "a rule to reconsider"; this is that reconsideration
+                // (`TS.260823.05`/C3).
+                entity_id: Some(path.clone()),
+                refusal: match owed {
+                    Some(by) => Refusal::UnanchoredButOwed { path: path.clone(), owed_to: by },
+                    None => Refusal::UnanchoredSurface { path: path.clone() },
+                },
                 span: SourceSpan::from(0..0),
             });
         }

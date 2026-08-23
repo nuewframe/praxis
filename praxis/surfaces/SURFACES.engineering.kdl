@@ -18,6 +18,17 @@ doctrine-surface "surface.skill.define-seam-contract" {
         compare and having nothing"
 }
 
+// Anchored by TS.260823.05, which is the first audit that could see it. It ships beside the
+// skill and an agent reads it exactly as it reads the skill — being an example is a fact
+// about its prose, not about whether it instructs.
+doctrine-surface "surface.skill.design-capability-layout.example" {
+    path "skills/design-capability-layout/EXAMPLE.md"
+    kind "skill"
+    serves "no-dumping-grounds" "port-adapter-parity"
+    note "the worked example the layout skill refers to. It carries a full capability layout \
+        with its ports named, which is instruction whether or not the file says `SKILL` on it"
+}
+
 doctrine-surface "surface.skill.design-capability-layout" {
     path "skills/design-capability-layout/SKILL.md"
     kind "skill"

@@ -164,8 +164,74 @@ pub fn compose(view: &str, version: &str, corpus: &Corpus) -> Option<ReadModel> 
         "what-this-product-means" => concepts(version, corpus),
         "how-it-fits-together" => architecture(version, corpus),
         "where-to-start" => where_to_start(version, corpus),
+        "what-you-must-declare" => what_you_must_declare(version, corpus),
         _ => return None,
     })
+}
+
+/// `what-you-must-declare` — the least a repository must hold, and when the rest arrives.
+///
+/// `TS.260823.09`. Twenty-seven kinds, a hundred and fifty-eight field names and fifty-nine
+/// rules is what an adopter meets, and `adopt-the-method` opened by teaching what a
+/// repository may never REDEFINE — the right rule, and an answer to a question nobody has
+/// yet. The question they do have is *what is the least I must declare before this thing
+/// will check*, and it had no answer anywhere, so the rational move was to copy an existing
+/// record and mutate it. That is transcription, which this method spends its longest section
+/// arguing against, and the vocabulary's size is what made it the sensible choice.
+///
+/// Computed, never listed: a hand-written minimum is a second copy of the schema and drifts
+/// the first time a kind gains a required edge.
+fn what_you_must_declare(version: &str, corpus: &Corpus) -> ReadModel {
+    let mut start = Section::new("start here", &["kind", "what it is"])
+        .empty_because("the schema declares no kinds, so there is no minimum to state");
+    for kind in &corpus.minimum {
+        let is = corpus
+            .vocabulary
+            .iter()
+            .find(|(name, _)| name == kind)
+            .map(|(_, is)| is.clone())
+            .unwrap_or_default();
+        start.push(vec![kind.clone(), is]);
+    }
+
+    let mut rest = Section::new("and when the rest arrives", &["kind", "when"])
+        .empty_because("every kind the schema declares is in the minimum");
+    let mut unstated = Section::new("kinds that do not say when", &["kind", "what it is"])
+        .empty_because("every kind outside the minimum names the moment that calls for it");
+    for (kind, is) in &corpus.vocabulary {
+        if corpus.minimum.iter().any(|m| m == kind) {
+            continue;
+        }
+        match corpus.triggers.iter().find(|(name, _)| name == kind) {
+            Some((_, when)) => rest.push(vec![kind.clone(), when.clone()]),
+            // Reported, not guessed. An adopter meeting a kind with no stated trigger
+            // re-derives what it is for — every time, in every repository, and never into
+            // the record.
+            None => unstated.push(vec![kind.clone(), is.clone()]),
+        }
+    }
+
+    ReadModel::new(
+        "what-you-must-declare",
+        "what is the least this repository must declare before the checker will pass?",
+        version,
+    )
+    .section(start)
+    .section(rest)
+    .section(unstated)
+    .define(
+        "computed",
+        "the minimum is not a list somebody wrote. It starts at the unit of work and follows \
+         every REQUIRED reference — a slice must name a capability, a capability the storm it \
+         came from, a storm its frame — and adds the config that binds this repository to the \
+         method. A kind gaining a required edge changes this answer with nothing to update.",
+    )
+    .define(
+        "the rest is not optional forever",
+        "a kind outside the minimum is one the work has not called for YET. It is not a tier, \
+         and there is no lite profile: a method a repository can weaken locally reports \
+         whatever that repository wanted to hear.",
+    )
 }
 
 /// `where-to-start` — the index a release opens with.

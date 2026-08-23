@@ -22,6 +22,34 @@ praxis check            with nothing copied
 
 ---
 
+## Start here — the least you must declare
+
+```console
+$ praxis view what-you-must-declare
+```
+
+**Seven kinds, not twenty-seven.** `config`, `frame`, `symptom`, `event-storm`, `cluster`,
+`capability`, `thin-slice` — and the view names the rest with the moment each arrives.
+
+It is **computed, never listed.** It starts at the unit of work and follows every *required*
+reference: a slice must name a capability, a capability the storm it was derived from, a storm
+its frame. Add the config that binds you to the method, and that is the closure. A kind gaining
+a required edge changes the answer with nothing to update — a hand-written minimum is a second
+copy of the schema, and it drifts.
+
+This section leads because of the order the questions actually arrive in. What follows —
+*what you may never redefine* — is the right rule and an answer to a question you do not have
+yet. Until `TS.260823.09` it came first, and the honest consequence was that the fastest route
+into this method was to copy somebody's record and change the words. That is transcription,
+which the longest section below argues nobody should do, and the size of the vocabulary is what
+made it the rational choice.
+
+**There is no lite profile, and the rest is not optional forever.** A kind outside the minimum
+is one the work has not called for *yet*. A method a repository can weaken locally reports
+whatever that repository wanted to hear.
+
+---
+
 ## What you do not copy
 
 **Nothing.** The method's entity kinds, its rules, and its admission conditions travel with the

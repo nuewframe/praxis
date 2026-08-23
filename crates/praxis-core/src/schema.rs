@@ -23,6 +23,15 @@ pub enum Cardinality {
 }
 
 impl Cardinality {
+    /// Whether a record must carry at least one of this field.
+    ///
+    /// What makes a reference part of the minimum: an optional edge is a thing you may add,
+    /// and a required one is a thing without which the record does not check.
+    #[must_use]
+    pub fn at_least_one(self) -> bool {
+        matches!(self, Self::One | Self::OneOrMore)
+    }
+
     fn parse(raw: &str) -> Option<Self> {
         match raw {
             "1" => Some(Self::One),
@@ -121,6 +130,9 @@ impl FieldSpec {
 /// What one entity kind must look like.
 #[derive(Debug, Clone, Default)]
 pub struct EntitySpec {
+    /// The moment in the work that calls for this kind. Read by `what-you-must-declare`
+    /// (`TS.260823.09`); a kind without one is reported rather than guessed at.
+    pub when: Option<String>,
     /// The prefix a reference to this kind carries, if it carries one — `CAP.` for a
     /// capability. Declared on the kind rather than known to the engine (`TS.260823.04`).
     pub id_prefix: Option<String>,
@@ -266,6 +278,7 @@ impl Schema {
                     name,
                     EntitySpec {
                         id_prefix: prop(entity, "id-prefix"),
+                        when: prop(entity, "when"),
                         is: prop(entity, "is"),
                         states: prop(entity, "states")
                             .map(|s| s.split_whitespace().map(str::to_owned).collect())
@@ -332,6 +345,52 @@ impl Schema {
 
     pub fn kinds(&self) -> impl Iterator<Item = &str> {
         self.entities.keys().map(String::as_str)
+    }
+
+    /// The least a repository must declare before the checker can pass — computed, not
+    /// listed.
+    ///
+    /// `TS.260823.09`. Start at the unit of work and follow every REQUIRED reference: a
+    /// slice must name a capability, a capability must name the storm it was derived from,
+    /// a storm must name its frame. Add `config`, which binds the repository to the method.
+    /// Nothing here is chosen; a hand-written list of it is a second copy of the schema and
+    /// drifts the first time a kind gains a required edge.
+    ///
+    /// The alternative was a tutorial, and a tutorial goes stale against a schema that grows.
+    #[must_use]
+    pub fn minimum_to_start(&self) -> Vec<String> {
+        let mut wanted: Vec<String> = vec!["config".to_owned(), "thin-slice".to_owned()];
+        let mut i = 0;
+        while i < wanted.len() {
+            let kind = wanted[i].clone();
+            i += 1;
+            let Some(spec) = self.entities.get(&kind) else { continue };
+            for field in &spec.fields {
+                let Some(target) = &field.references else { continue };
+                if field.each.at_least_one() && !wanted.iter().any(|k| k == target) {
+                    wanted.push(target.clone());
+                }
+            }
+        }
+        wanted.retain(|k| self.entities.contains_key(k));
+        wanted.sort();
+        wanted
+    }
+
+    /// Every kind, with what it is and the moment that calls for it.
+    ///
+    /// A kind whose `when=` is absent is returned with `None` and REPORTED by the view — an
+    /// adopter facing a kind with no stated trigger has to guess what it is for, which is
+    /// re-derivation of something the schema already knows.
+    #[must_use]
+    pub fn vocabulary(&self) -> Vec<(String, Option<String>, Option<String>)> {
+        let mut out: Vec<_> = self
+            .entities
+            .iter()
+            .map(|(name, spec)| (name.clone(), spec.is.clone(), spec.when.clone()))
+            .collect();
+        out.sort_by(|a, b| a.0.cmp(&b.0));
+        out
     }
 }
 

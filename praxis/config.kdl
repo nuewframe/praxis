@@ -80,6 +80,40 @@ config {
         select-with "--test"
     }
 
+    // ====================================================================
+    // What this repository ships as INSTRUCTION — the set `praxis audit-surfaces` measures
+    // against. Declared here rather than globbed in the engine (TS.260823.05).
+    //
+    // The glob was the fault, not its width. It named four shapes:
+    //
+    //     skills/*/SKILL.md · instructions/*.instructions.md
+    //     agents/*.agent.md · scripts/check-*.sh
+    //
+    // and reported "55 of 55 anchored" — true of that set, and silent about fifty-three
+    // further files under `skills/provision-project-overlay/templates/`, which is the tree
+    // COPIED INTO an adopter's repository. A denominator chosen by the thing being measured
+    // is the trust-transfer problem with a percentage sign after it.
+    //
+    // A template counts. It is instruction with placeholders, read by an agent in a
+    // repository that trusted us to send it; where it was read from is not the question.
+    // `hooks/` wires and `scripts/gen-*` generates — neither tells an agent what to do.
+    // ====================================================================
+    ships-doctrine {
+        from "skills"       named="*SKILL.md"
+        from "skills"       named="*.tmpl" owed-to="TS.260823.08" \
+            note="the overlay templates — fifty-three files an adopter receives, outside every \
+                audit until now. COUNTED and REPORTED, not refused, because anchoring them is \
+                not what should happen to them: every one teaches waves and sprints, and \
+                TS.260823.08 retires or rewrites the lot. Anchoring doctrine that is about to \
+                be deleted would be work done to make a number green. `owed-to` names who \
+                owes the disposal, so the debt is in the record and in every audit run rather \
+                than in somebody's head — and when that slice lands, this line goes with it"
+        from "skills"       named="*EXAMPLE.md"
+        from "instructions" named="*.instructions.md"
+        from "agents"       named="*.agent.md"
+        from "scripts"      named="check-*.sh"
+    }
+
     paths {
         product-root "."
         state-root "praxis/"

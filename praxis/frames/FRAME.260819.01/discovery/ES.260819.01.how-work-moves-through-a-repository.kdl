@@ -364,6 +364,19 @@ event-storm "ES.260819.01" {
     // ---- error in how the documents were built: what the record could COMPUTE was published,
     // ---- and who it was for was asked afterwards.
 
+    // Added by TS.260823.09. Distinct from `where-to-start` below, which is the release
+    // README: that answers the reader of a release, is publishable, and IS the document.
+    // This answers the ADOPTER, before any release exists for them, and its value is being
+    // CURRENT — a list of what the schema requires goes stale the moment a kind is added,
+    // which is why it is computed rather than written.
+    read-model "what-you-must-declare" needed-by="the-adopter" before="adopt" \
+        answers="what is the least this repository must declare before the checker will pass?" \
+        attacks="S7" \
+        publishable=#false \
+        because="it is derived from the schema the engine carries, so it is true of the version \
+            in front of you and false of every other. Frozen into a release it would describe \
+            a vocabulary that has moved, which is the second copy this record exists to refuse"
+
     read-model "where-to-start" needed-by="the-reader-of-a-release" \
         answers="what is this, what can it do, and where do I begin?" \
         attacks="S6" \

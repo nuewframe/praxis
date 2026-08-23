@@ -64,7 +64,7 @@ pub fn prove(schema: &Schema) -> Vec<Proof> {
                 };
             };
 
-            let facts = Facts { shipped: rule.given_shipped.clone() };
+            let facts = Facts { shipped: rule.given_shipped.clone(), owed: Vec::new() };
             let refusals = refusals_enforcing(&rule.name, &witness, schema, &facts);
             if refusals == 0 {
                 Proof::Unwitnessed { rule: rule.name.clone(), why: WITNESS_REFUSED_NOTHING }

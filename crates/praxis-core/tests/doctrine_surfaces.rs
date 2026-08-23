@@ -31,7 +31,12 @@ fn violations(record: &str, shipped: &[&str]) -> Vec<praxis_core::Violation> {
     let schema_doc = parse(SCHEMA).expect("schema parses");
     let record_doc = parse(record).expect("record parses");
     let schema = Schema::from_document(&schema_doc);
-    let facts = Facts { shipped: shipped.iter().map(|s| (*s).to_owned()).collect() };
+    let facts = Facts {
+        shipped: shipped.iter().map(|s| (*s).to_owned()).collect(),
+        // No debt in these fixtures: `owed` is the case where the record NAMES who owes a
+        // file's disposal, and every surface here is either anchored or genuinely orphaned.
+        owed: Vec::new(),
+    };
     check_corpus_given(&[schema_doc, record_doc], &schema, &facts)
 }
 
@@ -253,4 +258,125 @@ doctrine-surface "surface.dumped" {
          vocabulary does not admit it, which is a stronger guarantee than a rule that would \
          have to decide how much is too much"
     );
+}
+
+/// `TS.260823.05`/C2 and C3. A shipped file whose disposal is owed is counted and reported,
+/// never refused — and never silently exempt.
+///
+/// The audit reported "55 of 55 anchored" over a set the engine chose: four shapes globbed
+/// in `shipped_doctrine`, silent about fifty-three files under the overlay's `templates/`,
+/// which is the tree copied INTO an adopter's repository. A denominator chosen by the thing
+/// being measured is the trust-transfer problem with a percentage sign after it.
+#[test]
+fn a_file_whose_disposal_is_owed_is_reported_and_not_refused() {
+    let record = r#"
+doctrine-surface "surface.kept" {
+    path "skills/kept/SKILL.md"
+    kind "skill"
+    serves "something"
+}
+"#;
+    let schema_doc = parse(SCHEMA).expect("the schema parses");
+    let doc = parse(record).expect("the record parses");
+    let schema = Schema::from_document(&schema_doc);
+    let facts = Facts {
+        shipped: vec![
+            "skills/kept/SKILL.md".to_owned(),
+            "skills/going/templates/thing.tmpl".to_owned(),
+            "skills/orphan/SKILL.md".to_owned(),
+        ],
+        owed: vec![("skills/going/templates/thing.tmpl".to_owned(), "TS.999999.01".to_owned())],
+    };
+    let found = check_corpus_given(&[schema_doc.clone(), doc], &schema, &facts);
+
+    let owed: Vec<_> = found
+        .iter()
+        .filter(|v| v.refusal.message().contains("thing.tmpl"))
+        .collect();
+    assert_eq!(owed.len(), 1, "counted once, not once per surfaces file");
+    assert_eq!(
+        owed[0].severity(),
+        Severity::Report,
+        "a debt the record NAMES an owner for is reported; refusing it would force anchoring \
+         doctrine that slice is going to delete"
+    );
+    assert!(
+        owed[0].refusal.message().contains("TS.999999.01"),
+        "and it says who owes it — an exemption says a rule does not apply, this says somebody \
+         owes the answer: {}",
+        owed[0].refusal.message()
+    );
+
+    // A file nobody owes is still refused. The debt is not a way out of the rule.
+    let orphan: Vec<_> = found
+        .iter()
+        .filter(|v| v.refusal.message().contains("orphan"))
+        .collect();
+    assert_eq!(orphan.len(), 1);
+    assert_eq!(
+        orphan[0].severity(),
+        Severity::Refuse,
+        "an unanchored file with no owner named is refused as it always was"
+    );
+}
+
+/// `TS.260823.05`/C1. Which shapes count as instruction comes from the RECORD.
+///
+/// It used to be a glob in the shell naming four shapes. Widening it in place would have
+/// fixed the number and left the next shape to be discovered the same way — A4 says the
+/// engine may not hold what the record declares, and *what this repository ships as
+/// instruction* is a fact about the repository.
+#[test]
+fn c1_the_shapes_are_declared_and_a_repository_may_add_one() {
+    let config = parse(
+        r#"
+config {
+    repository "acme/checkout"
+    ships-doctrine {
+        from "playbooks" named="*.play.md"
+        from "skills"    named="*.tmpl" owed-to="TS.999999.01"
+    }
+}
+"#,
+    )
+    .expect("parses");
+
+    assert_eq!(
+        praxis_core::surface::declared_shapes(&[config.clone()]),
+        vec![
+            ("playbooks".to_owned(), "*.play.md".to_owned()),
+            ("skills".to_owned(), "*.tmpl".to_owned()),
+        ],
+        "a repository declares its own shapes, including ones this plugin has never had"
+    );
+
+    assert_eq!(
+        praxis_core::surface::owed_shapes(&[config]),
+        vec![("skills".to_owned(), "*.tmpl".to_owned(), "TS.999999.01".to_owned())],
+        "and the shapes whose disposal is owed name who owes it"
+    );
+}
+
+/// A repository declaring nothing yields nothing, so the caller refuses rather than falling
+/// back to a set the engine chose. The fallback IS the fault.
+#[test]
+fn c1_a_repository_declaring_no_shapes_yields_none() {
+    let bare = parse(r#"config { repository "acme/checkout" }"#).expect("parses");
+    assert!(praxis_core::surface::declared_shapes(&[bare]).is_empty());
+}
+
+/// One `*`, anywhere, or an exact name — enough for every shape this plugin ships and
+/// nothing more, because a shape language is a second thing to learn.
+#[test]
+fn c1_a_shape_matches_by_prefix_suffix_or_exactly() {
+    use praxis_core::surface::matches_shape;
+    assert!(matches_shape("SKILL.md", "*SKILL.md"));
+    assert!(matches_shape("verify.sh.tmpl", "*.tmpl"));
+    assert!(matches_shape("check-anti-dumping.sh", "check-*.sh"));
+    assert!(matches_shape("CLAUDE.md", "CLAUDE.md"));
+
+    assert!(!matches_shape("SKILL.md", "*.tmpl"));
+    assert!(!matches_shape("gen-coverage.sh", "check-*.sh"));
+    // A generator is not doctrine, and neither is a file that merely contains the shape.
+    assert!(!matches_shape("notes-about-SKILL.md.bak", "*SKILL.md"));
 }

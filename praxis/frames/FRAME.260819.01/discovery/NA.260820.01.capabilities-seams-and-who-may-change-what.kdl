@@ -395,7 +395,7 @@ notional-architecture "NA.260820.01" {
     // rather than decorative: it is the only thing standing between "adopting the method"
     // and "owning a variant of it".
     schema {
-        entity "invariant" is="one property the plugin GUARANTEES about code it is loaded into" \
+        entity "invariant" when="only in a repository that SHIPS instruction. It is what this plugin guarantees about code it is loaded into, and a repository that ships none declares none" is="one property the plugin GUARANTEES about code it is loaded into" \
             states="enforced advisory" \
             owned-by="delivery-record" \
             note="declared by TS.260821.05. the config has said `enable-all-fail-closed #true` and \
@@ -416,7 +416,7 @@ notional-architecture "NA.260820.01" {
             field "note"      each="0..n"
         }
 
-        entity "doctrine-surface" is="one file this plugin SHIPS as instruction — a skill, a guardrail, an agent, or a probe" \
+        entity "doctrine-surface" when="only in a repository that SHIPS instruction — one file an agent reads on this plugin's authority, and the record must say what asked for it" is="one file this plugin SHIPS as instruction — a skill, a guardrail, an agent, or a probe" \
             states="current retired" \
             owned-by="delivery-record" \
             note="declared by TS.260821.03. The record described the work and never the DOCTRINE \

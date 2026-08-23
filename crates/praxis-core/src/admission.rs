@@ -273,6 +273,11 @@ pub struct Capability {
     /// `product` — what a reader installed. `engine` — how it is built. See TS.260821.06/C3.
     pub facet: String,
     pub owns: Vec<String>,
+    /// The read models this capability owns. A view is owned by exactly one capability, and
+    /// this is where that fact lives — read by the composer since `TS.260823.03`, which is
+    /// when `dashboard()` stopped carrying three of this repository's capability names as
+    /// literals and started asking the record who owns each part.
+    pub owns_views: Vec<String>,
     /// Promoted truth: what shipped for this capability, and where. Derived, never
     /// hand-written — `promoted-truth-is-derived` recomputes it.
     pub shipped: Vec<crate::promote::Shipped>,
@@ -435,6 +440,11 @@ pub struct Corpus {
     /// on the corpus so the views that resolve a capability by name do not each hold their
     /// own copy of `CAP.` — which is what four call sites did until `TS.260823.04`.
     pub capability_prefix: Option<String>,
+    /// The least this repository must declare, computed from the schema (`TS.260823.09`).
+    pub minimum: Vec<String>,
+    /// Kind → the moment in the work that calls for it, where the schema declares one.
+    /// A kind absent here has no stated trigger and the view reports it (`TS.260823.09`).
+    pub triggers: Vec<(String, String)>,
     /// Why the product exists, above the problem it attacks (TS.260821.16).
     pub anchor: Anchor,
     /// Kind → what it means, from the schema's own `is=`. Carried on the corpus so a
@@ -446,6 +456,24 @@ pub struct Corpus {
 }
 
 impl Corpus {
+    /// Which capability owns this read model, as the record declares it — prefixed the way
+    /// a reference to a capability is written.
+    ///
+    /// `None` is a view nobody owns. That is a gap in the record, and it is returned as one:
+    /// the composer must not invent an owner, which is what four literals in `dashboard()`
+    /// amounted to (`TS.260823.03`).
+    #[must_use]
+    pub fn owner_of_view(&self, view: &str) -> Option<String> {
+        let owner = self
+            .capabilities
+            .iter()
+            .find(|c| c.owns_views.iter().any(|v| v == view))?;
+        Some(match self.capability_prefix.as_deref() {
+            Some(prefix) => format!("{prefix}{}", owner.id),
+            None => owner.id.clone(),
+        })
+    }
+
     /// A capability id with whatever prefix the schema declares removed.
     ///
     /// `TS.260823.04`. Four call sites did `trim_start_matches("CAP.")` — a naming
@@ -469,6 +497,12 @@ impl Corpus {
         // From the SCHEMA, once, rather than from a literal in each view that resolves a
         // capability by name (`TS.260823.04`).
         corpus.capability_prefix = schema.capability_prefix();
+        corpus.minimum = schema.minimum_to_start();
+        corpus.triggers = schema
+            .vocabulary()
+            .into_iter()
+            .filter_map(|(kind, _, when)| when.map(|w| (kind, w)))
+            .collect();
         for doc in docs {
             for violation in check_document(doc, schema, &known) {
                 if violation.severity() == crate::Severity::Refuse
@@ -523,6 +557,11 @@ impl Corpus {
                         owns: node
                             .iter_children()
                             .filter(|c| c.name().value() == "owns-event")
+                            .flat_map(string_args)
+                            .collect(),
+                        owns_views: node
+                            .iter_children()
+                            .filter(|c| c.name().value() == "owns-read-model")
                             .flat_map(string_args)
                             .collect(),
                         shipped: node

@@ -110,6 +110,21 @@ pub fn render_composed(document: &praxis_core::Composed) -> String {
         out.push_str(&format!("\n{}\n{}\n", "═".repeat(60), part.owner));
         out.push_str(&render(&part.model));
     }
+    // A view the record could compose and could not attribute. Named rather than dropped:
+    // an absent section and an unowned one look identical afterwards, and until
+    // `TS.260823.03` this was neither — the composer stamped its author's capability names
+    // on them and every adopter read somebody else's record (`TS.260823.03`).
+    if !document.orphaned.is_empty() {
+        out.push_str(&format!("\n{}\n", "═".repeat(60)));
+        out.push_str("not shown — no capability declares owning these\n");
+        for view in &document.orphaned {
+            out.push_str(&format!("   {view}\n"));
+        }
+        out.push_str(
+            "\ndeclare `owns-read-model` on the capability each belongs to. A view is owned by \
+             exactly one capability, and the composer will not choose for you.\n",
+        );
+    }
     out
 }
 

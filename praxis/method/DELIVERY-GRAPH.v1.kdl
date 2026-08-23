@@ -33,7 +33,8 @@ method "delivery-graph" {
     title "How work moves through a repository, as a record a checker can refuse"
 
     schema {
-        entity "method" is="the vocabulary a repository is governed BY — kinds, rules, and the gate" \
+        entity "method" when="never by hand — it ships with the engine, and a repository binds to it in the config" \
+            is="the vocabulary a repository is governed BY — kinds, rules, and the gate" \
             owned-by="delivery-record" \
             note="self-describing: the method declares the kind that holds the method. Anything \
                 else would put one node outside the vocabulary it defines, and that node is \
@@ -48,7 +49,8 @@ method "delivery-graph" {
             because="two agents naming two things at the same moment must not have to agree first" \
             note="the literal id FORMAT is a layout decision and lives on ADR.260819.01"
 
-        entity "vision" is="the world if this succeeds" \
+        entity "vision" when="when somebody asks what the work is FOR and the frame is the highest thing you can point at" \
+            is="the world if this succeeds" \
             owned-by="delivery-record" \
             note="declared by TS.260821.16. Not checked for TRUTH — it is what truth is checked \
                 against. Excluding it from the record for being unfalsifiable applied this \
@@ -58,7 +60,8 @@ method "delivery-graph" {
             field "note" each="0..n"
         }
 
-        entity "mission" is="what this product does to move toward the vision" \
+        entity "mission" when="with the vision, and never before it — a mission serving no vision is a direction with no destination" \
+            is="what this product does to move toward the vision" \
             owned-by="delivery-record" \
             note="declared by TS.260821.16" {
             field "is"             each="1"
@@ -70,7 +73,8 @@ method "delivery-graph" {
             field "note"           each="0..n"
         }
 
-        entity "strategy" is="the ordered approach — how we go about it, never how it is built" \
+        entity "strategy" when="when the order of the work starts mattering, and a frame needs saying which approach it is worked under" \
+            is="the ordered approach — how we go about it, never how it is built" \
             owned-by="delivery-record" \
             note="declared by TS.260821.16. It carries no falsifier because it is an ORDERING, and \
                 conformance to a declared sequence is computable: a frame written before any \
@@ -174,6 +178,11 @@ method "delivery-graph" {
             field "profile"     each="1" holds="profile" \
                 because="a field that HOLDS an entity is checked as one. Declared as a bare field, \
                     the profile's body was never descended into and omit-probe was an unchecked string"
+            field "ships-doctrine" each="0..1" \
+                because="which shapes count as instruction this repository ships. A fact about \
+                    the repository, so the engine may not hold it — and an audit whose \
+                    denominator lives in the engine measures whatever the engine chose to look \
+                    at (TS.260823.05)"
             field "verification" each="0..1" \
                 because="how this repository verifies, declared once so that `praxis evidence` runs \
                     what the RECORD names and never what a caller passed. Optional: a repository \
@@ -183,7 +192,8 @@ method "delivery-graph" {
             field "invariants"  each="0..1"
             field "paths"       each="1"
         }
-        entity "profile" is="which guardrails apply here, and which layers a slice may declare" \
+        entity "profile" when="in the config, at adoption — which guardrails apply here and which layers a slice may declare" \
+            is="which guardrails apply here, and which layers a slice may declare" \
             owned-by="delivery-record" \
             note="declared by TS.260821.05. config's `profile` field existed and had no SHAPE, so \
                 `omit-probe` was an unchecked string — the file said `may enable or omit, never \
@@ -194,7 +204,8 @@ method "delivery-graph" {
                 because="config may BIND an invariant and may never declare one. Referencing the \
                     kind is what makes that sentence enforceable rather than a comment"
         }
-        entity "notional-architecture" is="what the capabilities are to each other, free of any tool decision" \
+        entity "notional-architecture" when="when the capabilities need saying what they are to EACH OTHER, or the repository needs a kind this method does not name" \
+            is="what the capabilities are to each other, free of any tool decision" \
             states="sought held" \
             note="one record; cardinalities conservative for the same reason as frame" {
             field "slug"            each="1"
@@ -279,7 +290,8 @@ method "delivery-graph" {
             field "state"   each="0..1"
             field "note"    each="0..n"
         }
-        entity "adr" is="a durable technical decision, its argument, its alternatives, and its corrections" \
+        entity "adr" when="when a technical decision will outlive the iteration that made it" \
+            is="a durable technical decision, its argument, its alternatives, and its corrections" \
             states="proposed accepted superseded" \
             note="one record; cardinalities conservative for the same reason as frame" {
             field "slug"       each="1"
@@ -297,7 +309,8 @@ method "delivery-graph" {
             field "enforces"   each="0..1"
             field "open"       each="0..n"
         }
-        entity "release" is="an index into history — what it binds, what it resolves" \
+        entity "release" when="at the first cut — before that, work binds to a planned version and nothing is frozen" \
+            is="an index into history — what it binds, what it resolves" \
             states="planned released withdrawn" \
             owned-by="release-binding" \
             note="machine-owned. Every field is derived from what was bound, so the record is \
@@ -334,7 +347,8 @@ method "delivery-graph" {
             field "resolves"     each="0..n" references="symptom"
             field "trail"        each="1"
         }
-        entity "iteration" is="one COMMITMENT — the slices an ask committed to, worked together" \
+        entity "iteration" when="never by hand. `praxis pick-up` writes it, and writing one yourself is claiming a gate ran" \
+            is="one COMMITMENT — the slices an ask committed to, worked together" \
             states="open working closed abandoned" \
             owned-by="work-admission" \
             never-deleted=#true because="a closed iteration is history, and history is what makes a slice's maturity legible" \
@@ -378,7 +392,8 @@ method "delivery-graph" {
             field "trail"     each="1"
         }
 
-        entity "refusal" is="a pick-up the gate refused, and the condition that failed" \
+        entity "refusal" when="never by hand. The gate writes it when it refuses, which is what makes a refusal a fact rather than an absence" \
+            is="a pick-up the gate refused, and the condition that failed" \
             owned-by="work-admission" \
             never-deleted=#true because="a refusal nobody kept is a gate nobody can prove ran" \
             note="declared by ITER.260821.04, and the first kind the record needed that discovery \
@@ -411,7 +426,8 @@ method "delivery-graph" {
             // that its own vocabulary cannot express.
         }
 
-        entity "decision" is="a choice an iteration could not make implicitly, with what it rejected and what would show it wrong" \
+        entity "decision" when="when an iteration hits a choice it cannot make implicitly, with what it rejected and what would show it wrong" \
+            is="a choice an iteration could not make implicitly, with what it rejected and what would show it wrong" \
             owned-by="the iteration" \
             never-deleted=#true because="a decision nobody can read later is one that gets remade" \
             shape="carried as properties — chose, over, because, falsified-by, state, seal — with \
@@ -419,7 +435,8 @@ method "delivery-graph" {
             note="declared by ITER.260821.15. The record has carried decisions since ITER.260821.04 \
                 and nothing checked one"
 
-        entity "phase" is="one stage of work inside an iteration — WHEN in the attempt, as a layer is WHERE in the stack" \
+        entity "phase" when="as the work moves through an iteration — design before implement, and each says what it produced" \
+            is="one stage of work inside an iteration — WHEN in the attempt, as a layer is WHERE in the stack" \
             states="pending active complete skipped" \
             owned-by="the iteration" \
             note="undeclared until ITER.260820.01/P8. It survived the withdrawal of ADR.260819.02, \
@@ -457,7 +474,8 @@ method "delivery-graph" {
                     that punished it would teach people to write the approach at close"
         }
 
-        entity "approach" is="what will be built, and what it was chosen over" \
+        entity "approach" when="in the design phase, before the code — the alternatives are the half that proves a choice was made" \
+            is="what will be built, and what it was chosen over" \
             owned-by="the design-system phase" \
             note="declared by TS.260821.19. The alternative is the half that proves a choice was \
                 made — an approach with nothing rejected is a description of the only thing \
@@ -488,7 +506,8 @@ method "delivery-graph" {
             field "finding"    each="0..n"
         }
 
-        entity "walkthrough" is="one path through the record, walked all the way down — discovery's DEPTH activity" \
+        entity "walkthrough" when="when a path through the record needs walking all the way down, to find what the shape check cannot see" \
+            is="one path through the record, walked all the way down — discovery's DEPTH activity" \
             owned-by="delivery-record" \
             note="the storm is breadth: the whole timeline, shallow. A walk is one path, deep. \
                 Declared by WALK.260822.01, after the record was found to cite two walkthroughs \
@@ -508,10 +527,12 @@ method "delivery-graph" {
             field "trail"     each="1"
         }
 
-        entity "read-model" is="a view an actor must see before acting, owned by exactly one capability" \
+        entity "read-model" when="when an actor must SEE something before they can act, and one capability owns the answer" \
+            is="a view an actor must see before acting, owned by exactly one capability" \
             note="already load-bearing in every slice's needs/feeds edges and never declared"
 
-        entity "matured" is="one value the record changed, and what changed it" \
+        entity "matured" when="when a value the record holds changes — an append naming what taught it, never an overwrite" \
+            is="one value the record changed, and what changed it" \
             identified-by="the field that changed — `matured \"severity\"` is about `severity`" \
             owned-by="whatever holds the value" \
             note="declared by TS.260821.18. A product matures by ADDING a value, REMOVING one \
@@ -532,7 +553,8 @@ method "delivery-graph" {
             field "note"      each="0..n"
         }
 
-        entity "persona" is="somebody the product is for — what they came for, and how they judge whether they got it" \
+        entity "persona" when="before anything is framed. One is enough to start; the rest are discovered by the work and cite what surfaced them" \
+            is="somebody the product is for — what they came for, and how they judge whether they got it" \
             states="primary emergent" \
             owned-by="delivery-record" \
             note="declared by TS.260821.15. `needed-by` has been on every read model since the \
@@ -561,7 +583,8 @@ method "delivery-graph" {
             field "note"          each="0..n"
         }
 
-        entity "role" is="who may attest what — a position a human or an agent occupies, not a person" \
+        entity "role" when="when more than one identity works the record, and attesting your own work needs refusing" \
+            is="who may attest what — a position a human or an agent occupies, not a person" \
             owned-by="claim-settlement" \
             note="declared by TS.260821.08. `The same engineer cannot self-approve` has been in the \
                 router and in the engineer persona since before the delivery graph, and it is the \

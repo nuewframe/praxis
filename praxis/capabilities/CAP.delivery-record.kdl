@@ -30,7 +30,10 @@ capability "delivery-record" {
     owns-read-model "how-to-use-a-capability" answers="how do I use what this version can do?" publishable=#true \
         note="usage prose attaches to the capability record, which this capability owns. \
             release-binding decides WHICH version publishes, but explicitly does not write documents"
-    owns-read-model "what-is-currently-true" answers="what does this repository already know, so the next agent does not re-derive it?"
+    owns-read-model "what-is-currently-true"
+    owns-read-model "what-you-must-declare" \
+        note="added by TS.260823.09. The vocabulary is this capability's, so what the least of \
+            it is belongs here too" answers="what does this repository already know, so the next agent does not re-derive it?"
 
     enforces "convergence-or-split"
     enforces "capability-must-trace"

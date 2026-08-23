@@ -1640,39 +1640,69 @@ fn dashboarding(root: &Path) -> miette::Result<()> {
 /// The four shapes are the four things this plugin ships as instruction. A file outside them
 /// is not doctrine: `scripts/gen-*.sh` generates, `hooks/` wires, and neither tells an agent
 /// what to do.
-fn shipped_doctrine(from: &Path) -> Vec<String> {
+/// Every file this repository ships as instruction, as the RECORD declares its shapes.
+///
+/// `TS.260823.05`. This used to be a glob in the engine naming four shapes, and it reported
+/// "55 of 55 anchored" — true of that set, and silent about fifty-three further files under
+/// `skills/provision-project-overlay/templates/`, the tree copied INTO an adopter's
+/// repository. A denominator chosen by the thing being measured is the trust-transfer
+/// problem with a percentage sign after it.
+///
+/// The glob was the fault, not its width: A4 says the engine may not hold what the record
+/// declares, and *which shapes are instruction* is a fact about this repository. Widening it
+/// in place would have fixed today's number and left the next shape to be found the same way.
+fn shipped_doctrine(root: &Path, shapes: &[(String, String)]) -> Vec<String> {
     let mut out = Vec::new();
+    for (dir, pattern) in shapes {
+        collect_matching(&root.join(dir), root, pattern, &mut out);
+    }
+    out.sort();
+    out.dedup();
+    out
+}
 
-    let mut push = |path: PathBuf| {
-        if let Ok(rel) = path.strip_prefix(from) {
+/// Walk a directory, collecting every file whose name matches the pattern.
+///
+/// Recursive, because a template three directories down is read by an agent exactly as a
+/// top-level skill is. The pattern is a filename shape — `*SKILL.md`, `check-*.sh` — never
+/// a path, which is why it is exempt from the citation rule.
+fn collect_matching(dir: &Path, root: &Path, pattern: &str, out: &mut Vec<String>) {
+    let Ok(entries) = fs::read_dir(dir) else { return };
+    for entry in entries.flatten() {
+        let path = entry.path();
+        if path.is_dir() {
+            collect_matching(&path, root, pattern, out);
+        } else if praxis_core::surface::matches_shape(&entry.file_name().to_string_lossy(), pattern)
+            && let Ok(rel) = path.strip_prefix(root)
+        {
             out.push(rel.to_string_lossy().replace('\\', "/"));
         }
-    };
+    }
+}
 
-    if let Ok(entries) = fs::read_dir(from.join("skills")) {
-        for entry in entries.flatten() {
-            let skill = entry.path().join("SKILL.md");
-            if skill.is_file() {
-                push(skill);
+/// The shipped files whose ANCHORING a named slice owes, as `(path, slice)`.
+fn owed_anchors(root: &Path, docs: &[kdl::KdlDocument]) -> Vec<(String, String)> {
+    let mut out = Vec::new();
+    for doc in docs {
+        for config in doc.nodes().iter().filter(|n| n.name().value() == "config") {
+            let Some(body) = config.children() else { continue };
+            let Some(block) = body.nodes().iter().find(|n| n.name().value() == "ships-doctrine")
+            else {
+                continue;
+            };
+            let Some(inner) = block.children() else { continue };
+            for shape in inner.nodes().iter().filter(|n| n.name().value() == "from") {
+                let Some(owed_to) = praxis_core::schema::prop(shape, "owed-to") else { continue };
+                let Some(dir) = shape.entries().first().and_then(|e| e.value().as_string()) else {
+                    continue;
+                };
+                let Some(named) = praxis_core::schema::prop(shape, "named") else { continue };
+                let mut found = Vec::new();
+                collect_matching(&root.join(dir), root, &named, &mut found);
+                out.extend(found.into_iter().map(|p| (p, owed_to.clone())));
             }
         }
     }
-    for (dir, suffix) in
-        [("instructions", ".instructions.md"), ("agents", ".agent.md"), ("scripts", ".sh")]
-    {
-        let Ok(entries) = fs::read_dir(from.join(dir)) else { continue };
-        for entry in entries.flatten() {
-            let path = entry.path();
-            let name = entry.file_name().to_string_lossy().into_owned();
-            // Probes only, out of scripts/. A generator is not doctrine.
-            let is_probe = dir != "scripts" || name.starts_with("check-");
-            if path.is_file() && name.ends_with(suffix) && is_probe {
-                push(path);
-            }
-        }
-    }
-
-    out.sort();
     out
 }
 
@@ -1692,7 +1722,15 @@ fn auditing(root: &Path, from: &Path) -> miette::Result<bool> {
 
     let docs: Vec<_> = sources.into_iter().map(|(_, _, doc)| doc).collect();
     let corpus = Corpus::from_documents(&docs, &schema);
-    let shipped = shipped_doctrine(from);
+    let shapes = praxis_core::surface::declared_shapes(&docs);
+    if shapes.is_empty() {
+        miette::bail!(
+            "this repository declares no `ships-doctrine` in its config, so what counts as \
+             shipped instruction is undeclared. An audit whose denominator lives in the engine \
+             measures whatever the engine chose to look at"
+        );
+    }
+    let shipped = shipped_doctrine(from, &shapes);
     let audit = audit(surfaces(&corpus), &shipped);
 
     for (id, path) in &audit.absent {
@@ -2321,7 +2359,12 @@ fn check(root: &Path) -> miette::Result<usize> {
     // over the corpus and attributed back to the file that raised them.
     let docs: Vec<_> = sources.iter().map(|(_, _, d)| d.clone()).collect();
     // What the tree holds, for the rules the record alone cannot decide (TS.260821.03).
-    let facts = Facts { shipped: shipped_doctrine(Path::new(".")) };
+    // The shapes come from the record here too. A repository that declares none audits
+    // nothing rather than falling back to a set the engine chose (`TS.260823.05`).
+    let facts = Facts {
+        shipped: shipped_doctrine(Path::new("."), &praxis_core::surface::declared_shapes(&docs)),
+        owed: owed_anchors(Path::new("."), &docs),
+    };
     let corpus = check_corpus_given(&docs, &schema, &facts);
 
     // Redefinitions count as refusals: a repository running a variant of the method is not

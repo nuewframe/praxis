@@ -92,3 +92,85 @@ pub fn audit(surfaces: &[Surface], shipped: &[String]) -> Audit {
 pub fn surfaces(corpus: &Corpus) -> &[Surface] {
     &corpus.surfaces
 }
+
+/// Whether a filename matches a shape. One `*`, anywhere, or an exact name.
+///
+/// `TS.260823.05`. The shapes come from the record — `*SKILL.md`, `check-*.sh` — so this is
+/// the only place that knows what a shape MEANS, and it is pure: the shell walks the tree
+/// and asks.
+#[must_use]
+pub fn matches_shape(name: &str, pattern: &str) -> bool {
+    match pattern.split_once('*') {
+        Some((before, after)) => {
+            name.len() >= before.len() + after.len()
+                && name.starts_with(before)
+                && name.ends_with(after)
+        }
+        None => name == pattern,
+    }
+}
+
+/// The shapes the record says count as shipped instruction, as `(directory, pattern)`.
+///
+/// Empty is a repository that declares none, and the caller refuses rather than falling back
+/// to a set the engine chose. That fallback was the fault: four shapes globbed in the shell,
+/// reporting "55 of 55 anchored" while fifty-three files an adopter receives sat outside the
+/// denominator entirely.
+#[must_use]
+pub fn declared_shapes(docs: &[kdl::KdlDocument]) -> Vec<(String, String)> {
+    shapes_with(docs, None)
+}
+
+/// The shapes whose disposal is owed to a named slice, as `(directory, pattern, slice)`.
+#[must_use]
+pub fn owed_shapes(docs: &[kdl::KdlDocument]) -> Vec<(String, String, String)> {
+    shapes_with(docs, Some("owed-to"))
+        .into_iter()
+        .filter_map(|(dir, named)| {
+            owner_for(docs, &dir, &named).map(|owed| (dir, named, owed))
+        })
+        .collect()
+}
+
+fn owner_for(docs: &[kdl::KdlDocument], dir: &str, named: &str) -> Option<String> {
+    for shape in ships_doctrine_nodes(docs) {
+        let this_dir = shape.entries().first().and_then(|e| e.value().as_string());
+        if this_dir == Some(dir) && crate::schema::prop(&shape, "named").as_deref() == Some(named) {
+            return crate::schema::prop(&shape, "owed-to");
+        }
+    }
+    None
+}
+
+fn ships_doctrine_nodes(docs: &[kdl::KdlDocument]) -> Vec<kdl::KdlNode> {
+    let mut out = Vec::new();
+    for doc in docs {
+        for config in doc.nodes().iter().filter(|n| n.name().value() == "config") {
+            let Some(body) = config.children() else { continue };
+            let Some(block) = body.nodes().iter().find(|n| n.name().value() == "ships-doctrine")
+            else {
+                continue;
+            };
+            let Some(inner) = block.children() else { continue };
+            out.extend(inner.nodes().iter().filter(|n| n.name().value() == "from").cloned());
+        }
+    }
+    out
+}
+
+fn shapes_with(docs: &[kdl::KdlDocument], requiring: Option<&str>) -> Vec<(String, String)> {
+    let mut out = Vec::new();
+    for shape in ships_doctrine_nodes(docs) {
+        if let Some(key) = requiring
+            && crate::schema::prop(&shape, key).is_none()
+        {
+            continue;
+        }
+        let Some(dir) = shape.entries().first().and_then(|e| e.value().as_string()) else {
+            continue;
+        };
+        let Some(named) = crate::schema::prop(&shape, "named") else { continue };
+        out.push((dir.to_owned(), named));
+    }
+    out
+}
