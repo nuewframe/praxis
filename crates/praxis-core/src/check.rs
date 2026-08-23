@@ -80,6 +80,10 @@ pub enum Refusal {
     ImplementWithoutApproach { iteration: String, approaches: usize },
     /// A teach phase that names no reader.
     TaughtNobody { iteration: String },
+    /// An implement naming an approach the iteration never produced.
+    FollowedNothing { iteration: String, named: String },
+    /// An approach neither followed nor abandoned.
+    ApproachNotTaken { iteration: String, approach: String },
     /// A symptom resolved by a release the record does not hold.
     ResolvedByNothing { symptom: String, version: String },
     /// A symptom resolved by a release that bound no slice attacking it.
@@ -153,6 +157,9 @@ impl Refusal {
             Self::ContradictedMaturation { .. } => "a-value-agrees-with-its-maturation",
             Self::ImplementWithoutApproach { .. } => "implement-follows-an-approach",
             Self::TaughtNobody { .. } => "teach-reaches-an-end-user",
+            Self::FollowedNothing { .. } | Self::ApproachNotTaken { .. } => {
+                "the-plan-and-the-code-agree"
+            }
         }
     }
 
@@ -188,6 +195,8 @@ impl Refusal {
             Self::ContradictedMaturation { field, .. } => field,
             Self::ImplementWithoutApproach { .. } => "followed",
             Self::TaughtNobody { .. } => "produced",
+            Self::FollowedNothing { .. } => "followed",
+            Self::ApproachNotTaken { .. } => "approach",
             Self::UnjustifiedLifetime { missing, .. } => missing,
         }
     }
@@ -298,6 +307,16 @@ impl Refusal {
                 "{iteration} implemented without naming which of its {approaches} approach(es) it \
                  followed. Deriving the better approach is what design-system is FOR, and an \
                  implement that does not point at one built something the plan did not describe"
+            ),
+            Self::FollowedNothing { iteration, named } => format!(
+                "{iteration} followed {named:?}, which its design-system never produced. An \
+                 approach the record says was taken and does not hold is worse than no plan — no \
+                 plan is silence, and this is an account of a choice nobody made"
+            ),
+            Self::ApproachNotTaken { iteration, approach } => format!(
+                "{iteration} produced the approach {approach:?} and neither followed nor abandoned \
+                 it. Abandoning a plan is normal and expected — say so with `abandoned`, and the \
+                 alternative stays in the record where it is worth something"
             ),
             Self::TaughtNobody { iteration } => format!(
                 "{iteration}'s teach phase names no reader. Say who it taught with `taught`: a \
@@ -938,6 +957,59 @@ pub fn check_corpus_given(
                         },
                         span: implement.span(),
                     });
+                }
+
+                // The plan and the code agree. Not `was it written first` — that is
+                // unverifiable and was the wrong question (ITER.260822.14/AZ2, superseded).
+                // What is checkable is that every approach the record holds was taken, and
+                // that what implement claims to have followed exists.
+                if let Some(design) = complete("design-system") {
+                    let produced: Vec<String> = children_named(design, "approach")
+                        .iter()
+                        .filter_map(|a| string_arg(a))
+                        .collect();
+                    let followed: Vec<String> = complete("implement")
+                        .map(|i| {
+                            children_named(i, "followed")
+                                .iter()
+                                .filter_map(|f| string_arg(f))
+                                .chain(prop(i, "followed"))
+                                .collect()
+                        })
+                        .unwrap_or_default();
+
+                    for named in &followed {
+                        if !produced.contains(named) {
+                            out.push(Violation {
+                                entity_kind: "phase".to_owned(),
+                                entity_id: Some(id.clone()),
+                                refusal: Refusal::FollowedNothing {
+                                    iteration: id.clone(),
+                                    named: named.clone(),
+                                },
+                                span: design.span(),
+                            });
+                        }
+                    }
+                    for approach in children_named(design, "approach") {
+                        let Some(name) = string_arg(approach) else { continue };
+                        // Abandoning is a recorded act. The approach stays in the record —
+                        // deleting it loses the alternative that was considered, which is the
+                        // reason the plan was worth writing.
+                        let abandoned = !children_named(approach, "abandoned").is_empty()
+                            || prop(approach, "abandoned").is_some();
+                        if !abandoned && !followed.contains(&name) {
+                            out.push(Violation {
+                                entity_kind: "phase".to_owned(),
+                                entity_id: Some(id.clone()),
+                                refusal: Refusal::ApproachNotTaken {
+                                    iteration: id.clone(),
+                                    approach: name,
+                                },
+                                span: approach.span(),
+                            });
+                        }
+                    }
                 }
 
                 // A teach phase that does not say who it taught. Naming the reader rather

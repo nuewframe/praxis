@@ -78,6 +78,29 @@ rule that punished it would teach people to write the approach at close, which i
 behaviour being fixed. What matters is that the plan and the discovery stay
 distinguishable — that is the whole value of having written it down first.
 
+## Abandoning a plan
+
+**Expected, and cheap.** Building teaches things a plan cannot know.
+
+```kdl
+approach "the one that did not survive contact" {
+    over "doing it all at once"
+    because "it splits cleanly"
+    abandoned "the schema could not express it without a second kind"
+}
+```
+
+The approach **stays in the record**. Deleting it loses the alternative that was considered,
+which is the reason the plan was worth writing.
+
+What is refused is an approach neither followed nor abandoned — a decision the record *claims*
+was taken and was not. That is worse than no plan at all: no plan is silence, and this is an
+account of a choice nobody made, which a reader has no reason to distrust.
+
+`followed` and `abandoned` are **child nodes, not properties.** KDL keeps only the last of a
+repeated property, so four `followed="…"` on one node record one approach and lose three —
+which happened, and nothing said so until the rule ran (`BB1`).
+
 ## teach is not the doctrine layer
 
 A skill teaches an **agent** and is the `doctrine` layer. A version's docs teach the **reader

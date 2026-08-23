@@ -71,14 +71,19 @@ iteration "ITER.260822.14" {
 
     phase "design-ux" state="complete" required-by="docs" worked-by="agent:principal-engineer" \
         produced="the refusal names the PHASE and what it should point at, not the rule"
+    // `followed` is written as CHILD NODES. It was four repeated PROPERTIES, and KDL keeps
+    // only the last of a repeated property — so this iteration claimed four approaches and
+    // the record held one. Corrected rather than matured: nothing about the decision changed,
+    // the file simply never held what was decided (ITER.260823.01/BB1).
     phase "implement" state="complete" required-by="enforcement · docs" \
         worked-by="agent:principal-engineer" \
-        followed="the phase carries its own approach, and implement points at it" \
-        followed="four rules, and the fourth reports rather than refuses" \
-        followed="the schema describes a field whether it is a child node or a property" \
-        followed="an approach is matured, never overwritten" \
         produced="the phase and approach kinds, the two rules with witnesses, property-aware \
-            field reading, and thirty-three back-filled teach phases"
+            field reading, and thirty-three back-filled teach phases" {
+        followed "the phase carries its own approach, and implement points at it"
+        followed "four rules, and the fourth reports rather than refuses"
+        followed "the schema describes a field whether it is a child node or a property"
+        followed "an approach is matured, never overwritten"
+    }
     phase "learn" state="complete" required-by="always" worked-by="agent:principal-engineer" \
         produced="AZ1 and AZ2 — one about what the shape exposed, one about what it still cannot see"
     phase "teach" state="skipped" required-by="doctrine" worked-by="agent:principal-engineer" \

@@ -823,6 +823,31 @@ method "delivery-graph" {
                 }
                 """#
 
+        rule "the-plan-and-the-code-agree"            refuses="an approach the record says was taken that the iteration never produced, or one it produced and neither followed nor abandoned" \
+            because="an approach recorded and not taken is a decision the record CLAIMS was made. \
+                That is worse than no plan at all — no plan is silence, and this is an account of \
+                a choice nobody made, which a reader has no reason to distrust" \
+            found-by="ITER.260822.14/AZ2, superseded. Chronology was the wrong question: the code \
+                is the decision and the plan is the informed act before it, so what matters is not \
+                when it was written but that it and the thing built agree" \
+            witness=#"""
+                iteration "ITER.witness-unfollowed" {
+                    slug "planned-and-did-otherwise"
+                    on-slice "TS.260821.20"
+                    state "closed"
+                    phase "design-system" state="complete" {
+                        approach "the one that was written down" {
+                            over "something else"
+                            because "it seemed better at the time"
+                        }
+                    }
+                    phase "implement" state="complete" followed="an approach nobody recorded"
+                    trail {
+                        entry at="2026-08-22T00:00:00Z" by="human:witness" action="created"
+                    }
+                }
+                """#
+
         rule "teach-reaches-an-end-user"              reports="a teach phase that names no reader" \
             because="a skill teaches an AGENT and is the doctrine layer; a version's docs teach \
                 the reader of a release. Every iteration in this frame named one skill under both, \
