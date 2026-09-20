@@ -1,0 +1,61 @@
+thin-slice "TS.260821.01" {
+    slug "declare-an-entity-kind"
+    title "Refuse a record whose kind nothing declares, and say what to declare"
+    kind "command"
+    realizes "CAP.delivery-record"
+    from-storm "ES.260819.01"
+    state "delivered"
+
+    command "declare-entity"
+    actor "maintainer"
+    produces-event "EntityDeclared" "EntityDeclarationRefused"
+    needs-read-model "capabilities-and-what-they-own"
+
+    trigger "the model gained a kind of thing the record does not yet know about"
+    outcome "the kind is declared and its records are checked, or a record using an undeclared kind is refused by name"
+
+    scenario #"""
+        Given a record file holding a node whose kind the schema does not declare
+        When the record is checked
+        Then it is refused, naming the kind and saying that declaring it is an amendment to the
+             architecture rather than an edit to the engine — because three entities went missing
+             this way already, and each was found only when something tried to build against it.
+        """#
+
+    step "1" does="write the kind on the architecture's schema block, with what it IS and the fields it must carry"
+    step "2" does="records of that kind are checked from then on, with no engine change"
+    step "3a" does="on a record whose kind is undeclared, refuse and name it" when="undeclared"
+    step "3b" does="on a kind declared with no fields, admit and report — a shape that asks nothing cannot refuse anything" when="declared but empty"
+
+    excludes "deciding whether the kind SHOULD exist. That is the architecture's argument, not the checker's"
+    excludes "inventing a shape for an undeclared kind. The engine may not encode what the record declares (ADR.260819.01/A4)"
+    excludes "refusing an unknown PROPERTY on a known kind. Fields are declared; properties are not, and widening that is a separate cut"
+
+    layer "doctrine"    reaches="the skill teaches declaring the kind before writing records of it, and that extending the vocabulary is an amendment rather than a code change"
+    layer "enforcement" reaches="undeclared-entity-kind, which the schema has declared since NA.260820.01 and nothing has ever enforced"
+    layer "docs"        reaches="the refusal names the kind and points at where declaring it belongs"
+
+    claim "C1" text="a node whose kind the schema does not declare is refused, naming the kind" \
+        settled-by="a negative test with an undeclared kind, asserting the kind appears in the diagnostic"
+    claim "C2" text="declaring the kind on the schema admits it, with no engine change" \
+        settled-by="a test that adds a kind to a schema fixture and asserts the same record then passes"
+    claim "C3" text="a kind declared with no fields is admitted and reported, never silently accepted" \
+        settled-by="a test asserting a report rather than a refusal, and asserting it is not silent"
+    claim "C4" text="the three kinds that went undeclared — iteration, read-model, phase — would each have been caught" \
+        settled-by="a regression test replaying each against the schema as it stood before that kind was declared"
+
+    depends-on "the schema's entity-and-field shape, frozen — the same contract TS.260820.01 built against"
+
+    useful-alone "the record stops being able to grow a kind of thing in silence. Nothing else in \
+        this frame needs to ship for that to be worth having"
+    useful-to "the-team-building-a-digital-product"
+
+    attacks "S2" "S7"
+
+    cut-from "ITER.260820.01/P9" \
+        because="the rule was declared on the architecture and never enforced, so exactly the \
+            entities that were missing are the ones the checker could not have flagged. Three of \
+            the first iteration's nine findings are instances of this one gap"
+    note "cut with the checker the previous iteration built. It is the first slice whose shape was \
+        refused-or-admitted rather than asserted by its author"
+}

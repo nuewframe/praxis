@@ -1,0 +1,52 @@
+thin-slice "TS.260820.05" {
+    slug "pick-up-a-slice"
+    title "Take a slice, and have the refusal recorded when it is refused"
+    kind "command"
+    realizes "CAP.work-admission"
+    from-storm "ES.260819.01"
+
+    command "pick-up"
+    actor "working-agent"
+    produces-event "SliceVetted" "PickupRefused"
+    needs-read-model "what-is-ready-to-pick-up"
+
+    trigger "an agent has chosen a slice and is about to start"
+    outcome "either an iteration is open, or a refusal is on the record naming the condition that failed"
+
+    scenario #"""
+        Given a slice and a repository with other work possibly in flight
+        When the working agent picks it up
+        Then the gate admits it and opens an iteration, or refuses and records the refusal with the
+             condition that failed — because a gate that was never invoked and a gate that
+             refused look identical afterwards, and that is the whole of S3.
+        """#
+
+    step "1" does="ask to pick up this slice, now, against the tree as it currently stands"
+    step "2" does="the gate evaluates: dependencies frozen, no other iteration on this slice, work disjoint from what is in flight"
+    step "3a" does="on admission, open the iteration and freeze what it stands on" when="admitted"
+    step "3b" does="on refusal, record PickupRefused with the failing condition. Nothing opens" when="refused"
+
+    excludes "judging whether the work is any good. That is claim-settlement, at the other end"
+    excludes "queueing. A refusal is not a promise to admit later"
+
+    layer "doctrine"    reaches="the skill teaches that selection IS the commitment, and that refusals are recorded"
+    layer "enforcement" reaches="the one gate — the only place in the method that refuses at open"
+    layer "docs"        reaches="refusals appear in the iteration record and survive into the release projection"
+
+    claim "C1" text="a refused pickup writes a PickupRefused event naming the failing condition" \
+        settled-by="one test per condition, each asserting the event exists and names that condition"
+    claim "C2" text="a refused pickup opens nothing" \
+        settled-by="a test asserting no iteration exists after refusal"
+    claim "C3" text="a second iteration on a live slice is refused" \
+        settled-by="a negative test with an iteration already open"
+
+    depends-on "TS.260820.04 — the gate and its view share one implementation of the conditions"
+
+    useful-alone "the amount of process a unit of work received stops being the receiving \
+        agent's own account of it"
+    useful-to "the-team-building-a-digital-product"
+
+    attacks "S3"
+    principle-note "selection is the commitment. Choosing to work this is choosing not to work \
+        something else, and it is the first moment the information needed to decide exists"
+}

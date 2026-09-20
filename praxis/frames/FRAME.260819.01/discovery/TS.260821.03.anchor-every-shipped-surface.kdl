@@ -1,0 +1,83 @@
+// Cut from ITER.260821.19/AK3, and from what AK3 could not answer.
+//
+// AK3 says the router describes a spine that was replaced. Fixing the router by hand fixes
+// one file. The question underneath it — WHICH of the forty-seven things this plugin ships
+// still has a reason to exist — has no answer anywhere, and a hand sweep would have to
+// invent one skill at a time. That is the shape this frame refuses everywhere else.
+
+thin-slice "TS.260821.03" {
+    slug "anchor-every-shipped-surface"
+    title "Report any doctrine this plugin ships that no record entity justifies"
+    kind "command"
+    realizes "CAP.delivery-record"
+    from-storm "ES.260819.01"
+
+    command "audit-surfaces"
+    actor "automation"
+    produces-event "SurfaceAnchored" "SurfaceUnanchored"
+    needs-read-model "what-is-currently-true"
+
+    trigger "the plugin ships a skill, a guardrail, an agent, or a probe, and nobody can say what in the record asks for it"
+    outcome "every shipped surface either names the record entity it serves, or is reported by path"
+
+    scenario #"""
+        Given a plugin shipping forty-seven skills, three guardrails, three agents and
+             seventeen probes, of which twenty-two correspond to a slice this frame delivered
+        When the surfaces are audited
+        Then each shipped file is matched against a `doctrine-surface` the record declares, and
+             any file the record does not declare is REPORTED by path — because a skill nobody
+             can trace to a capability, a slice or a read model is doctrine an agent will follow
+             on the plugin's authority alone, which is S1 with the method's own name on it.
+        """#
+
+    step "1" does="read every `doctrine-surface` the record declares. The set comes from the record, never from the engine"
+    step "2" does="take the shipped files as facts handed in by the shell — the core never reads a directory"
+    step "3" does="a shipped file no surface declares is reported as unanchored, by path"
+    step "4" does="a surface declaring a path that does not ship REFUSES — a declared surface that is not there is a broken promise, not an untidy one"
+    step "5" does="a surface whose `serves` names nothing the record holds is caught by dangling-relationship, unchanged"
+
+    excludes "deleting anything. This slice makes the legacy set computable and does not act on it — \
+        the acting is TS.260821.04, and separating them is what keeps `unanchored` an honest \
+        measurement rather than a list produced by whoever did the deleting"
+    excludes "judging whether an anchored skill is a GOOD skill. It proves the record asks for the \
+        surface, never that the surface teaches the right thing"
+    excludes "refusing on an unanchored surface at this severity. The report names twenty-five on the \
+        day it lands; a rule that fails closed on its first run is one nobody can adopt. It flips to \
+        refuse in TS.260821.04, when the count is zero"
+
+    layer "doctrine"    reaches="declaring a surface is part of writing one, the way declaring a witness is part of declaring a rule"
+    layer "enforcement" reaches="every-shipped-surface-is-anchored (report) and a-declared-surface-ships (refuse)"
+    layer "docs"        reaches="`what does this plugin ship, and why` stops being answerable only by reading forty-seven files"
+
+    claim "C1" text="a shipped file that no declared surface names is reported, by path" \
+        settled-by="a test handing in a shipped path the record does not declare, asserting it is named in the report"
+    claim "C2" text="a declared surface whose path does not ship refuses" \
+        settled-by="a test declaring a surface for an absent path, asserting a refusal — the opposite direction from C1, and the one that fails closed"
+    claim "C3" text="the anchor is a relationship into the record, so a surface serving a withdrawn entity is already dangling" \
+        settled-by="a test declaring a surface whose `serves` names no entity, asserting dangling-relationship refuses it without a second rule"
+    claim "C4" text="the shipped set is a fact handed to the core, never a directory the core reads" \
+        settled-by="a test proving the audit is total over its input and touches no filesystem, plus a shell test that the enumeration is the shell's"
+
+    depends-on "TS.260821.01 — `doctrine-surface` is declared on the schema before it can be audited"
+
+    useful-alone "`which of the things we ship does the record still ask for` becomes answerable, and \
+        the answer on the first run is that twenty-five of forty-seven skills have no anchor. Worth \
+        having with nothing deleted, because today that number cannot be produced at all"
+    useful-to "the-team-building-a-digital-product"
+
+    attacks "S1"
+
+    cut-from "ITER.260821.19/AK3" \
+        note="AK3 was recorded as an observation about one file. Reading it as `the front door is \
+            stale` gives a slice that edits the front door; reading it as `nothing knows which door \
+            is which` gives this one"
+
+    principle-note "the method shipped twenty-five skills that no longer describe how work moves \
+        through this repository, and the only reason anyone knows is that a walkthrough read the \
+        router as a newcomer would. A method whose own surface drifts without objection is the root \
+        cause pointed inward — fidelity asserted by whoever shipped it"
+
+    proves "every shipped surface is either justified by the record or named as unjustified"
+    does-not-prove "that the anchored surfaces are correct. An anchor says the record asks for the \
+        skill; whether the skill teaches what the record means is what its own slice's docs layer is for"
+}

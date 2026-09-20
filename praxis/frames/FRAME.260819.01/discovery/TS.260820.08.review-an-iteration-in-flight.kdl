@@ -1,0 +1,56 @@
+thin-slice "TS.260820.08" {
+    slug "review-an-iteration-in-flight"
+    title "Review what an iteration has actually shown, writing nothing to the published record"
+    kind "view"
+    realizes "CAP.claim-settlement"
+    from-storm "ES.260819.01"
+
+    read-model "what-this-iteration-claims-and-has-shown"
+    content-owned-by "CAP.claim-settlement"
+    rendered-by "CAP.document-projection"
+    lifetime "working"
+    actor "reviewer"
+
+    trigger "an iteration is underway and someone needs to see what it has done"
+    outcome "they read it as a document, marked as a preview, and reviewing leaves no residue"
+
+    scenario #"""
+        Given an iteration in progress
+        When the reviewer asks to see it
+        Then they get a whole document composed from the record as it stands — what the iteration
+             promised, what it has evidenced, what is still open — plainly marked as a preview
+             of a version that does not exist yet, and thrown away after, which is what lets
+             the published tree stay written-once.
+        """#
+
+    step "1" does="ask, at any moment. Review cadence and release cadence are not the same"
+    step "2" does="compose a whole document from the record as it stands"
+    step "3" does="mark it a preview of a version that does not exist yet"
+    step "4" does="read it, without reconstructing the position from five sources"
+    step "5" does="discard. Nothing enters the committed tree"
+
+    excludes "approving anything. Reading is not a gate"
+    excludes "any write to the published tree, at any point, for any reason"
+
+    layer "doctrine"    reaches="the skill teaches reviewing in flight rather than at a checkpoint"
+    layer "enforcement" reaches="the working projection path is gitignored, so a preview cannot be committed by accident"
+    layer "docs"        reaches="the preview itself, marked and discarded"
+
+    claim "C1" text="a preview is never mistakable for a record — the header says which it is" \
+        settled-by="a golden test on the preview header"
+    claim "C2" text="composing a preview writes nothing to the published tree" \
+        settled-by="a test asserting the published tree hash is unchanged after a preview"
+    claim "C3" text="the preview reflects state at the moment it was asked, with no regeneration step" \
+        settled-by="a test that mutates state between two previews and asserts they differ"
+
+    depends-on "TS.260820.06 — there must be claims and evidence to show"
+
+    useful-alone "a reviewer stops judging an artifact by how finished it looks. That is S2, \
+        and it needs no release machinery"
+    useful-to "the-team-building-a-digital-product"
+
+    attacks "S2"
+    note "the second E10 test: content owned by claim-settlement, mechanism owned by \
+        document-projection. If rendering this needs a code path specific to this view, \
+        the capability split is fake"
+}

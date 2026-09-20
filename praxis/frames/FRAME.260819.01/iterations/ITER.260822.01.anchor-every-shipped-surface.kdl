@@ -1,0 +1,132 @@
+// Opened by `praxis pick-up`. Every condition below was evaluated against the
+// tree as it stood at 2026-08-22T02:15:35Z, and the verdicts are recorded
+// rather than summarised: a gate whose reasoning is not on the record is a gate
+// you have to trust.
+
+iteration "ITER.260822.01" {
+    slug "anchor-every-shipped-surface"
+    on-slice "TS.260821.03"
+    state "closed"
+    opened-at "2026-08-22T02:15:35Z"
+    opened-by "agent:praxis"
+
+    approval "admission" {
+        status "signed"
+        signer "human:wael"
+        at "2026-08-22T02:15:35Z"
+        signed-by "the ask to pick up this slice"
+    }
+
+    vet "create" state="done" at="2026-08-22T02:15:35Z" on-slice="TS.260821.03" {
+        condition "slice-is-shaped" verdict="passed"
+        condition "dependencies-delivered" verdict="passed"
+        condition "no-iteration-in-flight" verdict="passed"
+        condition "nothing-left-to-admit" verdict="passed"
+        condition "work-is-disjoint" verdict="not-computed" \
+            found="no seam manifest exists, so what two iterations would touch cannot be compared. Disjointness is half of what this capability says it judges, and half of what it judges is currently not computed at all"
+        condition "the-slice-is-the-best-available" verdict="left-to-the-maintainer"
+    }
+
+    // 2 of the declared conditions were not decided by the gate. They are
+    // recorded above rather than omitted: an admission that does not say what
+    // it left undecided claims more than it checked.
+
+    // Frozen at open, from the slices. Removing one from a slice now
+    // does not remove it from here — it makes the two disagree, and that is
+    // refused.
+    claim "C1" from-slice="TS.260821.03" state="met" \
+        evidence="a shipped file nobody declared is reported by path — \
+            asserts the report names the PATH and not a count, and that the severity is Report"
+    claim "C2" from-slice="TS.260821.03" state="met" \
+        evidence="a declared surface that does not ship refuses and \
+            a retired surface still in the tree refuses — both directions of the failing-closed \
+            half, plus the assertion that a retirement actually carried out is silent"
+    claim "C3" from-slice="TS.260821.03" state="met" \
+        evidence="a surface serving nothing the record holds is already dangling \
+            — `serves` references five kinds and dangling-relationship refuses without a second rule"
+    claim "C4" from-slice="TS.260821.03" state="met" \
+        evidence="the audit is pure and total over its input asserts \
+            every shipped path lands in exactly one bucket; the enumeration is shipped doctrine, \
+            and audit surfaces separates the record from the tree asserts \
+            the two trees stay two flags"
+
+    layer "doctrine"    state="evidenced" \
+        evidence="surface.skill.anchor-a-doctrine-surface, registered in the router" \
+        reaches="declaring a surface is part of writing one"
+    layer "enforcement" state="evidenced" \
+        evidence="a-declared-surface-ships refuses and every-shipped-surface-is-anchored reports; \
+            both are witnessed, taking the proven set from 17 of 41 to 19 of 43. 194 tests pass" \
+        reaches="the two rules, over the whole shipped set"
+    layer "docs"        state="evidenced" \
+        evidence="`praxis audit-surfaces` prints 23 of 68 anchored and names every unanchored path; \
+            `praxis truth` gained a `doctrine shipped` section and an entry in `not covered`" \
+        reaches="`what does this plugin ship, and why` is answerable without opening forty-seven files"
+
+    phase "design-ux" state="complete" required-by="docs" \
+        produced="the audit reports both directions separately and names paths, because a count of \
+            unanchored files tells a reader nothing they can act on"
+    phase "design-system" state="complete" required-by="enforcement" \
+        produced="Facts — the first thing this engine checks that the record alone cannot decide. \
+            The world is handed IN, and a rule about the world is witnessed by a rule that declares \
+            the world it assumes (given-shipped)"
+    phase "implement" state="complete" required-by="enforcement · docs" \
+        produced="the surface reader, check_surfaces, the audit-surfaces command, and 23 anchored surfaces"
+    phase "learn" state="complete" required-by="always" \
+        produced="four findings — two defects the record caught in this iteration's first hour, one \
+            widening that had to be argued rather than made, and one honest count"
+    phase "teach" state="skipped" required-by="doctrine" \
+        produced="surface.skill.anchor-a-doctrine-surface" \
+        skipped-because="it produced doctrine for an AGENT, which is the doctrine LAYER and is recorded there. Teaching an end user the feature's why and how did not happen — and the record already serves the next agent, whose own persona judges success by NOT needing a document (TS.260821.19, ITER.260822.15/BA1)"
+
+    finding "AL1" state="open" size="frame-sized" \
+        text="`praxis pick-up` over two slices wrote a refusal naming one thin-slice called \
+            \"TS.260821.03 TS.260821.04\" — the ids joined into a single value. The refusal writer \
+            was never updated when the commitment model changed, and the schema's `refusal` entity \
+            still declared `on-slice each=\"1\"` beside it" \
+        note="AK1's family exactly, one level over. The commitment rewire touched twenty-three \
+            admission sites and the record of the same ask being TURNED DOWN kept compiling. Found \
+            by running the gate on a real ask over two slices, which had never been done — every \
+            multi-slice pick-up in this frame so far had been admitted"
+
+    finding "AL2" state="open" size="observation" \
+        text="a corpus-level refusal that belongs to no document was computed and silently dropped. \
+            every-shipped-surface-is-anchored names a path with no entity id, and `praxis check` \
+            attributed corpus violations back to files before printing them" \
+        note="AG1 for the third time, in a third place. The pattern is now unmistakable: this \
+            engine loses refusals on the way OUT, not on the way in. Fixed generally — check now \
+            prints corpus violations that belong to no document — but nothing stops a fourth"
+
+    finding "AL3" state="open" size="observation" \
+        text="dangling-relationship refused the first two surfaces declared, because `serves` \
+            referenced three kinds and the router serves a FRAME. Widening the reference set to \
+            five is the move this frame refuses everywhere else" \
+        note="recorded because the widening is only legitimate if argued, and an argument nobody \
+            can find later is an assertion. The argument is on the field: `serves` means what the \
+            instruction exists to PRODUCE OR OPERATE. What must not happen is a sixth kind added \
+            because something failed"
+
+    finding "AL4" state="open" size="observation" \
+        text="the plugin ships 68 instruction surfaces and the record justifies 23. scripts/ \
+            the plugin validator already fails on three unrelated checks — dangling doc links and \
+            version literals — so the doctrine tree was drifting on two independent axes at once" \
+        note="not fixed here. TS.260821.04 owns taking the count to zero; the validate-plugin \
+            failures predate this iteration and belong to whatever slice owns the harness layer"
+    closed-at "2026-08-22T02:29:11Z"
+    outcome "continue"
+
+    close {
+        claims-settled "C1" how="met"
+        claims-settled "C2" how="met"
+        claims-settled "C3" how="met"
+        claims-settled "C4" how="met"
+        all-met #true
+        note "the accounting above was computed at close, not asserted. It says every claim is either met or carried by a finding that names it, and nothing about whether the work is any good"
+    }
+
+    trail {
+        entry at="2026-08-22T02:29:11Z" by="agent:praxis" action="state-changed" from="open" to="closed" note="closed by `praxis close`. The accounting was computed; the conclusion is not the machine's to draw"
+
+        entry at="2026-08-22T02:15:35Z" by="agent:praxis" action="created" \
+            note="opened by the gate, on the ask of human:wael"
+    }
+}

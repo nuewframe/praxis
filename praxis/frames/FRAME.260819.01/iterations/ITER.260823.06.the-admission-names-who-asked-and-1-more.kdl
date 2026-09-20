@@ -1,0 +1,295 @@
+// Opened by `praxis pick-up`. Every condition below was evaluated against the
+// tree as it stood at 2026-08-23T04:59:58Z, and the verdicts are recorded
+// rather than summarised: a gate whose reasoning is not on the record is a gate
+// you have to trust.
+//
+// One commitment over 2 slices. They were vetted separately and admitted
+// together — a commitment that admits its easy half is not one thing.
+
+iteration "ITER.260823.06" {
+    slug "the-admission-names-who-asked-and-1-more"
+    on-slice "TS.260823.01"
+    on-slice "TS.260823.02"
+    state "closed"
+    opened-at "2026-08-23T04:59:58Z"
+    opened-by "agent:praxis"
+
+    approval "admission" {
+        status "signed"
+        signer "human:wael"
+        at "2026-08-23T04:59:58Z"
+        signed-by "the ask to pick up these slices, as one commitment"
+    }
+
+    vet "create" state="done" at="2026-08-23T04:59:58Z" on-slice="TS.260823.01" {
+        condition "slice-is-shaped" verdict="passed"
+        condition "dependencies-delivered" verdict="passed"
+        condition "no-iteration-in-flight" verdict="passed"
+        condition "nothing-left-to-admit" verdict="passed"
+        condition "work-is-disjoint" verdict="not-computed" \
+            found="no seam manifest exists, so what two iterations would touch cannot be compared. Disjointness is half of what this capability says it judges, and half of what it judges is currently not computed at all"
+        condition "the-slice-is-the-best-available" verdict="left-to-the-maintainer"
+    }
+
+    vet "create" state="done" at="2026-08-23T04:59:58Z" on-slice="TS.260823.02" {
+        condition "slice-is-shaped" verdict="passed"
+        condition "dependencies-delivered" verdict="passed"
+        condition "no-iteration-in-flight" verdict="passed"
+        condition "nothing-left-to-admit" verdict="passed"
+        condition "work-is-disjoint" verdict="not-computed" \
+            found="no seam manifest exists, so what two iterations would touch cannot be compared. Disjointness is half of what this capability says it judges, and half of what it judges is currently not computed at all"
+        condition "the-slice-is-the-best-available" verdict="left-to-the-maintainer"
+    }
+
+    // 2 of the declared conditions were not decided by the gate. They are
+    // recorded above rather than omitted: an admission that does not say what
+    // it left undecided claims more than it checked.
+
+    // Frozen at open, from the slices. Removing one from a slice now
+    // does not remove it from here — it makes the two disagree, and that is
+    // refused.
+    claim "C1" from-slice="TS.260823.01" state=met \
+        text="`praxis pick-up` with no `--asked-by` refuses and opens no iteration" \
+        settled-by="a test running pick-up without the flag and asserting no iteration file was written" \
+        evidence="pick-up with the flag absent exits on the missing argument and writes nothing — \
+            neither an iteration nor a refusal, because a command that never reached the gate has \
+            no verdict to record"{
+        ran "cargo test --quiet --test the_admission"
+        exited 0
+        digest "fnv1a64:8aee5edad16658d4"
+        witnessed-at "2026-08-23T05:20:30Z"
+    }
+    claim "C2" from-slice="TS.260823.01" state=met \
+        text="the written admission records `asked`, not `signed`, and names the asker given" \
+        settled-by="a test reading back the opened iteration and asserting the status and the asker match what was passed" \
+        evidence="the gate writes `status \"asked\"` with `asked-by` and `via`; the word `signed` \
+            no longer appears in anything the gate composes"{
+        ran "cargo test --quiet --test the_admission"
+        exited 0
+        digest "fnv1a64:9d99ff048a37785b"
+        witnessed-at "2026-08-23T05:22:03Z"
+    }
+    claim "C3" from-slice="TS.260823.01" state=met \
+        text="the git identity is never consulted for an admission" \
+        settled-by="a test running pick-up in a tree with a configured git identity and a different `--asked-by`, asserting the record holds the one that was passed" \
+        evidence="run in a tree whose git identity is one person, asked by another: the record holds \
+            the name that was typed. The two differ, which is the only form of this test that proves \
+            anything — equal values would have passed on either implementation"{
+        ran "cargo test --quiet --test the_admission"
+        exited 0
+        digest "fnv1a64:8aee5edad16658d4"
+        witnessed-at "2026-08-23T05:22:10Z"
+    }
+    claim "C4" from-slice="TS.260823.01" state=met \
+        text="an `agent:` asker is still refused" \
+        settled-by="a test passing an agent namespace and asserting the refusal names the namespace rather than the flag" \
+        evidence="an agent asker is refused and the refusal names who. The rule enforcing it was \
+            DECLARED by the method and implemented nowhere — `check_admissions` is the first code in \
+            this engine that reads an approval back rather than writing one" \
+        note="C4 said `still`, which was wrong. Nothing was refusing it: `approval-signed-by-agent`, \
+            `iteration-without-signed-admission`, `unknown-approval-kind` and \
+            `adr-accepted-without-approval` were all declared and unimplemented. The slice assumed a \
+            guard it had to build. Carried as F5"{        matured "ran" to="ran \"cargo test --quiet --test the_admission\", exited 0, digest fnv1a64:64d5a585bf771cbd, witnessed-at \"2026-08-23T05:22:17Z\"" at="2026-08-23T05:22:54Z" because="re-witnessed against changed behaviour; the superseded run is kept because the chain back is what a pointer would have been"
+        ran "cargo test --quiet --test the_admission"
+        exited 0
+        digest "fnv1a64:8aee5edad16658d4"
+        witnessed-at "2026-08-23T05:22:54Z"
+    }
+    claim "C1" from-slice="TS.260823.02" state=met{
+        ran "cargo test --quiet --test witnessed_runs"
+        exited 0
+        digest "fnv1a64:c74700f8f72b55a9"
+        witnessed-at "2026-08-23T05:23:33Z"
+    }
+    claim "C2" from-slice="TS.260823.02" state=met{
+        ran "cargo test --quiet --test witnessed_runs"
+        exited 0
+        digest "fnv1a64:c74700f8f72b55a9"
+        witnessed-at "2026-08-23T05:23:39Z"
+    }
+    claim "C3" from-slice="TS.260823.02" state=met{
+        ran "cargo test --quiet --test witnessed_runs"
+        exited 0
+        digest "fnv1a64:c74700f8f72b55a9"
+        witnessed-at "2026-08-23T05:23:46Z"
+    }
+    claim "C4" from-slice="TS.260823.02" state=met{
+        ran "cargo test --quiet --test witnessed_runs"
+        exited 0
+        digest "fnv1a64:c74700f8f72b55a9"
+        witnessed-at "2026-08-23T05:23:52Z"
+    }
+
+
+    // ---- DESIGN ----------------------------------------------------------------
+    // Recorded before implement, and the alternatives are the half that proves a choice
+    // was made rather than described afterwards (TS.260821.19).
+
+    phase "design-system" state="complete" worked-by="agent:principal-engineer" \
+        note="ACTIVE, not complete, and F4 is why. `the-plan-and-the-code-agree` reads `followed` \
+            only from a COMPLETE implement phase, so a design recorded before implementation \
+            starts refuses every approach it produced. The phase is held open until implement \
+            confirms the approaches survived contact — which is a defensible reading, and is not \
+            the reading the rule intended" {
+        approach "the admission takes the asker from outside; the trail keeps recording the tool" {
+            over "prompting for confirmation inside the tool"
+            over "keeping the git identity and renaming the status alone"
+            over "removing the identity entirely and recording only that an ask happened"
+            because "the maintainer's position is that the ask through a prompt IS the permission, \
+                so the authority was never missing — what was missing is that the tool wrote down \
+                WHO, from a source that knows whose machine it is and nothing about who decided. \
+                A prompt would prove the tool ran twice. Renaming alone would leave a fabricated \
+                name in a field readers use to answer `who decided this`. Removing the identity \
+                would lose the one fact worth holding"
+            note "`Ask.signer` stays as it is for close, bind and cut. There it means WHO RAN IT \
+                and is a trail fact, which is honest — close already carries `--attested-by` for \
+                the authority. Only pick-up promotes `signer` into an approval, and only pick-up \
+                changes"
+        }
+
+        approach "`status` says asked, because the schema already does" {
+            over "keeping `signed` and documenting that it is not a signature"
+            over "introducing a separate `witnessed` status nothing can produce yet"
+            because "the schema's own reason for the approval field reads `the human's ask is the \
+                only gate, and it is recorded or it did not happen`. It has said `ask` since it was \
+                written; the engine has been writing `signed` over it. Aligning the word to the \
+                schema's is not a new claim, it is the removal of one"
+        }
+
+        approach "praxis runs a verification the CONFIG declares, selected by the flag" {
+            over "running an arbitrary command string passed on the command line"
+            over "having the agent run it and hand praxis the output to digest"
+            over "re-running the whole suite at close instead of per claim"
+            because "the point is that the agent cannot write the result from memory. An arbitrary \
+                `--by` string would make praxis a general command runner driven by the agent it is \
+                meant to check — the agent could name `true` and settle every claim. So the \
+                repository declares its verification once, in the config, and `--by` SELECTS within \
+                it. Agent-supplied output loses the whole guarantee. Re-running at close answers a \
+                different question and CI already answers it"
+            note "the fallback stays, and is marked. A repository declaring no verification keeps \
+                prose evidence and the claim records that it was REPORTED rather than witnessed, so \
+                a reader can tell the two apart instead of assuming"
+        }
+
+        approach "the digest is of the output, never of a file" {
+            over "hashing the test file"
+            over "recording the test's name and location"
+            because "`the-record-cites-what-it-holds` refuses a field naming a file and it is right \
+                — the review found a hundred and fifty-six dead pointers behind that rule. A digest \
+                of what the run PRINTED names no location, survives every rename, and is a value the \
+                agent does not know until the run happens, which is the property that matters"
+        }
+
+        produced "four approaches, each naming what it was chosen over"
+    }
+
+    // `followed` as child NODES, not repeated properties. Written as properties, KDL keeps
+    // the last and the rule saw one of four — so three approaches read as neither followed
+    // nor abandoned while the record plainly named them. That is TS.260823.04's subject
+    // (a field's form is the engine's secret) arriving inside the iteration that cut it,
+    // and it is carried as F6.
+    phase "implement" state="complete" worked-by="agent:principal-engineer" \
+        produced="the admission gate, the claim gate, two rules that had never been implemented, \
+            and eleven tests" {
+        followed "the admission takes the asker from outside; the trail keeps recording the tool"
+        followed "`status` says asked, because the schema already does"
+        followed "praxis runs a verification the CONFIG declares, selected by the flag"
+        followed "the digest is of the output, never of a file"
+    }
+
+    layer "doctrine" state="evidenced" \
+        evidence="`pick-up-a-slice` gains a `Who asked` section saying the asker is named and why a \
+            git identity is not one; `attach-evidence` stops saying evidence is a sentence and \
+            leads with the run; the router says neither end of an iteration lets the tool name a \
+            person" \
+        reaches="both slices' doctrine, and the retired claim that an agent cannot sign because there is nowhere to put its name"
+
+    layer "enforcement" state="evidenced" \
+        evidence="`--asked-by` is required with no default and an agent asker is refused; \
+            `check_admissions` reads an approval back for the first time, witnessing two rules that \
+            were declared and implemented nowhere; a claim settles only on a run that exited zero, \
+            and an ambiguous claim id refuses rather than settling whichever comes first" \
+        reaches="the admission gate and the claim gate, both of which were strings nothing read"
+
+    layer "docs" state="evidenced" \
+        evidence="`who admitted this work, and on whose word` answers with a name somebody typed; \
+            `what settled this claim` answers with a command, an exit status and a digest" \
+        reaches="both questions, which previously answered with whatever the producing agent wrote"
+
+    layer-set sealed=#true at="2026-08-23T05:00:00Z"
+
+    // ---- FINDINGS RAISED AT DESIGN ----------------------------------------------
+
+    finding "F1" \
+        text="`approval` is a FIELD, not a `holds=` entity, so its inner shape — `status`, `signer`, \
+            `at`, `signed-by` — is known to the engine and declared nowhere. Renaming a status \
+            therefore requires an engine change, which is TS.260823.04's subject arriving inside \
+            this iteration" \
+        owed-against="TS.260823.04"
+
+    finding "F2" \
+        text="close, bind and cut also derive `signer` from the git identity. There it means who \
+            ran the command and is carried on the trail rather than promoted into an approval, so \
+            it is not the same fault — but it is the same VALUE, and if the trail is ever read as \
+            authority the fault returns without a rule to catch it" \
+        owed-against="TS.260823.01"
+
+    finding "F6" \
+        text="`followed` written as repeated PROPERTIES on the implement phase collapses to one — \
+            KDL keeps the last — so three of four approaches read as neither followed nor \
+            abandoned while the record named all four on screen. Written as child nodes it is \
+            read correctly. Nothing says which form a field takes, and the refusal did not \
+            mention form at all: it reported the approaches as unfollowed, which sends an author \
+            to the plan rather than to the syntax. Third instance of this fault in one session" \
+        owed-against="TS.260823.04"
+
+    finding "F5" \
+        text="`TS.260823.01/C4` was written as `an agent asker is STILL refused`, on the assumption \
+            that `approval-signed-by-agent` was enforcing it. It was not. That rule, together with \
+            `iteration-without-signed-admission`, `unknown-approval-kind` and \
+            `adr-accepted-without-approval`, was declared by the method and implemented in no code \
+            path — the only thing in the engine that touched an approval was the writer. Two of the \
+            four are now implemented and witnessed; the other two are owed" \
+        owed-against="TS.260823.01"
+
+    finding "F4" \
+        text="`the-plan-and-the-code-agree` refuses every approach of an iteration whose design is \
+            complete and whose implement is not — the normal in-flight state of any iteration that \
+            did what TS.260821.19 asks. `complete(\"implement\")` returns nothing while work is \
+            underway, so `followed` reads empty and every approach looks neither followed nor \
+            abandoned. The two routes past it are to mark design incomplete while designing, or to \
+            record design and implement together AFTER building — which is writing the plan after \
+            the code, the exact thing TS.260821.20 was cut to refuse. The rule defeats the slice it \
+            was built on top of, in the only state an iteration spends real time in" \
+        owed-against="TS.260821.20"
+
+    finding "F3" \
+        text="this iteration's own admission reads `status \"signed\"` with `signer \"human:wael\"` \
+            supplied by the tool, because it was opened before the slice that removes it. It is left \
+            standing as the witness for TS.260823.01/C2 rather than corrected — an amended record \
+            would destroy the only instance of the fault the corpus holds" \
+        owed-against="TS.260823.01"
+    closed-at "2026-08-23T05:38:00Z"
+    outcome "continue"
+
+    close {
+        claims-settled "C1" how="met"
+        claims-settled "C2" how="met"
+        claims-settled "C3" how="met"
+        claims-settled "C4" how="met"
+        claims-settled "C1" how="met"
+        claims-settled "C2" how="met"
+        claims-settled "C3" how="met"
+        claims-settled "C4" how="met"
+        all-met #true
+        attested-by "human:wael"
+        note "the accounting above was computed at close, not asserted. It says every claim is either met or carried by a finding that names it, and nothing about whether the work is any good"
+    }
+
+    trail {
+        entry at="2026-08-23T05:38:00Z" by="agent:praxis" action="state-changed" from="open" to="closed" note="closed by `praxis close`. The accounting was computed; the conclusion is not the machine's to draw"
+
+        entry at="2026-08-23T04:59:58Z" by="agent:praxis" action="created" \
+            note="opened by the gate, on the ask of human:wael"
+    }
+}

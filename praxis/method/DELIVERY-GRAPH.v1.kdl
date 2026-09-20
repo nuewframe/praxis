@@ -1,0 +1,1575 @@
+// The delivery graph's own vocabulary. This is the METHOD, not any repository's use of it.
+//
+// It ships with the engine, and TS.260821.10 is why. Before that, a project adopting this
+// method had to copy a 946-line `schema` block and an `admits` block out of the author's own
+// discovery folder — which means every repository forks the method and drifts from it
+// silently, the second-copy problem this frame exists to attack, applied to the frame's own
+// definition of itself (ITER.260821.19/AK2).
+//
+// the config has named the three levels since the day it was written:
+//
+//     argument   — why a decision was made        an adr's body
+//     normative  — what the decision made true    THIS FILE
+//     binding    — how a repository applies it    that repository's the config
+//
+// The middle row was empty from the withdrawal of ADR.260819.02 until now. `governed-by`
+// pointed at nothing, and the comment beside it promised the binding would be restored when
+// the schema had a home that was not a decision.
+//
+// ---------------------------------------------------------------------------------------
+// This file is DATA. The engine carries it and parses it through the same reader as any
+// other record — it is not a shape the engine knows, and A4 (ADR.260819.01) is why: an
+// engine that encodes what the record declares can diverge from it, and nobody could tell.
+// Edit this file; the embedded copy is checked against it by a test.
+//
+// A repository may EXTEND what is here — declare kinds and rules this file does not name.
+// It may never REDEFINE one. That is `may bind, and may never declare` moved one level up,
+// and a method a repository can weaken locally is a method that reports whatever each
+// repository wanted to hear.
+// ---------------------------------------------------------------------------------------
+
+method "delivery-graph" {
+    version "1"
+    title "How work moves through a repository, as a record a checker can refuse"
+
+    schema {
+        entity "method" when="never by hand — it ships with the engine, and a repository binds to it in the config" \
+            is="the vocabulary a repository is governed BY — kinds, rules, and the gate" \
+            owned-by="delivery-record" \
+            note="self-describing: the method declares the kind that holds the method. Anything \
+                else would put one node outside the vocabulary it defines, and that node is \
+                exactly the one an adopter cannot check. Declared by TS.260821.10" {
+            field "version" each="1" because="a config binds to a version, and an engine that carries a different one must refuse rather than guess"
+            field "title"   each="1"
+            field "schema"  each="1" because="the vocabulary. Without it nothing in any record can be checked at all"
+            field "admits"  each="1" because="the gate travels with the method. A repository that could rewrite its own admission conditions has no gate"
+        }
+
+        identity "a stable id, assigned once, never reused, and allocable without coordination" \
+            because="two agents naming two things at the same moment must not have to agree first" \
+            note="the literal id FORMAT is a layout decision and lives on ADR.260819.01"
+
+        entity "vision" when="when somebody asks what the work is FOR and the frame is the highest thing you can point at" \
+            is="the world if this succeeds" \
+            owned-by="delivery-record" \
+            note="declared by TS.260821.16. Not checked for TRUTH — it is what truth is checked \
+                against. Excluding it from the record for being unfalsifiable applied this \
+                record's discipline one layer too high, and left the frame as the root with \
+                nothing above it" {
+            field "is"   each="1" because="the world state, in a sentence somebody could disagree with"
+            field "note" each="0..n"
+        }
+
+        entity "mission" when="with the vision, and never before it — a mission serving no vision is a direction with no destination" \
+            is="what this product does to move toward the vision" \
+            owned-by="delivery-record" \
+            note="declared by TS.260821.16" {
+            field "is"             each="1"
+            field "toward"         each="1" references="vision" because="a mission serving no vision is a direction with no destination"
+            field "delivered-when" each="1" \
+                because="what would count as having delivered it. The vision carries none — a \
+                    world state cannot be tested — and this is what separates a mission from an \
+                    aspiration. A mission nobody could be wrong about is a slogan"
+            field "note"           each="0..n"
+        }
+
+        entity "strategy" when="when the order of the work starts mattering, and a frame needs saying which approach it is worked under" \
+            is="the ordered approach — how we go about it, never how it is built" \
+            owned-by="delivery-record" \
+            note="declared by TS.260821.16. It carries no falsifier because it is an ORDERING, and \
+                conformance to a declared sequence is computable: a frame written before any \
+                persona exists is out of order, and being out of order is a fact" {
+            field "serves"  each="1" references="mission"
+            field "step"    each="1..n" because="the order. A strategy with no sequence is a preference" \
+                note="a step may carry `satisfied-by` child nodes naming the KINDS that occupy it, \
+                    and work-follows-the-declared-sequence reads them. A step with none is not \
+                    checked — the mapping is written when the author knows it, not when the \
+                    strategy is first stated"
+            field "matured" each="0..n" holds="matured" \
+                because="the work within a frame informs the strategy, and a revision is an append \
+                    naming what taught it. A strategy the work can always revise constrains \
+                    nothing; one it can never revise is a slogan nobody revisits"
+            field "note"    each="0..n"
+        }
+
+        entity "frame" is="a problem — symptoms, one root cause, one principle" \
+            completes="never; its symptoms resolve individually, each naming a release" \
+            note="only one frame exists, so every cardinality here is inferred from a sample of ONE. \
+                Required is limited to what a frame's own definition demands; the rest stays optional \
+                until a second frame says otherwise (ITER.260821.02/R4)" {
+            field "slug"             each="1"
+            field "title"            each="1"
+            field "symptom"          each="1..n" holds="symptom" because="a frame with no symptom cannot resolve, and resolution is per symptom"
+            field "under"      each="0..1" references="strategy" \
+                because="which strategy this problem is being solved under. Optional because the \
+                    one frame in this record predates the kind — a rule failing closed on arrival \
+                    is one this frame has had to walk back twice"
+            field "root-cause"       each="1" because="the convergence gate — symptoms that do not reduce to one cause were more than one problem"
+            field "principle"        each="1"
+            field "trail"            each="1"
+            field "current-ceiling"  each="0..1"
+            field "affected"         each="0..n"
+            field "baseline"         each="0..n"
+            field "cost-of-inaction" each="0..1"
+            field "identifies"       each="0..n"
+            field "retires"          each="0..n"
+            field "out-of-scope"     each="0..n"
+            field "created-by"       each="0..1"
+            field "created-at"       each="0..1"
+        }
+        entity "thin-slice" is="an atomic vertical slice — one command or one read model, cut so it can exercise a capability" \
+            states="proposed active delivered dropped" {
+            // The shape a checker refuses, made machine-readable. Derived from the storm's
+            // `slice-shape` policy and E13's two-kind split — not invented here. Added by
+            // ITER.260820.01/P7: the schema declared entities and relations but no FIELDS,
+            // so the validator had nothing to read and would have had to hardcode them,
+            // which is exactly what A4 forbids.
+            field "slug"           each="1"
+            field "title"          each="1"
+            field "kind"           each="1" one-of="command" "view"
+            field "realizes"       each="1" references="capability"
+            field "from-storm"     each="1" references="event-storm"
+            field "actor"          each="1"
+            field "trigger"        each="1"
+            field "outcome"        each="1"
+            field "layer"          each="1..n" because="verticality is the declared set, and a slice with none asserts nothing"
+            field "claim"          each="1..n" because="a slice with no claim cannot go unmet, so nothing can object"
+            field "command"        each="1"    when-kind="command"
+            field "produces-event" each="1..n" when-kind="command" because="a refusal is a fact, so a refusable command names both outcomes"
+            field "read-model"     each="1..n" when-kind="view" because="E13 — a view slice writes nothing and names the view instead"
+
+            // The optional half. Enumerated by turning the check on and reading what it
+            // refused, rather than by recalling what a slice usually carries — the record
+            // told us its own vocabulary (ITER.260821.01/Q1).
+            field "state"            each="0..1" one-of="proposed" "active" "delivered" "dropped"
+            field "scenario"         each="0..1"
+            field "step"             each="0..n"
+            field "excludes"         each="0..n" because="scope sealed at cut time, so drift has something to hit"
+            field "attacks"          each="0..n" references="symptom"
+            field "depends-on"       each="0..n"
+            field "useful-alone"     each="0..1" because="what you get if this ships and nothing after it does"
+            field "useful-to"        each="0..n" references="persona" \
+                because="`what you get` has an unstated subject until somebody is named. Value is \
+                    not a property of a change — it is a judgement, and a record stating the \
+                    change without the judge has recorded half of it"
+            field "needs-read-model" each="0..n"
+            field "feeds-read-model" each="0..n"
+            field "content-owned-by" each="0..n"
+            field "composes"         each="0..1"
+            field "lifetime"         each="0..1" one-of="working" "archival"
+            field "rendered-by"      each="0..1"
+            field "does-not-prove"   each="0..1"
+            field "amended-by"       each="0..n"
+            field "cut-from"         each="0..1"
+            field "principle-note"   each="0..1"
+            field "note"             each="0..n"
+            field "proves"           each="0..1"
+        }
+
+        entity "config" is="this repository's binding to the schema — it may bind, and may never declare" \
+            note="a root kind the record carried from the first commit and no schema ever named. \
+                Found by ITER.260821.01 the moment the rule it builds was turned on, which is the \
+                slice proving itself against a real omission rather than a fixture" {
+            field "repository"  each="1"
+            field "governed-by" each="0..1" \
+                because="which method governs this repository, as `<method>@v<version>`. Optional \
+                    so that a repository predating TS.260821.10 still checks; when present it must \
+                    name the method the engine carries"
+            field "profile"     each="1" holds="profile" \
+                because="a field that HOLDS an entity is checked as one. Declared as a bare field, \
+                    the profile's body was never descended into and omit-probe was an unchecked string"
+            field "ships-doctrine" each="0..1" \
+                because="which shapes count as instruction this repository ships. A fact about \
+                    the repository, so the engine may not hold it — and an audit whose \
+                    denominator lives in the engine measures whatever the engine chose to look \
+                    at (TS.260823.05)"
+            field "verification" each="0..1" \
+                because="how this repository verifies, declared once so that `praxis evidence` runs \
+                    what the RECORD names and never what a caller passed. Optional: a repository \
+                    that declares none settles claims on prose, and the record shows those as \
+                    reported rather than witnessed (TS.260823.02)"
+            field "versioning"  each="0..1"
+            field "invariants"  each="0..1"
+            field "paths"       each="1"
+        }
+        entity "profile" when="in the config, at adoption — which guardrails apply here and which layers a slice may declare" \
+            is="which guardrails apply here, and which layers a slice may declare" \
+            owned-by="delivery-record" \
+            note="declared by TS.260821.05. config's `profile` field existed and had no SHAPE, so \
+                `omit-probe` was an unchecked string — the file said `may enable or omit, never \
+                invent` and nothing could tell the difference between omitting an invariant and \
+                inventing one" {
+            field "layer"       each="1..n" because="the layer vocabulary is a binding: a service's strata are not a method's"
+            field "omit-probe"  each="0..n" references="invariant" \
+                because="config may BIND an invariant and may never declare one. Referencing the \
+                    kind is what makes that sentence enforceable rather than a comment"
+        }
+        entity "notional-architecture" when="when the capabilities need saying what they are to EACH OTHER, or the repository needs a kind this method does not name" \
+            is="what the capabilities are to each other, free of any tool decision" \
+            states="sought held" \
+            note="one record; cardinalities conservative for the same reason as frame" {
+            field "slug"            each="1"
+            field "title"           each="1"
+            field "frame"           each="1" references="frame"
+            field "state"           each="1" one-of="sought" "held"
+            field "schema"          each="0..1" \
+                because="what THIS repository adds to the method's vocabulary — kinds its own \
+                    records need and the method does not name. Required until TS.260821.10, when \
+                    the method's own vocabulary stopped living here: a project with no kinds of \
+                    its own would otherwise have to write an empty block to say so, and an empty \
+                    block is not a statement anybody makes on purpose"
+            field "trail"           each="1"
+            field "derived-from"    each="0..n"
+            field "exercised-by"    each="1..n"
+            field "excludes"        each="0..n" because="what it refuses to decide is what makes it notional"
+            field "substrate"       each="0..n"
+            field "external"        each="0..n"
+            field "capability-role" each="0..n"
+            field "seam"            each="0..n"
+            field "reading-rule"    each="0..n"
+            field "invariant"       each="0..n"
+            field "owes"            each="0..n"
+            field "open"            each="0..n"
+            field "answered"        each="0..n" \
+                because="an open question that got an answer is not deleted. What it WAS is how a \
+                    reader knows the answer was reached rather than assumed"
+        }
+        entity "capability" is="a permanent doing the system must have" \
+            id-prefix="CAP." \
+            note="the prefix a reference to this kind is written with. Declared by TS.260823.04: \
+                the engine trimmed the literal `CAP.` in four call sites, which is A4 exactly — \
+                a convention only the engine knew, in a record that could have used any other \
+                and never been told why nothing resolved" \
+            states="sought active retired" \
+            completes="never; it is retired" {
+            field "doing"            each="1" because="a capability that names no doing is a noun someone liked"
+            field "not"              each="1" because="an exclusion something else covers, never scope restated"
+            field "state"            each="1" one-of="sought" "active" "retired"
+            field "usage"            each="0..n" \
+                because="how to use this capability, written while it is being built and stored IN \
+                    the record. Not a file the record points at — a pointer is a second thing to \
+                    keep in step, and it is the one that rots"
+            field "shipped"          each="0..n" \
+                because="what shipped for this capability, and in which release. Written by \
+                    promotion and recomputed by promoted-truth-is-derived — never hand-written"
+            field "derived-from"     each="1" references="event-storm" \
+                because="capability-must-trace — a capability owns a cluster of events from a storm, or it is an assertion"
+            field "from-cluster"     each="1..n" references="cluster" \
+                because="the cluster IS the derivation. Naming a storm without the cluster inside it proves nothing"
+            field "owns-event"       each="1..n" unique-in="capability" \
+                because="an event kept consistent by two capabilities has no single owner, and the boundary between them is drawn wrong"
+                        field "facet"      each="0..1" one-of="product" "engine" \
+                because="a reader who installed the product and a maintainer who builds it are \
+                    asking different questions of the same list. Undeclared reads as engine, which \
+                    is the safe default: it is better to under-claim what the product does than to \
+                    hand a reader the tool's internals as a feature list (TS.260821.06/C3)"
+            field "owns-read-model"  each="1..n"
+            field "gate-test"        each="1..n" because="the four tests, each with the reason it passes"
+            field "keeps-consistent" each="1..n"
+            field "attacks"          each="1..n" references="symptom"
+            field "trail"            each="1"
+            field "enforces"         each="0..n"
+            field "principle-note"   each="0..1"
+            field "merge-reason"     each="0..1"
+            field "split-reason"     each="0..1"
+            field "narrowed-by"      each="0..1"
+            field "property"         each="0..n"
+        }
+
+        entity "cluster" is="a group of events that must stay consistent together — the unit a capability is derived FROM" \
+            note="contained in an event-storm. Declared so `from-cluster` resolves rather than merely being present"
+
+        entity "symptom" is="one observable thing that is wrong FOR SOMEBODY, resolving on its own schedule by naming a release" \
+            note="contained in a frame. Declared so `attacks` resolves" {
+            field "felt-by" each="0..n" references="persona" \
+                because="a symptom describes something wrong for somebody, and naming who makes \
+                    the difference between a problem and a complaint. Optional because every \
+                    symptom in this record predates the persona kind — a rule that fails closed \
+                    on the day it lands names all seven"
+            field "text"    each="0..1"
+            field "state"   each="0..1"
+            field "note"    each="0..n"
+        }
+        entity "adr" when="when a technical decision will outlive the iteration that made it" \
+            is="a durable technical decision, its argument, its alternatives, and its corrections" \
+            states="proposed accepted superseded" \
+            note="one record; cardinalities conservative for the same reason as frame" {
+            field "slug"       each="1"
+            field "title"      each="1"
+            field "state"      each="1" one-of="proposed" "accepted" "superseded"
+            field "body"       each="1" because="a decision with no argument is an instruction"
+            field "approval"   each="1..n" because="an accepted decision nobody signed is unsigned"
+            field "trail"      each="1"
+            field "decided-at" each="0..1"
+            field "matured-at" each="0..1"
+            field "deciders"   each="0..n"
+            field "raised-by"  each="0..1"
+            field "supersedes" each="0..n"
+            field "amendment"  each="0..n"
+            field "enforces"   each="0..1"
+            field "open"       each="0..n"
+        }
+        entity "release" when="at the first cut — before that, work binds to a planned version and nothing is frozen" \
+            is="an index into history — what it binds, what it resolves" \
+            states="planned released withdrawn" \
+            owned-by="release-binding" \
+            note="machine-owned. Every field is derived from what was bound, so the record is \
+                composed whole on each bind rather than edited — there is nothing in it a human \
+                wrote that a rewrite could lose. Declared with fields by ITER.260821.07" {
+            field "version"      each="1"
+            field "state"        each="1" one-of="planned" "released" "withdrawn"
+            field "binds"        each="0..n" references="iteration" \
+                because="a version with no content and a version nobody has computed are not the \
+                    same thing, so an empty one says so rather than being absent"
+            field "previously-cut" each="0..n" when-state="withdrawn" \
+                because="what a withdrawn version WAS cut at, kept so that a release taken back \
+                    and one never cut do not read alike. Many, because a version may be cut, \
+                    withdrawn and cut again — and a record holding only the latest cannot be asked \
+                    how many times somebody changed their mind"
+            field "withdrawn-because" each="1" when-state="withdrawn" \
+                because="a cut that is taken back says why, in the same place it said what it cut. \
+                    A release quietly returned to `planned` and one that was never cut look \
+                    identical afterwards, which is S3 applied to the release chain"
+            field "proposed-bump" each="1" when-state="planned" \
+                because="the record PROPOSES from the configured rules. Confirming is the \
+                    maintainer's, at cut — so the proposal is what a PLANNED release carries, and \
+                    once cut the index's `confirmed-bump` holds what was decided. Both are kept: \
+                    a confirmed bump that differs from the proposed one is a maintainer overriding \
+                    the rules, which is legitimate and worth being able to see"
+            field "proposal-incomplete-for" each="0..n" \
+                because="an iteration that declares no `contributes` informed the proposal with \
+                    nothing, and a proposal computed from half the work is not a proposal"
+            field "confirmation" each="0..1"
+            field "index"        each="0..1" when-kind="released" \
+                because="a release without an index is a release nothing can be verified against. \
+                    It POINTS at a commit and never mirrors what git already holds"
+            field "seal"         each="0..1" when-kind="released"
+            field "resolves"     each="0..n" references="symptom"
+            field "trail"        each="1"
+        }
+        entity "iteration" when="never by hand. `praxis pick-up` writes it, and writing one yourself is claiming a gate ran" \
+            is="one COMMITMENT — the slices an ask committed to, worked together" \
+            states="open working closed abandoned" \
+            owned-by="work-admission" \
+            never-deleted=#true because="a closed iteration is history, and history is what makes a slice's maturity legible" \
+            constraint="at most one open per slice" \
+            note="declared with fields by ITER.260821.01 so that `phase` — a contained entity — can \
+                be distinguished from a field at all. A container with no shape cannot refuse what \
+                it holds, which is what let `phase` go missing" {
+            field "slug"      each="1"
+            field "on-slice"  each="1..n" references="thin-slice" \
+                because="the commitment may span several slices. Its claims are the union of theirs, \
+                    its layers are bounded by their union, and it closes when all of them are \
+                    accounted for"
+            field "continues" each="0..1" references="iteration" \
+                because="a slice that took more than one iteration is not two unrelated attempts. \
+                    Naming which one this stands on is what lets a completeness question be asked \
+                    of the slice's whole history rather than of the current attempt alone \
+                    (`TS.260823.10`)"
+            field "state"     each="1" one-of="open" "working" "closed" "abandoned"
+            field "opened-at" each="1"
+            field "opened-by" each="1"
+            field "closed-at" each="0..1"
+            field "outcome"   each="0..1" one-of="continue" "pivot" "stop"
+            field "approval"  each="1..n" because="the human's ask is the only gate, and it is recorded or it did not happen"
+            field "vet"       each="1..n" because="vetted at create and again at start"
+            field "frozen"    each="0..1"
+            field "claim"     each="0..n"
+            field "layer"     each="0..n"
+            field "layer-set" each="0..1"
+            field "contributes" each="0..n" \
+                because="which configured bump rule this work matches. Declared by the iteration \
+                    rather than inferred, because only whoever did the work knows what kind of \
+                    change it was — and a bump proposal inferred from a diff is a guess about \
+                    intent"
+            field "phase"     each="0..n" holds="phase" because="a contained entity, not a value — without `holds` it is indistinguishable from a field, which is how it went missing"
+            field "decision"  each="0..n" holds="decision" \
+                because="a decision is bound to the iteration that FORCED it, by nesting inside it"
+            field "finding"   each="0..n"
+            field "triage"    each="0..n" \
+                because="what LEARN concluded about findings that are not this iteration's own — \
+                    where each one lands, and which phase of which slice owes it" \
+                note="`triage-finding` has been a command in the storm since the day it was held, \
+                    and the iteration entity had nowhere to put its result. Declared by \
+                    ITER.260821.19, which is the first iteration to triage a whole frame's findings \
+                    at once — and it was refused the moment it tried"
+            field "close"     each="0..1"
+            field "trail"     each="1"
+        }
+
+        entity "refusal" when="never by hand. The gate writes it when it refuses, which is what makes a refusal a fact rather than an absence" \
+            is="a pick-up the gate refused, and the condition that failed" \
+            owned-by="work-admission" \
+            never-deleted=#true because="a refusal nobody kept is a gate nobody can prove ran" \
+            note="declared by ITER.260821.04, and the first kind the record needed that discovery \
+                never named. `refusal-is-a-fact` has been a policy since the storm; the thing the \
+                policy produces had no shape, so nothing could hold one. It sits in iterations/ \
+                because an admission and a refusal are the two outcomes of ONE command, and a \
+                container is named for what its contents are to the owner" {
+            field "on-slice"     each="0..n" references="thin-slice" \
+                because="a refusal is about the COMMITMENT that was asked for, and an ask over four \
+                    slices refused on one of them is still one refusal. Left at 0..1 by the \
+                    commitment rewire, which changed `iteration` and not the record of the same \
+                    ask being turned down (ITER.260822.01/AL1)"
+            field "on-iteration" each="0..1" references="iteration" \
+                because="a close is refused about an ITERATION, not about the slice under it"
+            field "on-version"   each="0..1" \
+                because="a bind is refused about a VERSION, which is not an entity the refusal \
+                    can reference until a release exists to be refused against"
+            field "at"        each="1"
+            field "by"        each="1"
+            field "asked-by"  each="0..1" because="the human whose ask was refused, where there was one"
+            field "condition" each="1..n" \
+                because="a refusal that does not name the condition is indistinguishable from \
+                    never having been asked, which is S3"
+            field "trail"     each="1"
+
+            // on-slice, on-iteration and on-version are `0..1` and EXACTLY ONE should be
+            // present. The schema cannot say that: it has cardinality per field and no way
+            // to constrain a choice ACROSS fields. So a refusal naming nothing at all is
+            // accepted today. Recorded as W4 — the first thing the record has needed to say
+            // that its own vocabulary cannot express.
+        }
+
+        entity "decision" when="when an iteration hits a choice it cannot make implicitly, with what it rejected and what would show it wrong" \
+            is="a choice an iteration could not make implicitly, with what it rejected and what would show it wrong" \
+            owned-by="the iteration" \
+            never-deleted=#true because="a decision nobody can read later is one that gets remade" \
+            shape="carried as properties — chose, over, because, falsified-by, state, seal — with \
+                `amendment` as the only child. Deliberately shapeless in the same way as `phase`" \
+            note="declared by ITER.260821.15. The record has carried decisions since ITER.260821.04 \
+                and nothing checked one"
+
+        entity "phase" when="as the work moves through an iteration — design before implement, and each says what it produced" \
+            is="one stage of work inside an iteration — WHEN in the attempt, as a layer is WHERE in the stack" \
+            states="pending active complete skipped" \
+            owned-by="the iteration" \
+            note="undeclared until ITER.260820.01/P8. It survived the withdrawal of ADR.260819.02, \
+                where it was a first-class node, and nothing carried it forward — so the first \
+                iteration went from admission straight to implement with no phase recorded" \
+            note="shapeless until TS.260821.19, with its kinds carried as a PROSE STRING. So every \
+                phase in this frame was a `produced=` sentence written at close by whoever did the \
+                work, and every design-system among them is a past-tense summary of what was built" {
+            field "state"     each="1" one-of="pending" "active" "complete" "skipped"
+            field "approach"  each="0..n" holds="approach" \
+                because="what design-system PRODUCES. The phase exists to derive a better \
+                    approach, and it can only do that before the code exists — written afterwards \
+                    it is a description, and a description cannot be argued with while there is \
+                    still time to change what gets built"
+            field "taught"    each="0..n" references="persona" \
+                because="who the teach phase reached. A skill teaches an AGENT and is the doctrine \
+                    layer; a version's docs teach the reader of a release. Every iteration in this \
+                    frame named one skill under both, which is how the difference stayed invisible" \
+                note="the RECORD teaches the next agent — that is what it is for, and S7 is the \
+                    symptom about it. So naming that reader here is true of every iteration by \
+                    construction and discriminates nothing, and their persona judges success by \
+                    not needing a document. A teach phase reaches somebody the record cannot \
+                    serve, or it was skipped (ITER.260822.14/BA1)"
+            field "followed"  each="0..n" \
+                because="which approach implement built. An implement naming none against a \
+                    design-system that produced one is a phase that did not read its own plan"
+            field "produced"  each="0..1"
+            field "required-by" each="0..1"
+            field "worked-by" each="0..1"
+            field "skipped-because" each="0..1"
+            field "note"      each="0..n"
+            field "matured"   each="0..n" holds="matured" \
+                because="an approach that turns out wrong mid-iteration is matured, never edited. \
+                    Discovering the design was wrong while building is the normal case, and a rule \
+                    that punished it would teach people to write the approach at close"
+        }
+
+        entity "approach" when="in the design phase, before the code — the alternatives are the half that proves a choice was made" \
+            is="what will be built, and what it was chosen over" \
+            owned-by="the design-system phase" \
+            note="declared by TS.260821.19. The alternative is the half that proves a choice was \
+                made — an approach with nothing rejected is a description of the only thing \
+                anybody thought of" {
+            field "over"    each="1..n" because="what it was chosen over. Without one this is not a decision, it is the first idea"
+            field "because" each="1" because="why this one. `it is better` is not a reason and improvement is not self-evident"
+            field "note"    each="0..n"
+        }
+
+        entity "event-storm" is="one sweep of a domain's timeline — the evidence a capability is derived FROM" \
+            note="declared with fields so `read-model` stops being indistinguishable from a field" {
+            field "title"      each="1"
+            field "frame"      each="1" references="frame"
+            field "scope"      each="0..1"
+            field "held-at"    each="0..1"
+            field "held-by"    each="0..n"
+            field "actor"      each="0..n"
+            field "external"   each="0..n"
+            field "command"    each="1..n"
+            field "event"      each="1..n" claimed-by="capability.owns-event" \
+                because="an event no capability owns belongs to nothing — reported, not refused"
+            field "policy"     each="0..n"
+            field "read-model" each="0..n" holds="read-model" \
+                because="each carries its own lifetime declaration, which is what the published set \
+                    is derived from (TS.260820.12)"
+            field "cluster"    each="0..n" holds="cluster" because="a capability that traces to no cluster is an assertion"
+            field "process"    each="0..1"
+            field "finding"    each="0..n"
+        }
+
+        entity "walkthrough" when="when a path through the record needs walking all the way down, to find what the shape check cannot see" \
+            is="one path through the record, walked all the way down — discovery's DEPTH activity" \
+            owned-by="delivery-record" \
+            note="the storm is breadth: the whole timeline, shallow. A walk is one path, deep. \
+                Declared by WALK.260822.01, after the record was found to cite two walkthroughs \
+                thirty-four times — by finding id — into Markdown files nothing can check" {
+            field "slug"      each="1"
+            field "title"     each="1"
+            field "frame"     each="1" references="frame"
+            field "walked-at" each="1"
+            field "walked-by" each="1"
+            field "asks"      each="1" because="a walk with no question is a tour"
+            field "path"      each="1..n" because="which way it went, so someone can walk it again"
+            field "step"      each="0..n"
+            field "raised"    each="0..n" because="findings this walk produced, recorded where the work was"
+            field "finding"   each="0..n"
+            field "proves"    each="0..1"
+            field "does-not-prove" each="0..1"
+            field "trail"     each="1"
+        }
+
+        entity "read-model" when="when an actor must SEE something before they can act, and one capability owns the answer" \
+            is="a view an actor must see before acting, owned by exactly one capability" \
+            note="already load-bearing in every slice's needs/feeds edges and never declared"
+
+        entity "matured" when="when a value the record holds changes — an append naming what taught it, never an overwrite" \
+            is="one value the record changed, and what changed it" \
+            identified-by="the field that changed — `matured \"severity\"` is about `severity`" \
+            owned-by="whatever holds the value" \
+            note="declared by TS.260821.18. A product matures by ADDING a value, REMOVING one \
+                that did not work, and CHANGING one for something better. This record held two of \
+                the three: removal is strong — twenty-six retired surfaces name the tag they still \
+                stand at — and addition is a new node. Change was rewritten in place, so `we \
+                changed our mind` and `we were always right` looked identical afterwards" \
+            note="not a history of every edit. A change that taught nobody anything is a typo, and \
+                typos are not values" {
+            field "from"      each="1" because="what it used to say. The half that gets lost, and the half that makes the change legible"
+            field "to"        each="1" because="what it says now. Checked against the value the record actually holds"
+            field "at"        each="1"
+            field "because"   each="1" because="why it is better. `it changed` is not a reason and improvement is not self-evident"
+            field "taught-by" each="1" \
+                because="what made the case — a finding, a walkthrough, an iteration. A change \
+                    citing nothing is a rewrite, which is the discipline a strategy revision and \
+                    an emergent persona are already held to"
+            field "note"      each="0..n"
+        }
+
+        entity "persona" when="before anything is framed. One is enough to start; the rest are discovered by the work and cite what surfaced them" \
+            is="somebody the product is for — what they came for, and how they judge whether they got it" \
+            states="primary emergent" \
+            owned-by="delivery-record" \
+            note="declared by TS.260821.15. `needed-by` has been on every read model since the \
+                storm was written and named nothing the record held: a label saying a reader needs \
+                this view, with no statement of who a reader IS. So `useful-alone` — the field \
+                that says what you get — has always had an unstated subject" \
+            note="not a role. A role is what you may attest (TS.260821.08); a persona is what you \
+                came for, and one person occupies several roles in a week" {
+            field "is"            each="1" because="who they are, in a sentence"
+            field "came-for"      each="1" because="the outcome they arrived wanting. Not what the product does — what they were trying to get done"
+            field "does-not-care" each="0..n" \
+                because="what they will not read and do not want explained. The half a document \
+                    gets wrong by including, and the reason two personas need two documents rather \
+                    than one longer one"
+            field "judges-by"     each="1" \
+                because="how they would know they got it. A persona nobody can be wrong about is a \
+                    description, and this is the field that makes it a claim"
+            field "state"         each="0..1" one-of="primary" "emergent"
+            field "found-by"      each="1" when-state="emergent" \
+                because="discovered means discovered BY something — a finding, a walkthrough, a \
+                    slice. One primary persona is named before framing because it is the reason \
+                    discovery is happening; the rest emerge from the work and cite what surfaced \
+                    them. Required WHEN emergent rather than by a rule of its own — \
+                    entity-without-a-required-field already refuses a missing field, and a second \
+                    rule saying the same thing is a second thing to keep in step"
+            field "note"          each="0..n"
+        }
+
+        entity "role" when="when more than one identity works the record, and attesting your own work needs refusing" \
+            is="who may attest what — a position a human or an agent occupies, not a person" \
+            owned-by="claim-settlement" \
+            note="declared by TS.260821.08. `The same engineer cannot self-approve` has been in the \
+                router and in the engineer persona since before the delivery graph, and it is the \
+                single rule this plugin states most confidently and enforces least. It sat in the \
+                bottom row of the enforcement table — agent-attested, trusted, not compelled — \
+                which is S2 exactly: an artifact looks identical whether the reviewer was a \
+                different mind or the same one wearing a second hat" {
+            field "is"            each="1" because="what the role is for, in a sentence"
+            field "owns-phase"    each="1..n" because="which stage of an attempt this role is answerable for. A role owning no phase is a title"
+            field "may-sign"      each="0..n" because="which approval kinds this role may put a signature against"
+            field "never-for-own" each="0..n" \
+                because="the phases whose work this role may not attest when it did the work \
+                    itself. This is the field the whole kind exists for — everything else about a \
+                    role is describable in prose, and this is not"
+            field "note"          each="0..n"
+        }
+
+        relates "realizes"      from="thin-slice" to="capability" each="1" \
+            because="a slice with no capability is unfunded work"
+        relates "derived-from"  from="capability" to="event-storm" each="1..n" \
+            because="a capability that traces to no cluster is an assertion, which is this frame's root cause"
+        relates "identifies"    from="frame" to="capability" each="0..n"
+        relates "from-storm"    from="thin-slice" to="event-storm" each="1"
+        relates "raised-by"     from="adr" to="frame" each="1" \
+            because="a decision belongs to the problem that forced it" write-once=#true
+        relates "supersedes"    from="adr" to="adr" each="0..1"
+        relates "exercised-by"  from="notional-architecture" to="thin-slice" each="1..n" \
+            because="an architecture nothing exercised is a drawing"
+        relates "needs-read-model" from="thin-slice" to="read-model" each="0..n" \
+            note="actor-facing. See the reading rules above — this is never a capability seam"
+        relates "feeds-read-model" from="thin-slice" to="read-model" each="0..n" \
+            note="points BACKWARDS as a dependency. See the reading rules above"
+        relates "on-slice"      from="iteration" to="thin-slice" each="1..n" write-once=#true \
+            because="the ITERATION is the commitment; a slice is a unit of work that adds value. \
+                One ask to start can commit to several slices, and they are worked together or the \
+                commitment was never one thing" \
+            was="each=1 — `an iteration is an attempt at ONE slice`" \
+            corrected-by="ITER.260821.19. That reading confused the unit of WORK with the unit of \
+                COMMITMENT. It survived eighteen iterations because every ask happened to name one \
+                slice, so the model was never tested against what it actually claimed" \
+            note="which attempt a slice is on is still derived, by ordering the iterations that \
+                name it — never stored. And a slice may still be in only one OPEN iteration at a \
+                time, which is the constraint that mattered and is unchanged"
+        relates "depends-on"    from="thin-slice" to="seam" each="0..n" \
+            constraint="never slice → slice. Dependency is only ever on a frozen contract, which is what makes disjointness a query" \
+            violated-by="seventeen of eighteen slices today. Carried as open"
+
+        // RESTATED by TS.260823.04. It read "every entity carries a trail" and contradicted
+        // the schema beside it: eight of twenty-five kinds declare a `trail` field, so writing
+        // one on a capability was refused as an undeclared field WHILE this line called it
+        // required. Nothing could tell, because nothing in the engine reads this block —
+        // every `requires` here is prose, and the ones that hold are held by a `rule` further
+        // down. Said accurately, this is enforced: a kind that declares a trail with each="1"
+        // is refused without one by `entity-without-a-required-field`.
+        requires "an entity whose kind declares a trail carries one" \
+            entry-common="at" "by" "action" append-only=#true \
+            because="attribution distinguishes human authorship from agent authorship, which is the \
+                distinction a method built on trust transfer exists to make legible"
+        // Held by `approval-signed-by-agent` since TS.260823.01, and by nothing before it.
+        requires "only a human may be named as having asked or attested" kinds="acceptance" "admission" \
+            because="an agent-signed approval is the trust-transfer problem expressed as a signature"
+        requires "an iteration is vetted twice — at the ask to create, and again at the ask to start" \
+            because="the tree moves in between. An admission computed against a tree that has since \
+                changed is an admission of something else, and the second vet is where a stale \
+                freeze is caught"
+        // The admission is an ASK, not a signature — TS.260823.01. Held by
+        // `iteration-without-signed-admission`, implemented by that slice.
+        requires "an iteration carries an admission naming who asked, before it may be worked" \
+            because="selection IS the commitment, and ITERATE has exactly one gate. The human's ask \
+                to start an iteration is that approval — so it is recorded as one, or `the agent \
+                was asked` is the agent's own account of having been asked" \
+            retired-kinds="plan · design" \
+            retired-because="they were tier gates under the withdrawn ADR.260819.02. A second gate \
+                before implementation contradicts `the only gate`"
+        requires "a refusal is recorded as a fact, with the condition that caused it" \
+            because="a gate never invoked and a gate that refused look identical afterwards"
+
+        // Structural rules that fall out of the relationships above. Each is refusable, and
+        // each is enforced by the capability owning the act it refuses — see the invariants.
+        // Five rules the ENGINE has enforced since ITER.260820.01 and this record never
+        // named. A4 says the engine may not hold a rule the record does not state; these
+        // were exactly that, and nothing found them until refusals were asked which rule
+        // they enforce (ITER.260821.19/AJ1).
+        rule "entity-without-a-required-field" refuses="a record missing a field its kind requires" \
+            witness=#"""
+                thin-slice "TS.witness" {
+                    slug "missing-its-title"
+                }
+                """#
+        rule "field-outside-its-cardinality"   refuses="a field appearing more or fewer times than its kind allows" \
+            witness=#"""
+                capability "witness" {
+                    state "sought"
+                    state "active"
+                }
+                """#
+        rule "kind-declared-without-a-shape"   reports="a kind the schema names and gives no fields, so nothing about its records can be refused"
+        rule "a-value-claimed-twice"           refuses="two records claiming one value for a field that must be unique" \
+            witness=#"""
+                capability "witness-one" {
+                    state "sought"
+                    derived-from "ES.260819.01"
+                    from-cluster "iteration-control"
+                    owns-event "ContestedByTwo"
+                    doing "one"
+                    not "two"
+                    trail {
+                        entry at="2026-08-21T00:00:00Z" by="human:witness" action="created"
+                    }
+                }
+                capability "witness-two" {
+                    state "sought"
+                    derived-from "ES.260819.01"
+                    from-cluster "iteration-control"
+                    owns-event "ContestedByTwo"
+                    doing "one"
+                    not "two"
+                    trail {
+                        entry at="2026-08-21T00:00:00Z" by="human:witness" action="created"
+                    }
+                }
+                """#
+        rule "a-value-nothing-claims"          reports="a value that wanted a claimant and found none"
+
+        rule "dangling-relationship"        refuses="an edge naming something the record does not hold" \
+            note="the witness carries a capability of its own. `dangling-relationship` is skipped \
+                when the corpus knows NO entity of the target kind — a guard against false \
+                positives on a partial document — so a witness that declares only the dangling edge \
+                witnesses nothing. Found by the prover on its first run (ITER.260821.19/AJ2)" \
+            witness=#"""
+                capability "witness-context" {
+                    state "sought"
+                    derived-from "ES.260819.01"
+                    from-cluster "iteration-control"
+                    owns-event "SomethingHappened"
+                    doing "exist, so the target kind is known"
+                    not "anything else"
+                    trail {
+                        entry at="2026-08-21T00:00:00Z" by="human:witness" action="created"
+                    }
+                }
+                thin-slice "TS.witness" {
+                    slug "points-nowhere"
+                    title "a slice realizing a capability the record does not hold"
+                    kind "command"
+                    realizes "CAP.nowhere"
+                    from-storm "ES.260819.01"
+                    actor "someone"
+                    trigger "something"
+                    outcome "something"
+                    layer "docs"
+                    claim "C1" text="a claim"
+                    command "do-a-thing"
+                    produces-event "ThingDone"
+                }
+                """#
+        rule "duplicate-identity"           refuses="two entities claiming one id"
+        rule "entity-without-identity"      refuses="a node with no id"
+        rule "undeclared-entity-kind"       refuses="a kind this schema does not name"
+        rule "undeclared-state"             refuses="a state this schema does not name for that kind"
+        rule "undeclared-relationship"      refuses="an edge this schema does not name"
+        rule "entity-without-required-owner" refuses="an entity that nests with no singular owner"
+        rule "unknown-trail-action"         refuses="a trail action outside the vocabulary"
+        rule "trail-entry-missing-field"    refuses="a trail entry without at, by or action"
+        rule "unknown-approval-kind"        refuses="an approval kind this schema does not name"
+        // Both witnesses added by TS.260823.01, together with the code that makes them
+        // refuse. Declared since the graph was written and implemented NOWHERE: until that
+        // slice the only code in this engine that touched an approval was the code that
+        // wrote it, so the human gate every other rule assumes held was a string nothing
+        // ever read back.
+        rule "approval-signed-by-agent"     refuses="an asker outside the human namespace" \
+            witness=#"""
+                iteration "ITER.witness" {
+                    slug "admitted-by-an-agent"
+                    on-slice "TS.witness"
+                    state "open"
+                    approval "admission" {
+                        status "asked"
+                        asked-by "agent:praxis"
+                    }
+                }
+                """#
+        rule "adr-accepted-without-approval" refuses="an accepted decision nobody signed"
+        rule "iteration-without-signed-admission" refuses="work beginning on an iteration nobody asked for" \
+            witness=#"""
+                iteration "ITER.witness" {
+                    slug "nobody-asked"
+                    on-slice "TS.witness"
+                    state "open"
+                }
+                """#
+        rule "iteration-worked-without-start-vet"  refuses="work beginning on a create-vet alone"
+        rule "complete-phase-without-evidence"     refuses="a phase marked complete that produced nothing"
+        // Cross-field constraint. Declared as vocabulary rather than as a rule, because it
+        // is a shape an ENTITY carries — `exactly one of these fields is present`. W4 found
+        // it: a refusal is about a slice, an iteration or a version, and cardinality per
+        // field cannot say that, so a refusal naming nothing at all was accepted.
+        vocabulary "one-of-fields" \
+            means="exactly one of the named fields is present on a record of this kind" \
+            found-by="ITER.260821.07/W4 — the first thing the record needed to say that its own \
+                vocabulary could not express. Every gap before it was a kind or a field nobody had \
+                declared; this one is a gap in the schema LANGUAGE" \
+            applies-to="refusal — on-slice · on-iteration · on-version"
+
+        rule "an-immutable-record-carries-a-seal"  refuses="a record whose kind declares immutability and that carries no seal" \
+            because="cut-release-is-immutable and an-accepted-decision-is-append-only both check the \
+                seal ONLY WHEN PRESENT, so a record with no seal is protected by nothing. \
+                Append-only that nothing seals is append-only nobody has" \
+            found-by="ITER.260821.15/AE3 and ITER.260821.17/AG3" \
+            note="the rule that makes the other two mean anything. It refuses the current record \
+                until every accepted decision and every resolved symptom is sealed" \
+            witness=#"""
+                iteration "ITER.witness" {
+                    on-slice "TS.witness"
+                    state "closed"
+                    decision "accepted and sealed by nothing" chose="this" over="that" \
+                        falsified-by="something" state="accepted"
+                    trail {
+                        entry at="2026-08-21T00:00:00Z" by="human:witness" action="created"
+                    }
+                }
+                frame "F.witness" {
+                    symptom "S.witness" state="resolved" resolved-by="9.9.9" text="sealed by nothing"
+                }
+                """#
+        rule "a-commitment-carries-every-claim"    refuses="a commitment that does not carry a claim one of its slices declares" \
+            because="the close accounts for the claims an ITERATION holds, so a claim dropped from \
+                the iteration is a claim nothing objects to. TS.260820.07/C3 refuses deleting it \
+                from the SLICE; this is the same move one level over, and nothing checked it" \
+            found-by="ITER.260821.19/AJ6 — an edit dropped four claims and the close passed, \
+                reporting three" \
+            witness=#"""
+                thin-slice "TS.witness" {
+                    slug "witnessed"
+                    claim "C1"
+                    claim "C2"
+                }
+                iteration "ITER.witness" {
+                    on-slice "TS.witness"
+                    state "closed"
+                    claim "C1" from-slice="TS.witness" state="met"
+                    trail {
+                        entry at="2026-08-21T00:00:00Z" by="human:witness" action="created"
+                    }
+                }
+                """#
+        rule "a-claim-id-is-unique-in-its-iteration" refuses="an iteration carrying two claims with one id" \
+            because="the gate pins claims at open and the working agent settles them. Writing the \
+                settled claim BESIDE the pinned one rather than onto it leaves both, and the close \
+                reads whichever comes first" \
+            found-by="ITER.260821.07/W6 — the first time a rule caught the agent who wrote it, on \
+                the real tree rather than in a fixture" \
+            witness=#"""
+                iteration "ITER.witness" {
+                    on-slice "TS.witness"
+                    state "working"
+                    claim "C1" from-slice="TS.witness" state="pending"
+                    claim "C1" from-slice="TS.witness" state="met"
+                    trail {
+                        entry at="2026-08-21T00:00:00Z" by="human:witness" action="created"
+                    }
+                }
+                """#
+        rule "a-record-is-filed-in-its-container"  refuses="a record whose kind belongs to a container it is not in" \
+            because="shape is checked and PLACEMENT is not. praxis check passed on a valid record in \
+                the wrong directory, and only looking caught it" \
+            found-by="ITER.260821.04/T1"
+        rule "a-derived-field-is-recomputed"       refuses="a written field the record derives and no rule recomputes" \
+            because="a derived field written once and never rechecked is a cache — a second copy \
+                whose fidelity is unverifiable without checking the first, which is the whole of \
+                this frame. One recomputed by a rule is a projection with a proof attached" \
+            found-by="ITER.260821.07/W7, answered in part by ITER.260821.11/AA1" \
+            still-owed="release.proposed-bump and release.proposal-incomplete-for are still \
+                write-time only"
+        rule "a-rule-has-a-witness"                reports="a declared rule that no record in the corpus demonstrates refusing" \
+            because="a rule that has never been shown to refuse is indistinguishable from one that \
+                CANNOT. AG1 proved it: a correct rule reported nothing because its refusals were \
+                computed and silently dropped, and it was caught only because the answer had been \
+                predicted" \
+            found-by="ITER.260821.17/AG1, and the three attribution bugs S7, AG1, AG2 — each found \
+                by a rule firing, never by a test" \
+            note="reported rather than refused: a rule declared today for a shape the record does \
+                not hold yet is legitimate. What is not legitimate is nobody knowing which"
+
+        rule "a-close-names-its-attester"             refuses="a close with no attester named by whoever ran it" \
+            because="a default is not an attestation. An identity the tool supplied proves that \
+                the tool ran, which nobody doubted — and it is what made \
+                an-attestation-is-not-self-issued unreachable for the whole of its first day" \
+            found-by="ITER.260822.05/AP3" \
+            note="this cannot make attestation unforgeable and does not claim to. An agent can \
+                type a human's name. What changes is that doing so is an ACT rather than a \
+                default, which is the whole difference between S3 and a gate"
+
+        rule "an-attestation-is-not-self-issued"      refuses="a closed iteration attested by the identity that worked a phase the attestation covers" \
+            because="an artifact looks identical whether the reviewer was a different mind or the \
+                same one wearing a second hat. That is S2, and `the same engineer cannot \
+                self-approve` has been stated in the router and in the engineer persona since \
+                before the delivery graph while being enforced by nothing at all" \
+            found-by="ITER.260822.04's decision `what a persona serves`, which anchored three \
+                personas to the root because the record had no word for who may attest what" \
+            witness=#"""
+                iteration "ITER.witness" {
+                    on-slice "TS.witness"
+                    state "closed"
+                    phase "implement" state="complete" worked-by="agent:one"
+                    attestation "close" by="agent:one"
+                }
+                """# \
+            note="what is refused is ATTESTING your own work. Working two phases is normal and \
+                often better; signing off on what you built is the act this rule exists for"
+
+        rule "a-role-owns-a-declared-phase"           reports="a role owning a phase the record does not name" \
+            because="a role owning no recognisable phase is a title, and a title in a record is a \
+                dumping ground with a job description"
+
+        rule "a-record-names-somebody-it-is-for"      reports="a record holding no persona at all" \
+            because="every fact this record holds exists to serve somebody, and until TS.260821.15 \
+                the one fact it never held was who. `needed-by` named a role with nothing behind \
+                it, and `useful-alone` — the field that says what you get — had an unstated subject" \
+            found-by="the maintainer, reading the published set as two personas" \
+            note="one primary persona is enough. The rest emerge from the work and cite what \
+                surfaced them, so this reports the ABSENCE of any and never the absence of many — \
+                enumerating personas upfront is a week spent on people nobody has met"
+
+        rule "implement-follows-an-approach"          refuses="an implement phase complete against a design-system that produced an approach it does not name" \
+            because="deriving the better approach is what design-system is FOR, and an implement \
+                that points at none built something the plan did not describe. Every design-system \
+                in this frame was a past-tense summary written at close by whoever did the work — \
+                including one that was wrong in exactly the way a design phase exists to catch" \
+            found-by="the maintainer, on ADR.260819.02's phase list" \
+            witness=#"""
+                iteration "ITER.witness" {
+                    slug "built-without-reading-the-plan"
+                    on-slice "TS.260821.19"
+                    state "closed"
+                    phase "design-system" state="complete" {
+                        approach "one way" {
+                            over "another way"
+                            because "it is better"
+                        }
+                    }
+                    phase "implement" state="complete"
+                    trail {
+                        entry at="2026-08-22T00:00:00Z" by="human:witness" action="created"
+                    }
+                }
+                """#
+
+        rule "a-frame-is-worked-under-a-strategy"     reports="a frame naming no strategy" \
+            because="everything this record holds descends from a frame, and the frame was the \
+                root with nothing above it. A problem nobody can trace to a strategy is work \
+                nobody can justify — and the check is the one this record makes everywhere else, \
+                that nothing is orphaned, rather than whether any of it is true" \
+            found-by="the maintainer: vision, mission and strategy are the pillars, and the record \
+                held none of them"
+
+        rule "the-plan-and-the-code-agree"            refuses="an approach the record says was taken that the iteration never produced, or one it produced and neither followed nor abandoned" \
+            because="an approach recorded and not taken is a decision the record CLAIMS was made. \
+                That is worse than no plan at all — no plan is silence, and this is an account of \
+                a choice nobody made, which a reader has no reason to distrust" \
+            found-by="ITER.260822.14/AZ2, superseded. Chronology was the wrong question: the code \
+                is the decision and the plan is the informed act before it, so what matters is not \
+                when it was written but that it and the thing built agree" \
+            witness=#"""
+                iteration "ITER.witness-unfollowed" {
+                    slug "planned-and-did-otherwise"
+                    on-slice "TS.260821.20"
+                    state "closed"
+                    phase "design-system" state="complete" {
+                        approach "the one that was written down" {
+                            over "something else"
+                            because "it seemed better at the time"
+                        }
+                    }
+                    phase "implement" state="complete" followed="an approach nobody recorded"
+                    trail {
+                        entry at="2026-08-22T00:00:00Z" by="human:witness" action="created"
+                    }
+                }
+                """#
+
+        rule "a-continuation-shares-its-slice"        refuses="`continues` naming an iteration whose slices do not overlap this one's" \
+            because="a continuation stands on a PRIOR ATTEMPT AT THE SAME SLICE. One naming an \
+                iteration over different work is not carrying that iteration's claims forward, it \
+                is borrowing its name — and the claims a second iteration inherits are exactly the \
+                ones this rule protects from arriving unearned" \
+            found-by="`TS.260823.10`, cut from ITER.260823.08/F1, ITER.260823.08/F2 and \
+                ITER.260823.06/F4 — three findings, one shape: every completeness question in this \
+                engine was asked of one iteration as though the iteration's span and the slice's \
+                life were the same span" \
+            witness=#"""
+                iteration "ITER.witness-first" {
+                    slug "witness-first"
+                    on-slice "TS.witness-a"
+                    state "closed"
+                    trail {
+                        entry at="2026-08-22T00:00:00Z" by="human:witness" action="created"
+                    }
+                }
+                iteration "ITER.witness-second" {
+                    slug "witness-second"
+                    on-slice "TS.witness-b"
+                    continues "ITER.witness-first" because="borrows the name, not the slice"
+                    state "open"
+                    trail {
+                        entry at="2026-08-22T00:00:00Z" by="human:witness" action="created"
+                    }
+                }
+                """#
+
+        rule "a-continuation-states-why"              reports="`continues` naming an iteration with no `because`" \
+            because="`a-slice-took-more-than-one-iteration` is a fitness function that reads the \
+                COUNT of attempts and infers a cause. A continuation that says why — mis-cut, \
+                large, or something the first iteration could not reach — turns that inference into \
+                a fact the record states rather than one a reader has to guess at" \
+            witness=#"""
+                iteration "ITER.witness-first" {
+                    slug "witness-first"
+                    on-slice "TS.witness"
+                    state "closed"
+                    trail {
+                        entry at="2026-08-22T00:00:00Z" by="human:witness" action="created"
+                    }
+                }
+                iteration "ITER.witness-second" {
+                    slug "witness-second"
+                    on-slice "TS.witness"
+                    continues "ITER.witness-first"
+                    state "open"
+                    trail {
+                        entry at="2026-08-22T00:00:00Z" by="human:witness" action="created"
+                    }
+                }
+                """#
+
+        rule "teach-reaches-an-end-user"              reports="a teach phase that names no reader" \
+            because="a skill teaches an AGENT and is the doctrine layer; a version's docs teach \
+                the reader of a release. Every iteration in this frame named one skill under both, \
+                which is how the difference stayed invisible for thirty-three of them" \
+            witness=#"""
+                iteration "ITER.witness-taught" {
+                    slug "taught-nobody-in-particular"
+                    on-slice "TS.260821.19"
+                    state "closed"
+                    phase "teach" state="complete" produced="a skill"
+                    trail {
+                        entry at="2026-08-22T00:00:00Z" by="human:witness" action="created"
+                    }
+                }
+                """# \
+            note="reported, and it names the READER rather than sniffing the path. `produced` \
+                containing `skills/` was a heuristic on a string, and it would have called a \
+                correct teach phase wrong the moment somebody wrote a guide somewhere else"
+
+        rule "a-value-agrees-with-its-maturation"     refuses="a record whose field disagrees with the latest `matured` entry for it" \
+            because="a maturation says a value became X. If the record holds Y, one of the two is \
+                wrong and a reader cannot tell which — which is worse than not recording the \
+                change at all, because it reads as an account of what happened" \
+            found-by="the maintainer: maturing forward is what supports iterative development" \
+            witness=#"""
+                capability "witness-disagreeing" {
+                    doing "one thing"
+                    not "another thing"
+                    state "sought"
+                    derived-from "ES.260819.01"
+                    from-cluster "projection"
+                    owns-event "WitnessDisagreed"
+                    matured "doing" {
+                        from "an older thing"
+                        to "a different thing"
+                        at "2026-08-22"
+                        because "it got better"
+                        taught-by "ITER.260822.13"
+                    }
+                    trail {
+                        entry at="2026-08-22T00:00:00Z" by="human:witness" action="created"
+                    }
+                }
+                """#
+
+        rule "a-claim-of-value-names-whose"           reports="a slice saying what you get without naming who gets it" \
+            because="value is not a property of a change — it is a judgement somebody makes, and \
+                a record stating the change without the judge has recorded half of it. \
+                `useful-alone` says `what you get if this ships and nothing after it does`, and \
+                the subject was unstated for the whole life of the record" \
+            found-by="ITER.260822.11/AV1" \
+            given-shipped="" \
+            witness=#"""
+                thin-slice "TS.witness" {
+                    slug "value-with-no-judge"
+                    title "a slice claiming value for nobody"
+                    kind "command"
+                    realizes "CAP.delivery-record"
+                    from-storm "ES.260819.01"
+                    command "witness"
+                    actor "somebody"
+                    produces-event "Witnessed"
+                    trigger "a witness is needed"
+                    outcome "the rule fires"
+                    layer "doctrine" reaches="nothing"
+                    claim "C1" text="something" settled-by="a test"
+                    useful-alone "something you get, and the record does not say who gets it"
+                }
+                """# \
+            note="reported, not refused. Thirty-four slices were annotated before this landed so \
+                the count is zero on arrival — the same order TS.260821.04 had to use, and the \
+                reason AV1 carried rather than being forced"
+
+        rule "a-published-view-names-its-reader"     reports="a publishable view naming no persona it is for" \
+            because="`needed-by` has been on every read model since the storm was written and no \
+                projection ever read it. So seven documents were published in alphabetical order, \
+                four of them about how the tool is built, and a reader who wanted outcomes opened \
+                the architecture because it sorted first. A document nobody is for is one nobody \
+                will read" \
+            found-by="TS.260821.14, from the maintainer reading the published set as two personas \
+                — and finding the record had already answered the question" \
+            note="reported, and NAMED. A view with no reader is left in the story's index under \
+                `addressed to nobody`, because hiding it from the reader hides the fault with it" \
+            witness=#"""
+                event-storm "ES.witness-unaddressed" {
+                    read-model "a-view-for-nobody" answers="what does this answer?" \
+                        publishable=#true because="it is frozen by nature" \
+                        publishes-to="docs/releases/<version>/a.md"
+                }
+                """#
+
+        rule "work-follows-the-declared-sequence"    reports="work at a declared step while an earlier step the strategy declares is satisfied by nothing" \
+            because="a strategy carries no falsifier because it is an ORDERING, and that argument \
+                only holds if the ordering is checked. It was declared with six steps and nothing \
+                compared any work against them for a day — which made `conformance is computable` \
+                a claim of the same kind this frame exists to distrust" \
+            found-by="ITER.260823.02/BC3, carried from TS.260821.16/C5" \
+            note="computed from what the record HOLDS, never from when anything was written. This \
+                record's frame predates every persona by thirty iterations and always will, so a \
+                report derived from trail timestamps could never be cleared — and a report nobody \
+                can act on is noise. A state report clears the moment the missing record is \
+                written, which is the only reason to tell somebody they are out of sequence" \
+            note="the strategy declares what satisfies each step and the engine computes the \
+                order. An engine that KNEW what `audience` meant could diverge from the record and \
+                nobody could tell, which is what A4 forbids — so a repository whose strategy has \
+                different steps declares its own `satisfied-by` and this rule works unchanged" \
+            note="a step declaring no `satisfied-by` is not checked. A strategy is prose somebody \
+                writes first and maps to kinds later, and requiring the mapping upfront would make \
+                declaring one a schema exercise" \
+            witness=#"""
+                strategy "S.witness-out-of-order" {
+                    serves "M.witness"
+                    step "1" is="audience" {
+                        satisfied-by "persona"
+                    }
+                    step "2" is="work" {
+                        satisfied-by "thin-slice"
+                    }
+                }
+                thin-slice "TS.witness-early" {
+                    slug "cut-before-anybody-was-named"
+                    title "a slice under a strategy whose first step nothing satisfies"
+                    kind "command"
+                    realizes "CAP.delivery-record"
+                    from-storm "ES.260819.01"
+                    command "witness"
+                    actor "somebody"
+                    produces-event "Witnessed"
+                    trigger "a witness is needed"
+                    outcome "the rule fires"
+                    layer "doctrine" reaches="nothing"
+                    claim "C1" text="something" settled-by="a test"
+                    useful-alone "a witness"
+                    useful-to "the-maintainer"
+                }
+                """#
+
+        rule "the-record-cites-what-it-holds"        refuses="a field naming a file the checker cannot follow" \
+            because="a citation is an appeal to something that carries the weight of the claim. \
+                An `evidence=` naming a test file and a function inside it says GO HERE \
+                AND SEE — and the moment that function is renamed the claim is orphaned, silently, \
+                while still reading as settled. A hundred and fifty-six of them stood in this \
+                record. The record says WHAT was shown; the repository says where it lives; git \
+                says when it moved. The copy that rots is the one the record keeps" \
+            found-by="TS.260821.17, from W16 — thirty-four citations into unfollowable Markdown, \
+                which was the same fault one level up and was read as a documentation problem" \
+            note="what the record MAY cite is its own ids. `TS.260821.17`, `AG1`, `C3` and \
+                `ITER.260822.14` are followable — dangling-relationship refuses one the record does \
+                not hold, which is exactly the check a path cannot have" \
+            note="not refused: the record's assertions about its own tree, because none of them \
+                can rot silently. `doctrine-surface.path` is checked by a-declared-surface-ships; \
+                `layer.owns` and the `paths` block are read by the tool, which fails when they are \
+                wrong; `publishes-to` is where the record WRITES; `given-shipped` and `witness` \
+                declare a synthetic world for a witness and name files that deliberately do not \
+                exist. If that distinction is wrong, the seventy-eight surfaces are the next thing \
+                to rework" \
+            still-owed="the KDL comments. A path in a comment is invisible to a parser and rots \
+                the same way — `write-durable-comments` is the only thing standing over it, and it \
+                is doctrine with no probe" \
+            witness=#"""
+                thin-slice "TS.witness-citing" {
+                    slug "cites-a-path"
+                    title "a slice whose claim points outside the record"
+                    kind "command"
+                    realizes "CAP.delivery-record"
+                    from-storm "ES.260819.01"
+                    command "witness"
+                    actor "somebody"
+                    produces-event "Witnessed"
+                    trigger "a witness is needed"
+                    outcome "the rule fires"
+                    layer "doctrine" reaches="nothing"
+                    claim "C1" text="something is true" settled-by="tests/witness.rs::it_is_true"
+                    useful-alone "a witness"
+                    useful-to "the-maintainer"
+                }
+                """#
+
+        rule "a-state-vocabulary-is-declared-once"    refuses="a kind whose `states=` and whose `state` field's `one-of=` disagree" \
+            because="`withdrawn` had to be added to `release` in two places, and the first edit \
+                alone changed nothing — because `states=` was declared and never read. A kind that \
+                refuses what it also permits is a vocabulary nobody can trust, and an attribute \
+                nothing consults is indistinguishable from one that is honoured" \
+            found-by="WALK.260822.02/AS7" \
+            witness=#"""
+                notional-architecture "NA.witness" {
+                    slug "split-vocabulary"
+                    title "a kind declaring its states twice"
+                    frame "FRAME.260819.01"
+                    state "held"
+                    trail {
+                        entry at="2026-08-22T00:00:00Z" by="human:witness" action="created"
+                    }
+                    schema {
+                        entity "witness-kind" states="one two" {
+                            field "state" each="1" one-of="one" "three"
+                        }
+                    }
+                }
+                """#
+
+        rule "a-config-binds-a-method-the-engine-carries" refuses="a config naming a method this engine does not carry" \
+            because="`governed-by` pointed at nothing from the withdrawal of ADR.260819.02 until \
+                TS.260821.10, because the thing it should have named had no home. A binding to a \
+                method the engine does not have is a repository being checked against rules nobody \
+                can see, which is worse than no binding because it reads as one" \
+            witness=#"""
+                config {
+                    repository "witness/binding"
+                    governed-by "no-such-method@v99"
+                    profile "witness" {
+                        layer "one" "a stratum"
+                    }
+                    paths {
+                        state-root "praxis/"
+                    }
+                }
+                """#
+
+        rule "resolution-names-a-release"          refuses="a symptom resolved by a release the record does not hold, or by one that bound no slice attacking it" \
+            because="a frame shrinks by a RELEASE, never by an opinion. Resolution computed from \
+                what shipped is the frame's own principle applied to the frame's own bookkeeping — \
+                and a method that exempts its own progress reports from the standard it sets is the \
+                root cause with a nicer surface" \
+            note="the sharpest check in the set. It is also the one most likely to refuse something \
+                the maintainer believes, which is the point" \
+            witness=#"""
+                frame "F.witness" {
+                    symptom "S.witness" state="resolved" resolved-by="0.0.0" text="claimed by nothing"
+                }
+                """#
+        rule "a-decision-names-what-it-rejected"   refuses="a decision that names no alternative it rejected" \
+            because="a decision with no alternatives is a preference, and a preference recorded as a \
+                decision is the hardest kind to argue with later — there is nothing to argue against" \
+            witness=#"""
+                iteration "ITER.witness" {
+                    on-slice "TS.witness"
+                    state "closed"
+                    decision "no alternative was available" chose="this" falsified-by="something"
+                    trail {
+                        entry at="2026-08-21T00:00:00Z" by="human:witness" action="created"
+                    }
+                }
+                """#
+        rule "a-decision-names-its-falsifier"      refuses="a decision that names nothing which would show it wrong" \
+            because="the same reason. A decision nothing could falsify was never a choice between \
+                real options, and a reader two years out cannot tell whether it still holds" \
+            witness=#"""
+                iteration "ITER.witness" {
+                    on-slice "TS.witness"
+                    state "closed"
+                    decision "a preference wearing a decision's clothes" chose="this" over="that"
+                    trail {
+                        entry at="2026-08-21T00:00:00Z" by="human:witness" action="created"
+                    }
+                }
+                """#
+        rule "a-decision-is-bound-to-an-iteration" refuses="a decision that belongs to no iteration" \
+            because="a decision filed beside the work loses the one thing that makes it readable \
+                later — what forced it" \
+            witness=#"""
+                decision "filed beside the work" chose="this" over="that" falsified-by="something"
+                """#
+        rule "an-accepted-decision-is-append-only" refuses="an accepted decision whose body no longer matches what was accepted" \
+            because="a decision that can be edited afterwards is a decision nobody can cite" \
+            note="the seal covers the body and deliberately NOT the amendments, so appending a \
+                correction is not an edit. Same mechanism as cut-release-is-immutable and the same \
+                honest limit: it makes a rewrite visible, it does not prevent one"
+        rule "publish-only-what-survives-freezing" refuses="a read model that does not declare whether it survives being frozen, or declares a lifetime with no reason" \
+            because="the publication test is a judgement about perishability, and an unjustified \
+                judgement is indistinguishable from an oversight. There is no repository-wide \
+                default: perishability belongs to the question, not to the file type" \
+            note="a publishable view must also declare WHERE it lands, because the published set is \
+                derived from these declarations and from nothing else — an engine that composes its \
+                own paths has taken the decision back" \
+            witness=#"""
+                event-storm "ES.witness" {
+                    read-model "nobody-decided-about-this-one"
+                }
+                """#
+        rule "promoted-truth-is-derived"           refuses="a capability whose promoted truth is not what the record derives from what cut releases bound" \
+            because="if it did not come from bound work it is not promotion, it is an assertion \
+                about the past — which is the root cause with a version number attached" \
+            note="the answer to W7's class. A derived field written once and never rechecked is a \
+                cache; one RECOMPUTED by a rule is a projection with a proof attached. The command \
+                and the check call the same derivation, so they cannot disagree about what truth is" \
+            witness=#"""
+                capability "witness" {
+                    state "active"
+                    shipped "9.9.9" by="ITER.nowhere" slice="TS.nowhere"
+                }
+                """#
+        rule "cut-release-is-immutable"            refuses="a cut release whose content no longer matches the seal written when it was cut" \
+            because="a release is a POINT on the version line, and a point that moved is not one. \
+                Everything downstream — publication, verification, symptom resolution — pins to it" \
+            note="the seal makes an edit VISIBLE. It is not a signature and does not make forgery \
+                hard: anyone who can edit the record can recompute it. What it catches is the edit \
+                nobody meant to make and nobody would otherwise notice, which is the failure this \
+                frame is actually about" \
+            witness=#"""
+                release "REL.witness" {
+                    version "9.9.9"
+                    state "released"
+                    binds "ITER.witness"
+                    seal "fnv1a64:0000000000000000"
+                }
+                """#
+        rule "no-silent-drop"                      refuses="a closed iteration carrying a claim that is neither met nor carried by a finding" \
+            because="an unmet claim that closes in silence and a met claim look identical \
+                afterwards, and the refusal is the only thing that makes them different. This is \
+                S5, the symptom with the most day-to-day cost" \
+            note="a recorded finding is enough to close. Judging whether the shortfall is \
+                acceptable is LEARN's job, not the gate's — this rule refuses silence, never \
+                shortfall" \
+            witness=#"""
+                thin-slice "TS.witness" {
+                    slug "witnessed"
+                    claim "C1"
+                }
+                iteration "ITER.witness" {
+                    on-slice "TS.witness"
+                    state "closed"
+                    claim "C1" from-slice="TS.witness" state="pending"
+                    trail {
+                        entry at="2026-08-21T00:00:00Z" by="human:witness" action="created"
+                    }
+                }
+                """#
+        rule "claim-dropped-from-the-slice"        refuses="an iteration carrying a claim its slice no longer declares" \
+            because="every other check here is defeated by editing the claim list, which is exactly \
+                how scope goes quietly in a Markdown checklist today. The claims are frozen into \
+                the iteration when the gate opens it, so deleting one from the slice does not \
+                remove it — it makes the two disagree" \
+            note="the check that matters (TS.260820.07). Without it, no-silent-drop is advice" \
+            witness=#"""
+                thin-slice "TS.witness" {
+                    slug "witnessed"
+                    claim "C1"
+                }
+                iteration "ITER.witness" {
+                    on-slice "TS.witness"
+                    state "working"
+                    claim "C9" from-slice="TS.witness" state="met"
+                    trail {
+                        entry at="2026-08-21T00:00:00Z" by="human:witness" action="created"
+                    }
+                }
+                """#
+        rule "evidence-names-its-layer"            refuses="an iteration evidencing a layer its slice never declared" \
+            reports="a layer the slice declared that a sealed iteration evidences nothing for" \
+            because="the slice set the granularity when it was cut. Evidence outside it is evidence \
+                for something nobody asked about, and a declared layer that vanishes from the \
+                accounting was never reached AND never refused — which is S2 at layer granularity" \
+            note="declared in the storm as a policy the day it was held, and enforced by nothing \
+                until ITER.260821.05. Reported rather than refused on the absent side, because an \
+                iteration is allowed to close having reached less than it hoped — it is not allowed \
+                to do so silently" \
+            witness=#"""
+                thin-slice "TS.witness" {
+                    slug "witnessed"
+                    layer "doctrine"
+                }
+                iteration "ITER.witness" {
+                    on-slice "TS.witness"
+                    state "closed"
+                    layer "harness" state="evidenced"
+                    layer-set sealed=#true
+                    trail {
+                        entry at="2026-08-21T00:00:00Z" by="human:witness" action="created"
+                    }
+                }
+                """#
+        rule "phase-required-by-a-declared-layer"  refuses="a phase skipped while a layer it is the only route to stays sealed and unevidenced" \
+            note="which phases are mandatory is decided by the slice's sealed LAYER SET, not by \
+                preference. A slice declaring `doctrine` cannot skip teach; one declaring \
+                `enforcement` or `docs` cannot skip implement. design-ux and design-system are \
+                judgement, and skipping either is a recorded rationale rather than a silence"
+        rule "skipped-phase-without-rationale"     refuses="a phase skipped with no reason recorded"
+        rule "amendment-records-no-change"  refuses="an amendment that changes nothing"
+        rule "slice-without-one-capability" refuses="a slice realizing zero or several capabilities"
+
+        // ------------------------------------------------------------------------------
+        // What this method no longer holds, and the words that went with it.
+        //
+        // Until TS.260823.06 a retirement named what was withdrawn and no VOCABULARY, so the
+        // fact was one the record stated and nothing could check. The consequence was not
+        // theoretical: `TS.260821.04` retired the sprint-era spine, `using-praxis` announced
+        // the retirement, and thirteen shipped files went on teaching waves and sprints
+        // beside it for two versions. An agent loads both and does not pick the newer one.
+        //
+        // A retirement carrying no words is REPORTED for exactly that reason — it can
+        // enforce nothing. A shipped surface instructing an agent in one of these words is
+        // REFUSED, by file and by line.
+        // ------------------------------------------------------------------------------
+        retired "the initiative-era rules" \
+            were="slice-under-unadmitted-initiative · slice-delivers-outside-initiative-ask · covers-unknown-obligation" \
+            because="they name entities the model no longer has. The one that survived is \
+                slice-without-one-capability, which is the same rule against `realizes`" {
+            word "initiative" instead="a frame — a problem with symptoms and a root cause, worked under a strategy"
+        }
+
+        retired "the sprint-era spine" \
+            were="the PLAN · TRIAGE · BUILD · LEARN · TEACH pipeline, its documents and its tier gates" \
+            because="retired by TS.260821.04, eighteen iterations before anything objected. The \
+                vocabulary half is added here: the surfaces were removed and the words they \
+                taught were left loose in every file that had ever named them" {
+            word "wave"   instead="a frame, and the discovery cut from it"
+            word "sprint" instead="an iteration, opened by the gate on somebody's ask"
+            word "TS-"    instead="`TS.<yymmdd>.<n>` — a slice id the record allocates, not a ticket number"
+        }
+
+        // How a surface may NAME a retired word without teaching it.
+        //
+        // Per line, and that is the whole distinction the rule can draw: a line naming a
+        // retired kind and not saying it was retired is an instruction. A surface must be
+        // able to explain what changed — a rule refusing every mention would make the
+        // history unwritable, and an agent reading a method with a silent hole in its past
+        // will fill the hole. Declared here rather than in the engine because which words
+        // mark an explanation is a fact about this method's prose (A4).
+        a-retirement-may-be-explained \
+            marked-by="retire" marked-by="no longer" marked-by="replaced" \
+            marked-by="superseded" marked-by="removed" marked-by="was deleted" \
+            marked-by="used to" marked-by="formerly" marked-by="there are no" \
+            marked-by="pre-graph" marked-by="v0.7.1" \
+            note="`retire` rather than `retired`, because a line saying `the retirement of the \
+                sprint spine` is explaining as plainly as one saying `retired`. The markers are \
+                stems for that reason, and each is matched anywhere in the line" \
+            because="the retirement notice and the instruction are the same sentence shape, and \
+                only one of them belongs in shipped doctrine"
+
+        rule "a-retirement-names-its-vocabulary" refuses="a retirement that names no words, since it can enforce nothing" \
+            because="a retirement the tree is free to contradict is a fact stated and never kept. \
+                REPORTED rather than refused: it is a gap in what the record says about its own \
+                history, and failing the record closed over its history is a different mistake" \
+            witness=#"""
+                notional-architecture "NA.witness" {
+                    schema {
+                        retired "the witness-era rules" were="one rule nobody names"
+                    }
+                }
+                """#
+
+        rule "surface-teaches-a-retired-kind" refuses="shipped doctrine instructing an agent in a word the method retired" \
+            because="doctrine and record disagreeing is not a documentation lapse. It is two \
+                instructions in one context window, and an agent handed both will invent a third — \
+                which is S1, produced by the doctrine surface that exists to prevent S1" \
+            note="the purge is the work; this is the rule that makes the purge finishable and keeps \
+                it finished. A cleanup with no check behind it is a cleanup that has to be done again" \
+            given-shipped="skills/witness/SKILL.md" \
+            witness=#"""
+                doctrine-surface "surface.witness" {
+                    path "skills/witness/SKILL.md"
+                    kind "skill"
+                    serves "TS.witness"
+                    state "shipped"
+                }
+                """# {
+            given-file "skills/witness/SKILL.md" \
+                text="Create a sprint for this work, then close the sprint."
+        }
+
+        rule "a-manifest-is-derived-from-the-record" refuses="a harness manifest whose version \
+                or description no longer matches what the record derives for it" \
+            because="a manifest is the first thing an adopter reads and the only thing a \
+                marketplace shows — a published document carrying no evidence of when, or \
+                whether, it was ever true. Five of them described a version two behind the \
+                record and a method the record had retired, and nothing noticed because nothing \
+                compared them to anything" \
+            found-by="the validation review of 2026-08-22, which read all five manifests at \
+                0.7.1 against a record holding 0.8.0" \
+            witness=#"""
+                release "REL.witness" {
+                    version "1.0.0"
+                    state "planned"
+                    trail {
+                        entry at="2026-08-22T00:00:00Z" by="human:witness" action="created"
+                    }
+                }
+                """# {
+            given-file ".claude-plugin/plugin.json" \
+                text="{\"name\": \"praxis\", \"version\": \"0.7.1\"}"
+        }
+
+        rule "the-package-ships-what-it-tells-you-to-run" refuses="the distributed package's \
+                `files` omitting the engine or the method file" \
+            because="every skill in the tree instructs an agent to run `praxis check`, and a \
+                package shipping `skills`, `agents`, `instructions`, `scripts` without `crates` \
+                or `praxis` delivers doctrine that says to run a command it does not contain" \
+            found-by="the same validation review, reading the npm package's own file list \
+                against what a skill in it instructs an agent to do" \
+            witness="" {
+            given-file "package.json" \
+                text="{\"name\": \"praxis\", \"files\": [\"skills\", \"agents\"]}"
+        }
+
+        // Whether this model is working, six months on. Two of these falsify rather than
+        // confirm, and both fail quietly if the model is right on paper and unused in
+        // practice — the failure mode a method is least likely to notice about itself.
+        fitness "checks-moved-out-of-attestation" \
+            text="most of the agent-attested fidelity checks are computed rather than asked"
+        fitness "no-drift-between-view-and-record" \
+            text="a rendered view and the state it depicts cannot disagree"
+        fitness "a-slice-took-more-than-one-iteration" falsifies=#true \
+            because="if every slice completes in a single iteration, the iteration is ceremony and should be cut" \
+            fired=#true at="ITER.260821.03" \
+            what-happened="TS.260820.04 closed with C1 met-in-part and was NOT delivered, so the \
+                tool put it back in `ready` and blocked the gate behind it. Resolved not by \
+                re-opening the slice but by a later iteration settling the residue — which is a \
+                mechanism nothing had implemented until T2 corrected how delivery is derived"
+        fitness "a-finding-travelled-the-whole-loop" falsifies=#true \
+            because="opened by learning, triaged, addressed by a slice, closed by a release that \
+                shipped. If none ever completes the circuit, the loop is drawn but not running" \
+            fired=#false as-of="ITER.260821.18" \
+            what-happened="eighteen slices delivered and eighty-eight findings raised, and not one \
+                had completed the circuit. Findings were raised, carried and settled — S1, X1, U3, \
+                AG3 — but none had been triaged back into DISCOVERY and addressed by a slice cut \
+                for it. The loop was drawn and had never run" \
+            note="this is the falsifier doing exactly what it was written to do: it noticed. \
+                TS.260821.02 is the first slice cut FROM a finding rather than from the storm, and \
+                whether this fitness function fires depends on that slice reaching a release"
+    }
+
+    admits "an iteration on a slice" {
+        condition "slice-is-shaped" check="slice-is-shaped" \
+            because="a slice the checker refuses is not work waiting to start, it is a defect"
+        condition "dependencies-delivered" check="dependencies-delivered" \
+            because="an iteration standing on undelivered work is standing on nothing" \
+            caveat="P2 — every dependency in the tree today names a SLICE, which the schema \
+                forbids in favour of a frozen seam. The check reads the id out of the prose \
+                and says that it did, so the caveat is visible in the answer rather than \
+                filed in a finding nobody reads"
+        condition "no-iteration-in-flight" check="no-iteration-in-flight" \
+            because="at most one open iteration per slice — the iteration entity's own constraint"
+        condition "nothing-left-to-admit" check="nothing-left-to-admit" \
+            because="a slice whose claims are all met and whose iteration is closed has nothing \
+                to admit. It is not blocked; it is done, and the two must not look alike"
+        condition "work-is-disjoint" \
+            uncomputed="no seam manifest exists, so what two iterations would touch cannot be \
+                compared. Disjointness is half of what this capability says it judges, and \
+                half of what it judges is currently not computed at all" \
+            because="two iterations that overlap produce a merge, and a merge is where the \
+                record and the tree stop agreeing"
+        condition "the-slice-is-the-best-available" judgement=#true \
+            because="selection is the maintainer's judgement and the tool does not rank. \
+                Declared anyway, so the answer shows the reader which part of the gate it \
+                did not decide for them"
+    }
+}

@@ -4,6 +4,31 @@ All notable changes to the Praxis plugin are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.8.0] — 2026-09-20
+
+**This release closes the direction that precedes it.** The delivery graph lands complete, and it is the last release
+built on this spine.
+
+### Added
+- **The delivery graph** — iteration-native thin slices replace the pre-graph spine: a frame, its capabilities, and vertical slices bound to iterations. Recorded in `ADR.260819.02`.
+- **`praxis-core` and the `praxis` CLI** — the first refusals computed from the record rather than asserted, with every rule proved able to refuse.
+- **Twenty-nine skills** for the graph's own verbs — `adopt-the-method`, `anchor-a-doctrine-surface`, `anchor-the-work`, `ask-the-record`, `ask-what-is-true`, `attach-evidence`, `bind-work-to-a-version`, `close-an-iteration`, `cut-a-slice`, `cut-the-version`, `declare-a-lifetime`, `declare-an-entity-kind`, `declare-an-invariant`, `document-usage`, `mature-a-value`, `name-a-capability`, `name-a-persona`, `pick-up-a-slice`, `plan-before-building`, `promote-what-shipped`, `publish-the-release-set`, `record-a-decision`, `resolve-a-symptom`, `review-in-flight`, `see-the-dashboard`, `see-what-is-ready`, `verify-the-published-tree`, `witness-a-rule`, `write-durable-comments`.
+- **The published release set** (`docs/releases/<version>`) — a release is one document, generated from state, and the published tree can be verified against it.
+- **An attestation the tool does not supply** — self-approval refuses, and the dumping ground is gone.
+- **Vision, mission and strategy anchor the work** — `docs/product.md` becomes the anchor, and the arrow runs both ways: the work informs the strategy.
+
+### Changed
+- **The record stops taking the agent's word** — evidence names its layer, and a decision carries a why.
+- **The engine stops knowing this repository** — the rules no longer assume Praxis's own layout.
+- **One version across every harness** — every declared file is synced from `package.json`, and no other file states the version.
+- **An iteration is the commitment**, not an attempt at one slice.
+- **A surface does not teach a retired kind**, and one front door writes it.
+
+### Fixed
+- **`praxis pick-up` could not start**, and no test would have said so.
+- **The audit exclude list was never read** — `validate-plugin` now passes against its own configuration.
+- **The teach phase has one reader**, and it is not the next agent.
+
 ## [0.7.1] — 2026-08-11
 
 ### Added

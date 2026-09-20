@@ -1,0 +1,541 @@
+// The NOTIONAL architecture. It models what the capabilities are to each other — what each
+// decides, what each owns, what crosses between them and in which shape. It names no
+// framework, no language, no storage, no file layout and no command surface.
+//
+// It is notional because it must outlive every one of those. KDL, a Rust engine and a CLI
+// are this decade's binding of it; the model below is what a later binding would have to
+// keep in order still to be Praxis.
+//
+// Derivation, not assertion. Every element here traces to a cluster, a policy or an
+// acceptance criterion that already exists — the same rule ES.260819.01 applies to
+// capabilities, applied to the architecture that relates them. Where this record disagrees
+// with a committed capability record, the disagreement is stated and the correction is
+// OWED, not applied: naming and re-cutting capabilities is the maintainer's act.
+
+notional-architecture "NA.260820.01" {
+    slug "capabilities-seams-and-who-may-change-what"
+    title "Five capabilities, one substrate, three seams, and single-writer ownership per fact"
+    frame "FRAME.260819.01"
+    derived-from "ES.260819.01" "WALK.260820.01" "WALK.260820.02"
+    state "sought"
+    exercised-by "TS.260820.04" "TS.260820.05" "TS.260820.06" "TS.260820.07" "TS.260820.08" \
+        "TS.260820.09" "TS.260820.10" "TS.260820.11" "TS.260820.13" "TS.260820.16" \
+        "TS.260820.17" "TS.260820.18" \
+        note="twelve of eighteen slices have been walked. The remainder accrete as they are \
+            picked up — an architecture derived from exercise is finished when the slices are, \
+            not before"
+
+    // ================================================================
+    // WHAT THIS RECORD DELIBERATELY DOES NOT DECIDE.
+    //
+    // Each of these is downstream and replaceable. Any of them changing must leave every
+    // element below standing; if one cannot, the element was a tool decision in disguise.
+    // ================================================================
+
+    excludes "the encoding of facts" because="KDL is a binding. The model needs facts to be typed, addressable and trailed — not to be KDL"
+    excludes "identity FORMATS, folder placement, and what may sit in the state root" \
+        because="the schema below says a slice has an identity and an owner. What that id LOOKS \
+            like and which directory holds it are layout, decided on ADR.260819.01"
+    excludes "the engine and its language" because="ADR.260819.01 decided a compiled Rust CLI. Nothing below depends on it"
+    excludes "file and directory layout" because="which node lives at which path is a locator concern. The model needs identity, not location"
+    excludes "the command surface" because="a command in this model is an actor's intent, not a CLI verb"
+    excludes "storage, indexing and query mechanics" because="the substrate below states what must be true of holding facts, never how"
+    excludes "distribution and the install paths" because="FRAME.260819.01 declares them out of scope; ES.260819.01 could not derive them (E11)"
+
+    // ================================================================
+    // THE SUBSTRATE — beneath all five, owned by none.
+    //
+    // Factored out of CAP.delivery-record by WALK.260820.02/W12. It is not a capability:
+    // it refuses nothing about the work and decides nothing. It is what every capability
+    // needs in order to hold a fact at all.
+    // ================================================================
+
+    substrate "the-record" {
+        is "the typed, trailed, addressable fact store every capability writes its own facts into"
+        not "it is not a capability. It refuses malformed structure, never a bad decision, and it \
+            has no opinion about the method being followed"
+
+        must "hold every fact as typed and addressable, so a fact is found by following an edge rather than by knowing where it sits"
+        must "apply exactly one change set at a time, whole or not at all"
+        must "carry a trail entry on every change, naming who and when"
+        must "answer a named query as a typed fact set, without the asker reaching into how facts are held"
+        must "refuse a write whose author does not own the fact being written"
+
+        derived-from "WALK.260820.01" locator="the engine sits under all four as a seam, not a capability"
+        derived-from "WALK.260820.02" locator="W12"
+
+        falsifier "if the substrate ever needs to know what a slice, a claim or a release MEANS \
+            in order to hold it, it is not a substrate and the factoring is wrong"
+    }
+
+    // ================================================================
+    // THE EXTERNAL PARTICIPANT — history.
+    //
+    // ES.260819.01 declares one clock and the record is not it. Named here because an
+    // unnamed external dependency is crossed silently the first time caching looks cheap.
+    // ================================================================
+
+    external "history" {
+        is "an immutable, content-addressed history that exists outside the record and owns what actually happened"
+        bound-to "git" note="the binding. The model requires immutability, content addressing and an external owner — not git"
+
+        record-may "point at a position in it, and record that pointer once"
+        record-may-not "mirror it, cache its contents, or derive a second ordering from it" \
+            because="a copy whose fidelity to history is unverifiable-without-checking-history is \
+                this frame's root cause reproduced one level up (E21)"
+
+        trust-direction "one way. The record trusts history; history knows nothing of the record"
+        consequence "a claim about history — that a commit resolves, that it contains a directory — \
+            is settled by asking history, never by consulting the record (TS.260820.09 C3)"
+
+        derived-from "ES.260819.01" locator="E20" "E21"
+        derived-from "WALK.260820.02" locator="W14"
+    }
+
+    // ================================================================
+    // THE CAPABILITIES — what each DECIDES, and what it may never do.
+    //
+    // `decides` is the load-bearing field. A capability that decides nothing is substrate;
+    // a capability that decides something another capability owns is a boundary error.
+    // ================================================================
+
+    capability-role "delivery-record" {
+        decides "whether a fact about the method's own derivation is well formed — a capability that traces to no cluster, a slice without the shape, symptoms that do not converge, a resolution without an attacking release, a view with no declared lifetime, a guide ahead of promoted truth"
+        owns-facts "problems and their symptoms" "discovery, its walks and its rejected options" "capabilities" "slices and their claims" "declared lifetimes" "usage prose"
+        consumes "release-facts@v1" from="release-binding" \
+            for="resolution-names-a-release and guide-follows-promoted-truth, which are enforceable only against what a release bound"
+        emits "slice-facts@v1" to="work-admission" "claim-settlement"
+        emits "read-model@v1" to="document-projection" views="capabilities-and-what-they-own" "what-is-currently-true" "how-to-use-a-capability" "the-problem-as-it-stands"
+        never "judge whether a decision was good, or whether work was done well. It refuses shape and derivation, and nothing else"
+        owed "restate merge-reason on the consistency argument rather than the fundability one (W13)"
+    }
+
+    capability-role "work-admission" {
+        decides "whether an iteration may open, and whether an open iteration may close"
+        owns-facts "iterations and their whole lifecycle" "frozen dependencies" "refusals and the condition that caused each"
+        consumes "slice-facts@v1" from="delivery-record" for="what a slice depends on, and what it declared"
+        consumes "settlement-facts@v1" from="claim-settlement" for="which claims are settled and which are carried, at close"
+        emits "read-model@v1" to="document-projection" views="what-is-ready-to-pick-up"
+        emits "iteration-facts@v1" to="release-binding"
+        never "judge the work. It judges preconditions at open and accounting at close, and looks at the work itself at neither"
+        owed "the iteration is one entity and this capability owns it end to end. `not` currently says \
+            `and then it is finished`, which W8 falsifies. TS.260820.07 re-files here, and \
+            no-silent-drop moves here with it (W8, W9)"
+
+        // The gate's conditions, declared rather than coded. A4 forbids the engine holding
+        // a rule the record does not state, and WHICH conditions decide admission is such a
+        // rule. The engine carries a check per name; a condition naming a check the engine
+        // does not have is REPORTED AS UNCOMPUTED, never quietly passed. That is the whole
+        // difference between `nothing blocks this` and `blocking was not computed`, which is
+        // read-model@v1's third constraint at the granularity of a single condition.
+        // Declared by ITER.260821.03, from ES.260819.01 `pick-up` and the iteration-control
+        // cluster's `it judges readiness and disjointness only`.
+        // The gate moved to the method (TS.260821.10). Admission conditions are NORMATIVE:
+        // a repository that could rewrite its own has no gate, and this one had them sitting
+        // in its own discovery folder where every adopter would have had to copy them.
+        // See the method document the engine carries and the plugin ships.
+    }
+
+    capability-role "claim-settlement" {
+        decides "whether a stated claim is met by its evidence, whether evidence names a layer the slice declared, and whether a shortfall has been carried"
+        owns-facts "evidence and the layer each names" "claim settlements" "findings and their triage" "decisions and their alternatives"
+        consumes "slice-facts@v1" from="delivery-record" for="the layer set and the claim set a slice declared"
+        emits "settlement-facts@v1" to="work-admission" "release-binding"
+        emits "read-model@v1" to="document-projection" views="what-this-iteration-claims-and-has-shown" "the-decisions-that-shaped-this"
+        never "produce evidence, judge its quality, or perform a close. It supplies the settlement; the iteration's owner acts on it"
+    }
+
+    capability-role "release-binding" {
+        decides "what a version contains, when it is cut, and what current truth becomes as a consequence"
+        owns-facts "bindings of an iteration to a version" "releases and their index into history" "the current-truth field of every capability record"
+        consumes "iteration-facts@v1" from="work-admission" for="whether an iteration closed"
+        consumes "settlement-facts@v1" from="claim-settlement" for="which claims are unsettled, so a refusal can name them"
+        consumes "lifetime-facts@v1" from="delivery-record" for="which views are publishable, from which the published set is DERIVED and never listed by hand"
+        consumes "problem-facts@v1" from="delivery-record" for="which symptoms a release resolved. The release node does not store this twice — it is read from the symptoms that name it"
+        emits "release-facts@v1" to="delivery-record"
+        emits "read-model@v1" to="document-projection" views="the-published-set-for-a-release"
+        never "write a document, or hand-edit truth that did not come from bound work"
+        note "it authors a field inside a record delivery-record owns. Under per-fact ownership \
+            this crosses no boundary — see invariant single-writer-per-fact (W10)"
+    }
+
+    capability-role "document-projection" {
+        decides "how a declared view becomes a whole document, what lifetime that document has, and whether a published one still matches the release it claims"
+        owns-facts "publications and what each depicts" "detected drift"
+        consumes "read-model@v1" from="delivery-record" "work-admission" "claim-settlement" "release-binding"
+        never "mutate the record, edit a document toward a new state, or know what any view CONTAINS"
+        note "the only capability that consumes from all four and emits to none of them. E7's \
+            argument for why it sits closest to the frame's root cause is visible in the shape"
+    }
+
+    // ================================================================
+    // THE SEAMS — what crosses a boundary, in which direction, in what shape.
+    //
+    // Three, and only one of them is new. `read-model@v1` came from WALK.260820.01;
+    // `fact-set@v1` and `change-set@v1` from WALK.260820.02. A fourth would be a smell:
+    // every remaining edge in the graph is one of these three.
+    // ================================================================
+
+    seam "read-model@v1" {
+        direction "a content-owning capability → document-projection"
+        carries "one view's content as a typed result: sections, columns, rows of values, referenced prose, and its own declared emptiness"
+        shape-at "WALK.260820.01#read-model-v1"
+        purpose "so a renderer can compose a document without ever knowing what a view MEANS"
+
+        constraint "cells carry values, never markup" because="the moment a capability may emit presentation, the split is fiction while still passing TS.260820.10 C3"
+        constraint "prose is referenced, not inlined" because="prose a human wrote is data; prose a renderer composed is presentation"
+        constraint "empty sections declare their own emptiness" because="a reader who cannot tell `nothing is blocked` from `blocking was not computed` is reading the trust-transfer problem at table granularity"
+        constraint "an archival result names the version it depicts" because="stamp-on-publish enforced in the shape rather than in the renderer"
+
+        falsifier "if projection ever needs a code path specific to one view, the read-side split is fake" \
+            state="tested, did not fire" by="WALK.260820.01/W2"
+    }
+
+    seam "fact-set@v1" {
+        direction "the capability that OWNS a fact → the capability that must DECIDE with it"
+        carries "the answer to a named query, as typed values, as of a stated moment"
+        shape-at "WALK.260820.02#fact-set-v1"
+        purpose "so a capability can compute a verdict from a typed input instead of reaching into \
+            how another capability holds its state — which is the only way the verdict can be \
+            recomputed from the record later, and the frame's principle requires that it can be"
+
+        constraint "the consumer declares the query; the owner answers it" because="a consumer composing its own query over another's facts is reading internals with extra steps"
+        constraint "no verdict field. The owner states facts; the consumer decides" because="a fact set carrying a verdict is an instruction wearing a fact's shape, and it moves the decision away from the capability that owns the act"
+        constraint "answered as of a moment, never cached across a change set" because="a gate that decided from a stale answer has a refusal nobody can recompute"
+        constraint "an empty answer declares its own emptiness" because="carried over from read-model@v1 for the same reason at a different granularity"
+
+        instance "slice-facts@v1"      from="delivery-record"  to="work-admission" "claim-settlement"
+        instance "settlement-facts@v1" from="claim-settlement" to="work-admission" "release-binding"
+        instance "iteration-facts@v1"       from="work-admission"   to="release-binding"
+        instance "release-facts@v1"    from="release-binding"  to="delivery-record"
+        instance "lifetime-facts@v1"   from="delivery-record"  to="release-binding"
+        instance "problem-facts@v1"    from="delivery-record"  to="release-binding" \
+            note="a release's `resolves` is derived from the symptoms that name it, never stored \
+                beside them. The same argument as `history`, one scale down: a second copy whose \
+                fidelity is unverifiable-without-checking-the-first is what this frame is about"
+
+        falsifier "if any consumer needs a field the owner would not publish to every consumer, \
+            the seam is a private channel between two capabilities and the boundary is drawn wrong"
+    }
+
+    seam "change-set@v1" {
+        direction "any capability → the-record"
+        carries "every write one command makes, each naming the fact it changes and its author"
+        shape-at "WALK.260820.02#change-set-v1"
+        purpose "so atomicity is a property of the model rather than a promise each capability makes separately"
+
+        constraint "one command, one change set" because="promote-truth moves truth on many capability records and is still one"
+        constraint "whole or nothing, leaving the record unchanged on failure" because="a half-applied promotion is worse than an unapplied one — it is wrong in a way nobody can see (TS.260820.17 C1)"
+        constraint "every write names the fact it changes" because="the per-fact writer rule must be checkable before application, not by review afterwards"
+        constraint "a change set spanning the record and history still applies as one" because="TS.260820.09 C2 requires the tag and the index node to succeed or fail together"
+
+        settles "TS.260820.09 C2" "TS.260820.17 C1" "TS.260820.07 C3" \
+            note="three acceptance criteria, in three capabilities, all settling against this one \
+                structure. That they were written before it was named is the evidence it is real"
+    }
+
+    // ================================================================
+    // HOW TO READ THE SLICE GRAPH.
+    //
+    // Both of these were found by checking this record against the eighteen slices rather
+    // than by walking. Without them the graph shows five cross-capability violations that
+    // are not violations, and the two that ARE get lost among them.
+    // ================================================================
+
+    reading-rule "needs-read-model is actor-facing" {
+        states "a slice's `needs-read-model` is what the ACTOR must see before issuing the command. It reaches them through document-projection and is never a capability consuming another capability's view"
+        without-it "TS.260820.16 reads as release-binding reaching into delivery-record, when it is a maintainer looking at a dashboard before deciding to bind"
+        consequence "no capability consumes a read model except document-projection. If one ever does, either the view is really a fact set or the boundary is wrong"
+    }
+
+    reading-rule "feeds-read-model is a dependency pointing backwards" {
+        states "when a slice of A feeds a view owned by B, nothing of A writes into B. A authors facts that B's view is computed FROM — so the edge is B consuming a fact set from A, drawn in the opposite direction to the one the graph shows"
+        without-it "cut-slice, declare-lifetime and resolve-symptom all read as delivery-record writing into other capabilities' views"
+        consequence "every `feeds-read-model` crossing an ownership boundary must have a matching `consumes` in the other direction, or a fact is reaching a view with no seam carrying it"
+        found "one missing edge — release-binding consumes lifetime and problem facts from delivery-record, which TS.260820.12 and TS.260820.18 both require and no record declared"
+    }
+
+    // ================================================================
+    // INVARIANTS THAT SPAN CAPABILITIES.
+    //
+    // Not policies — ES.260819.01's ten policies each belong to one capability. These are
+    // true of the relationships, so no single capability can hold them.
+    // ================================================================
+
+    invariant "single-writer-per-fact" {
+        states "every fact has exactly one authoring capability. An entity may hold facts with several different authors"
+        so-that "ownership does not have to follow containment, and a capability can author what it owns inside a record it does not"
+        example "release-binding authors a capability record's current-truth field; delivery-record owns the record"
+        checkable-by "a write whose author does not own the named fact is refused before the change set applies"
+        derived-from "WALK.260820.02" locator="W10"
+        supported-by "TS.260820.17" locator="C2"
+    }
+
+    invariant "judgement-travels-as-fact" {
+        states "a capability hands another its findings, never its instructions. The receiving capability re-decides"
+        so-that "the capability that owns an act is the only one that ever performs it, and every refusal can be recomputed from the inputs that produced it"
+        example "claim-settlement states which claims are unsettled; work-admission refuses the close"
+        checkable-by "a fact set carrying a verdict field, or a capability emitting an event it does not own"
+        derived-from "WALK.260820.02" locator="W7" "W8"
+    }
+
+    invariant "enforcement-follows-the-act" {
+        states "a policy is enforced by the capability that owns the act it refuses, not by the one that owns the concept it is about"
+        so-that "a refusal happens where the change would happen, and cannot be routed around by calling the act from elsewhere"
+        example "no-silent-drop is about claims and refuses a CLOSE, so it belongs to the iteration's owner"
+        checkable-by "a policy listed on a capability that owns none of the acts it refuses"
+        derived-from "WALK.260820.02" locator="W9"
+        note "applying it reassigns exactly one policy of ten, which is why it reads as a discovery \
+            rather than a change — the model was already doing this without saying so"
+    }
+
+    invariant "no-capability-reads-another-s-state" {
+        states "facts cross only as fact sets answering a declared query. Nothing reads how another capability holds anything"
+        so-that "a change to how one capability stores its facts cannot force a change in a capability that merely decides with them"
+        example "work-admission never learns how a slice is held, only what it depends on"
+        checkable-by "a consumer that names a field no fact set publishes"
+        derived-from "ES.260819.01" locator="E10 — the coupling argument, arriving on the write side"
+        derived-from "WALK.260820.02" locator="W7"
+    }
+
+    invariant "refusal-is-a-recorded-fact" {
+        states "every refusal is a fact with the condition that caused it, held by the capability that refused"
+        so-that "a gate that was never invoked and a gate that refused stop looking identical afterwards"
+        example "PickupRefused, CloseRefused, ConvergenceRefused, DriftDetected"
+        checkable-by "a refusal path that produces no fact"
+        derived-from "ES.260819.01" locator="E6" "refusal-is-a-fact"
+    }
+
+    // ================================================================
+    // WHAT THIS ARCHITECTURE OWES.
+    //
+    // Corrections it forces on records already committed. Held as obligations, not applied:
+    // naming and re-cutting capabilities is a maintainer command, and an architecture that
+    // silently rewrote the capabilities it was derived from would be asserting, not deriving.
+    // ================================================================
+
+    owes "declare `depends-on` against a frozen seam and retire the slice-to-slice form" from="P2" "S2" \
+        because="seventeen of eighteen slices name a slice, which is what made the backlog a chain \
+            eight deep rather than a fan. The shape of the edge is what makes the work serial"
+    owes "retire thin-slice.state — delivery is derived and a stored copy can only disagree" from="S4"
+    owes "reconcile the harness layer: the config says the six install manifests, TS.260820.11 says the CI path" from="Z3"
+    owes "read the archival root from config rather than composing it in the engine" from="Y5" \
+        because="the same class as the bump rules before W3, and as AD1 — a binding the record \
+            declares and the engine does not consult"
+    owes "one fact, one reader. `owns-event` was read correctly by the checker and wrongly by the \
+        corpus, and nothing compared them" from="AB1" \
+        because="a checker that validates the record cannot catch a reader that misreads it, and \
+            this frame has been building both"
+    owes "a `start` command, so the second vet is an act rather than a line claiming one" from="T3"
+    owes "a way for the gate to admit `this slice settles that slice's residue`" from="Y3" \
+        because="two iterations were admitted over a machine refusal for the same cause. A gate a \
+            human must overrule at every dependency inversion is a gate that gets switched off"
+    owes "run the release chain end to end on this repository's own release" from="AA4" "AF2" \
+        because="bind, publish, cut, verify and promote are all built and none has run together. \
+            Every finding in this frame came from USING rather than testing"
+
+    owes "re-file TS.260820.07 under CAP.work-admission" from="W8" \
+        because="the iteration is one entity and work-admission owns it. The slice's content is right; the capability on it is wrong"
+    owes "move no-silent-drop from CAP.claim-settlement to CAP.work-admission" from="W9"
+    owes "restate CAP.work-admission's `not` — `and then it is finished` is false of a capability that owns an iteration through its whole life" from="W8"
+    owes "restate CAP.delivery-record's merge-reason on the consistency argument" from="W13" \
+        note="the verdict survives; the reasoning on the record is not the reasoning that justifies it"
+    owes "record read-model@v1, fact-set@v1 and change-set@v1 as frozen seam contracts once there is a manifest to freeze them in" from="W7" "W11"
+    owes "declare the notional-architecture record kind in ADR.260819.02's normative block" \
+        note="this record is applied but undeclared, the same status E12 records for the file-naming rule. \
+            The checker may not enforce an invariant the record does not declare, and it may not \
+            validate a kind the record does not know"
+
+    // ================================================================
+    // OPEN — carried forward rather than settled here.
+    // ================================================================
+
+    open "whether problem facts and derivation facts stay one capability" \
+        falsifier="if problem facts ever change on a different cadence, or by a different writer, than derivation facts, the merge in CAP.delivery-record is wrong" \
+        note="W13 corrected the argument and left the verdict standing. Six slices remain unwalked, \
+            and TS.260820.18 is the only one on this boundary that has been exercised"
+
+    answered "what an iteration IS, as an entity" \
+        is="the COMMITMENT. Not an attempt at a slice — the set of slices one ask committed to, \
+            worked together and accounted for together" \
+        by="ITER.260821.19" \
+        note="it was declared with fields by ITER.260821.01 and still carried `on-slice each=1`, \
+            which quietly answered the question wrongly: it made the iteration a property of a \
+            slice rather than a commitment over slices. Eighteen iterations never caught it because \
+            every ask happened to name one slice — the model was never asked the question it was \
+            answering"
+
+    open "whether document-projection consuming from all four is a hub or a correct sink" \
+        falsifier="if projection ever needs to emit anything back into the record beyond its own publication facts, it is a hub and the topology is wrong"
+
+    // ================================================================
+    // THE SCHEMA — what exists in the record, and what may relate to what.
+    //
+    // Recovered from the withdrawn ADR.260819.02 and re-homed here, because this is not a
+    // decision: it is the model. What a frame IS, what a slice IS, which relationships are
+    // legal — that is what the capabilities are to each other, stated as entities rather
+    // than as behaviours. An ADR is a technical decision, and a schema that needed thirteen
+    // amendments in a day was never one.
+    //
+    // Sorted on the way in. Anything that was really about ENCODING or LAYOUT — filename
+    // patterns, folder placement, Markdown in the tree, empty directories — went to
+    // ADR.260819.01 instead, where the layout is decided. What is left is notional: it
+    // survives KDL being replaced.
+    // ================================================================
+
+    // What THIS repository adds to the method's vocabulary.
+    //
+    // The 946 lines that were here are now the method's own record, carried by the engine
+    // (TS.260821.10). What stays is what an adopting project would not want: Praxis SHIPS
+    // instruction — skills, guardrails, agents, probes — and acme/checkout does not. A
+    // vocabulary for doctrine belongs to the repository that has doctrine.
+    //
+    // This block is an EXTENSION. It may add kinds and rules the method does not name; it
+    // may not redefine one, and a collision is refused. That constraint is load-bearing
+    // rather than decorative: it is the only thing standing between "adopting the method"
+    // and "owning a variant of it".
+    schema {
+        entity "invariant" when="only in a repository that SHIPS instruction. It is what this plugin guarantees about code it is loaded into, and a repository that ships none declares none" is="one property the plugin GUARANTEES about code it is loaded into" \
+            states="enforced advisory" \
+            owned-by="delivery-record" \
+            note="declared by TS.260821.05. the config has said `enable-all-fail-closed #true` and \
+                omitted three probes BY NAME since the binding was written, and neither the \
+                enabling nor the omitting referred to anything the record held — the ids were \
+                strings, and what actually enforced them was fourteen shell scripts and their \
+                header comments. An invariant is what a probe is FOR; the probe is how, and the \
+                two were never connected" {
+            field "protects"  each="1" because="a guarantee that cannot be stated in a sentence is not one"
+            field "severity"  each="1" one-of="refuse" "report" \
+                because="the difference between a gate and a notice is the whole of what an adopter \
+                    needs to know, and describing a probe as stronger than it is was already a \
+                    named failure in this repository's own README"
+            field "language"  each="0..n" because="static enforcement is best-effort per language, and which languages is a FACT about the probe rather than a hope"
+            field "structural" each="0..1" because="a probe that reads structure rather than text applies to every language, and saying so is different from listing nine"
+            field "from-adr"  each="0..1" references="adr" because="config may enable an invariant and may never invent one; this names where the id came from"
+            field "state"     each="0..1" one-of="enforced" "advisory"
+            field "note"      each="0..n"
+        }
+
+        entity "doctrine-surface" when="only in a repository that SHIPS instruction — one file an agent reads on this plugin's authority, and the record must say what asked for it" is="one file this plugin SHIPS as instruction — a skill, a guardrail, an agent, or a probe" \
+            states="current retired" \
+            owned-by="delivery-record" \
+            note="declared by TS.260821.03. The record described the work and never the DOCTRINE \
+                shipped to do the work, so twenty-five of forty-seven skills could stop \
+                corresponding to anything without a single edge going dangling. A surface names \
+                what asks for it; an unanchored one is instruction on the plugin's authority alone" {
+            field "path"        each="1" because="the anchor is to a file, so an absent file is a broken promise rather than an untidy one"
+            field "kind"        each="1" one-of="skill" "guardrail" "agent" "probe"
+            field "serves"      each="1..n" references="thin-slice capability read-model event-storm invariant role" \
+                because="a surface serving nothing is doctrine nobody asked for, which is the whole \
+                    rule. It references five kinds, so a surface whose reason was withdrawn is \
+                    already caught by dangling-relationship rather than by a second rule" \
+                note="widened from three kinds to five after the rule refused the router and the \
+                    storming skill on their first declaration. Widening a reference set to stop a \
+                    refusal is the move this frame refuses everywhere else, so the argument is \
+                    stated rather than assumed: `serves` means WHAT THE INSTRUCTION EXISTS TO \
+                    PRODUCE OR OPERATE, and event-storming produces a storm the way cut-a-slice \
+                    produces a slice. using-praxis serves the FRAME because the router exists for \
+                    the method this frame defines — when the frame closes, its justification \
+                    changes, which is the dependency worth being able to see. What must not be \
+                    added is a sixth kind chosen because something failed" \
+                note="`frame` was REMOVED from this list by TS.260821.08, and role added in its \
+                    place. The frame is the ROOT: every surface descends from it by construction, \
+                    so `serves \"FRAME.260819.01\"` is true of everything and discriminates nothing. \
+                    A target true by construction cannot discriminate, and a field that cannot \
+                    discriminate IS a dumping ground — the count going from one to four revealed \
+                    it, but it was already one when it was one. The fix is not a rule that detects \
+                    the pile: no-dumping-grounds forbids the NAMES utils, helpers, common, and \
+                    never measures whether a folder became a junk drawer. Anti-dumping works by \
+                    making the dumping ground unnameable, and the same move applies to an edge" \
+                note="`invariant` was added as the sixth by TS.260821.05, and the note above is the \
+                    reason it has to be argued rather than noted. It is not the forbidden move: the \
+                    forbidden move is widening the set to silence a refusal about a surface that \
+                    genuinely serves nothing. A probe OPERATES an invariant — that is the plainest \
+                    reading of `serves` in the whole vocabulary, and the invariant kind was cut as \
+                    a slice precisely so that this anchor could exist. The test is whether the kind \
+                    was declared for its own reasons or reached for; this one has its own slice, \
+                    its own rule and its own witness"
+            field "state"       each="0..1" one-of="current" "retired"
+            field "retired-at"  each="0..1" when-state="retired"
+            field "stands-at"   each="0..1" when-state="retired" because="a retirement names where the file still stands, so removal is recoverable by name"
+            field "because"     each="0..1"
+            field "note"        each="0..n"
+        }
+
+        rule "an-enabled-invariant-is-enforced"    reports="an invariant the config enables that no doctrine-surface enforces" \
+            because="`enable-all-fail-closed #true` has been a claim about fourteen shell scripts \
+                that nothing ever compared against anything. An invariant with no enforcer is a \
+                guarantee the plugin makes and nothing keeps — the root cause wearing the \
+                enforcement layer's clothes" \
+            found-by="ITER.260822.02/AM1 — twenty-five surfaces had no anchor because the record had \
+                no vocabulary for what a probe is FOR" \
+            given-shipped="scripts/check-witness.sh" \
+            witness=#"""
+                invariant "witness-unenforced" {
+                    protects "nothing, because nothing enforces it"
+                    severity "refuse"
+                }
+                doctrine-surface "surface.probe.witness" {
+                    path "scripts/check-witness.sh"
+                    kind "probe"
+                    serves "TS.260821.05"
+                }
+                """# \
+            note="reported, not refused: an invariant declared before its probe is written is a \
+                legitimate order of work. What is not legitimate is nobody knowing which"
+
+        rule "a-declared-surface-ships"            refuses="a doctrine-surface naming a path the plugin does not ship" \
+            because="a surface declared for an absent file is a promise the record makes on the \
+                plugin's behalf and cannot keep. This is the direction that fails closed, because \
+                unlike the reverse it can never be a legitimate work-in-progress" \
+            witness=#"""
+                doctrine-surface "surface-for-a-file-that-is-not-there" {
+                    path "skills/no-such-skill/SKILL.md"
+                    kind "skill"
+                    serves "TS.260821.03"
+                }
+                """#
+
+        rule "every-shipped-surface-is-anchored"   refuses="a shipped skill, guardrail, agent or probe that no doctrine-surface declares" \
+            because="doctrine an agent follows on the plugin's authority alone is exactly S1 — \
+                improvisation the method MANDATED. Twenty-five of forty-seven skills described a \
+                workflow that had been replaced, and nothing objected because the record never held \
+                the shipped surface at all" \
+            found-by="ITER.260821.19/AK3, read as `nothing knows which door is which` rather than \
+                as `one file is stale`" \
+            given-shipped="skills/no-such-skill/SKILL.md" \
+            witness=#"""
+                doctrine-surface "witness-anchoring-something-else" {
+                    path "skills/using-praxis/SKILL.md"
+                    kind "skill"
+                    serves "TS.260821.03"
+                }
+                """# \
+            note="reported rather than refused on the day it landed: it named forty-five files, and \
+                a rule that fails closed on its first run is one nobody can adopt. FLIPPED to refuse \
+                by ITER.260822.04 when the count reached zero — 48 of 48 anchored. Twenty surfaces \
+                retired, twenty-eight anchored, and the twenty-five that AM1 said had nowhere to go \
+                went somewhere the moment TS.260821.05 gave the record a word for what they do" \
+            note="the first rule in this schema whose witness needs a WORLD. `given-shipped` \
+                declares the tree the witness assumes, beside the rule, for the same reason the \
+                witness itself lives here — a world supplied by the engine would be the engine \
+                deciding what the rule is about"
+    }
+
+    trail {
+        entry at="2026-08-20T00:00:00-05:00" by="agent:principal-engineer" action="created" \
+            note="seeded from ES.260819.01 and WALK.260820.01, then falsified by walking the write \
+                side end to end (WALK.260820.02). Two undeclared cross-capability edges resolved: \
+                one into a new seam, one into per-fact ownership. CAP.delivery-record was tested \
+                for a split and survived, with the substrate factored out beneath all five"
+        entry at="2026-08-20T00:00:00-05:00" by="agent:principal-engineer" action="amended" \
+            note="the schema moved here from the withdrawn ADR.260819.02, sorted on the way in: \
+                the model stayed, the encoding and layout rules went to ADR.260819.01, and the \
+                rules naming retired entities were retired rather than carried"
+        entry at="2026-08-20T00:00:00-05:00" by="agent:principal-engineer" action="checked-against-the-graph" \
+            note="all eighteen slices traversed against this record. Read-model ownership matched \
+                exactly. Eight cross-capability edges: five dissolved by the two reading rules, \
+                two are the known write-side corrections, and one was a genuine gap — \
+                release-binding consumes from delivery-record, now declared"
+    }
+}

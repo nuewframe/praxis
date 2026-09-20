@@ -1,0 +1,60 @@
+thin-slice "TS.260820.09" {
+    slug "cut-the-version"
+    title "Cut the version, and record the index that points into git"
+    kind "command"
+    realizes "CAP.release-binding"
+    from-storm "ES.260819.01"
+
+    command "cut-release"
+    actor "maintainer"
+    produces-event "ReleaseCut"
+    needs-read-model "the-published-set-for-a-release"
+    feeds-read-model "the-published-set-for-a-release"
+
+    trigger "everything intended for the version is bound and the version is going out"
+    outcome "a point exists on the version line, indexed to the commit it was cut at"
+
+    scenario #"""
+        Given iterations bound to a version, all closed
+        When the maintainer cuts the release
+        Then the version exists and its index node is written in the same operation — version,
+             tag, commit, what it binds, what it resolves — because a release without an index
+             is a release nothing can be verified against, and the index is what makes going
+             back a lookup rather than an archaeology exercise.
+        """#
+
+    step "1" does="confirm the bump the record proposed from the bound work"
+    step "2" does="refuse if any bound iteration did not close"
+    step "3" does="cut, and write the index node in the same operation — version, tag, commit, binds, resolves"
+    step "4" does="the release is now immutable. Nothing rebinds to it and the index node is never edited"
+
+    excludes "binding. Everything intended for the version is already bound (TS.260820.16)"
+    excludes "promoting truth. That follows the cut and is separately refusable (TS.260820.17)"
+    excludes "writing documents. Every published artifact is TS.260820.10"
+    excludes "copying anything git already holds into the index. The node points at a commit; it never mirrors history"
+    excludes "deciding the version number. The record proposes a bump; confirming it is separate"
+
+    layer "doctrine"    reaches="the skill teaches truth promotion as part of releasing, not after it"
+    layer "enforcement" reaches="only closed iterations may bind, and resolution-names-a-release"
+    layer "docs"        reaches="capability records carry what shipped"
+
+    claim "C1" text="cutting with an unclosed bound iteration is refused, naming the iteration" \
+        settled-by="a negative test asserting non-zero exit and the iteration id in the diagnostic"
+    claim "C2" text="the cut and the index node are one operation — a failure leaves neither" \
+        settled-by="a fault-injection test asserting no tag and no index node after a mid-cut failure"
+    claim "C3" text="the recorded commit resolves in git and contains that release's published directory" \
+        settled-by="a test resolving the commit and asserting the directory exists at it"
+    claim "C4" text="editing a cut release's index node is refused" \
+        settled-by="a negative test mutating an existing index node"
+
+    depends-on "TS.260820.16 — the version's content must be bound before it can be cut"
+
+    useful-alone "there is a point on the version line that everything else can be pinned to. \
+        Nothing in publishing, verification or symptom resolution is possible before it"
+    useful-to "the-team-building-a-digital-product"
+
+    amended-by "atomicity split" \
+        was="one slice carrying bind, cut and promote-truth — three commands, which the schema's own atomicity rule forbids"
+
+    attacks "S6"
+}

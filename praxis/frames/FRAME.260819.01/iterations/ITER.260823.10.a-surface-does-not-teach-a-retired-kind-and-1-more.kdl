@@ -1,0 +1,276 @@
+// Opened by `praxis pick-up`. Every condition below was evaluated against the
+// tree as it stood at 2026-08-23T07:11:44Z, and the verdicts are recorded
+// rather than summarised: a gate whose reasoning is not on the record is a gate
+// you have to trust.
+//
+// One commitment over 2 slices. They were vetted separately and admitted
+// together — a commitment that admits its easy half is not one thing.
+
+iteration "ITER.260823.10" {
+    slug "a-surface-does-not-teach-a-retired-kind-and-1-more"
+    on-slice "TS.260823.06"
+    on-slice "TS.260823.08"
+    state "closed"
+    opened-at "2026-08-23T07:11:44Z"
+    opened-by "agent:praxis"
+
+    approval "admission" {
+        status "asked"
+        asked-by "human:wael"
+        at "2026-08-23T07:11:44Z"
+        via "the ask to pick up these slices, as one commitment"
+    }
+
+    vet "create" state="done" at="2026-08-23T07:11:44Z" on-slice="TS.260823.06" {
+        condition "slice-is-shaped" verdict="passed"
+        condition "dependencies-delivered" verdict="passed"
+        condition "no-iteration-in-flight" verdict="passed"
+        condition "nothing-left-to-admit" verdict="passed"
+        condition "work-is-disjoint" verdict="not-computed" \
+            found="no seam manifest exists, so what two iterations would touch cannot be compared. Disjointness is half of what this capability says it judges, and half of what it judges is currently not computed at all"
+        condition "the-slice-is-the-best-available" verdict="left-to-the-maintainer"
+    }
+
+    vet "create" state="done" at="2026-08-23T07:11:44Z" on-slice="TS.260823.08" {
+        condition "slice-is-shaped" verdict="passed"
+        condition "dependencies-delivered" verdict="passed"
+        condition "no-iteration-in-flight" verdict="passed"
+        condition "nothing-left-to-admit" verdict="passed"
+        condition "work-is-disjoint" verdict="not-computed" \
+            found="no seam manifest exists, so what two iterations would touch cannot be compared. Disjointness is half of what this capability says it judges, and half of what it judges is currently not computed at all"
+        condition "the-slice-is-the-best-available" verdict="left-to-the-maintainer"
+    }
+
+    // 2 of the declared conditions were not decided by the gate. They are
+    // recorded above rather than omitted: an admission that does not say what
+    // it left undecided claims more than it checked.
+
+    // Frozen at open, from the slices. Removing one from a slice now
+    // does not remove it from here — it makes the two disagree, and that is
+    // refused.
+    claim "C1" from-slice="TS.260823.06" state=met{
+        ran "cargo test --quiet --test retired_vocabulary"
+        exited 0
+        digest "fnv1a64:534c044469238ae1"
+        witnessed-at "2026-08-23T12:59:35Z"
+    }
+    claim "C2" from-slice="TS.260823.06" state=met{
+        ran "cargo test --quiet --test retired_vocabulary"
+        exited 0
+        digest "fnv1a64:c9fb251b4ed857e0"
+        witnessed-at "2026-08-23T12:59:50Z"
+    }
+    claim "C3" from-slice="TS.260823.06" state=met{
+        ran "cargo test --quiet --test retired_vocabulary"
+        exited 0
+        digest "fnv1a64:d5327f4deb70df8a"
+        witnessed-at "2026-08-23T13:00:05Z"
+    }
+    claim "C4" from-slice="TS.260823.06" state=met{
+        ran "cargo test --quiet --test retired_vocabulary"
+        exited 0
+        digest "fnv1a64:baa8642c8311e5f0"
+        witnessed-at "2026-08-23T13:00:20Z"
+    }
+    claim "C1" from-slice="TS.260823.08" state=met{
+        ran "cargo test --quiet --test the_front_door"
+        exited 0
+        digest "fnv1a64:935eaf850aa9d8b9"
+        witnessed-at "2026-08-23T13:00:37Z"
+    }
+    claim "C2" from-slice="TS.260823.08" state=met{
+        ran "cargo test --quiet --test the_front_door"
+        exited 0
+        digest "fnv1a64:10a9b5b129b259f0"
+        witnessed-at "2026-08-23T13:00:46Z"
+    }
+    claim "C3" from-slice="TS.260823.08" state=met{
+        ran "cargo test --quiet --test the_front_door"
+        exited 0
+        digest "fnv1a64:58e696b292f66dc4"
+        witnessed-at "2026-08-23T13:00:54Z"
+    }
+    claim "C4" from-slice="TS.260823.08" state=met{
+        ran "cargo test --quiet --test the_front_door"
+        exited 0
+        digest "fnv1a64:935eaf850aa9d8b9"
+        witnessed-at "2026-08-23T13:01:03Z"
+    }
+
+    // ---- DESIGN ----------------------------------------------------------------
+    // Recorded complete beside implement, which is the workaround ITER.260823.06/F4 named
+    // and F1 below carries again. TS.260823.10 is cut for it.
+
+    phase "design-system" state="complete" worked-by="agent:principal-engineer" {
+        approach "a retirement declares the vocabulary that retires with it" {
+            over "a list of forbidden words compiled into the checker"
+            over "an allowlist per file, granting each surface an exemption"
+            because "`retired \"the initiative-era rules\"` already existed and named no words, \
+                so the retirement was a fact the record STATED and nothing could check. A4 \
+                forbids the engine holding what the record declares, and which words a method \
+                has retired is exactly that. A per-file allowlist inverts the burden: it says \
+                the rule does not apply here, which is how fifty-one files stayed contradictory \
+                while every audit read green"
+            note "each retired word carries `instead=`, so the refusal names the file, the line, \
+                the kind AND the replacement. A refusal that only forbids leaves the author to \
+                guess, and guessing is the improvisation this frame is about"
+        }
+
+        approach "the unit is the LINE, and a retirement marker on it is an explanation" {
+            over "refusing every mention of a retired word anywhere"
+            over "a whole-file exemption for any file that mentions a retirement"
+            because "a surface must be able to say what changed. A rule refusing every mention \
+                makes the history unwritable, and an agent reading a method with a silent hole in \
+                its past will fill the hole. A file-level exemption is too coarse in the other \
+                direction — the retirement notice would license the paragraph under it to go on \
+                teaching, which is precisely the shape `using-praxis` had"
+            note "the markers are declared in the record, not in the engine, for the same reason \
+                the vocabulary is. They are stems — `retire` rather than `retired` — because a \
+                line saying `the retirement of the sprint spine` explains as plainly as one \
+                saying `retired`"
+        }
+
+        approach "one front door, and it WRITES rather than instructs" {
+            over "keeping two skills and correcting their prose"
+            over "one skill that tells an agent which files to create"
+            because "the split between greenfield and brownfield was never the useful axis: what \
+                a repository needs on arrival is the same either way, and what differs is \
+                judgement rather than scaffolding. And a skill that instructs an agent to write \
+                four files produces four files that vary by agent — `praxis adopt` is a command, \
+                so what adoption writes is testable, which is what C1 and C3 require"
+        }
+
+        approach "the generated gate is derived from the record of what ships" {
+            over "a curated list of probes in the verify template"
+            over "walking scripts/ at adoption time"
+            because "the list it replaced named the sprint-id-collision probe and the \
+                design-approval gate, both retired by TS.260821.04, both removed, and the second \
+                described in its own comment as hard-fail with no warn mode. A curated list is \
+                the same fault with newer entries. Walking the tree needs the plugin beside the \
+                binary, and the record travels with the engine — so the probe steps come from \
+                `SURFACES.probes`, embedded the way the method is"
+        }
+
+        approach "the engineering overlay is one POINTER file, not sixteen copies" {
+            over "retiring the overlay outright"
+            over "keeping the sixteen skill templates and correcting their vocabulary"
+            because "capability layout, seams, the test pyramid and defensive patterns are about \
+                CODE and survived the spine's retirement on their own merits, so deleting them \
+                would throw away doctrine that was never at fault. But sixteen templates \
+                restating the plugin's own rules inside somebody else's repository is the \
+                second-copy problem shipped as a feature — the retired overlay skill said in its \
+                own words that an overlay must never restate plugin doctrine, while doing exactly that in sixteen files"
+        }
+
+        produced "five approaches, two new rules, one new command, and the disposal of \
+            fifty-three template files"
+    }
+
+    phase "implement" state="complete" worked-by="agent:principal-engineer" \
+        produced="a declared retired vocabulary with what to say instead, two rules and their \
+            witnesses, thirteen corrected top-level surfaces, `praxis adopt` and its four \
+            templates, and twenty-one tests" {
+        followed "a retirement declares the vocabulary that retires with it"
+        followed "the unit is the LINE, and a retirement marker on it is an explanation"
+        followed "one front door, and it WRITES rather than instructs"
+        followed "the generated gate is derived from the record of what ships"
+        followed "the engineering overlay is one POINTER file, not sixteen copies"
+    }
+
+    layer "doctrine" state="evidenced" \
+        evidence="thirteen top-level surfaces stopped teaching waves, sprints, initiatives and \
+            the TS-NNN id form — three personas, the one always-on guardrail, four engineering \
+            skills and the router. `adopt-the-method` is the one front door and the index names \
+            it first; `anchor-a-doctrine-surface` says a surface speaks the current method" \
+        reaches="every file an agent loads at session start, and the first thing an adopter runs"
+
+    layer "enforcement" state="evidenced" \
+        evidence="`surface-teaches-a-retired-kind` refuses by file and line and says what to \
+            write instead; `a-retirement-names-its-vocabulary` reports a retirement that can \
+            enforce nothing. Both are witnessed. `praxis check` is clean over 58 of 58 shipped \
+            surfaces, from 56 of 107 with fifty-one owed" \
+        reaches="both slices' rules, and the declared debt TS.260823.05 left standing"
+
+    layer "harness" state="evidenced" \
+        evidence="`praxis adopt` writes the same four files from all six install paths, and the \
+            generated verify entry point calls only probes the record says ship — ten of them, \
+            derived rather than listed. The two it used to call had been retired for two \
+            versions" \
+        reaches="what arrives in an adopter's repository in the first hour"
+
+    layer "docs" state="evidenced" \
+        evidence="`does what we ship agree with what we record` has a computed answer instead of \
+            a reading exercise; `what do I do first` has one answer, and following it leaves a \
+            repository under the method rather than beside it" \
+        reaches="the two questions the audit and the front door could not previously answer"
+
+    layer-set sealed=#true at="2026-08-23T07:11:44Z"
+
+    finding "F1" \
+        text="design and implement were recorded complete together, after building. That is one \
+            of the two routes ITER.260823.06/F4 named past `the-plan-and-the-code-agree`, and \
+            the other is to mark design incomplete while designing — the rule refuses the \
+            normal in-flight state of any iteration that did what TS.260821.19 asks. The \
+            approaches here were genuinely reached before the code and the record cannot show \
+            it, which is the fault stated exactly: fidelity invisible in the artifact. Third \
+            occurrence, and now cut as TS.260823.10/C5" \
+        owed-against="TS.260821.20"
+
+    finding "F2" \
+        text="three of the thirteen corrected surfaces needed more than a word swap. The PM \
+            persona named four skills that do not ship and the designer persona three, so a \
+            faithful substitution would have left an agent instructed to run nothing. They were \
+            rewritten to name the shipped skills, which is past what TS.260823.06 excludes — it \
+            excludes deciding what corrected doctrine should SAY. Recorded rather than \
+            reinterpreted: a surface pointing at a retired skill is the same contradiction one \
+            level out, and a rule for it would have caught all three. Nothing checks it today" \
+        owed-against="TS.260823.06"
+
+    finding "F3" \
+        text="the line-level exemption is a heuristic and says so. A line naming a retired word \
+            beside a retirement marker passes, so `create a sprint — this replaced the old flow` \
+            passes too. It was chosen over the alternatives because both were worse, not because \
+            it is exact, and the honest bound is that it catches instruction written without any \
+            awareness of the retirement, which is what all sixty-four offending files were" \
+        owed-against="TS.260823.06"
+
+    finding "F4" \
+        text="`praxis check` went from under a second to over two minutes on the first run of \
+            the new rule — the scan re-tokenised each line once per retired word, over a hundred \
+            and seven files. Fixed to tokenise once per line, and it is 8 seconds in a debug \
+            build. Nothing in this engine measures its own runtime, so the next such regression \
+            is found the same way this one was: somebody waiting" \
+        owed-against="TS.260823.06"
+
+    finding "F5" \
+        text="the overlay templates were retired as ONE doctrine-surface naming a directory, not \
+            as fifty-one naming files. The engine anchors by path and no file at that path ships, \
+            so nothing is a promise the record cannot keep — but it means the record can no \
+            longer say WHICH fifty-one were retired, only that the tree was. The alternative was \
+            fifty-one stanzas of the same sentence, which would bury the one fact a reader needs. \
+            v0.7.1 is tagged and every file is recoverable by name" \
+        owed-against="TS.260821.03"
+    closed-at "2026-08-23T13:03:59Z"
+    outcome "continue"
+
+    close {
+        claims-settled "C1" how="met"
+        claims-settled "C2" how="met"
+        claims-settled "C3" how="met"
+        claims-settled "C4" how="met"
+        claims-settled "C1" how="met"
+        claims-settled "C2" how="met"
+        claims-settled "C3" how="met"
+        claims-settled "C4" how="met"
+        all-met #true
+        attested-by "human:wael"
+        note "the accounting above was computed at close, not asserted. It says every claim is either met or carried by a finding that names it, and nothing about whether the work is any good"
+    }
+
+    trail {
+        entry at="2026-08-23T13:03:59Z" by="agent:praxis" action="state-changed" from="open" to="closed" note="closed by `praxis close`. The accounting was computed; the conclusion is not the machine's to draw"
+
+        entry at="2026-08-23T07:11:44Z" by="agent:praxis" action="created" \
+            note="opened by the gate, on the ask of human:wael"
+    }
+}

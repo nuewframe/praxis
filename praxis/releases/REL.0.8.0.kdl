@@ -1,0 +1,58 @@
+// CUT. This record is immutable: nothing rebinds to a cut release and the index
+// node is never edited. The `seal` below is computed from the content — change
+// any of it and `praxis check` says so.
+//
+// The index POINTS at a commit. It never mirrors what git already holds.
+
+release "REL.0.8.0" {
+    version "0.8.0"
+    state "withdrawn"
+    withdrawn-because #"""
+        the artifacts it froze are correct and not worth reading (AS4)
+        Re-cut when TS.260821.12 has landed and the published set is worth opening
+        """#
+    proposed-bump "minor"
+    binds "ITER.260820.01"
+    binds "ITER.260821.01"
+    binds "ITER.260821.02"
+    binds "ITER.260821.03"
+    binds "ITER.260821.04"
+    binds "ITER.260821.05"
+    binds "ITER.260821.06"
+    binds "ITER.260821.07"
+    binds "ITER.260821.08"
+    binds "ITER.260821.09"
+    binds "ITER.260821.10"
+    binds "ITER.260821.11"
+    binds "ITER.260821.12"
+    binds "ITER.260821.13"
+    binds "ITER.260821.14"
+    binds "ITER.260821.15"
+    binds "ITER.260821.16"
+    binds "ITER.260821.17"
+    binds "ITER.260821.18"
+    binds "ITER.260821.19"
+    binds "ITER.260822.01"
+    binds "ITER.260822.02"
+    binds "ITER.260822.03"
+    binds "ITER.260822.04"
+    binds "ITER.260822.05"
+    binds "ITER.260822.06"
+    binds "ITER.260822.07"
+
+    // Resolves nothing. Stated rather than omitted: a release that fixed
+    // no symptom and one nobody checked are not the same thing.
+
+    previously-cut {
+        tag "v0.8.0"
+        commit "9ca9a394a93301a453180246d0454496fc68810c"
+        cut-at "2026-08-22T13:08:35Z"
+        cut-by "human:wael"
+        confirmed-bump "minor"
+    }
+
+    trail {
+        entry at="2026-08-22T13:08:35Z" by="agent:praxis" action="cut" \
+            note="the release and its index written in one operation. Neither exists without the other"
+    }
+}

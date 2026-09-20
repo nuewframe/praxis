@@ -1,0 +1,107 @@
+// The record begins at "something is wrong".
+//
+// Everything it holds descends from a frame, and a frame is a problem: symptoms, one root
+// cause, one principle. `root-cause` says why the PROBLEM exists. Nothing says why the
+// PRODUCT exists, or for whom, or what would count as it having worked.
+//
+// Praxis states its own purpose in the Markdown dashboard §1 — "make an LLM coding agent execute
+// disciplined delivery with fidelity, producing trustworthy artifacts a human team can build
+// on without re-deriving the reasoning" — in prose, in a Markdown file, checked by nothing.
+// The frame that governs eighteen iterations of work does not contain it.
+//
+// The consequence is exactly where it would be expected. A published release can tell a
+// reader HOW, because usage is in the record. It cannot tell them WHY.
+
+thin-slice "TS.260821.16" {
+    slug "state-the-why"
+    title "Anchor the work to a vision, a mission and a strategy it can be traced to"
+    kind "command"
+    realizes "CAP.delivery-record"
+    from-storm "ES.260819.01"
+
+    command "check"
+    actor "whoever starts a product, before the first frame is written"
+    produces-event "PurposeDeclared" "ImpactAttributed"
+    needs-read-model "the-problem-as-it-stands"
+
+    trigger "somebody asks what this product is for and the answer is in a README nothing checks"
+    outcome "purpose is a record, every symptom names the persona it hurts, and a release can open with why"
+
+    scenario #"""
+        Given a product whose purpose is a paragraph in a Markdown file
+        When the purpose is declared — the outcome it exists to deliver, and what would count as
+             having delivered it
+        Then the frame sits UNDER it, each symptom naming which persona feels it and how, and a
+             published release opens with why before how — because a reader who is told what a
+             tool does and never why it exists has been handed a manual for a decision they have
+             not made yet.
+        """#
+
+    step "1" does="vision, mission and strategy become the root the frame hangs from. The frame is the root today and it floats"
+    step "2" does="a frame references a strategy, a strategy the mission, the mission the vision. The check is traceability, never truth"
+    step "3" does="`purpose` sits under the strategy: the outcome THIS product delivers, and what would count as delivered"
+    step "4" does="a symptom names the persona it hurts and how. S1 through S7 describe things wrong for SOMEBODY, and this frame has never said who"
+    step "5" does="the release opens with why — the purpose, and what this version moved toward it — before it says how"
+    step "6" does="a finding may oblige a STRATEGY, not only a slice. Today everything learned feeds back into how the work is done and never into whether it is the right work"
+    step "7" does="a strategy is revised by appending, naming the evidence that forced it. A revision citing nothing is a rewrite wearing a revision's clothes"
+    step "8" does="`delivered-when` is the falsifier, on the PURPOSE and not above it. A purpose nobody could be wrong about is a slogan"
+
+    excludes "checking whether a vision or a mission is TRUE. Neither is a claim about delivery; \
+        both are what claims get judged against, and the record checks the same thing it checks \
+        everywhere else — that nothing is orphaned. A frame tracing to no strategy is work nobody \
+        can justify, and that is computable while `is this vision correct` is not"
+    excludes "a falsifier on the strategy. It is an ORDERING, and what it earns is adherence \
+        rather than proof — a frame written before any persona exists is out of sequence, and \
+        being out of sequence is a fact"
+    excludes "measuring whether the purpose was achieved. The record can say what would count and \
+        what shipped toward it; whether the world changed is not a fact any repository holds"
+    excludes "one purpose per capability. A capability is a doing the SYSTEM must have — the \
+        purpose is why the system is worth having at all, and there is one of those or the product \
+        is two products"
+
+    layer "doctrine"    reaches="discovery states the why before it frames anything, and the skill says what makes a purpose falsifiable"
+    layer "enforcement" reaches="a frame with no purpose is reported; a symptom naming no persona is reported; a purpose with no `delivered-when` is refused"
+    layer "docs"        reaches="a release opens with why, and the reader decides whether to keep reading before they are told how"
+
+    claim "C1" text="purpose is a record with an outcome and a test for it, and one without a test is refused" \
+        settled-by="a test declaring a purpose with no `delivered-when`, asserting a refusal — a purpose nobody could be wrong about is a slogan"
+    claim "C2" text="every frame traces upward to a strategy, and one that does not is reported" \
+        settled-by="a test asserting a frame naming no strategy is reported and not refused, because every frame in this record predates the kind — and that the chain frame → strategy → mission → vision is followed by dangling-relationship without a rule of its own"
+    claim "C6" text="a strategy is revised by appending, and a revision naming no evidence is refused" \
+        settled-by="a test amending a strategy with no cited finding, asserting a refusal — and one WITH a finding, asserting the prior wording survives and the seal still verifies"
+    claim "C5" text="strategy is an ordering, and work out of sequence is reported" \
+        settled-by="a test asserting a frame whose symptoms name personas the record does not hold is reported as out of sequence — the strategy says audience precedes frame, and adherence to a declared order is computable"
+    claim "C3" text="a symptom names the persona it hurts and how" \
+        settled-by="a test asserting a symptom with no `felt-by` is reported, and FRAME.260819.01 amended so all seven name somebody"
+    claim "C4" text="the release opens with why before how" \
+        settled-by="a test asserting the purpose is the published set's first section and usage follows it, and that a version whose record holds no purpose says so rather than opening with a table"
+
+    depends-on "TS.260821.15 — a symptom names the persona it hurts, so the persona is a record first"
+
+    useful-alone "`what is this for` becomes a question the record answers. Praxis has stated its \
+        own purpose in prose since before the delivery graph existed, and eighteen iterations of \
+        work have descended from a frame that does not contain it"
+    useful-to "the-reader-of-a-release" "the-team-building-a-digital-product"
+
+    attacks "S7"
+
+    cut-from "the maintainer, on the two sides of the product: development wants why, what and \
+        the mechanics of how — and use wants why and how" \
+        note="the record answers all three development questions and one of the two use questions. \
+            The missing one is the same one in both columns, which is why it went unnoticed: \
+            everybody building already knew the why"
+
+    note "amended on the maintainer's correction. The first cut EXCLUDED vision, mission and \
+        strategy as unfalsifiable — which applies this record's discipline one layer too high. \
+        They are the pillars of the Markdown dashboard and the anchor for everything under them; what is \
+        checkable is not whether a vision is true but whether anything traces to it"
+
+    principle-note "this frame computes fidelity from the record, and the fact every other fact \
+        exists to serve was the one left in prose. Not by oversight — a purpose is the thing \
+        everybody in the room already agrees on, so nobody writes it down, and the first person \
+        who did not attend the conversation finds a tool with no reason attached"
+
+    proves "the record holds what the product is for, a release can open with it, and what changed it is visible"
+    does-not-prove "that the purpose is the right one. It makes it falsifiable and contradictable, \
+        which is what `delivered-when` is for — a wrong purpose stated beats a right one assumed"
+}

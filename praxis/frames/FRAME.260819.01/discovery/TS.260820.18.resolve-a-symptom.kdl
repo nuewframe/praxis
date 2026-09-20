@@ -1,0 +1,54 @@
+thin-slice "TS.260820.18" {
+    slug "resolve-a-symptom"
+    title "Close a symptom by naming a release that demonstrably attacked it"
+    kind "command"
+    realizes "CAP.delivery-record"
+    from-storm "ES.260819.01"
+
+    command "resolve-symptom"
+    actor "maintainer"
+    produces-event "SymptomResolved"
+    needs-read-model "the-problem-as-it-stands"
+    feeds-read-model "the-problem-as-it-stands" "the-published-set-for-a-release"
+
+    trigger "a release shipped work that was supposed to remove a symptom"
+    outcome "the symptom is marked resolved against a release that can be shown to have attacked it"
+
+    scenario #"""
+        Given a symptom on a frame and a release that has been cut
+        When the maintainer marks the symptom resolved by that release
+        Then it is accepted only if that release bound a slice whose `attacks` names this
+             symptom — so resolution is COMPUTED from what shipped rather than asserted by
+             whoever is closing it, which is the frame's own principle applied to the frame's
+             own bookkeeping.
+        """#
+
+    step "1" does="name the release that resolved it"
+    step "2" does="the release must exist in the index"
+    step "3" does="the release must have bound at least one slice whose attacks names this symptom"
+    step "4" does="the symptom's state moves. A frame shrinks only this way"
+
+    excludes "closing the frame. A frame has no terminal state; its symptoms resolve individually"
+    excludes "partial resolution without saying so. `partially-resolved` is a state, not a hedge"
+
+    layer "doctrine"    reaches="the skill teaches that a frame shrinks only by a release, never by an opinion"
+    layer "enforcement" reaches="resolution-names-a-release, extended to require an attacking slice in that release"
+    layer "docs"        reaches="the release notes carry which symptoms it closed"
+
+    claim "C1" text="resolving against a release that does not exist is refused" \
+        settled-by="a negative test with a dangling resolved-by"
+    claim "C2" text="resolving against a release that bound no slice attacking this symptom is refused" \
+        settled-by="a negative test with a real release and no attacking slice"
+    claim "C3" text="a resolved symptom cannot silently return to present" \
+        settled-by="a negative test reverting a resolution without a new frame or an amendment"
+
+    depends-on "TS.260820.16 — the attacking slice must be bound to the release"
+
+    useful-alone "`resolved-by` becomes checkable. Every frame in the repository can be audited \
+        against what actually shipped, with no projection and no publishing"
+    useful-to "the-team-building-a-digital-product"
+
+    attacks "S5" "S6"
+    note "the sharpest check in the set: it makes progress against a problem computable from the \
+        record rather than declared by whoever wants to close it"
+}

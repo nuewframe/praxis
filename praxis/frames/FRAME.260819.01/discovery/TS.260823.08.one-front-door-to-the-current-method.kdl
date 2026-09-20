@@ -1,0 +1,116 @@
+// The two skills an adopter runs first install the method that was retired.
+//
+//   bootstrap-project          scaffolds docs/product/waves/wave-000-bootstrap/, a SPRINT
+//                              placeholder, INIT files and a wave dashboard. Mentions
+//                              praxis/config.kdl, `praxis check` and the delivery graph
+//                              exactly zero times.
+//   provision-project-overlay  emits 53 template files: create-wave/, create-sprint/,
+//                              close-sprint/, start-thin-slice/, intake-code-contribution/,
+//                              praxis.config.yaml. Also zero.
+//
+// And the verify.sh it generates — the adopter's mandatory gate — calls
+// `check-sprint-id-collision.sh` and `check-design-approval-gate.sh`, neither of which this
+// plugin ships. The second is commented "HARD-FAIL by design, no warn mode."
+//
+// So the first hour of adoption produces a sprint file, a wave directory, and a gate that
+// cannot run, in a method that has none of those things. `adopt-the-method` is correct and
+// nobody reaches it, because the two skills named in the index above it have already run.
+//
+// The maintainer's instruction: retire what is not needed, rewrite what is, corrected to the
+// current approach. The engineering-discipline body — capability layout, seams, tests,
+// defensive patterns — is not spine-bound and survives. The wave-and-sprint scaffolding does not.
+
+thin-slice "TS.260823.08" {
+    slug "one-front-door-to-the-current-method"
+    title "Make the first thing an adopter runs put them under the delivery graph"
+    kind "command"
+    realizes "CAP.multi-harness-distribution"
+    from-storm "ES.260819.01"
+
+    command "adopt"
+    actor "somebody installing this plugin into a repository for the first time"
+    produces-event "RepositoryAdopted" "AdoptionRefused"
+    needs-read-model "where-to-start"
+
+    trigger "an adopter runs the skill the index names first and gets a wave directory"
+    outcome "adoption produces a config bound to the method, a record that checks, and nothing that names a retired kind"
+
+    scenario #"""
+        Given a repository that has just installed this plugin
+        When the adopter runs the one skill that puts it under the method
+        Then it has a config bound to `delivery-graph@v1`, a verify entry point that runs the
+             probes this plugin actually ships, and `praxis check` passes over an empty record
+             — and it has no wave, no sprint and no file naming either.
+        """#
+
+    step "1" does="one front door, not two. `bootstrap-project` and `provision-project-overlay` split greenfield from brownfield and both install the retired spine; the split was never the useful axis and `adopt-the-method` already handles both cases in one section"
+    step "2" does="the wave-and-sprint templates are retired. Sixteen template skills, five prompts and the persona overlays that carry them describe a spine the record deleted"
+    step "3" does="the engineering-discipline overlay is rewritten, not retired. Capability layout, seams, the test pyramid and defensive patterns are about code and survived the spine's retirement on their own merits"
+    step "4" does="the generated verify entry point calls only probes this plugin ships. Two of the eleven it names do not exist, and one of those is the gate it describes as hard-fail"
+    step "5" does="what is written is a CONFIG and a checkable empty record — never a transcription of what the repository already claims. That is the longest argument `adopt-the-method` makes and the front door currently contradicts it"
+
+    excludes "writing the adopter's record for them. Adoption produces the binding and the shape; \
+        the frame, the storm and the capabilities are the adopter's work and deriving them \
+        automatically would import claims without their evidence"
+    excludes "migrating an existing wave-and-sprint repository. Somebody running the 0.7.1 \
+        overlay today has artifacts that no longer map, and telling them what to do with those \
+        is its own slice with its own evidence"
+    excludes "the six install paths themselves. How the plugin arrives is unchanged; what it \
+        does on arrival is the subject"
+
+    layer "doctrine"    reaches="one adoption skill, teaching the current method; the retired scaffolding is gone rather than left where an agent will read it"
+    layer "enforcement" reaches="what adoption writes passes `praxis check`, and the generated verify entry point names only probes that ship"
+    layer "harness"     reaches="the same adoption path from all six harnesses, with nothing harness-specific left in the retired templates"
+    layer "docs"        reaches="`what do I do first` has one answer, and following it leaves a repository under the method rather than beside it"
+
+    claim "C1" text="adoption writes a config bound to the method the engine carries, and the result checks clean" \
+        settled-by="a test running adoption into an empty tree and asserting `praxis check` passes over what it wrote"
+    claim "C2" text="nothing adoption writes names a retired kind" \
+        settled-by="the retired-kind check running over the adoption output, refusing nothing"
+    claim "C3" text="the generated verify entry point names only probes this plugin ships" \
+        settled-by="a test asserting every probe the generated script calls exists in the shipped set"
+    claim "C4" text="the engineering-discipline doctrine survives adoption and the spine scaffolding does not" \
+        settled-by="a test over the adoption output asserting the capability, seam and test guidance is present and no wave, sprint or initiative artifact is"
+
+    depends-on "TS.260823.05 — the templates have to be inside the audited set before it can be said which of them survive"
+
+    amended-by "the coupling with TS.260823.06 is not a wait" raised-by="ITER.260823.09/F1" \
+        was="depends-on TS.260823.06 — what counts as a retired kind is that slice's, and C2 is its rule applied here" \
+        change="the dependency is withdrawn and the coupling is stated instead. What C2 needs from \
+            TS.260823.06 is its RULE, which exists the moment that slice is worked; what \
+            `depends-on` asserts is that the other slice is DELIVERED, which is a different and \
+            here a false claim — 06 refuses thirteen shipped files and fifty-one templates, and \
+            the fifty-one are what this slice disposes of. Neither can land green without the \
+            other" \
+        why="`depends-on` has one meaning and this is the second time in two commitments it has \
+            been asked to carry another. ITER.260823.09/F1 said it about the cut rather than the \
+            code: the vocabulary cannot say `these two land together`, and the gate refusing the \
+            pair was right both times. Withdrawing the edge rather than widening the word keeps \
+            the refusal meaningful and puts the coupling where a reader meets it — an edge the \
+            gate cannot honour is worse than no edge and a sentence"
+
+    note "lands with TS.260823.06 — one commitment, not an ordering. 06 makes a surface teaching a \
+        retired kind refusable and leaves the tree loud; this slice disposes of the fifty-one \
+        templates that are most of what it finds. Taken apart, either one is correct and the \
+        audit stays owed"
+
+    useful-alone "the first hour of adoption stops installing the method this record retired. \
+        Today it produces a wave directory, a sprint placeholder and a gate that cannot run, and \
+        the skill that would have explained the actual method is third in the index"
+
+    attacks "S1"
+
+    useful-to "the-adopter"
+
+    cut-from "the validation review of 2026-08-22, which read both entry points and found neither \
+        mentions the delivery graph, and found two of the eleven probes their verify script calls \
+        are not shipped"
+
+    principle-note "a method is whatever its front door installs. Everything downstream of the \
+        first hour is a correction to it, and a correction an adopter has to discover on their \
+        own is one most will not make"
+
+    proves "a repository that follows the adoption path is under the method the record declares"
+    does-not-prove "that adoption SUCCEEDS in a repository nobody here has seen. That is what \
+        `adopt-the-method` says it still owes, and this slice narrows the claim without closing it"
+}

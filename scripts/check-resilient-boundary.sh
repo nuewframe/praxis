@@ -22,7 +22,7 @@
 #
 # Mode (decision D3 — warn-first, mechanical promotion to fail-closed):
 #   Read from .resilience.json `mode`:
-#     "warn"    (default) — report findings, exit 0. Use until a wave closes clean.
+#     "warn"    (default) — report findings, exit 0. Use until an iteration closes clean.
 #     "enforce"           — report findings, exit 1. Promote here once clean.
 #
 # Config (.resilience.json at repo root, all keys optional):
@@ -203,7 +203,7 @@ at least one of:
 For a genuine exception, put a reviewed opt-out comment containing
 '$OPT_OUT_MARKER' (with the reason) in the file.
 
-Mode is '$MODE'. Set "mode": "enforce" in .resilience.json once a wave closes
+Mode is '$MODE'. Set "mode": "enforce" in .resilience.json once an iteration closes
 with zero un-opted-out findings (plan decision D3).
 EOF
 } >&2

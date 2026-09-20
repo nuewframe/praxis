@@ -1,0 +1,71 @@
+// The pillars. Declared by TS.260821.16.
+//
+// Everything this record holds descended from a frame, and a frame is a problem — so the
+// record began at "something is wrong" and had nothing above it. `root-cause` says why the
+// PROBLEM exists; nothing said why the PRODUCT does.
+//
+// These are not checked for truth. They are what truth is checked against, and the check is
+// the one this record makes everywhere else: that nothing is orphaned. A frame tracing to no
+// strategy is work nobody can justify.
+
+vision "trustworthy-by-construction" {
+    is "a team can trust what an agent produced without re-deriving it"
+    note "no falsifier, deliberately. A world state cannot be tested, and asking whether a \
+        vision is TRUE is the category error that kept all three of these out of the record"
+}
+
+mission "fidelity-is-computed" {
+    is "make execution fidelity a property computed from the record, rather than a claim made by whoever produced the artifact"
+    toward "trustworthy-by-construction"
+    delivered-when "somebody who did not do the work can ask the record what happened and act on \
+        the answer, without asking the person who did it and without reading a document that \
+        argues it went well"
+    note "this is what separates a mission from an aspiration. It can be wrong, and the way it \
+        would be wrong is that people keep asking each other"
+}
+
+strategy "name-the-person-before-the-system" {
+    serves "fidelity-is-computed"
+
+    // `satisfied-by` names the KINDS that occupy each step, and
+    // work-follows-the-declared-sequence reads them. It reports a step nothing satisfies
+    // while a later one is occupied — computed from what the record HOLDS, so writing the
+    // missing thing clears it. A step listing no kind is unmapped and is not checked.
+
+    step "1" is="purpose — the outcome this exists to deliver, under the mission it serves" {
+        satisfied-by "mission"
+        satisfied-by "vision"
+    }
+    step "2" is="audience — the PRIMARY persona, named before anything is framed. Who this is for is not a discovery output; it is the reason discovery is happening" {
+        satisfied-by "persona"
+    }
+    step "3" is="frame — the problem, with every symptom naming which persona feels it and how" {
+        satisfied-by "frame"
+    }
+    step "4" is="discovery data — four activities: STORM the timeline, ARCHITECT the capabilities and their boundaries, STRUCTURE the data shapes, integrations and commands, and VALIDATE" {
+        satisfied-by "event-storm"
+        satisfied-by "notional-architecture"
+        satisfied-by "walkthrough"
+    }
+    step "5" is="work — capabilities, slices, iterations, all downstream of a stated purpose and a named person" {
+        satisfied-by "capability"
+        satisfied-by "thin-slice"
+        satisfied-by "iteration"
+    }
+    step "6" is="publish — the reader is told WHY and HOW. Not what was built, and never how it was built" {
+        satisfied-by "release"
+    }
+
+    note "no falsifier, because this is an ORDERING. What it earns is adherence, and conformance \
+        to a declared sequence is computable — a frame written before any persona exists is out \
+        of order, and being out of order is a fact"
+    note "further personas emerge from the work within a frame and cite what surfaced them. \
+        Enumerating them upfront is a week spent on people nobody has met"
+    note "the arrow runs both ways. This strategy anchors the work, and the work informs it — \
+        revised by appending, naming the evidence that forced it. A strategy the work can always \
+        revise constrains nothing; one it can never revise is a slogan nobody revisits"
+    note "it was DERIVED from the work rather than stated first. Thirty-odd slices, a withdrawn \
+        release, and reading the published set as somebody who had not built it produced this \
+        order — which is the loop it describes, running once before anything could record that \
+        it had"
+}

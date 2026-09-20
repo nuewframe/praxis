@@ -1,0 +1,365 @@
+// Retired by TS.260821.04. Each of these described the sprint-era spine — create-wave,
+// start-thin-slice, create-sprint, intake, close-sprint — which the delivery graph replaced
+// eighteen iterations before anything objected.
+//
+// The files are removed, not shimmed. v0.7.1 is tagged, so every one is recoverable by name
+// with `git checkout v0.7.1 -- <path>`. Keeping both spines loaded would mean an arriving
+// agent reads two methods and picks one, which is S1 — the symptom, not a mitigation of it.
+//
+// A retired surface whose file is still in the tree REFUSES. The record does not get to say
+// a thing was retired and leave it where an agent will read it.
+
+doctrine-surface "surface.retired.create-wave" {
+    path "skills/create-wave/SKILL.md"
+    kind "skill"
+    serves "TS.260821.04"
+    state "retired"
+    retired-at "2026-08-22"
+    stands-at "v0.7.1"
+    because "a wave is an initiative document. A frame is a problem with symptoms and a root \
+        cause, and slices are cut from a storm"
+}
+
+doctrine-surface "surface.retired.create-initiative" {
+    path "skills/create-initiative/SKILL.md"
+    kind "skill"
+    serves "TS.260821.04"
+    state "retired"
+    retired-at "2026-08-22"
+    stands-at "v0.7.1"
+    because "same document under its own name — an initiative document, replaced by the frame and its \
+        discovery"
+}
+
+doctrine-surface "surface.retired.derive-waves-from-history" {
+    path "skills/derive-waves-from-history/SKILL.md"
+    kind "skill"
+    serves "TS.260821.04"
+    state "retired"
+    retired-at "2026-08-22"
+    stands-at "v0.7.1"
+    because "derives waves. There are no waves"
+}
+
+doctrine-surface "surface.retired.start-thin-slice" {
+    path "skills/start-thin-slice/SKILL.md"
+    kind "skill"
+    serves "TS.260821.04"
+    state "retired"
+    retired-at "2026-08-22"
+    stands-at "v0.7.1"
+    because "the front door of the sprint spine. The gate is pick-up-a-slice, and it refuses in \
+        writing"
+}
+
+doctrine-surface "surface.retired.create-sprint" {
+    path "skills/create-sprint/SKILL.md"
+    kind "skill"
+    serves "TS.260821.04"
+    state "retired"
+    retired-at "2026-08-22"
+    stands-at "v0.7.1"
+    because "a sprint is an immutable bridge. The commitment is the iteration, opened by the gate"
+}
+
+doctrine-surface "surface.retired.close-sprint" {
+    path "skills/close-sprint/SKILL.md"
+    kind "skill"
+    serves "TS.260821.04"
+    state "retired"
+    retired-at "2026-08-22"
+    stands-at "v0.7.1"
+    because "replaced by close-an-iteration, which refuses a silent drop rather than trusting the \
+        close"
+}
+
+doctrine-surface "surface.retired.intake-code-contribution" {
+    path "skills/intake-code-contribution/SKILL.md"
+    kind "skill"
+    serves "TS.260821.04"
+    state "retired"
+    retired-at "2026-08-22"
+    stands-at "v0.7.1"
+    because "the Phase 0 gate of a spine that no longer exists. Admission is computed by the gate"
+}
+
+doctrine-surface "surface.retired.verify-and-assemble-pr" {
+    path "skills/verify-and-assemble-pr/SKILL.md"
+    kind "skill"
+    serves "TS.260821.04"
+    state "retired"
+    retired-at "2026-08-22"
+    stands-at "v0.7.1"
+    because "Phase 6 of the same spine. What an iteration showed is what it evidenced"
+}
+
+doctrine-surface "surface.retired.create-adr" {
+    path "skills/create-adr/SKILL.md"
+    kind "skill"
+    serves "TS.260821.04"
+    state "retired"
+    retired-at "2026-08-22"
+    stands-at "v0.7.1"
+    because "replaced by record-a-decision, which binds a decision to the iteration that forced \
+        it"
+}
+
+doctrine-surface "surface.retired.create-capability-record" {
+    path "skills/create-capability-record/SKILL.md"
+    kind "skill"
+    serves "TS.260821.04"
+    state "retired"
+    retired-at "2026-08-22"
+    stands-at "v0.7.1"
+    because "a a Markdown capability record. Capabilities are records the checker reads, cut by \
+        name-a-capability"
+}
+
+doctrine-surface "surface.retired.create-product-design-spec" {
+    path "skills/create-product-design-spec/SKILL.md"
+    kind "skill"
+    serves "TS.260821.04"
+    state "retired"
+    retired-at "2026-08-22"
+    stands-at "v0.7.1"
+    because "a spec beside an INIT. A slice declares its own scenario, steps and claims"
+}
+
+doctrine-surface "surface.retired.create-product-architecture-spec" {
+    path "skills/create-product-architecture-spec/SKILL.md"
+    kind "skill"
+    serves "TS.260821.04"
+    state "retired"
+    retired-at "2026-08-22"
+    stands-at "v0.7.1"
+    because "same, for architecture. The notional architecture is a record and carries the schema"
+}
+
+doctrine-surface "surface.retired.create-quality-spec" {
+    path "skills/create-quality-spec/SKILL.md"
+    kind "skill"
+    serves "TS.260821.04"
+    state "retired"
+    retired-at "2026-08-22"
+    stands-at "v0.7.1"
+    because "same, for quality. A claim names the evidence that settles it, at cut time"
+}
+
+doctrine-surface "surface.retired.discovery-and-ambiguity-log" {
+    path "skills/discovery-and-ambiguity-log/SKILL.md"
+    kind "skill"
+    serves "TS.260821.04"
+    state "retired"
+    retired-at "2026-08-22"
+    stands-at "v0.7.1"
+    because "Phase 1 of the Major-tier architect pipeline. Discovery is the storm, the notional \
+        architecture and the walkthrough"
+}
+
+doctrine-surface "surface.retired.author-user-docs" {
+    path "skills/author-user-docs/SKILL.md"
+    kind "skill"
+    serves "TS.260821.04"
+    state "retired"
+    retired-at "2026-08-22"
+    stands-at "v0.7.1"
+    because "replaced by document-usage, which refuses a guide for behaviour a version never \
+        shipped"
+}
+
+doctrine-surface "surface.retired.lean-delivery-guardrails" {
+    path "instructions/lean-delivery-guardrails.instructions.md"
+    kind "guardrail"
+    serves "TS.260821.04"
+    state "retired"
+    retired-at "2026-08-22"
+    stands-at "v0.7.1"
+    because "every rule in it is about waves, sprints, TS-NNN ids and a qa document. It contradicts the \
+        record it ships beside"
+}
+
+doctrine-surface "surface.retired.code-contribution-intake" {
+    path "instructions/code-contribution-intake.instructions.md"
+    kind "guardrail"
+    serves "TS.260821.04"
+    state "retired"
+    retired-at "2026-08-22"
+    stands-at "v0.7.1"
+    because "it exists to require intake-code-contribution, which is retired above"
+}
+
+doctrine-surface "surface.retired.check-sprint-disjointness" {
+    path "scripts/check-sprint-disjointness.sh"
+    kind "probe"
+    serves "TS.260821.04"
+    state "retired"
+    retired-at "2026-08-22"
+    stands-at "v0.7.1"
+    because "checks disjointness between sprints. Nothing produces a sprint"
+}
+
+doctrine-surface "surface.retired.check-sprint-id-collision" {
+    path "scripts/check-sprint-id-collision.sh"
+    kind "probe"
+    serves "TS.260821.04"
+    state "retired"
+    retired-at "2026-08-22"
+    stands-at "v0.7.1"
+    because "checks sprint id collisions. Ids are allocated by the gate, without coordination"
+}
+
+doctrine-surface "surface.retired.check-design-approval-gate" {
+    path "scripts/check-design-approval-gate.sh"
+    kind "probe"
+    serves "TS.260821.04"
+    state "retired"
+    retired-at "2026-08-22"
+    stands-at "v0.7.1"
+    because "hard-fails a Major-tier sprint whose ADR is unsigned. Approvals are a field the \
+        checker refuses on"
+}
+
+// The Markdown capability records, retired by TS.260821.06. A living record kept in two
+// places has one that is wrong and no way to say which.
+//
+// Two of the three were ported. CAP.method-spine-and-execution was NOT: its core purpose is
+// "the PLAN -> TRIAGE -> BUILD -> LEARN -> TEACH spine, thin-slice lifecycle,
+// sprint-as-immutable-bridge, tier-table routing" — the spine TS.260821.04 retired. It is
+// not a capability that needs porting; it is the old method wearing a capability's name, and
+// what replaced it is work-admission and claim-settlement.
+doctrine-surface "surface.retired.cap-method-spine" {
+    path "docs/capabilities/CAP.method-spine-and-execution.md"
+    kind "guardrail"
+    serves "TS.260821.06"
+    state "retired"
+    retired-at "2026-08-22"
+    stands-at "v0.7.1"
+    because "it describes the sprint spine, the tier table and the immutable bridge. All three \
+        were retired by TS.260821.04; the capability that named them has nothing left to own"
+}
+
+doctrine-surface "surface.retired.cap-multi-harness-md" {
+    path "docs/capabilities/CAP.multi-harness-distribution.md"
+    kind "guardrail"
+    serves "TS.260821.06"
+    state "retired"
+    retired-at "2026-08-22"
+    stands-at "v0.7.1"
+    because "ported to CAP.multi-harness-distribution, where the four \
+        gate tests and what it keeps consistent are stated for the first time"
+}
+
+doctrine-surface "surface.retired.cap-conformance-md" {
+    path "docs/capabilities/CAP.plugin-conformance-and-validation-probes.md"
+    kind "guardrail"
+    serves "TS.260821.06"
+    state "retired"
+    retired-at "2026-08-22"
+    stands-at "v0.7.1"
+    because "ported and NARROWED to CAP.conformance-probes. The Markdown \
+        record claimed five script families, which is a list rather than a consistency boundary"
+}
+
+// The regex half, retired by TS.260821.07.
+//
+// Both learned what this plugin contains by matching a pattern against the working tree.
+// The fragile thing about that was never the pattern: it was that the prose WAS the state,
+// so the pattern was the only reader, and the only way to find out it had stopped matching
+// was for somebody to notice the output looked wrong.
+//
+// Neither is a doctrine-surface by kind — a generator is not instruction — but both are
+// recorded here because retiring them is what TS.260821.07 DID, and a removal nobody wrote
+// down is indistinguishable from a removal nobody made.
+doctrine-surface "surface.retired.gen-coverage-matrix" {
+    path "scripts/gen-coverage-matrix.sh"
+    kind "probe"
+    serves "TS.260821.07"
+    state "retired"
+    retired-at "2026-08-22"
+    stands-at "v0.7.1"
+    because "it derived the coverage matrix by grepping every probe's --include list. Language \
+        coverage is now a field on the invariant, declared by whoever writes the probe, and a \
+        structural probe SAYS so instead of being listed against nine languages it does not scan"
+}
+
+doctrine-surface "surface.retired.gen-doctrine-index" {
+    path "scripts/gen-doctrine-index.sh"
+    kind "probe"
+    serves "TS.260821.07"
+    state "retired"
+    retired-at "2026-08-22"
+    stands-at "v0.7.1"
+    because "it scraped the instruction files frontmatter into a table inside generated \
+        markers, and CI failed on a hand-edit within them. It kept one table honest about a set \
+        of files nothing else could describe at all"
+}
+
+// ---------------------------------------------------------------------------------------
+// The two front doors, retired by TS.260823.08.
+//
+// They split greenfield from brownfield, and both installed the spine TS.260821.04 deleted:
+// a wave directory, a sprint placeholder, fifty-one overlay templates and a generated
+// verify.sh calling two probes this plugin does not ship. Neither named the delivery graph
+// once. `adopt-the-method` was correct and third in the index, so nobody reached it.
+//
+// The split was never the useful axis. What a repository needs on arrival is the same
+// whether or not it already has code: a binding, a gate that can run, and the engineering
+// doctrine that was never spine-bound. `praxis adopt` writes those three and nothing else.
+//
+// The files are removed, not shimmed. v0.7.1 is tagged; every one is recoverable by name
+// with `git checkout v0.7.1 -- <path>`.
+// ---------------------------------------------------------------------------------------
+
+doctrine-surface "surface.retired.bootstrap-project" {
+    path "skills/bootstrap-project/SKILL.md"
+    kind "skill"
+    serves "TS.260823.08"
+    state "retired"
+    retired-at "2026-08-23"
+    stands-at "v0.7.1"
+    because "it scaffolded a bootstrap wave directory, a sprint placeholder and a wave \
+        dashboard, in a method that has none of the three. Twenty of its lines instructed an \
+        agent in a kind the record had retired two versions earlier"
+}
+
+doctrine-surface "surface.retired.provision-project-overlay" {
+    path "skills/provision-project-overlay/SKILL.md"
+    kind "skill"
+    serves "TS.260823.08"
+    state "retired"
+    retired-at "2026-08-23"
+    stands-at "v0.7.1"
+    because "it emitted fifty-one template files — sixteen skill templates, eleven prompts, the \
+        persona overlays and a YAML config of its own — into an adopter's repository. The \
+        engineering half survived on its own merits and is rewritten as one pointer file; the \
+        spine half had nothing left to describe"
+}
+
+doctrine-surface "surface.retired.overlay-templates" {
+    path "skills/provision-project-overlay/templates/"
+    kind "skill"
+    serves "TS.260823.08"
+    state "retired"
+    retired-at "2026-08-23"
+    stands-at "v0.7.1"
+    because "the fifty-one files TS.260823.05 revealed and declared as debt on the \
+        `ships-doctrine` shape. They are retired as one act because they were written as one \
+        act: a tree copied whole into an adopter's repository, teaching waves, sprints, \
+        initiatives and TS-NNN ids in every file that had a verb in it"
+    note "one declaration for a directory, not fifty-one for its files. The engine anchors by \
+        PATH and no file at this path ships, so nothing here is a promise the record cannot \
+        keep — and fifty-one retirement stanzas saying the same sentence would bury the one \
+        fact a reader needs, which is that the tree is gone"
+}
+
+doctrine-surface "surface.retired.overlay-manifest" {
+    path "skills/provision-project-overlay/manifest.yaml"
+    kind "skill"
+    serves "TS.260823.08"
+    state "retired"
+    retired-at "2026-08-23"
+    stands-at "v0.7.1"
+    because "the managed-file list the overlay emitted from. What adoption writes is now four \
+        files named in the engine, derived from the record of what ships — a manifest is a \
+        second copy of that list, and the two would drift the way every other pair has"
+}

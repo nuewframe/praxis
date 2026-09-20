@@ -1,0 +1,187 @@
+// Opened by `praxis pick-up`. Every condition below was evaluated against the
+// tree as it stood at 2026-08-23T18:15:45Z, and the verdicts are recorded
+// rather than summarised: a gate whose reasoning is not on the record is a gate
+// you have to trust.
+
+iteration "ITER.260823.12" {
+    slug "one-version-across-every-harness"
+    on-slice "TS.260823.07"
+    state "closed"
+    opened-at "2026-08-23T18:15:45Z"
+    opened-by "agent:praxis"
+
+    approval "admission" {
+        status "asked"
+        asked-by "human:wael"
+        at "2026-08-23T18:15:45Z"
+        via "the ask to pick up this slice"
+    }
+
+    vet "create" state="done" at="2026-08-23T18:15:45Z" on-slice="TS.260823.07" {
+        condition "slice-is-shaped" verdict="passed"
+        condition "dependencies-delivered" verdict="passed"
+        condition "no-iteration-in-flight" verdict="passed"
+        condition "nothing-left-to-admit" verdict="passed"
+        condition "work-is-disjoint" verdict="not-computed" \
+            found="no seam manifest exists, so what two iterations would touch cannot be compared. Disjointness is half of what this capability says it judges, and half of what it judges is currently not computed at all"
+        condition "the-slice-is-the-best-available" verdict="left-to-the-maintainer"
+    }
+
+    // 2 of the declared conditions were not decided by the gate. They are
+    // recorded above rather than omitted: an admission that does not say what
+    // it left undecided claims more than it checked.
+
+    // Frozen at open, from the slices. Removing one from a slice now
+    // does not remove it from here — it makes the two disagree, and that is
+    // refused.
+    claim "C1" from-slice="TS.260823.07" state=met{
+        ran "cargo test --quiet --test harness_manifests"
+        exited 0
+        digest "fnv1a64:0d1cd14082105331"
+        witnessed-at "2026-08-23T18:16:41Z"
+    }
+    claim "C2" from-slice="TS.260823.07" state=met{
+        ran "cargo test --quiet --test harness_manifests"
+        exited 0
+        digest "fnv1a64:8133f07ba84d9b95"
+        witnessed-at "2026-08-23T18:16:53Z"
+    }
+    claim "C3" from-slice="TS.260823.07" state=met{
+        ran "cargo test --quiet --test harness_manifests"
+        exited 0
+        digest "fnv1a64:5028315840d6542a"
+        witnessed-at "2026-08-23T18:17:03Z"
+    }
+    claim "C4" from-slice="TS.260823.07" state=met{
+        ran "cargo test --quiet --test harness_manifests"
+        exited 0
+        digest "fnv1a64:10f4e2fe6d63b7ff"
+        witnessed-at "2026-08-23T18:17:14Z"
+    }
+
+    phase "design-system" state="complete" worked-by="agent:principal-engineer" {
+        approach "a manifest is PATCHED in place, never re-rendered whole" {
+            over "composing each manifest from nothing, the way a released document is"
+            over "one canonical template all six harnesses render from"
+            because "a manifest is only PARTLY derived — version and description come from \
+                the record, and skills paths, hooks and per-harness structure are facts about \
+                how doctrine reaches that harness, not facts this engine has an opinion about. \
+                Re-composing the whole file would mean deciding a shape that was never wrong; \
+                what was wrong was three facts inside a shape that already was right"
+        }
+
+        approach "drift is judged field by field, on the parsed value, not by comparing bytes" {
+            over "comparing the whole re-rendered document to what is on disk, byte for byte, \
+                the way a released document is verified"
+            over "hashing only the fields this engine writes"
+            because "the first build did exactly the byte comparison an archival document gets, \
+                and it flagged every hand-authored manifest as drifted from itself — reformatting \
+                a file this engine only partly owns is not the fact `hand-edited` is about, and a \
+                rule that cannot tell the two apart is a rule nobody can trust the day it fires"
+        }
+
+        approach "a manifest's text is fed to the SAME retired-vocabulary rule a skill is, \
+            never a manifest-specific copy of it" {
+            over "a manifest-specific rule for retired words, mirroring `surface-teaches-a-\
+                retired-kind`"
+            because "a manifest is shipped text an adopter reads before any skill exists for \
+                them, and `surface-teaches-a-retired-kind` already asks exactly one question of \
+                any shipped text: does it instruct in a word the method retired. Two rules \
+                asking the same question is the second-copy problem this frame keeps finding \
+                inside itself"
+        }
+
+        approach "the package's own `files` list is asked directly whether it ships `crates` \
+            and `praxis`, rather than modelled as a manifest with derived fields" {
+            over "treating the npm package's own manifest as a sixth derived manifest"
+            because "the npm package's manifest carries no version or description this record derives — its \
+                fault is narrower and different in kind: every skill instructs an agent to run a \
+                command, and the file list is either honest about containing that command or it \
+                is not. A yes/no question does not need the projection machinery the five \
+                manifests do"
+        }
+
+        produced "four approaches, one new dependency, a `manifest` module, two new rules and \
+            their witnesses, and the six real files corrected"
+    }
+
+    phase "implement" state="complete" worked-by="agent:principal-engineer" \
+        produced="`praxis_core::manifest::derive`, patching version and description in place; \
+            `a-manifest-is-derived-from-the-record` and `the-package-ships-what-it-tells-you-to-\
+            run`, both witnessed; `praxis publish` regenerating the five manifests alongside a \
+            release's own documents; the five manifests and the npm package's own manifest corrected to 0.8.0, \
+            the mission's own words, no retired vocabulary, and `crates`/`praxis` shipped; nine \
+            tests" {
+        followed "a manifest is PATCHED in place, never re-rendered whole"
+        followed "drift is judged field by field, on the parsed value, not by comparing bytes"
+        followed "a manifest's text is fed to the SAME retired-vocabulary rule a skill is, \
+            never a manifest-specific copy of it"
+        followed "the package's own `files` list is asked directly whether it ships `crates` \
+            and `praxis`, rather than modelled as a manifest with derived fields"
+    }
+
+    layer "doctrine" state="evidenced" \
+        evidence="`publish-the-release-set` regenerates the five manifests alongside a \
+            release's narrative documents, and the manifests carry the version and mission the \
+            record holds rather than five hand compositions of it" \
+        reaches="the first thing an adopter reads, before any other doctrine exists for them"
+
+    layer "enforcement" state="evidenced" \
+        evidence="`a-manifest-is-derived-from-the-record` and `the-package-ships-what-it-tells-\
+            you-to-run` are declared and witnessed; the five manifests and the npm package's own manifest are \
+            fed to `surface-teaches-a-retired-kind` alongside every other shipped surface; \
+            `praxis check` is clean over all six" \
+        reaches="the six files S6 named, and the vocabulary check TS.260823.06 built, reaching \
+            files it had never been pointed at"
+
+    layer "harness" state="evidenced" \
+        evidence="all five harness manifests carry 0.8.0 and the mission's own description, and \
+            the npm package's own manifest ships `crates` and `praxis` beside the skills that instruct running \
+            them" \
+        reaches="what an adopter installs from any of the six paths, before any doctrine loads"
+
+    layer "docs" state="evidenced" \
+        evidence="`what version am I installing and what does it mean` is answerable from any \
+            manifest, because every one of them now carries the answer the record holds" \
+        reaches="the question a stale manifest could not answer"
+
+    layer-set sealed=#true at="2026-08-23T18:15:45Z"
+
+    finding "F1" \
+        text="the first build of the drift check compared each manifest's FULL re-rendered \
+            text against what was on disk, byte for byte — the same comparison \
+            `verify-published` uses for an archival document. Every hand-authored manifest \
+            failed it immediately, on formatting alone: a manifest is only partly derived, and \
+            reformatting the parts a human still owns is not the fact `hand-edited` was supposed \
+            to name. Caught by running the check against the real tree before writing a single \
+            test for it, and fixed by comparing the parsed VALUE of each derived field instead" \
+        owed-against="TS.260823.07"
+
+    finding "F2" \
+        text="a `given-file` value written as a raw multi-line string (`#\"\"\"...\"\"\"#`) on \
+            one line, rather than starting on its own line the way every existing witness using \
+            that form does, parsed with two extra literal quote characters folded into the \
+            content — the witness read as never firing, and the honest cause was a string \
+            malformed in a way `cargo build` cannot see. Fixed by using an ordinary escaped \
+            string for content that was never multi-line to begin with" \
+        owed-against="TS.260823.07"
+    closed-at "2026-08-23T18:17:28Z"
+    outcome "continue"
+
+    close {
+        claims-settled "C1" how="met"
+        claims-settled "C2" how="met"
+        claims-settled "C3" how="met"
+        claims-settled "C4" how="met"
+        all-met #true
+        attested-by "human:wael"
+        note "the accounting above was computed at close, not asserted. It says every claim is either met or carried by a finding that names it, and nothing about whether the work is any good"
+    }
+
+    trail {
+        entry at="2026-08-23T18:17:28Z" by="agent:praxis" action="state-changed" from="open" to="closed" note="closed by `praxis close`. The accounting was computed; the conclusion is not the machine's to draw"
+
+        entry at="2026-08-23T18:15:45Z" by="agent:praxis" action="created" \
+            note="opened by the gate, on the ask of human:wael"
+    }
+}

@@ -1,17 +1,12 @@
 {
-  "name": "praxis",
-  "description": "Praxis — lean wave-based product delivery unified with Principal Engineer discipline. Three-mode engineer persona (architect / implementer / reviewer), three-tier change triage, mechanical Design Approval, waves, thin-slices, code contribution intake, immutable sprint bridges, hypothesis loops, capability-driven architecture, anti-dumping + sleep + skipped-test + port/adapter-parity enforcement, ADR discipline, Pyramid Test Strategy, defensive implementation, TDD verification.",
-  "version": "0.7.1",
   "author": {
     "name": "Nuewframe"
   },
+  "description": "make execution fidelity a property computed from the record, rather than a claim made by whoever produced the artifact",
   "homepage": "https://github.com/nuewframe/praxis",
-  "repository": "https://github.com/nuewframe/praxis",
-  "license": "MIT",
   "keywords": [
     "praxis",
     "product-management",
-    "wave-methodology",
     "thin-slices",
     "code-contribution-intake",
     "lean-delivery",
@@ -28,5 +23,9 @@
     "design-approval-gate",
     "port-adapter-parity",
     "workflow"
-  ]
+  ],
+  "license": "MIT",
+  "name": "praxis",
+  "repository": "https://github.com/nuewframe/praxis",
+  "version": "0.8.0"
 }

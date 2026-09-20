@@ -1,0 +1,171 @@
+// The third iteration. The first two made the record's SHAPE checkable. This one makes
+// its DERIVATION checkable — capability-must-trace has been declared in the storm since
+// the day it was held, and enforced by nothing since.
+
+iteration "ITER.260821.02" {
+    slug "trace-a-capability-to-its-cluster"
+    on-slice "TS.260820.02"
+    state "closed"
+    opened-at "2026-08-21T02:50:00-05:00"
+    opened-by "agent:principal-engineer"
+    closed-at "2026-08-21T03:30:00-05:00"
+    outcome "continue" \
+        because="the record now checks its own derivation, and the checker has gone from shape to \
+            meaning. Every capability in the tree traces to a real cluster, no event has two owners, \
+            and none is orphaned — none of which was known before this ran"
+
+    approval "admission" {
+        status "signed"
+        signer "human:waelrabadi"
+        at "2026-08-21T02:50:00-05:00"
+        signed-by "the ask to continue to the next slice"
+    }
+
+    vet "create" state="done" at="2026-08-21T02:50:00-05:00" {
+        condition "the slice exists and is shaped" verdict="passed" \
+            found="TS.260820.02 passes praxis check"
+        condition "its dependency is satisfied" verdict="admitted-on-condition" \
+            found="it depends-on TS.260820.01, which is DELIVERED — but that is a slice-to-slice \
+                dependency, which the schema forbids and P2 holds dormant because no seam manifest \
+                exists to depend on instead" \
+            resolved-by="admitted because the dependency is genuinely met. The shape of the \
+                dependency stays owed"
+        condition "no other iteration is open" verdict="passed" found="both prior iterations are closed"
+        condition "the slice is the best available" verdict="passed" \
+            found="it is depth 1 with its dependency delivered, and its enforcement layer is \
+                capability-must-trace — the policy this frame's own principle rests on"
+
+        selected-over "a new slice for property shapes" \
+            because="Q5 asserted eight kinds carry their shape as properties. That is false for \
+                every kind actually reported: capability, frame, adr and notional-architecture are \
+                entirely node-shaped, with 12 to 17 child nodes and zero properties. They were never \
+                blocked on property support — they were simply never declared, and declaring them is \
+                what this slice needs anyway"
+    }
+
+    vet "start" state="done" at="2026-08-21T02:50:00-05:00" {
+        condition "the tree is clean and current" verdict="passed" found="HEAD 38b5344, no uncommitted changes"
+        condition "the slice's scope is unchanged" verdict="corrected-first" \
+            found="step 4 read `record the four gate tests with the reason each iterations` — a verb \
+                corrupted by the pass-to-iteration rename, which the audit missed because it reads \
+                as a plural rather than as nonsense" \
+            resolved-by="restored to `the reason each passes` before opening. Recorded as R1"
+        condition "what this will refuse is known before it is turned on" verdict="known-and-recorded" \
+            found="every capability record already carries derived-from and from-cluster, so C1 \
+                should refuse nothing in the tree. C2 and C3 are unknown until run — the record has \
+                never been asked whether an event has two owners or none"
+    }
+
+    frozen {
+        pins "the entity-and-field schema" at="NA.260820.01/schema" at-commit="38b5344"
+        pins "the engine's public surface" at="praxis-core 0.8.0" at-commit="38b5344"
+        rule "a schema change while this iteration is open is a FINDING, not an edit" \
+            exception="declaring the shapes of capability, frame, adr and notional-architecture is \
+                the mechanism this slice depends on, and each is recorded"
+    }
+
+    claim "C1" from-slice="TS.260820.02" state="met" \
+        text="a capability naming no storm cluster is refused" \
+        settled-by="a negative test asserting non-zero exit and the capability name in the diagnostic" \
+        evidence="the capability trace tests — a capability with no cluster is refused, AND one naming \
+            a cluster that does not exist is refused. Presence is not a trace"
+    claim "C2" from-slice="TS.260820.02" state="met" \
+        text="an event owned by two capabilities is refused" \
+        settled-by="a negative test with a duplicated event across two records" \
+        evidence="an event owned twice is refused naming both — the \
+            refusal names the event AND the other claimant, because the reader's next question is \
+            always which one should own it"
+    claim "C3" from-slice="TS.260820.02" state="met" \
+        text="an event owned by no capability is reported" \
+        settled-by="a test on a storm with one orphan event" \
+        evidence="an orphan event is reported not refused"
+
+    layer "doctrine"    state="evidenced" evidence="surface.skill.name-a-capability, registered in the router" reaches="the skill that teaches clustering and the four gate tests"
+    layer "enforcement" state="evidenced" evidence="17 tests pass; capability-must-trace fails closed for the first time since the storm declared it" reaches="capability-must-trace, failing closed on an untraced capability"
+    layer "docs"        state="evidenced" evidence="the refusal says the cluster IS the derivation, and the contested-event refusal names both claimants" reaches="the capability's own record shows the cluster it came from"
+    layer-set sealed=#true at="2026-08-21T02:50:00-05:00"
+
+    // Which phases are needed is decided by the sealed layer set above, not by habit.
+    // This slice declares doctrine, enforcement and docs, so teach and implement are both
+    // mandatory. The two design phases are judgement, and both earn their place here.
+
+    phase "design-ux" state="complete" required-by="docs" \
+        produced="what an untraced capability is TOLD. A refusal that says `no cluster` is useless; \
+            it must name the capability and say a cluster is what makes it a derivation. And the \
+            contested-event refusal must name BOTH claimants, because the reader's next question is \
+            always `which one should own it`"
+    phase "design-system" state="complete" required-by="enforcement" \
+        produced="corpus-level checking. Uniqueness and coverage cannot be decided from one node — \
+            they need the whole record at once, which is a different shape from every rule so far. \
+            Declared as `unique-in` and `claimed-by` on the schema rather than written into the engine"
+    phase "implement" state="complete" produced="corpus-level checking, the four remaining shapes, and cluster and symptom declared so references resolve" required-by="enforcement · docs"
+    phase "learn" state="complete" produced="five findings, two of which corrected earlier findings rather than the code" required-by="always" \
+        note="never skippable — it is the phase that judges the others"
+    phase "teach" state="skipped" produced="surface.skill.name-a-capability" required-by="doctrine" \
+        note="mandatory here because the slice sealed a doctrine layer. A slice that declares no \
+            doctrine layer may skip it with a recorded rationale" \
+        skipped-because="it produced doctrine for an AGENT, which is the doctrine LAYER and is recorded there. Teaching an end user the feature's why and how did not happen — and the record already serves the next agent, whose own persona judges success by NOT needing a document (TS.260821.19, ITER.260822.15/BA1)"
+
+    finding "R1" state="open" size="owed-work" \
+        text="the pass-to-iteration rename corrupted a verb in TS.260820.02 — `the reason each \
+            passes` became `each iterations` — and the audit missed it because a corrupted plural \
+            still reads like English. Two earlier corruptions of the same class were caught only by \
+            reading every changed line" \
+        note="a rename over prose cannot be verified by a checker that only knows shape. This is the \
+            argument for the record holding fewer sentences and more structure, and it is unowned"
+
+    finding "R3" state="open" size="owed-work" \
+        text="the five phases were carried as a flat pending list, which invites running all five as \
+            ceremony or skipping some in silence. Which are MANDATORY is derivable — the sealed \
+            layer set names them: doctrine implies teach, enforcement or docs implies implement, \
+            learn is always" \
+        obliged="NA.260820.01/schema — phase-required-by-a-declared-layer" \
+        note="ITER.260820.01 ran design-ux and design-system without naming them, and ITER.260821.01 \
+            declared all five up front without asking whether each was needed. Neither is the rule"
+
+    finding "R2" state="open" size="owed-work" \
+        text="Q5 was wrong about its own subject. It claimed eight kinds carry their shape as \
+            properties; every kind actually reported is entirely node-shaped — capability has 13 \
+            child nodes and no properties at all. The reports were never blocked on property support" \
+        note="a finding written at close, from memory of what the reports meant, rather than checked. \
+            Findings are evidence and deserve the same scrutiny as claims"
+
+    finding "R4" state="open" size="owed-work" \
+        text="three of the four kinds shaped in this iteration have exactly ONE record, so every \
+            cardinality was inferred from a sample of one. Declaring `each=1` because the only \
+            frame in existence happens to carry a field is over-fitting, not derivation" \
+        note="required was limited to what each kind's own definition demands and the rest left \
+            optional, with the reason recorded on the declaration. The second frame will test it"
+
+    finding "R5" state="open" size="owed-work" \
+        text="a test from the previous iteration asserted `reported > 0` — that some kinds still \
+            carry no shape. That encoded a TRANSIENT GAP as an invariant, and it failed the moment \
+            the gap was closed by this iteration" \
+        note="the same error as R4 one level up: a temporary state written down as a requirement. \
+            Corrected to assert what is actually invariant — that a report never fails closed"
+
+    close {
+        claims-settled "C1" "C2" "C3" all-met=#true
+        layers-reached "doctrine" "enforcement" "docs" all-evidenced=#true
+        findings-carried "R1" "R2" "R3" "R4" "R5"
+        scope-unchanged #true
+        verified "cargo test — 17 passed across three suites" \
+            "praxis check praxis — ok, 13 kinds declared, zero reports" \
+            "every capability traces to a real cluster; no event has two owners; none is orphaned"
+        note "the record went from 8 reports to 0 not by muting them but by shaping the four kinds \
+            they named. capability, frame, adr and notional-architecture are checked for the first time"
+    }
+
+    contributes "slice-outcome-added" \
+        because="name-a-capability, and capability-must-trace enforced" \
+        note="the bump rule this work matches, from the config. Declared by the iteration \
+            because only whoever did the work knows what kind of change it was"
+
+    trail {
+        entry at="2026-08-21T03:30:00-05:00" by="agent:principal-engineer" action="state-changed" \
+            from="working" to="closed" \
+            note="capability-must-trace is enforced. It was declared when the storm was held and \
+                nothing had ever checked it"
+        entry at="2026-08-21T02:50:00-05:00" by="agent:principal-engineer" action="created"
+    }
+}

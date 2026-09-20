@@ -1,0 +1,145 @@
+// Opened by `praxis pick-up`. Every condition below was evaluated against the
+// tree as it stood at 2026-08-22T09:02:56Z, and the verdicts are recorded
+// rather than summarised: a gate whose reasoning is not on the record is a gate
+// you have to trust.
+
+iteration "ITER.260822.07" {
+    slug "the-method-has-a-home"
+    on-slice "TS.260821.10"
+    state "closed"
+    opened-at "2026-08-22T09:02:56Z"
+    opened-by "agent:praxis"
+
+    approval "admission" {
+        status "signed"
+        signer "human:wael"
+        at "2026-08-22T09:02:56Z"
+        signed-by "the ask to pick up this slice"
+    }
+
+    vet "create" state="done" at="2026-08-22T09:02:56Z" on-slice="TS.260821.10" {
+        condition "slice-is-shaped" verdict="passed"
+        condition "dependencies-delivered" verdict="passed"
+        condition "no-iteration-in-flight" verdict="passed"
+        condition "nothing-left-to-admit" verdict="passed"
+        condition "work-is-disjoint" verdict="not-computed" \
+            found="no seam manifest exists, so what two iterations would touch cannot be compared. Disjointness is half of what this capability says it judges, and half of what it judges is currently not computed at all"
+        condition "the-slice-is-the-best-available" verdict="left-to-the-maintainer"
+    }
+
+    // 2 of the declared conditions were not decided by the gate. They are
+    // recorded above rather than omitted: an admission that does not say what
+    // it left undecided claims more than it checked.
+
+    // Frozen at open, from the slices. Removing one from a slice now
+    // does not remove it from here — it makes the two disagree, and that is
+    // refused.
+    claim "C1" from-slice="TS.260821.10" state="met" \
+        evidence="a project that copied nothing is still governed, \
+            and a real scratch repository: acme/checkout with a config and a frame, no schema \
+            document anywhere, and `praxis check` refused a frame field the method does not \
+            declare. `praxis ready` ran, so the gate travelled too"
+    claim "C2" from-slice="TS.260821.10" state="met" \
+        evidence="this repository extends rather than redefines. \
+            NA.260820.01 went from 1487 lines to 541: invariant and doctrine-surface stayed as \
+            extensions, everything else is the method's. praxis check clean at 21 kinds — 19 from \
+            the method, 2 from here"
+    claim "C3" from-slice="TS.260821.10" state="met" \
+        evidence="extending adds and redefining refuses — a new kind \
+            lands, a redefinition does not, and the redefined field is asserted ABSENT so the rule \
+            is shown to discriminate rather than to refuse everything local"
+    claim "C4" from-slice="TS.260821.10" state="met" \
+        evidence="the method is data and passes its own rules — it \
+            parses through the ordinary reader, passes its own rules, and include_str! points at \
+            the SHIPPED file so the byte-identity assertion is true by construction rather than by \
+            a test that hopes"
+    claim "C5" from-slice="TS.260821.10" state="met" \
+        evidence="a config bound to a method the engine lacks is refused, \
+            plus the config carrying `governed-by \"delivery-graph@v1\"` for the first time"
+
+    layer "doctrine"    state="evidenced" \
+        evidence="surface.skill.adopt-the-method and surface.skill.write-durable-comments, both \
+            anchored and registered" \
+        reaches="adopting means installing, and the skill says what a project may add and what it may not touch"
+    layer "enforcement" state="evidenced" \
+        evidence="a-config-binds-a-method-the-engine-carries refuses and is witnessed; composition \
+            counts a redefinition as a refusal in praxis check. 237 tests pass across 32 targets" \
+        reaches="composition refuses a redefinition; governed-by refuses an unknown method"
+    layer "docs"        state="evidenced" \
+        evidence="`praxis schema` names the method and its counts; `praxis schema --print` writes \
+            it whole" \
+        reaches="`what governs this repository` is answerable by a command"
+
+    phase "design-ux" state="complete" required-by="docs" worked-by="agent:principal-engineer" \
+        produced="`praxis schema` answers the question an adopter actually has, and the \
+            undeclared-kind refusal now tells them which of the two schemas to look at"
+    phase "design-system" state="complete" required-by="enforcement" worked-by="agent:principal-engineer" \
+        produced="one file, two carriers. include_str! points at the SHIPPED file rather than a \
+            copy beside the module, so there is nothing to keep in sync"
+    phase "implement" state="complete" required-by="enforcement · docs" worked-by="agent:principal-engineer" \
+        produced="the method record, Schema::method, Schema::extend, governing/admission in the \
+            shell, the binding rule, and the praxis schema command"
+    phase "learn" state="complete" required-by="always" worked-by="agent:principal-engineer" \
+        produced="three findings, two of them from the maintainer reading the work as it landed"
+    phase "teach" state="skipped" required-by="doctrine" worked-by="agent:principal-engineer" \
+        produced="surface.skill.adopt-the-method" \
+        skipped-because="it produced doctrine for an AGENT, which is the doctrine LAYER and is recorded there. Teaching an end user the feature's why and how did not happen — and the record already serves the next agent, whose own persona judges success by NOT needing a document (TS.260821.19, ITER.260822.15/BA1)"
+
+    finding "AR1" state="open" size="frame-sized" \
+        text="nothing pulls the binary. The plugin ships to six harnesses as a Markdown and \
+            scripts tree; hooks/session-start injects the router and stops there. An agent that \
+            installs the plugin has skills describing commands it cannot run" \
+        obliges="a slice under CAP.multi-harness-distribution — the bootstrap installs or updates \
+            the engine, and the plugin version and the engine version are checked against each other" \
+        note="raised by the maintainer mid-iteration. It does not change the two-carrier design — \
+            the method still has to reach an agent that has only the plugin — but it means the \
+            binary is REACHABLE from a plugin install rather than a separate thing an adopter \
+            happens to have, and that is a stronger position than this slice assumed"
+
+    finding "AR2" state="open" size="observation" \
+        text="four test harnesses read NA.260820.01 as THE schema and broke when the method moved \
+            out of it. Each was silently asserting that one document held the whole vocabulary" \
+        note="the tests were right to break and the breakage was the useful part: it enumerated \
+            every place that had baked in `the architecture is the schema`. A composition that had \
+            been designed to be invisible would have left all four passing against half a vocabulary"
+
+    finding "AR4" state="open" size="observation" \
+        text="check-invariants counted a SKILL as keeping an invariant, while the published view \
+            counted only probes. The two disagreed, and the command was the one overstating" \
+        note="a skill teaches and a probe fails a build, and calling both `kept` is describing a \
+            gate as stronger than it is — which this repository's own README already names as a \
+            failure. There are three states now, not two: kept by a probe, TAUGHT and unchecked, \
+            or neither. comments-state-meaning is the first thing to land in the middle one, and \
+            it is honest that it did"
+
+    finding "AR3" state="open" size="observation" \
+        text="the comment restored above `governed-by` was a changelog entry — when it was fixed \
+            and what it used to say — rather than a statement of what the field IS. Caught by the \
+            maintainer reading the diff" \
+        obliges="config comments say what a field means; the history belongs to the slice, the \
+            finding, or the decision that produced it" \
+        note="the same file's own header had the same defect: it named an ADR block as the \
+            normative home, which stopped being true when ADR.260819.02 was withdrawn and nobody \
+            noticed for six days. Prose that narrates history rots exactly where prose that states \
+            meaning does not"
+    closed-at "2026-08-22T09:20:03Z"
+    outcome "continue"
+
+    close {
+        claims-settled "C1" how="met"
+        claims-settled "C2" how="met"
+        claims-settled "C3" how="met"
+        claims-settled "C4" how="met"
+        claims-settled "C5" how="met"
+        all-met #true
+        attested-by "human:waelrabadi"
+        note "the accounting above was computed at close, not asserted. It says every claim is either met or carried by a finding that names it, and nothing about whether the work is any good"
+    }
+
+    trail {
+        entry at="2026-08-22T09:20:03Z" by="agent:praxis" action="state-changed" from="open" to="closed" note="closed by `praxis close`. The accounting was computed; the conclusion is not the machine's to draw"
+
+        entry at="2026-08-22T09:02:56Z" by="agent:praxis" action="created" \
+            note="opened by the gate, on the ask of human:wael"
+    }
+}

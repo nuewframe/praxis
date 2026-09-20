@@ -1,0 +1,199 @@
+// Opened by `praxis pick-up`. Every condition below was evaluated against the
+// tree as it stood at 2026-08-22T03:55:18Z, and the verdicts are recorded
+// rather than summarised: a gate whose reasoning is not on the record is a gate
+// you have to trust.
+//
+// One commitment over 2 slices. They were vetted separately and admitted
+// together — a commitment that admits its easy half is not one thing.
+
+iteration "ITER.260822.04" {
+    slug "retire-the-pre-graph-spine-and-1-more"
+    on-slice "TS.260821.04"
+    on-slice "TS.260821.07"
+    state "closed"
+    opened-at "2026-08-22T03:55:18Z"
+    opened-by "agent:praxis"
+
+    approval "admission" {
+        status "signed"
+        signer "human:wael"
+        at "2026-08-22T03:55:18Z"
+        signed-by "the ask to pick up these slices, as one commitment"
+    }
+
+    vet "create" state="done" at="2026-08-22T03:55:18Z" on-slice="TS.260821.04" {
+        condition "slice-is-shaped" verdict="passed"
+        condition "dependencies-delivered" verdict="passed"
+        condition "no-iteration-in-flight" verdict="passed"
+        condition "nothing-left-to-admit" verdict="passed"
+        condition "work-is-disjoint" verdict="not-computed" \
+            found="no seam manifest exists, so what two iterations would touch cannot be compared. Disjointness is half of what this capability says it judges, and half of what it judges is currently not computed at all"
+        condition "the-slice-is-the-best-available" verdict="left-to-the-maintainer"
+    }
+
+    vet "create" state="done" at="2026-08-22T03:55:18Z" on-slice="TS.260821.07" {
+        condition "slice-is-shaped" verdict="passed"
+        condition "dependencies-delivered" verdict="passed"
+        condition "no-iteration-in-flight" verdict="passed"
+        condition "nothing-left-to-admit" verdict="passed"
+        condition "work-is-disjoint" verdict="not-computed" \
+            found="no seam manifest exists, so what two iterations would touch cannot be compared. Disjointness is half of what this capability says it judges, and half of what it judges is currently not computed at all"
+        condition "the-slice-is-the-best-available" verdict="left-to-the-maintainer"
+    }
+
+    // 2 of the declared conditions were not decided by the gate. They are
+    // recorded above rather than omitted: an admission that does not say what
+    // it left undecided claims more than it checked.
+
+    // Frozen at open, from the slices. Removing one from a slice now
+    // does not remove it from here — it makes the two disagree, and that is
+    // refused.
+    claim "C1" from-slice="TS.260821.04" state="met" \
+        evidence="`praxis audit-surfaces` reports 48 of 48 anchored, and `praxis check` reports \
+            zero. The twenty-five AM1 said had nowhere to go went somewhere the moment \
+            TS.260821.05 gave the record a word for what they do — ten engineering skills to the \
+            invariants they teach, ten probes to the invariants they enforce, three personas to the \
+            frame under a recorded decision"
+    claim "C2" from-slice="TS.260821.04" state="met" \
+        evidence="settled by ITER.260822.02 — twenty retirements naming v0.7.1, plus three more \
+            here (contract-freshness, and the two generators TS.260821.07 retired)"
+    claim "C3" from-slice="TS.260821.04" state="met" \
+        evidence="every-shipped-surface-is-anchored is now `refuses`. \
+            a shipped file nobody declared is named by path asserts \
+            Severity::Refuse, so a silent flip back fails the suite"
+    claim "C4" from-slice="TS.260821.04" state="met" \
+        evidence="settled by ITER.260822.02 — the the router matches the binary tests"
+
+    claim "C1" from-slice="TS.260821.07" state="met" \
+        evidence="the shipped set is derived and regenerates identically, \
+            plus publishing 0.8.0 twice with `git diff --exit-code` clean. CI now does exactly that \
+            instead of running two --check generators"
+    claim "C2" from-slice="TS.260821.07" state="met" \
+        evidence="a gate and a notice are published differently — \
+            severity and language coverage both come from the invariant record, and a structural \
+            probe says so rather than being listed against nine languages it does not scan"
+    claim "C3" from-slice="TS.260821.07" state="met" \
+        evidence="surface.retired.gen-coverage-matrix and surface.retired.gen-doctrine-index are removed and recorded as \
+            retired; the coverage matrix is gone. publish() reads the Corpus and nothing else"
+    claim "C4" from-slice="TS.260821.07" state="met" \
+        evidence="an older version is not described by the current tree \
+            — each surface carries the release derived from what IT serves, so two versions publish \
+            different documents from one record. This is the claim neither generator could make at \
+            all: both read the tree, so both answered the same way whichever version you asked"
+
+    layer "doctrine"    state="evidenced" \
+        evidence="the router's guardrail section no longer carries a scraped table and points at \
+            the published set; the Markdown architecture README and the Markdown dashboard stop describing \
+            three Markdown capability records that no longer exist" \
+        reaches="what a version shipped is stated by the record"
+    layer "enforcement" state="evidenced" \
+        evidence="every-shipped-surface-is-anchored REFUSES; 48 of 48 anchored; 7 of 10 invariants \
+            kept with 3 omitted and 0 unkept; CI publishes and fails on a diff. 212 tests pass" \
+        reaches="no generator applies a pattern to a Markdown file to learn what this plugin contains"
+    layer "docs"        state="evidenced" \
+        evidence="the 0.8.0 doctrine document — 48 surfaces with what \
+            asked for each and which release shipped it, ten guarantees with their severity and \
+            language coverage, and the retired set with where each still stands" \
+        reaches="`what did 0.8.0 ship` stops being a question about the working tree"
+
+    phase "design-ux" state="complete" required-by="docs" \
+        produced="`shipped in` says `not derivable from what it serves` rather than guessing. A \
+            column that reads 0.8.0 because the tool had nothing better is worse than one that admits it"
+    phase "design-system" state="complete" required-by="enforcement" \
+        produced="which version shipped a surface is DERIVED — serves names a slice, an iteration \
+            covers it, that iteration bound to a release. Storing it would be a second copy of a \
+            fact the record already holds, and the first thing to go stale"
+    phase "implement" state="complete" required-by="enforcement · docs" \
+        produced="the what-this-plugin-ships view, thirteen anchors, the severity flip, two \
+            generators retired, CI rewired to publish-and-diff"
+    phase "learn" state="complete" required-by="always" \
+        produced="two findings and one decision"
+    phase "teach" state="skipped" required-by="doctrine" \
+        produced="the published document is itself the teaching artifact for this slice" \
+        skipped-because="it produced doctrine for an AGENT, which is the doctrine LAYER and is recorded there. Teaching an end user the feature's why and how did not happen — and the record already serves the next agent, whose own persona judges success by NOT needing a document (TS.260821.19, ITER.260822.15/BA1)"
+
+    decision "what a persona serves" \
+        chose="anchor the three personas to FRAME.260819.01, the weakest anchor in the vocabulary" \
+        over="a `persona` entity kind, so a persona could serve the phases it owns" \
+        over="anchoring each persona to the invariants its skills teach" \
+        over="retiring them, on the grounds that the graph names actors and not roles" \
+        because="a persona is not a capability, an invariant or a slice. It is a statement about \
+            WHO may attest what, and the reason this plugin has personas at all is the \
+            trust-transfer problem — the same engineer cannot self-approve, because an artifact \
+            looks identical whether the reviewer was a different mind or the same one wearing a \
+            second hat. That is S2, and S2 belongs to the frame. A `persona` kind was rejected as \
+            three records' worth of vocabulary for three records; anchoring to invariants was \
+            rejected because a persona does not enforce anything" \
+        falsified-by="a fourth persona, or a persona that needs to say something the frame cannot \
+            hold — at which point three surfaces pointing at one frame stops being an argument and \
+            becomes the dumping ground it currently resembles" \
+        seal="fnv1a64:997fb5b9e20e1e74" {
+        amendment "the falsifier fired, and not the way it was written" at="2026-08-22T00:00:00Z" \
+            by="agent:principal-engineer" \
+            note=#"""
+                TS.260821.08 reverses the conclusion and keeps the reasoning.
+
+                The prediction was a FOURTH persona. What happened is that the frame went from
+                one surface to four inside the same iteration, and the tell is structural rather
+                than numeric. The frame is the ROOT — every surface descends from it by
+                construction — so `serves` naming it is true of everything and discriminates
+                nothing. A target true by construction cannot discriminate, and a field that
+                cannot discriminate is a dumping ground when it holds ONE thing. It was already
+                wrong at one.
+
+                The rejected alternative "a persona entity kind" was rejected for being three
+                records' worth of vocabulary for three records. That was the mistake. `role` earns
+                its place not by anchoring three files but by making "the same engineer cannot
+                self-approve" computable — the rule this plugin states most confidently and, until
+                now, enforced least.
+
+                `frame` is removed from the serves vocabulary. The fix is not a rule that detects
+                the pile: no-dumping-grounds forbids the NAMES utils, helpers, common, and never
+                measures whether a folder became a junk drawer. Anti-dumping works by making the
+                dumping ground unnameable.
+                """#
+    }
+
+    finding "AO1" state="open" size="observation" \
+        text="the count reached zero because the record gained a WORD, not because anything was \
+            tidied. Twenty-five surfaces sat unanchored through ITER.260822.02 and all twenty-five \
+            anchored in one edit once `invariant` existed" \
+        note="AM1 read as a backlog and was a vocabulary gap. The audit rule was built to catch \
+            doctrine that stopped corresponding to something; twice now its real finding has been \
+            doctrine that never corresponded to anything because the record could not describe it. \
+            That is a different defect and it is the more common one"
+
+    finding "AO2" state="open" size="frame-sized" \
+        text="`praxis publish` composes the CURRENT record and stamps it with a version. Only \
+            `shipped in` is genuinely per-version; every other section of every published document \
+            would read the same for 0.7.0 as for 0.8.0" \
+        obliges="a slice that makes publishing for an old version read that version's record, or \
+            an explicit statement that the published set depicts the record AT PUBLISH TIME and \
+            the version stamp is the commit it was published from" \
+        note="found by writing TS.260821.07/C4 and having to be careful about what it could \
+            honestly claim. The claim passes because `shipped in` is derived per surface — but the \
+            general machinery is `current record, stamped`, and `Depicts 0.8.0, and nothing else` \
+            is a stronger sentence than the code behind it"
+    closed-at "2026-08-22T04:03:47Z"
+    outcome "continue"
+
+    close {
+        claims-settled "C1" how="met"
+        claims-settled "C2" how="met"
+        claims-settled "C3" how="met"
+        claims-settled "C4" how="met"
+        claims-settled "C1" how="met"
+        claims-settled "C2" how="met"
+        claims-settled "C3" how="met"
+        claims-settled "C4" how="met"
+        all-met #true
+        note "the accounting above was computed at close, not asserted. It says every claim is either met or carried by a finding that names it, and nothing about whether the work is any good"
+    }
+
+    trail {
+        entry at="2026-08-22T04:03:47Z" by="agent:praxis" action="state-changed" from="open" to="closed" note="closed by `praxis close`. The accounting was computed; the conclusion is not the machine's to draw"
+
+        entry at="2026-08-22T03:55:18Z" by="agent:praxis" action="created" \
+            note="opened by the gate, on the ask of human:wael"
+    }
+}

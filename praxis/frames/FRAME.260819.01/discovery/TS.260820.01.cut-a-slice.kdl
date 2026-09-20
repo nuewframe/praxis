@@ -1,0 +1,90 @@
+// ============================================================================
+// THIN-SLICE SCHEMA
+//
+// A slice is atomic because it names exactly ONE of: a command, or a read model.
+// It is vertical because it reaches every layer between the actor and the record.
+// Neither is asserted — both are shapes a checker can refuse (ES finding E2/E13).
+//
+//   kind              "command" | "view"  (E13: a view slice writes nothing)
+//   realizes          the capability. A slice with no capability is unfunded work
+//   from-storm        the storm the command or read model appears in
+//   command / actor   command kind: the one command, the one actor who issues it
+//   produces-event    command kind: what becomes true. May be more than one when
+//                     the command can be refused — a refusal is a fact (E6)
+//   read-model        view kind: the one view, and the capability owning its CONTENT
+//   needs-read-model  what the actor must SEE before they can act. This is the
+//                     dependency edge work-admission reads at the gate
+//   feeds-read-model  which views this slice's events populate. Paired with the above
+//                     the graph traverses both ways, so a checker can ask whether every
+//                     publishable view has something keeping it current (E24)
+//   trigger/outcome/scenario/step    the use-case. UCD, unchanged
+//   excludes          scope sealed at cut time, so drift has something to hit (S5)
+//   layer             which layers it must reach, and what reaching means here.
+//                     This is the verticality proof (S4)
+//   claim             what will be true when done — each naming the evidence that
+//                     settles it AT CUT TIME, so the worker cannot pick convenient proof
+//   depends-on        what must be frozen before pickup. Makes the gate computable
+//   useful-alone      what you get if this ships and nothing after it does
+// ============================================================================
+
+thin-slice "TS.260820.01" {
+    slug "cut-a-slice"
+    title "Cut a slice whose verticality can be refused rather than asserted"
+    kind "command"
+    realizes "CAP.delivery-record"
+    from-storm "ES.260819.01"
+    state "delivered" by="ITER.260820.01" \
+        note="all three claims met against named evidence, all three declared layers reached"
+
+    command "cut-slice"
+    actor "maintainer"
+    produces-event "SliceCut" "SliceCutRefused"
+    needs-read-model "capabilities-and-what-they-own"
+    feeds-read-model "what-is-ready-to-pick-up"
+
+    trigger "a capability exists and a piece of it is worth doing before the rest"
+    outcome "a unit of work exists that the tooling agrees is vertical, or was refused for saying why not"
+
+    scenario #"""
+        Given a capability derived from a storm
+        When the maintainer cuts a slice from it
+        Then the slice is accepted only if it names one command or one read model, one
+             actor, the events it produces, and the layers it reaches — and a slice that
+             names none of these is refused at the moment it is written, not discovered
+             to be horizontal three days into working it.
+        """#
+
+    step "1" does="read what the capability owns and what is already cut from it"
+    step "2" does="name the command or read model this slice delivers, and the one actor who uses it"
+    step "3" does="declare the layers it must reach, and state what reaching each one means here"
+    step "4" does="state the claims, each naming the evidence that will settle it"
+    step "5" does="write it. The shape is checked now — refusal names the missing field"
+
+    excludes "admitting the slice for work — cutting commits to nothing and costs nothing to get wrong"
+    excludes "estimating it"
+
+    layer "doctrine"    reaches="the skill that tells an agent how to cut, and what refusal means"
+    layer "enforcement" reaches="the slice-shape check, failing closed with the missing field named"
+    layer "docs"        reaches="the slice appears in the capability's rendered record"
+
+    claim "C1" text="a slice missing any of command/actor/event/layer is refused at write time" \
+        settled-by="a negative test per missing field, each asserting a non-zero exit and the field name in the diagnostic"
+    claim "C2" text="the refusal names which field is missing, not that the file is invalid" \
+        settled-by="golden diagnostic output"
+    claim "C3" text="a slice that names a capability which does not exist is refused" \
+        settled-by="a negative test with a dangling realizes"
+
+    depends-on "the capability record format, frozen"
+
+    useful-alone "verticality stops being a word the author applies to their own work. \
+        That is S4 answered, with nothing else in this frame delivered"
+    useful-to "the-team-building-a-digital-product"
+
+    amended-by "produces its refusal" raised-by="ITER.260820.01/P5" \
+        change="produces SliceCutRefused as well as SliceCut" \
+        why="the sealed `docs` layer requires a refused slice and its reason to be readable off the \
+            record, and no refusal event existed. Recorded as an amendment rather than an edit \
+            because scope seals at open (ES.260819.01/E29)"
+
+    attacks "S4"
+}

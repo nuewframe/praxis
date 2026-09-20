@@ -31,7 +31,7 @@ fi
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 AST_PARSER="$SCRIPT_DIR/ast_parse.sh"
 
-# ---- Handle --generate mode (TS-032) ----------------------------------------
+# ---- Handle --generate mode (TS.260811.32) ----------------------------------
 if [[ $GENERATE_MODE -eq 1 ]]; then
   if ! command -v python3 >/dev/null 2>&1; then
     echo "check-seam-contract-parity: python3 required for --generate mode" >&2

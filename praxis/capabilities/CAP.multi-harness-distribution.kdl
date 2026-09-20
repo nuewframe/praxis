@@ -1,0 +1,47 @@
+// Ported from surface.retired.cap-multi-harness-md by TS.260821.06.
+//
+// The Markdown record was correct as far as anyone could tell, and nobody could tell: it
+// traced to no storm, declared no gate tests, and named nothing it keeps consistent. This
+// port applies name-a-capability to the product's own capabilities, which is the first time
+// the method has been pointed at the thing that ships it.
+
+capability "multi-harness-distribution" {
+    doing "deliver one skills/agents/instructions tree to six harnesses from a single source, and inject the router at session start in each"
+    not "it does not decide WHAT the doctrine says. It owns how doctrine reaches an agent, never what the agent is told"
+    state "sought"
+    facet "product"
+
+    derived-from "ES.260819.01"
+    from-cluster "projection"
+
+    owns-event "RouterInjected" "ManifestPublished" "OverlayProvisioned"
+    owns-read-model "none" \
+        note="a harness manifest is not a view an actor reads before acting. Applying the \
+            ownership rule evenly leaves this capability with the mechanism, exactly as it \
+            leaves document-projection"
+
+    attacks "S1"
+
+    property "single source" \
+        because="six manifests rendered from one tree cannot disagree; six maintained by hand will"
+    property "session-start injection" \
+        because="a router nobody loads is doctrine nobody follows, and every harness forgets between sessions"
+
+    gate-test "names-a-doing" verdict="pass" \
+        because="getting one tree into six harnesses and loaded at session start is a doing"
+    gate-test "fundable-on-own-terms" verdict="pass" \
+        because="an adopter on Cursor gets nothing from any other capability if this one does not work"
+    gate-test "slices-deliver-independently" verdict="pass" \
+        because="add a harness / change what injects / provision an overlay are three separate outcomes"
+    gate-test "states-an-exclusion" verdict="pass" \
+        because="it never decides what the doctrine says. Without that exclusion it would own every skill in the tree"
+
+    keeps-consistent "every harness manifest against the single source tree they are rendered from" \
+        "the injected router against the file on disk"
+
+    trail {
+        entry at="2026-08-22T00:00:00Z" by="agent:principal-engineer" action="created" \
+            note="ported from Markdown. The gate tests and keeps-consistent are NEW — the \
+                Markdown record declared neither, so its boundary had never been argued"
+    }
+}

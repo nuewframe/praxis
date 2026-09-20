@@ -1,0 +1,113 @@
+// Three traps, all the same fault: the schema declares a field, and the ENGINE decides what
+// shape that field takes. An author reading the schema cannot tell which, and the refusal
+// does not say.
+//
+//   1. property or child node
+//        read-model "x" { publishable #false }   → refused: "does not say whether it survives
+//                                                   being frozen" — while it says so on screen
+//        read-model "x" publishable=#false       → accepted
+//      Both are valid KDL. `view.get("publishable")` reads a property only.
+//
+//   2. cardinality counts NODES, values live in ARGUMENTS
+//        owns-event "PaymentAuthorised"
+//        owns-event "PaymentDeclined"            → "appears 2 times; the schema requires
+//                                                   exactly one"
+//        owns-event "PaymentAuthorised" "PaymentDeclined"  → accepted
+//      Meanwhile `name-a-capability` teaches that a capability owns a CLUSTER of events. The
+//      doctrine says many, the schema says each="1", and the refusal explains neither.
+//
+//   3. `requires "every entity carries a trail"` contradicts the schema outright. `capability`,
+//      `event-storm` and `persona` declare no `trail` field, so writing one is refused as
+//      undeclared — while the gate declares it required of every entity.
+//
+// The validation review hit all three inside twenty minutes, in a repository built by
+// following the skills. An adopter reads a declared field, writes valid KDL, and is told the
+// field is missing. That is S1 — agents improvise structure — caused by the thing that exists
+// to stop them improvising.
+
+thin-slice "TS.260823.04" {
+    slug "a-field-declares-its-own-form"
+    title "Make the schema say what shape a field takes, instead of the engine knowing"
+    kind "command"
+    realizes "CAP.delivery-record"
+    from-storm "ES.260819.01"
+
+    command "check"
+    actor "somebody writing a record by reading the schema"
+    produces-event "FormDeclared" "FormMismatched"
+    needs-read-model "what-is-currently-true"
+
+    trigger "an author writes a declared field in valid KDL and is told the field is missing"
+    outcome "every field declares the form it takes, the checker reads that form, and a mismatch says which form was expected"
+
+    scenario #"""
+        Given a schema that declares a field
+        When an author writes that field in the other valid KDL form
+        Then either it is accepted, or the refusal names the form the schema declared and the
+             form that was written — because a refusal that says a field is absent when it is
+             visible on the line above teaches the author that the checker is unreliable, and
+             an author who distrusts the checker starts working around it.
+        """#
+
+    step "1" does="a field declares its form — `as=\"property\"`, `as=\"node\"`, or either. The engine reads the declaration instead of holding the answer per field"
+    step "2" does="cardinality says what it counts. `each=` over nodes and `values=` over arguments are different questions, and one word answering both is why `owns-event` reads as a contradiction"
+    step "3" does="a form mismatch refuses by naming both forms. `missing` is the wrong word for a field that is present in the other shape, and it is the word that sends an author looking in the wrong place"
+    step "4" does="`trail` is declared on every kind that the gate requires it of, or the gate stops requiring it of every kind. The two have contradicted each other since the gate was written and nothing could see it"
+    step "5" does="the identity prefix — `CAP.`, `TS.`, `ITER.` — is declared rather than trimmed by string match in four engine call sites"
+
+    excludes "changing which fields exist, or their cardinalities. The vocabulary is not the \
+        subject; how an author can tell what shape to write it in is"
+    excludes "accepting both forms everywhere. Permissiveness would remove the refusal without \
+        removing the ambiguity, and the record would then hold two shapes for one fact — which \
+        is the second-copy problem at field level"
+    excludes "the composed-document OWNERS, which are TS.260823.03's. This slice took the \
+        identity prefix back from that one — an id format is a form question and belongs with \
+        the other two — and the dependency between them went with it. The dependency was never \
+        a coupling: it was two slices claiming one outcome, and the gate refused the pair rather \
+        than admitting a cut that would have settled the same claim twice"
+    excludes "the diagnostic span bug and the duplicated report, which are defects rather than \
+        design and are carried as findings against this iteration rather than as claims"
+
+    layer "doctrine"    reaches="`declare-an-entity-kind` says a field declares its form, and shows the two forms and how to choose"
+    layer "enforcement" reaches="the checker reads the declared form; a mismatch names both forms; a kind requiring a trail declares one"
+    layer "docs"        reaches="`what shape does this field take` is answerable from `praxis schema` alone, with nothing to infer from the engine"
+
+    claim "C1" text="a field written in the form the schema declares is accepted, in both directions" \
+        settled-by="a test writing one field as a property and another as a node, each matching its declaration, asserting both check clean"
+    claim "C2" text="a field absent in both forms says `missing`, and a field present in either never does" \
+        settled-by="a test writing each field in the form the other declares, asserting neither is reported missing, and one omitted entirely, asserting it is" \
+        amended-by="ITER.260823.07/D1, which superseded the claim this slice was cut with" \
+        note="cut as `a form mismatch names the expected form and the written one`. That claim \
+            presupposed the design D1 rejected: with both forms read there IS no mismatch, so it \
+            could not be met as written and ITER.260823.07 carried it by F1 rather than \
+            reinterpreting it. What survives is the half the fix actually guarantees — `missing` \
+            is said when and only when the field is absent — and it is testable, which the \
+            original half no longer is"
+    claim "C3" text="cardinality over nodes and over values are separately declared and separately reported" \
+        settled-by="a test declaring a multi-valued field, writing it as repeated nodes, and asserting the refusal explains which of the two was exceeded"
+    claim "C4" text="every kind the gate requires a trail of declares a trail field" \
+        settled-by="a test over the method asserting no kind is required to carry a field its own shape does not declare"
+    claim "C5" text="an identity prefix is resolved from the record rather than trimmed by the engine" \
+        settled-by="a test resolving references in a corpus whose prefixes differ from this repository's"
+
+
+    useful-alone "an adopter stops being refused for writing what the schema told them to write. \
+        Today the fastest route past these three traps is to copy an existing record and mutate \
+        it, which is transcription — the one move `adopt-the-method` spends its longest section \
+        arguing against"
+
+    attacks "S1"
+
+    useful-to "the-adopter"
+
+    cut-from "the validation review of 2026-08-22, which hit all three traps while building a \
+        first record by following the skills rather than by copying"
+
+    principle-note "a checker teaches. Every refusal is doctrine delivered at the moment it is \
+        needed, and a refusal that misdescribes the fault teaches the author to route around \
+        the checker — which produces exactly the improvised structure the frame is about"
+
+    proves "the form of every declared field is readable from the schema"
+    does-not-prove "that the vocabulary is small enough to learn, which is TS.260823.09's, or \
+        that the schema is right. It makes the schema self-describing about shape"
+}

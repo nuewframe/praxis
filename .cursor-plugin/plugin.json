@@ -1,17 +1,14 @@
 {
-  "name": "praxis",
-  "displayName": "Praxis",
-  "description": "Lean wave-based product delivery unified with Principal Engineer discipline. Three-mode engineer persona, mechanical Design Approval, capability-driven architecture, anti-dumping, ADRs, Pyramid Test Strategy, defensive patterns, TDD verification.",
-  "version": "0.7.1",
+  "agents": "./agents/",
   "author": {
     "name": "Nuewframe"
   },
+  "description": "make execution fidelity a property computed from the record, rather than a claim made by whoever produced the artifact",
+  "displayName": "Praxis",
   "homepage": "https://github.com/nuewframe/praxis",
-  "repository": "https://github.com/nuewframe/praxis",
-  "license": "MIT",
+  "hooks": "./hooks/hooks-cursor.json",
   "keywords": [
     "product-management",
-    "wave-methodology",
     "thin-slices",
     "lean-delivery",
     "hypothesis-driven",
@@ -25,7 +22,9 @@
     "port-adapter-parity",
     "workflow"
   ],
+  "license": "MIT",
+  "name": "praxis",
+  "repository": "https://github.com/nuewframe/praxis",
   "skills": "./skills/",
-  "agents": "./agents/",
-  "hooks": "./hooks/hooks-cursor.json"
+  "version": "0.8.0"
 }

@@ -1,0 +1,285 @@
+// The TECHNICAL decision for this frame — how the record is encoded, what executes against
+// it, and what a human types. It sits beside discovery because a decision belongs to the
+// problem that forced it: discovery says what the system must DO, and this says what it is
+// BUILT FROM.
+//
+// It carries no method content. What a frame is, what a slice is, which phases exist, which
+// invariants hold — all of that is the frame, the storm, the capabilities and the notional
+// architecture. A decision that legislates the method is a second writer for facts the
+// record already owns, which is how ADR.260819.02 grew a schema and thirteen amendments in
+// one day before being withdrawn.
+
+adr "ADR.260819.01" {
+    slug "kdl-state-and-the-rust-engine"
+    title "KDL state, a compiled Rust engine, and the CLI surface"
+    state "accepted"
+    decided-at "2026-08-19"
+    matured-at "2026-08-20"
+    deciders "human:waelrabadi" "agent:principal-engineer" "agent:product-designer" "agent:product-manager"
+    raised-by frame="FRAME.260819.01"
+
+    approval "acceptance" {
+        status "signed"
+        signer "human:waelrabadi"
+        at "2026-08-19T00:00:00-05:00"
+        note "transcribed from the sealed Markdown record, which carries Status: Accepted and \
+            names its deciders. Not a signature given at port time"
+    }
+
+    body {
+        section "problem" #"""
+            Praxis holds its own operational state in semi-structured Markdown — frontmatter,
+            tables, checklist markers — and five failure modes follow from using a narrative
+            format as a state machine:
+
+            1. Fragile in-place regex mutation. Agents mutate tables and frontmatter by
+               search-and-replace, which corrupts syntax, jitters whitespace and drops content.
+            2. Multi-document state drift. Status duplicated across the dashboard, the sprint,
+               its ledger and the initiative drifts silently, because nothing mechanically
+               synchronises them.
+            3. Silent scope-dropping at close. Deleting an unmet criterion makes a close
+               succeed, and no tool objects.
+            4. A shell portability and performance ceiling. Roughly fifteen check scripts
+               calling jq, sed, grep and inline python spawn hundreds of subshells, differ
+               between BSD and GNU userlands, and cannot express invariants like DAG cycle
+               detection or bidirectional rollups.
+            5. Domain mismatch in quality probes. The standard verify path assumes a web
+               service — HTTP observability, externalised config, stateless request paths —
+               and produces irrelevant warnings on compilers, CLIs and libraries.
+
+            This is the substrate half of FRAME.260819.01's ceiling. The frame's own words:
+            the obstacle is the substrate, not the doctrine.
+            """#
+
+        section "evidence" #"""
+            The Standoff (SSF compiler) repository was audited as a working precedent for
+            mechanical state: a slice ledger with a closed vocabulary of failure shapes, and a
+            gap register enforced bidirectionally — the close fails if a gap is mentioned in
+            prose without an id, or if a resolved gap is still open. Load-bearing pointers
+            eliminated silent scope-dropping outright rather than making it easier to detect.
+
+            On the runtime: a single compiled binary loads a hundred state files, validates
+            schemas, checks DAG dependencies and evaluates ratchets in memory in single-digit
+            milliseconds, with no host dependency on python, jq or a particular bash.
+            """#
+
+        section "decision" #"""
+            A KDL-first state architecture, executed by a compiled Rust CLI, with every
+            published document a whole-document projection of that state.
+
+            1. State is KDL. All transactional state is held as KDL nodes. Markdown is never a
+               mutable state store, and — per this decision's own maturation — never a source
+               inside the state root at all.
+            2. Whole-document synthesis, zero regex. Rendering compiles fresh whole documents
+               from state. Tooling never search-and-replaces over an existing document. This is
+               where the regex ceiling actually dies: a spliced document can be corrupted, a
+               regenerated one cannot.
+            3. Functional core, imperative shell. A pure core holds domain types, codecs,
+               invariant validators and templates; a shell holds subcommands, process execution
+               and diagnostics. The core is where invariants are decidable; the shell is where
+               the world is untidy.
+            4. Domain profiles. The repository declares its profile and the check path
+               activates only the guardrails that apply, which is what stops service probes
+               producing false positives on a compiler or a library.
+            """#
+
+        section "layout-and-concurrency" #"""
+            Absorbed from the withdrawn ADR.260819.02, where it was the one section that was a
+            technical decision rather than method. The state root is a git-backed filesystem
+            mutated by many agents at once, so the layout is a concurrency design, not a
+            taxonomy. Five rules produce the property:
+
+            1. One file per independently-mutated entity — never a registry file. A single
+               registry serialises every agent that touches it.
+            2. References are stored on the side the acting agent already owns, so an agent
+               writes only in its own subtree.
+            3. Nothing derived is stored. A rollup file is a file every agent must write, which
+               is the worst contention shape available. Single-writer ownership and lock-free
+               concurrency turn out to be the same design.
+            4. Ids are allocable without coordination.
+            5. Immutable entities are write-once: frozen contracts, accepted decisions and
+               released releases have zero contention by construction.
+
+            One safety rule is absolute: never rely on git's textual merge for state files. A
+            three-way merge of two KDL edits can produce a syntactically valid document with a
+            semantically wrong graph, which is worse than a conflict because nothing announces
+            it. Files are single-writer or add-only with distinct names; where neither holds, a
+            conflict is raised and resolved by re-running the mutation, never by merging hunks.
+
+            Where two agents would collide on one file, the collision is left in place on
+            purpose: under the disjointness rule that work was never legitimately parallel, so
+            the layout makes a disjointness violation surface as a merge conflict. The conflict
+            is the signal, not a defect to engineer away.
+            """#
+
+        section "the-stack" #"""
+            Matured 2026-08-20, from named-in-passing to decided.
+
+            Language and edition: Rust, 2024 edition, on rustc 1.97.1 pinned exactly in
+            the pinned toolchain so every agent and every CI run compile with the same compiler — an unpinned toolchain reintroduces the BSD-versus-GNU class of
+            defect this decision exists to remove, one layer up.
+
+            Crate topology: praxis-core (pure) and praxis-cli (shell), one workspace.
+
+            CLI: clap 4, derive API. The derive form keeps the command surface a type rather
+            than a builder script, so the shell's argument model is checked by the same
+            compiler as the core's domain model.
+
+            Diagnostics: miette. A checker whose output cannot point at the offending line and
+            span is a checker people route around, and this one exists to be believed.
+
+            Encoding: KDL v2 specifically, not KDL generally. The committed tree already uses v2
+            syntax — #true/#false keywords and the multi-line string dedent rule — so a v1-only
+            parser cannot read what exists today.
+
+            Parser: kdl-rs, the reference Rust implementation, used as a DOCUMENT MODEL rather
+            than through a derive macro. Minimum version confirmed at the first commit that
+            depends on it, by the same rule as the toolchain pin.
+
+            The document-model form is not a preference, it is forced. Praxis reads its schema
+            from the record — NA.260820.01 declares the entity kinds, their states and their
+            relationships — so the engine must validate against a schema loaded at runtime. A
+            derive-based deserializer encodes the schema in Rust types, which makes extending a
+            vocabulary a recompile instead of an amendment, and puts the engine in the position
+            of enforcing rules no record declares. That is the one thing this method forbids of
+            its own checker.
+            """#
+
+        section "alternatives" #"""
+            Kept because a solution held without its siblings was inherited rather than chosen.
+
+            JSON / JSONC — strictest parsing and the most reliable to generate, with no
+            ergonomic multi-line prose. Rejected: the record carries paragraphs, and escaping
+            them into string literals makes the source unreadable in review, which the
+            trust-transfer thesis cannot afford.
+
+            YAML — good block scalars, weak type system, frequent indentation drift under
+            generation. Rejected: a state machine whose parse depends on whitespace an agent
+            emits is the current failure mode in a new syntax.
+
+            CUE — strict, with a genuine constraint lattice. Rejected: high generation error
+            rate on its advanced types, and the constraint power lands in the wrong place —
+            invariants belong in the engine where they can carry a diagnostic.
+
+            Embedded relational store — strongest query story. Rejected: unreviewable in a pull
+            request, and the method depends on a human reading reasoning in review.
+
+            KDL — node-and-attribute AST, no indentation traps, raw multi-line strings that
+            carry prose without escaping, slashdash node commenting. Selected.
+
+            Shell scripts retained — rejected on the portability and expressiveness ceiling
+            recorded in `problem`, which is the frame's baseline, not a preference.
+
+            On the parser, four ways were available.
+
+            knuffel — the derive-based KDL deserializer named in the original record. Rejected
+            twice over: it targets KDL v1, which cannot read this tree, and it is derive-based,
+            which is the disqualifying half. A v2-capable successor would still be wrong.
+
+            A maintained derive-based successor — rejected on the derive argument alone. The
+            schema lives in the record, not in the type system, and a struct definition is a
+            second writer for facts NA.260820.01 owns.
+
+            serde with a generic value model — rejected: serde's data model carries no spans, and
+            TS.260820.01 C2 requires a refusal to name the missing FIELD. A diagnostic that can
+            only say the document is invalid fails the claim.
+
+            A hand-rolled parser — rejected. It is small enough to write; the spike proved a
+            usable subset in a few hundred lines. But it makes this project the owner of KDL v2
+            grammar conformance forever, and the subtleties already load-bearing in this tree —
+            multi-line string dedent, raw strings, slashdash — are exactly where a hand-rolled
+            parser drifts from the spec silently.
+            """#
+    }
+
+    // ================================================================
+    // WHAT THIS DECISION ENFORCES — the encoding and layout half of the schema.
+    //
+    // Sorted here from the withdrawn ADR.260819.02. Everything about what an entity IS and
+    // what may relate to what went to NA.260820.01, where the model lives. What is left is
+    // decided by THIS decision and dies with it: change the encoding or the layout and every
+    // rule below is renegotiated, while nothing in the notional architecture moves.
+    // ================================================================
+
+    enforces {
+        identity-format "<KIND>.<YYMMDD>.<NN>" \
+            exempt="CAP.<name> — a capability is permanent and identified by what it DOES, so a \
+                date would imply a later-dated capability supersedes it" \
+            exempt="RELEASE.<semver> — semver IS the name, and a date beside it is a second ordering" \
+            exempt="config — a binding, not a record" \
+            derived-from="ES.260819.01/E12"
+
+        rule "node-id-is-the-filename-prefix" refuses="a record file whose name does not begin with its node id" \
+            note="a record file is named for its node id, then its slug. The slug is what makes a \
+                directory listing readable without opening every file"
+        rule "markdown-in-the-state-root" refuses="a Markdown source under the state root" \
+            because="every Markdown file in this repository is generated. A state root holding two \
+                kinds of source blurs the one distinction this decision exists to make" \
+            violated-by="the two walk records, which are Markdown. See `open`"
+        rule "locator-not-repo-root-relative" refuses="a locator resolved from the file's own directory" \
+            because="a file-relative locator breaks the moment the tree moves, and graphs are meant to merge across repositories"
+        rule "placeholder-file" refuses=".gitkeep and friends" because="directories materialize on demand"
+        rule "empty-directory" refuses="a directory holding nothing"
+        rule "comment-states-a-path" reports="a comment naming a file path" \
+            because="a comment may explain a shape; it may not state a fact the graph owns"
+        rule "config-declares-normative-content" refuses="a declaration in config" \
+            because="config binds. A declaration there is a second writer for a fact the record owns"
+        rule "checker-enforces-undeclared-rule" refuses="an engine rule no record declares" \
+            because="a checker that enforces what nothing declares is legislating"
+
+        placement "an entity nests under its owner when it has exactly one owner for all time and that owner is a container"
+        placement "a container folder is named for what its contents ARE to the owner — discovery, adr — never for the plural of one kind" \
+            because="discovery produces storms, slices and an architecture together and they are read together"
+        placement "a decision sits beside discovery under the frame that raised it" \
+            was="a decision sits at the state root, never under a frame" \
+            because="that rule assumed a transient container. A frame is PERMANENT — it has no \
+                terminal state — so the argument against burying a durable decision in it does not apply"
+        placement "a container directory is named by its id alone; the record file inside carries the full name"
+        placement "an iteration sits under the frame in iterations/, one file per iteration" \
+            because="one file per independently-mutated entity, with distinct names — two agents \
+                opening two iterations create two files and never contend"
+    }
+
+    amendment "A1" raised-by="FRAME.260819.01" {
+        change "ADR.260819.02 is withdrawn, and its supersession of this decision with it. This decision is accepted in full, not in part"
+        change "its layout and concurrency rules are absorbed here, as the only part of it that was a technical decision"
+        why "its subject matter — what a frame is, what a slice is, which phases exist, which invariants hold — belongs to the frame, the storm, the capabilities and the notional architecture, all of which now carry it directly. What remained was a schema, and a schema that needs thirteen amendments in a day is not a decision"
+        note "this also dissolves the partial-supersession problem: with .02 gone there is nothing to be partially superseded by, and the adr state vocabulary no longer has to express it"
+    }
+
+    amendment "A2" raised-by="FRAME.260819.01" {
+        change "no Markdown is a source inside the state root. Prose that the record owns is KDL; every Markdown file in the repository is generated"
+        why "carried forward from the withdrawn decision, where it amended a commitment that put prose in Markdown fragments. The distinction between source and projection is the one this decision exists to make unmistakable, and a state root holding two kinds of source blurs it"
+        note "currently violated by the two walk records, which are Markdown — see `open`"
+    }
+
+    amendment "A3" raised-by="FRAME.260819.01" {
+        change "the stack is decided rather than named in passing: Rust 2024 edition on a pinned stable toolchain, clap 4 derive, miette diagnostics, KDL v2"
+        why "every one of these was a passing mention in the original record, and the spike has since depended on KDL v2 specifics. A dependency the decision does not state is a dependency nobody can review"
+    }
+
+    amendment "A4" raised-by="ITER.260820.01" {
+        change "knuffel is rejected. The parser is kdl-rs, used as a document model"
+        change "the engine may not encode the schema in its own types. It validates against the schema the record declares, loaded at runtime"
+        why "knuffel targets KDL v1 and cannot read this tree — but the disqualifying reason is that it is derive-based. Praxis reads its entity kinds, states and relationships from NA.260820.01, so a schema baked into Rust structs would make extending a vocabulary a recompile, and would put the engine in the position of enforcing rules no record declares"
+        note "raised by the first iteration, at the moment the decision blocked it, rather than filed beside the work"
+    }
+
+    amendment "A5" raised-by="ITER.260820.01" {
+        change "the toolchain pin is exact: rustc 1.97.1, in the pinned toolchain"
+        change "the channel is never `stable`. A floating channel means two agents compile with two compilers"
+        why "the version was held open rather than guessed. Read off the toolchain on 2026-08-21 — rustc 1.97.1 (8bab26f4f 2026-07-14) — which is what `written by whoever runs the toolchain` asked for. It clears the 1.85 floor the 2024 edition needs"
+        note "rustup installs from the pinned toolchain, so pinning exact costs a contributor nothing and buys one compiler for everyone"
+    }
+
+    trail {
+        entry at="2026-08-19T00:00:00-05:00" by="human:waelrabadi" action="created"
+        entry at="2026-08-20T00:00:00-05:00" by="agent:principal-engineer" action="ported-to-graph" \
+            note="ported from the sealed Markdown record"
+        entry at="2026-08-20T00:00:00-05:00" by="agent:principal-engineer" action="amended" \
+            note="moved beside discovery under the frame that raised it; absorbed the technical \
+                residue of the withdrawn ADR.260819.02; matured the stack from mentions to \
+                decisions; recovered the rejected alternatives, which no record in the tree \
+                carried"
+    }
+}

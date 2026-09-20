@@ -1,0 +1,85 @@
+// The record holds five capabilities and the product has three, and they are disjoint sets.
+//
+// work-admission · claim-settlement · release-binding · delivery-record · document-projection
+// are the ENGINE's internals. multi-harness-distribution · method-spine-and-execution ·
+// plugin-conformance-and-validation-probes are what somebody installs. The first set is in
+// KDL and published; the second is in Markdown and published by nobody.
+//
+// So the 0.8.0 published capabilities hands a reader the guts of the tool that produced
+// the document instead of the product the document is about.
+
+thin-slice "TS.260821.06" {
+    slug "hold-the-products-own-capabilities"
+    title "Publish a capability set that describes what the reader installed"
+    kind "view"
+    realizes "CAP.document-projection"
+    from-storm "ES.260819.01"
+
+    read-model "capabilities-and-what-they-own"
+    actor "a reader of a release, who installed the product and did not build it"
+    needs-read-model "what-is-currently-true"
+
+    trigger "a reader opens the published capability set for a version and finds the engine's internals"
+    outcome "the capability set published for a version names the product's capabilities, derived from records the checker reads"
+
+    scenario #"""
+        Given three capability records kept as hand-written Markdown outside the record, and five
+             kept as KDL inside it, describing disjoint things
+        When the set is published for a version
+        Then it names what the product can do at that version, each capability tracing to the
+             cluster it was derived FROM and the releases that shipped it — because a capability
+             record nobody can check is the second copy this frame exists to attack, and the fact
+             that this one has been correct so far is not something anyone can demonstrate.
+        """#
+
+    step "1" does="port the three Markdown capability records to the record, keeping their names"
+    step "2" does="each declares its cluster, its owned events, its gate tests and its exclusion — name-a-capability applies to the product's own capabilities or it applies to nobody's"
+    step "3" does="what each has shipped is DERIVED from bound releases, never restated. promoted-truth-is-derived already refuses a hand-written one"
+    step "4" does="retire the Markdown capability records — a living record kept in two places has one that is wrong and no way to say which"
+    step "5" does="the five engine capabilities stay, and the published view distinguishes them: a reader is told which are the product and which are how it is built"
+
+    excludes "inventing capabilities. The three are the three the product already claims; this makes \
+        them checkable, and if one turns out to fail its own gate tests that is a finding, not a rewrite"
+    excludes "the ADRs and RFCs under docs/. Those are ARGUMENT — a human's reasoning at a date — \
+        and generating an argument from state would be inventing one"
+    excludes "the Markdown dashboard. The dashboard is a WORKING projection, composed on demand and never \
+        committed (TS.260820.13). That it is committed today is a separate contradiction"
+
+    layer "doctrine"    reaches="name-a-capability is what the product's own capabilities are held to, the same as any adopter's"
+    layer "enforcement" reaches="the three are subject to every capability rule — gate tests, cluster trace, derived promotion"
+    layer "docs"        reaches="the archival projection's capabilities describes the product at that version"
+
+    claim "C1" text="the three product capabilities are records the checker reads, each passing the four gate tests" \
+        settled-by="praxis check over the ported records, with the refusals it raised on the first run recorded in the iteration"
+    claim "C2" text="what a capability has shipped is derived from bound releases and refused if hand-written" \
+        settled-by="promoted-truth-is-derived, already implemented, exercised against a ported record"
+    claim "C3" text="the published capability set separates what the product does from how it is built" \
+        settled-by="a test asserting the view carries both sets and labels them, and that a reader asking `what can 0.8.0 do` is not answered with the engine's internals"
+    claim "C4" text="the Markdown capability records are retired, so no capability is stated in two places" \
+        settled-by="the absence of the files, plus a test that a capability named in the record and in a Markdown file under docs/ is reported"
+
+    depends-on "TS.260821.03 — the retirement shape (state · retired-at · stands-at) is declared on the schema there"
+
+    note "the retirement shape came from TS.260821.03's schema amendment, not from TS.260821.04's \
+        use of it. Naming 04 here would have been the same preference-as-dependency mistake that \
+        deadlocked TS.260821.05"
+
+    useful-alone "`what can this version of Praxis do` becomes answerable from the record. Today the \
+        answer is in three Markdown files nothing checks, and the published set answers a different \
+        question confidently"
+    useful-to "the-reader-of-a-release"
+
+    attacks "S7"
+
+    cut-from "the ask to regenerate docs/<version> from state rather than by regex" \
+        note="the request was about GENERATION. The blocker turned out to be upstream of it: the \
+            generator works, and it has been generating the wrong subject"
+
+    principle-note "this frame moved the engine's own state into a checked record eighteen \
+        iterations ago and left the product's state in prose the whole time. The tool was pointed \
+        outward before it was pointed at the thing it ships"
+
+    proves "a reader of a published release is told what the product does, from records that were checked"
+    does-not-prove "that the three capabilities are the RIGHT decomposition. It makes them checkable, \
+        never correct — and the four gate tests are what will say"
+}

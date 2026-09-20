@@ -1,0 +1,43 @@
+// Who may attest what. Declared by TS.260821.08.
+//
+// A role is a POSITION, not a person. `human:wael` occupies one; so does
+// `agent:principal-engineer`. The record has never adjudicated who anybody is and does not
+// start here — it holds identities as strings from git and compares them for equality, which
+// is exactly as far as an engine should go.
+//
+// The field this kind exists for is `never-for-own`. Everything else about a role is
+// describable in prose, and this is not: it is the difference between a sentence in the
+// router saying the same engineer cannot self-approve, and a close that refuses.
+
+role "product-manager" {
+    is "frames the problem, cuts slices from a storm, and signs the admission that opens a commitment"
+    owns-phase "design-ux"
+    may-sign "admission"
+    never-for-own "design-ux"
+    note "the human half of a rule the engine already enforces: approval-signed-by-agent refuses \
+        a signature outside the human namespace, so an admission needs a person and this names \
+        which person it needs"
+}
+
+role "product-designer" {
+    is "owns what a read model must answer before an actor can act, and a slice's scenario and claims"
+    owns-phase "design-ux"
+    may-sign "design"
+    never-for-own "design-ux"
+    note "shares design-ux with the product-manager deliberately. A phase with one owner is a \
+        phase whose owner cannot be reviewed by anybody who understands it"
+}
+
+role "principal-engineer" {
+    is "architect, implementer and reviewer — three modes, never two at once"
+    owns-phase "design-system"
+    owns-phase "implement"
+    owns-phase "learn"
+    may-sign "design"
+    may-sign "close"
+    never-for-own "implement"
+    never-for-own "design-system"
+    note "the mode split is not a style preference. It exists so that `who checked this` has an \
+        answer that is not `the person who wrote it`, and until TS.260821.08 the split was \
+        honoured by whoever remembered to honour it"
+}

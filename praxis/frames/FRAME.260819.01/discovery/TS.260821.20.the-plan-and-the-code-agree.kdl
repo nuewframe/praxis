@@ -1,0 +1,80 @@
+// implement-follows-an-approach checks that implement NAMES an approach. It does not check
+// that the named one exists.
+//
+//     phase "implement" state="complete" followed="an approach nobody recorded"
+//
+// passes. So does a design-system that produced three approaches while implement followed
+// one — the other two are decisions the record says were taken, and were not.
+//
+// AZ2 asked whether the plan was written before the code, which is unverifiable and was also
+// the wrong question. The code IS the decision; the plan is the educated act before it, and
+// what it buys is that the alternatives were in view when the decision was taken. What that
+// requires is not chronology. It is that the plan and the thing built AGREE.
+
+thin-slice "TS.260821.20" {
+    slug "the-plan-and-the-code-agree"
+    title "Refuse an approach the record says was taken and was not"
+    kind "command"
+    realizes "CAP.claim-settlement"
+    from-storm "ES.260819.01"
+
+    command "check"
+    actor "whoever closes an iteration that planned something"
+    produces-event "ApproachHonoured" "ApproachAbandoned"
+    needs-read-model "what-this-iteration-claims-and-has-shown"
+
+    trigger "an iteration records a plan and builds something the plan does not describe"
+    outcome "every approach the record holds was either followed or is recorded as abandoned, and a `followed` naming nothing dangles"
+
+    scenario #"""
+        Given an iteration whose design-system produced approaches
+        When implement is complete
+        Then each approach was followed, or says why it was not — because an approach recorded
+             and not taken is a decision the record CLAIMS was made, which is worse than no plan
+             at all: no plan is silence, and this is an account of a choice nobody made.
+        """#
+
+    step "1" does="`followed` names an approach the same iteration produced. One naming nothing dangles, the way every other unresolved edge does"
+    step "2" does="every approach produced is followed, or carries `abandoned` saying what happened instead"
+    step "3" does="abandoning is normal and cheap. Building teaches things a plan cannot know, and a rule that made abandonment expensive would teach people to record only what they had already built"
+    step "4" does="an abandoned approach stays in the record. Deleting it loses the alternative that was considered, which is the whole reason the plan exists"
+
+    excludes "checking that the CODE matches the approach. No record can read an implementation \
+        and say whether it is the thing that was described — that is what the claims and their \
+        evidence are for, one layer down, and pretending otherwise would be the strongest \
+        overclaim in this frame"
+    excludes "requiring an approach per claim, or per file, or any finer granularity. The unit is \
+        the decision, and a decision that shaped four claims is one decision"
+
+    layer "doctrine"    reaches="abandoning a plan is a recorded act, and the skill says it is expected rather than a failure"
+    layer "enforcement" reaches="a `followed` naming no approach is refused; an approach neither followed nor abandoned is refused"
+    layer "docs"        reaches="`what did they plan, and what did they actually do` is answerable per iteration"
+
+    claim "C1" text="a `followed` naming an approach the iteration did not produce is refused" \
+        settled-by="a test naming an approach nothing recorded, asserting a refusal — the case that passes today"
+    claim "C2" text="an approach neither followed nor abandoned is refused" \
+        settled-by="a test with two approaches and one `followed`, asserting the unfollowed one is named — a decision the record claims was taken and was not"
+    claim "C3" text="an abandoned approach is recorded, not deleted, and says what happened instead" \
+        settled-by="a test asserting an `abandoned` with no reason is refused, and that an abandoned approach still satisfies the rule while staying in the record"
+
+    depends-on "TS.260821.19 — there are approaches to agree with"
+
+    useful-alone "a plan stops being able to describe work that was never done. Today an iteration \
+        can record three approaches, build against none of them, name a fourth that does not \
+        exist, and close clean"
+
+    attacks "S2"
+
+    useful-to "the-team-building-a-digital-product"
+
+    cut-from "ITER.260822.14/AZ2, superseded — the maintainer: the code is the decision, and the \
+        plan is the informed act before it"
+
+    principle-note "an artifact looks identical whether the agent reasoned hard or pattern-matched \
+        a template. A plan makes the reasoning legible, and an unfollowed plan makes it legible \
+        and false — which is worse, because the reader now has an account to trust"
+
+    proves "the plan the record holds is the plan that was built against"
+    does-not-prove "that the code is any good, or that the approach was right. It refuses a plan \
+        that describes work nobody did; whether the work was worth doing is what the claims settle"
+}

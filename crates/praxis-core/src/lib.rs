@@ -1,0 +1,58 @@
+//! `praxis-core` — the functional core.
+//!
+//! It parses KDL, loads the schema the record declares, and decides whether an entity
+//! conforms. It reads no files, prints nothing, and holds no opinion the record does
+//! not state: ADR.260819.01/A4 forbids the engine encoding what the record declares,
+//! so every rule applied here arrives as data from `NA.260820.01/schema`.
+
+pub mod admission;
+pub mod adopt;
+pub mod ask;
+pub mod binding;
+pub mod check;
+pub mod cut;
+pub mod evidence;
+pub mod close;
+pub mod pickup;
+pub mod dashboard;
+pub mod guide;
+pub mod invariant;
+pub mod manifest;
+pub mod promote;
+pub mod prove;
+pub mod publish;
+pub mod review;
+pub mod schema;
+pub mod surface;
+pub mod truth;
+pub mod verify;
+pub mod withdraw;
+pub mod view;
+
+pub use check::{
+    Known, Refusal, Severity, Violation, check_corpus, check_document, check_node, index_all,
+    refused,
+};
+pub use admission::{Assessment, Capability, Carried, Config, Decision, Release, Symptom, View, Condition, Conditions, Corpus, Settled, Verdict, assess, project};
+pub use binding::{Binding, Proposal, Rejected, bind, propose, unbind};
+pub use cut::{Blocked, Cut, cut, seal};
+pub use close::{Closing, Unaccounted, close_iteration};
+pub use pickup::{Ask, Continuation, Pickup, Record, pick_up};
+pub use dashboard::{Composed, Part, dashboard};
+pub use guide::{NoGuide, guide_for, guides};
+pub use prove::{
+    NO_WITNESS, Proof, WITNESS_REFUSED_NOTHING, WITNESS_UNPARSEABLE, prove, unwitnessed,
+};
+pub use promote::{Change, Promotion, Shipped, derive, promote, undeclared_promotions};
+pub use publish::{Document, Publication, compose as compose_view, publish};
+pub use schema::{Cardinality, EntitySpec, FieldSpec, Rule, Schema};
+pub use review::review;
+pub use truth::what_is_currently_true;
+pub use verify::{Drift, Published, Verified, verify};
+pub use view::{Cell, ReadModel, Section};
+
+/// Parse KDL source, returning the document or the parse error unchanged — the codec
+/// refuses syntax and nothing else.
+pub fn parse(source: &str) -> Result<kdl::KdlDocument, kdl::KdlError> {
+    source.parse()
+}

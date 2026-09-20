@@ -1,0 +1,84 @@
+// Cut from ITER.260822.05/AP3, an hour after the rule it fixes was declared working.
+//
+// TS.260821.08 built `an-attestation-is-not-self-issued` and it passed four tests. Then the
+// iteration that built it closed cleanly, and it should not have: every phase was worked by
+// agent:principal-engineer, and that role declares never-for-own "implement".
+//
+// It closed because `praxis close` records `by="agent:praxis"` — the TOOL — and a signer
+// taken from git. Neither is the agent that did the work, so the rule compared two identities
+// that can never be equal. Correct rule, no reachable path, shipped green.
+//
+// Underneath that is the thing this frame is actually about: the tool cannot distinguish a
+// human running it from an agent running it under that human's git identity, and every
+// signature in this record rests on that distinction.
+
+thin-slice "TS.260821.09" {
+    slug "an-attestation-the-tool-does-not-supply"
+    title "Refuse a close whose attester the tool supplied rather than a person"
+    kind "command"
+    realizes "CAP.claim-settlement"
+    from-storm "ES.260819.01"
+
+    command "close"
+    actor "whoever is accountable for the work being done"
+    produces-event "AttestationRecorded" "UnattestedCloseRefused"
+    needs-read-model "what-this-iteration-claims-and-has-shown"
+
+    trigger "an iteration closes and the only identity on the close is the one the tool wrote"
+    outcome "a close carries an attester that was named rather than defaulted, and one that names no distinct reviewer is refused"
+
+    scenario #"""
+        Given an iteration whose phases were all worked by one agent identity
+        When it is closed with no attester named
+        Then the close is REFUSED — because a default is not an attestation, and a signature the
+             tool supplied proves that the tool ran, which nobody doubted.
+        """#
+
+    step "1" does="`praxis close` requires the attester to be named, and never defaults it"
+    step "2" does="the attester is written into the record as its own fact, distinct from the trail's `by`"
+    step "3" does="refuse when no attester is distinct from every identity that worked a covered phase"
+    step "4" does="an-attestation-is-not-self-issued compares against the NAMED attester, which is what makes it reachable"
+    step "5" does="the trail keeps recording the tool as `by`, because what ran and who attested are different facts and conflating them is the bug"
+
+    excludes "making attestation unforgeable. An agent can type a human's name and this cannot \
+        stop it. What changes is that doing so is an ACT rather than a default, which is the whole \
+        difference between S3 and a gate — and pretending otherwise would be the root cause again"
+    excludes "identity verification, signing keys, or any notion of who a person really is. The \
+        record compares strings, and an engine that adjudicates identity has an opinion about employment"
+    excludes "requiring a human. An agent MAY attest another agent's work — the rule is about \
+        self-attestation, not about species"
+
+    layer "doctrine"    reaches="closing is something somebody does, and the skill says who"
+    layer "enforcement" reaches="a close with no named attester is refused, and an-attestation-is-not-self-issued becomes reachable"
+    layer "docs"        reaches="`who attested this` is a question the record answers with a name somebody chose to write"
+
+    claim "C1" text="a close with no named attester is refused" \
+        settled-by="a test closing with no attester, asserting a refusal, plus the CLI having no default for it"
+    claim "C2" text="an-attestation-is-not-self-issued fires on the named attester, so it has a reachable path" \
+        settled-by="an end-to-end test through the binary: work a phase as an identity, close as that identity, assert the refusal — not a core test, because AK1 and this finding are both defects the core could not see"
+    claim "C3" text="what RAN and who ATTESTED stay separate facts" \
+        settled-by="a test asserting the trail still records the tool as `by` while the attestation carries the named identity, and that they are not compared to each other"
+    claim "C4" text="ITER.260822.05 is re-attested or its close is marked unattested" \
+        settled-by="the record, either way — the iteration that shipped this defect does not get grandfathered past it"
+
+    depends-on "TS.260821.08 — the rule and the role vocabulary exist before the path to reach them"
+
+    useful-alone "the one gate this plugin describes as its strongest becomes reachable. It is \
+        currently a rule that passes its tests and cannot fire in production, which is worse than \
+        not having it: it reads as a guarantee"
+    useful-to "the-team-building-a-digital-product"
+
+    attacks "S2"
+
+    cut-from "ITER.260822.05/AP3"
+
+    principle-note "the rule was declared working because four tests passed and none of them ran \
+        the binary. That is AK1 exactly, and AK1 already obliged a binary smoke test which was \
+        written and which only checks that commands BUILD. A path that exists and cannot be \
+        reached is the specific thing this record keeps failing to see, and it has now happened \
+        three times"
+
+    proves "an attestation is something a person chose to write"
+    does-not-prove "that the person who wrote it did the review, or exists. It moves forgery from \
+        the default path to a deliberate act, and that is the whole of what a record can do"
+}

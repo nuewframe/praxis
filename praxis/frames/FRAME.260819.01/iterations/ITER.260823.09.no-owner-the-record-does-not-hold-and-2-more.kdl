@@ -1,0 +1,267 @@
+// Opened by `praxis pick-up`. Every condition below was evaluated against the
+// tree as it stood at 2026-08-23T06:20:18Z, and the verdicts are recorded
+// rather than summarised: a gate whose reasoning is not on the record is a gate
+// you have to trust.
+//
+// One commitment over 3 slices. They were vetted separately and admitted
+// together — a commitment that admits its easy half is not one thing.
+
+iteration "ITER.260823.09" {
+    slug "no-owner-the-record-does-not-hold-and-2-more"
+    on-slice "TS.260823.03"
+    on-slice "TS.260823.05"
+    on-slice "TS.260823.09"
+    state "closed"
+    opened-at "2026-08-23T06:20:18Z"
+    opened-by "agent:praxis"
+
+    approval "admission" {
+        status "asked"
+        asked-by "human:wael"
+        at "2026-08-23T06:20:18Z"
+        via "the ask to pick up these slices, as one commitment"
+    }
+
+    vet "create" state="done" at="2026-08-23T06:20:18Z" on-slice="TS.260823.03" {
+        condition "slice-is-shaped" verdict="passed"
+        condition "dependencies-delivered" verdict="passed"
+        condition "no-iteration-in-flight" verdict="passed"
+        condition "nothing-left-to-admit" verdict="passed"
+        condition "work-is-disjoint" verdict="not-computed" \
+            found="no seam manifest exists, so what two iterations would touch cannot be compared. Disjointness is half of what this capability says it judges, and half of what it judges is currently not computed at all"
+        condition "the-slice-is-the-best-available" verdict="left-to-the-maintainer"
+    }
+
+    vet "create" state="done" at="2026-08-23T06:20:18Z" on-slice="TS.260823.05" {
+        condition "slice-is-shaped" verdict="passed"
+        condition "dependencies-delivered" verdict="passed"
+        condition "no-iteration-in-flight" verdict="passed"
+        condition "nothing-left-to-admit" verdict="passed"
+        condition "work-is-disjoint" verdict="not-computed" \
+            found="no seam manifest exists, so what two iterations would touch cannot be compared. Disjointness is half of what this capability says it judges, and half of what it judges is currently not computed at all"
+        condition "the-slice-is-the-best-available" verdict="left-to-the-maintainer"
+    }
+
+    vet "create" state="done" at="2026-08-23T06:20:18Z" on-slice="TS.260823.09" {
+        condition "slice-is-shaped" verdict="passed"
+        condition "dependencies-delivered" verdict="passed"
+        condition "no-iteration-in-flight" verdict="passed"
+        condition "nothing-left-to-admit" verdict="passed"
+        condition "work-is-disjoint" verdict="not-computed" \
+            found="no seam manifest exists, so what two iterations would touch cannot be compared. Disjointness is half of what this capability says it judges, and half of what it judges is currently not computed at all"
+        condition "the-slice-is-the-best-available" verdict="left-to-the-maintainer"
+    }
+
+    // 2 of the declared conditions were not decided by the gate. They are
+    // recorded above rather than omitted: an admission that does not say what
+    // it left undecided claims more than it checked.
+
+    // Frozen at open, from the slices. Removing one from a slice now
+    // does not remove it from here — it makes the two disagree, and that is
+    // refused.
+    claim "C1" from-slice="TS.260823.03" state=met \
+        text="a composed part takes its owner from the read model's declared ownership" \
+        settled-by="a test composing a dashboard in a corpus whose capabilities are named differently, asserting the parts carry those names"{
+        ran "cargo test --quiet --test dashboard"
+        exited 0
+        digest "fnv1a64:f3e72e60c98c1416"
+        witnessed-at "2026-08-23T06:51:23Z"
+    }
+    claim "C2" from-slice="TS.260823.03" state=met \
+        text="a part naming an owner the record does not hold is refused" \
+        settled-by="a test declaring a view owned by a capability nobody declared, asserting a refusal that names both"{
+        ran "cargo test --quiet --test dashboard"
+        exited 0
+        digest "fnv1a64:62f2ce253dc198c9"
+        witnessed-at "2026-08-23T06:51:30Z"
+    }
+    claim "C3" from-slice="TS.260823.03" state=met \
+        text="no capability name appears as a literal in the engine" \
+        settled-by="a test over the engine's own source asserting no `CAP.`-prefixed literal remains"{
+        ran "cargo test --quiet --test dashboard"
+        exited 0
+        digest "fnv1a64:62f2ce253dc198c9"
+        witnessed-at "2026-08-23T06:51:37Z"
+    }
+    claim "C1" from-slice="TS.260823.05" state=met \
+        text="the shapes that count as shipped instruction are read from the record, not globbed by the engine" \
+        settled-by="a test declaring an additional shape and asserting the audit counts it without an engine change"{
+        ran "cargo test --quiet --test doctrine_surfaces"
+        exited 0
+        digest "fnv1a64:1ee3214b8e487823"
+        witnessed-at "2026-08-23T06:51:44Z"
+    }
+    claim "C2" from-slice="TS.260823.05" state=met \
+        text="a template under a skill is counted as a shipped surface" \
+        settled-by="a test over a skill carrying a template, asserting it appears in the audited set"{
+        ran "cargo test --quiet --test doctrine_surfaces"
+        exited 0
+        digest "fnv1a64:56ba8145a24da060"
+        witnessed-at "2026-08-23T06:51:52Z"
+    }
+    claim "C3" from-slice="TS.260823.05" state=met \
+        text="the reported total is the size of the audited set, and unanchored files are named individually" \
+        settled-by="a test asserting the count and the named list agree"{
+        ran "cargo test --quiet --test doctrine_surfaces"
+        exited 0
+        digest "fnv1a64:ef5e215d885f4551"
+        witnessed-at "2026-08-23T06:52:00Z"
+    }
+    claim "C1" from-slice="TS.260823.09" state=met \
+        text="the minimum declarable set is derived from the schema, not listed by hand" \
+        settled-by="a test adding a required kind to the method and asserting the view includes it with no other change"{
+        ran "cargo test --quiet --test where_to_begin"
+        exited 0
+        digest "fnv1a64:e0b413f4a3926cf8"
+        witnessed-at "2026-08-23T06:52:06Z"
+    }
+    claim "C2" from-slice="TS.260823.09" state=met \
+        text="a record holding only the minimum checks clean" \
+        settled-by="a test building a record from exactly what the view names and asserting `praxis check` passes"{
+        ran "cargo test --quiet --test where_to_begin"
+        exited 0
+        digest "fnv1a64:e0b413f4a3926cf8"
+        witnessed-at "2026-08-23T06:52:13Z"
+    }
+    claim "C3" from-slice="TS.260823.09" state=met \
+        text="every kind outside the minimum names the moment that calls for it" \
+        settled-by="a test asserting a kind with no declared trigger is reported"{
+        ran "cargo test --quiet --test where_to_begin"
+        exited 0
+        digest "fnv1a64:e0b413f4a3926cf8"
+        witnessed-at "2026-08-23T06:52:19Z"
+    }
+
+
+    // ---- DESIGN ----------------------------------------------------------------
+    // ACTIVE until implement completes — ITER.260823.06/F4.
+
+    phase "design-system" state="complete" worked-by="agent:principal-engineer" {
+        approach "a composed part asks the record who owns its view" {
+            over "passing the owner in from each caller"
+            over "deriving the owner from which module composed the part"
+            because "`dashboard()` holds three literals — `CAP.delivery-record`, \
+                `CAP.work-admission`, `CAP.release-binding` — and they are THIS repository's \
+                capability names, compiled into the tool every repository runs. A read model \
+                already declares who owns it; the composer reading that is the one answer that \
+                is not a second copy. Passing it in from callers moves the literal rather than \
+                removing it, and deriving it from the module makes the engine's file layout the \
+                authority on the record's ownership"
+        }
+
+        approach "which shapes count as shipped instruction is declared, and a template counts" {
+            over "widening the glob in the engine to include templates"
+            over "auditing only what an adopter's repository ends up with"
+            because "the glob IS the fault, not its width: A4 says the engine may not hold what \
+                the record declares, and `which shapes are instruction` is a fact about this \
+                plugin. Widening it in place fixes today's number and leaves the next shape to be \
+                discovered the same way. A template is instruction with placeholders, read by an \
+                agent in a repository that trusted us to send it — where it was read from is not \
+                the question"
+            note "the number gets much worse. 55 of 55 becomes 55 of roughly 108, and that is the \
+                audit starting to work rather than the plugin getting worse. The figure was green \
+                because of what it declined to look at"
+        }
+
+        approach "the minimum is computed from the schema, as its own view" {
+            over "adding it to `where-to-start`, which already exists"
+            over "writing it into `adopt-the-method` as prose"
+            because "`where-to-start` is `needed-by=\"the-reader-of-a-release\"`, is publishable, \
+                and IS the release README. This answers a different person — the adopter, before \
+                any release exists for them — and folding the two would put a working answer \
+                inside a frozen document. Prose in a skill is a second copy of the schema and \
+                drifts the first time a kind is added, which is the fault the whole record exists \
+                to attack"
+            note "so a new read model, `what-you-must-declare`, added to the storm and owned by \
+                delivery-record. Two slices declaring one view is the mis-cut the gate caught \
+                between TS.260823.03 and TS.260823.04 an hour ago, and this is the same shape \
+                found before it cost anything"
+        }
+
+        produced "three approaches, and a read model the storm did not hold"
+    }
+
+    phase "implement" state="complete" worked-by="agent:principal-engineer" \
+        produced="derived dashboard owners, a declared shipped-doctrine set, a computed \
+            minimum vocabulary, and thirteen tests" {
+        followed "a composed part asks the record who owns its view"
+        followed "which shapes count as shipped instruction is declared, and a template counts"
+        followed "the minimum is computed from the schema, as its own view"
+    }
+
+    layer "doctrine" state="evidenced" \
+        evidence="`adopt-the-method` now OPENS with the least a repository must declare and \
+            reaches `may never redefine` afterwards, which is the order the questions arrive in" \
+        reaches="the skill an adopter reads first, and the reason copying was the rational move"
+
+    layer "enforcement" state="evidenced" \
+        evidence="a composed part takes its owner from the record and a view nobody owns yields \
+            no part; the audited set is declared and a template counts; a kind outside the \
+            minimum with no stated trigger is reported" \
+        reaches="all three slices' rules"
+
+    layer "harness" state="evidenced" \
+        evidence="the audited set now covers what each of the six install paths actually \
+            delivers, templates included — the first time any of them was inside the count" \
+        reaches="what the overlay writes into somebody else's repository"
+
+    layer "docs" state="evidenced" \
+        evidence="`what is the least I must declare` answers with seven kinds and names when \
+            each of the other twenty arrives; `how much of what we ship can the record justify` \
+            answers 56 of 107 instead of 55 of 55" \
+        reaches="the two questions an adopter and a maintainer could not previously ask"
+
+    layer-set sealed=#true at="2026-08-23T06:10:00Z"
+
+    finding "F1" \
+        text="widening the audited set left the tree REFUSING. `every-shipped-surface-is-anchored` \
+            fails closed, correctly, and the fifty-one files it revealed are the overlay templates \
+            that TS.260823.08 retires — so this slice could not land green without doing that \
+            slice's work. The cut says 05 comes BEFORE 08; the truth is that a slice widening a \
+            measurement cannot land independently of the slice that resolves what it reveals. \
+            Resolved by declaring the debt — `owed-to` on the shape, printed on every run — which \
+            is a finding carried, not an exemption. The gate's `depends-on` cannot express `these \
+            two must land together`" \
+        owed-against="TS.260823.08"
+
+    finding "F2" \
+        text="in an adopter's repository the dashboard now composes NOTHING, because \
+            `what-is-currently-true` and `what-is-ready-to-pick-up` are views the METHOD provides \
+            and no adopter capability owns them. Honest — it names them and says what to declare — \
+            but it surfaces a modelling question this slice does not answer: who owns a view that \
+            the method supplies rather than the repository's own domain" \
+        owed-against="TS.260823.03"
+
+    finding "F3" \
+        text="an anonymous corpus violation was attributed to every document holding any record \
+            of its kind, so fifty-one unanchored files printed two hundred and four times. The \
+            comment on `belongs` had already called an anonymous corpus violation `a rule to \
+            reconsider`; naming the violation by its path fixed it. Other corpus rules that carry \
+            no entity id have the same shape and were not audited here" \
+        owed-against="TS.260823.05"
+    closed-at "2026-08-23T06:57:57Z"
+    outcome "continue"
+
+    close {
+        claims-settled "C1" how="met"
+        claims-settled "C2" how="met"
+        claims-settled "C3" how="met"
+        claims-settled "C1" how="met"
+        claims-settled "C2" how="met"
+        claims-settled "C3" how="met"
+        claims-settled "C1" how="met"
+        claims-settled "C2" how="met"
+        claims-settled "C3" how="met"
+        all-met #true
+        attested-by "human:wael"
+        note "the accounting above was computed at close, not asserted. It says every claim is either met or carried by a finding that names it, and nothing about whether the work is any good"
+    }
+
+
+    trail {
+        entry at="2026-08-23T06:57:57Z" by="agent:praxis" action="state-changed" from="open" to="closed" note="closed by `praxis close`. The accounting was computed; the conclusion is not the machine's to draw"
+
+        entry at="2026-08-23T06:20:18Z" by="agent:praxis" action="created" \
+            note="opened by the gate, on the ask of human:wael"
+    }
+}

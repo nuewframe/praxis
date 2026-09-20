@@ -56,3 +56,15 @@ temp/
 __pycache__/
 *.py[cod]
 *$py.class
+
+# Rust — build output only. Cargo.lock is deliberately NOT ignored: this workspace
+# ships a binary, and a committed lockfile is the dependency half of the same argument
+# ADR.260819.01 makes for pinning the toolchain exactly — two agents must not resolve
+# two different dependency graphs.
+/target/
+**/*.rs.bk
+*.pdb
+
+# Praxis delivery graph — generated trees only; the rest of praxis/ is the record
+praxis/.render/
+praxis/.cache/

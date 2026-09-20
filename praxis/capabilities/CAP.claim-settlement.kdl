@@ -1,0 +1,50 @@
+capability "claim-settlement" {
+    doing "settle every stated claim against evidence, or refuse to let the work close"
+    not "it does not judge whether the work should have been started, and it does not produce the evidence. It refuses to let a claim close without it"
+    state "sought"
+    facet "engine"
+
+    derived-from "ES.260819.01"
+    from-cluster "evidence-and-settlement"
+
+    owns-event "EvidenceAttached" "ClaimSettled" "FindingRaised" "FindingTriaged" "DecisionRecorded" \
+        "DecisionAccepted" "AcceptanceRefused"
+
+    owns-read-model "what-this-iteration-claims-and-has-shown" \
+        answers="what did it promise, what has it evidenced, and what is still open?" \
+        note="the review view. Working lifetime — composed on demand, discarded after, never entering the published tree"
+
+    owns-read-model "the-decisions-that-shaped-this" \
+        answers="what was decided, what were the alternatives, and what tested it?" \
+        publishable=#true note="it owns DecisionRecorded, so it owns what a decision document says"
+
+    enforces "no-silent-drop"
+    enforces "evidence-names-its-layer"
+
+    attacks "S2" "S3" "S5"
+
+    gate-test "names-a-doing" verdict="pass" \
+        because="settling a claim against an artifact is a doing, and it is the difference between a record of work and a report of work"
+    gate-test "fundable-on-own-terms" verdict="pass" \
+        because="refusing a close that drops scope is worth funding with no admission gate present at all"
+    gate-test "slices-deliver-independently" verdict="pass" \
+        because="attach evidence naming its layer / settle a claim / refuse a close with an unsettled claim / raise a finding / triage it"
+    gate-test "states-an-exclusion" verdict="pass" \
+        because="readiness is work-admission's business, and producing evidence is the worker's. This capability only refuses"
+
+    keeps-consistent "every stated claim against its evidence or its recorded shortfall" \
+        "a finding against the iteration that raised it" \
+        "a decision against the work that forced it"
+
+    principle-note "an unmet claim that closes in silence and a met claim look identical afterwards. \
+        The refusal is what makes them different"
+
+    usage "`praxis close <ITER> --outcome continue|pivot|stop` — every claim settled, or every shortfall carried by a finding that NAMES it, or the close is refused."
+    usage "`praxis review <ITER> [--markdown]` — preview what an iteration promised against what it has shown, at any moment, writing nothing. Layers the slice declared and nothing reached are listed, not omitted."
+
+
+
+    trail {
+        entry at="2026-08-20T00:00:00-05:00" by="agent:principal-engineer" action="created"
+    }
+}

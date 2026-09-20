@@ -1,0 +1,251 @@
+// The fourth iteration, and the first that is not a refusal. Every rule so far has been
+// something the record REFUSES. This one has to compute an ANSWER — which is a different
+// shape, crosses the read-model@v1 seam, and puts finding E10's falsifier under load for
+// the first time in code rather than on a walkthrough.
+
+iteration "ITER.260821.03" {
+    slug "see-what-is-ready"
+    on-slice "TS.260820.04"
+    state "closed"
+    opened-at "2026-08-21T04:10:00-05:00"
+    opened-by "agent:principal-engineer"
+    closed-at "2026-08-21T07:55:00-05:00"
+    outcome "continue" \
+        because="the record can now answer a question instead of only refusing an answer, and the \
+            first thing it said was that fifteen of nineteen slices are blocked and half of what \
+            work-admission claims to judge is computed by nothing. Neither was knowable before"
+
+    approval "admission" {
+        status "signed"
+        signer "human:waelrabadi"
+        at "2026-08-21T04:10:00-05:00"
+        signed-by "the ask to continue to the next slice"
+    }
+
+    vet "create" state="done" at="2026-08-21T04:10:00-05:00" {
+        condition "the slice exists and is shaped" verdict="passed" \
+            found="TS.260820.04 passes praxis check under all thirteen declared kinds"
+        condition "its dependency is satisfied" verdict="passed" \
+            found="depends-on TS.260820.01, delivered by ITER.260820.01. The same P2 caveat as \
+                every other slice — the dependency is on a slice rather than on a frozen seam — \
+                but this iteration is the one that has to READ these edges, so P2 stops being \
+                a note and becomes an input"
+        condition "no other iteration is open" verdict="passed" found="all three prior iterations are closed"
+        condition "the slice is the best available" verdict="passed" \
+            found="it is what TS.260820.05 — the one gate — depends on, and it is the first slice \
+                whose output is a RESULT rather than a refusal. Three iterations have built one \
+                shape of thing. A fourth in the same shape would tell us less than this one"
+
+        selected-over "TS.260820.03 what-is-currently-true" \
+            because="the same seam, one dependency deeper, and no gate downstream waiting on it. \
+                Both are views; only one is what the gate is built from"
+    }
+
+    vet "start" state="done" at="2026-08-21T04:10:00-05:00" {
+        condition "the tree is clean and current" verdict="passed" found="HEAD c16fc56, no uncommitted state changes"
+        condition "the slice's scope is unchanged" verdict="passed" \
+            found="read line by line against the rename audit. No corrupted verb sense — the word \
+                `pass` does not appear in this slice at all"
+        condition "C1 can be settled by this iteration" verdict="admitted-on-condition" \
+            found="C1 asks for a property test that every slice the VIEW calls ready is admitted by \
+                the GATE. The gate is TS.260820.05, which depends on this slice. The claim as cut \
+                cannot be fully settled here without building the thing that depends on it" \
+            resolved-by="admitted, with the residue named rather than papered over. This iteration \
+                settles the half that is settleable — one implementation of the conditions, the view \
+                a pure projection of it — and records the other half as owed against TS.260820.05. \
+                Recorded as S1"
+        condition "what this will compute is unknown before it runs" verdict="known-and-recorded" \
+            found="unlike the three preceding iterations, this one cannot predict its own output. \
+                A checker's job is to refuse nothing on a clean tree; a view's job is to say \
+                something nobody has computed. Whatever it prints on first run is a finding"
+    }
+
+    frozen {
+        pins "the entity-and-field schema" at="NA.260820.01/schema" at-commit="c16fc56"
+        pins "the read-model@v1 seam" at="NA.260820.01/seam" at-commit="c16fc56" \
+            note="its four constraints are the acceptance criteria for the result type, not advice"
+        pins "the engine's public surface" at="praxis-core 0.8.0" at-commit="c16fc56"
+        rule "a schema change while this iteration is open is a FINDING, not an edit" \
+            exception="declaring the admission conditions is the mechanism this slice depends on. \
+                A4 forbids the engine holding a rule the record does not state, and `which \
+                conditions the gate evaluates` is exactly such a rule — so it is declared, and the \
+                declaration is recorded here"
+    }
+
+    claim "C1" from-slice="TS.260820.04" state="met-in-part" \
+        text="the view and the gate evaluate identical conditions" \
+        settled-by="a test asserting the projection's ready set IS the assessment's ready set, so \
+            the view computes no condition of its own" \
+        evidence="the view shows exactly what the assessment admits — the \
+            ready section is derived from assess(), not recomputed beside it" \
+        residue="that the GATE also calls assess() cannot be shown until the gate exists. Owed \
+            against TS.260820.05, recorded as S1. Drift is prevented by construction — there is one \
+            evaluator and no second place to put a condition — but construction is not evidence"
+    claim "C2" from-slice="TS.260820.04" state="met" \
+        text="every excluded slice names its blocking condition" \
+        settled-by="a test asserting no exclusion has an empty reason" \
+        evidence="no exclusion has an empty reason — and it asserts the \
+            reason is SPECIFIC, naming the undelivered slice or the iteration in flight, because a \
+            reason that names only its own category tells the reader nothing they did not know"
+
+    decision "a delivered slice is not marked delivered" \
+        chose="leave TS.260820.04 with no `state`, and let the derivation from its iterations stand" \
+        over="writing `state \"delivered\"` on it, as the three slices before it carry" \
+        falsified-by="a reader who needs the stored state because deriving it is too slow, or a \
+            case where the derivation is genuinely ambiguous and the record has to say which \
+            reading it meant" \
+        because="delivery is now computed. A stored copy of a computed fact is the second copy whose \
+            fidelity is unverifiable-without-checking-the-first, which is what this frame is about. \
+            The drift check treats silence as deference and only a CONTRADICTION as drift, so the \
+            record stays consistent without duplicating anything" \
+        owed="the three slices that do carry it, and the schema field that allows it (S4)" seal=fnv1a64:f53af813d9c456c9
+
+    layer "doctrine"    state="evidenced" evidence="surface.skill.see-what-is-ready, registered in the router under PLAN" reaches="the skill tells an agent to ask this before choosing, and to read the uncomputed conditions FIRST"
+    layer "enforcement" state="evidenced" evidence="30 tests pass; the conditions are declared on the record and evaluated in one place" reaches="one implementation of the conditions, so the view cannot drift from the gate"
+    layer "docs"        state="evidenced" evidence="`praxis ready` renders on demand through a renderer whose whole input is &ReadModel" reaches="rendered on demand as a working projection, never committed"
+    layer-set sealed=#true at="2026-08-21T04:10:00-05:00"
+
+    // Derived from the sealed layer set above, per phase-required-by-a-declared-layer.
+    // doctrine implies teach. enforcement and docs imply implement. learn is always.
+    // The two design phases are judgement, and both are argued for below rather than assumed.
+
+    phase "design-ux" state="complete" required-by="docs" \
+        produced="the five sections and their order — and the one that matters, `not decided for \
+            you`. A blocked slice is told the SPECIFIC thing blocking it, never the category; a \
+            delivered slice is shown as done rather than as blocked, because a reader who cannot \
+            tell those apart is being misled by a true answer; and a condition nobody computed is \
+            named with the count of slices it left undecided, because at the granularity of one \
+            condition `nothing blocks this` and `this was not computed` look identical, which is \
+            S3 one level below where the storm found it"
+    phase "design-system" state="complete" required-by="enforcement" \
+        produced="read-model@v1 as a type, with its four constraints as acceptance criteria rather \
+            than as advice — cells carry values, prose is referenced by condition name, an empty \
+            section states its own emptiness, and a working result names the moment where an \
+            archival one would name a version. And the conditions declared ON THE RECORD with a \
+            check name, so an undeclared check is reported as uncomputed instead of the engine \
+            quietly holding a rule the record never stated (A4)"
+    phase "implement" state="complete" required-by="enforcement · docs" \
+        produced="praxis-core::view, praxis-core::admission, praxis-cli::render, `praxis ready`, \
+            and thirteen tests"
+    phase "learn" state="complete" required-by="always" \
+        produced="six findings, one of which corrected this iteration's own design before close" \
+        note="never skippable — it is the phase that judges the others"
+    phase "teach" state="skipped" required-by="doctrine" \
+        produced="surface.skill.see-what-is-ready, whose longest section is how to read a SHORT \
+            ready set — because the first real answer produced one, and the instinct it invites is \
+            to weaken a condition" \
+        skipped-because="it produced doctrine for an AGENT, which is the doctrine LAYER and is recorded there. Teaching an end user the feature's why and how did not happen — and the record already serves the next agent, whose own persona judges success by NOT needing a document (TS.260821.19, ITER.260822.15/BA1)"
+
+    finding "S1" state="open" size="owed-work" carries="C1" \
+        text="C1 cannot be settled by the slice that owns it. It asks for a property test against \
+            the GATE, and the gate is TS.260820.05, which depends on TS.260820.04. The settlement \
+            is circular in the cut, and neither the cut nor three iterations of vetting noticed" \
+        obliges="TS.260820.05 — settle C1's residue there, and check the other seventeen slices for \
+            claims whose settlement depends on something downstream of them" \
+        note="the shape check refuses a slice with no claim. Nothing checks whether a claim is \
+            SETTLEABLE by the slice that carries it, which is a different and harder question"
+
+    finding "S2" state="open" size="frame-sized" \
+        text="the backlog is a queue, not a set. Fifteen of nineteen slices are blocked, every one \
+            of them by dependencies-delivered, and the longest chain is eight deep — 04 → 05 → 06 \
+            → 07 → 16 → 09 → 10 → 11. At one iteration per slice that is eight sequential \
+            iterations no matter how many agents are available" \
+        obliges="P2 — depends-on must name a frozen seam rather than a slice" \
+        note="P2 has been carried as a notational defect since the graph was seeded. It is not one. \
+            A dependency on a SLICE blocks until that whole slice is delivered; a dependency on a \
+            frozen CONTRACT blocks only until the contract is frozen, which is usually already \
+            true. The shape of the edge is what makes the work serial, and no reading of the \
+            eighteen slices had shown it — it took counting"
+
+    finding "S3" state="open" size="owed-work" \
+        text="half of what work-admission says it judges is computed by nothing. The \
+            iteration-control cluster reads `it judges readiness and disjointness only`, and \
+            work-is-disjoint is uncomputed for all nineteen slices because no seam manifest exists \
+            to compare two iterations against" \
+        note="this was true before this iteration and invisible. It is now printed in every answer, \
+            with the count of slices it did not decide. That is the difference the section exists \
+            to make — the gap did not change, its visibility did"
+
+    finding "S4" state="open" size="owed-work" \
+        text="a slice's `state` duplicates a fact now derivable from its iterations. Three slices \
+            carry `state \"delivered\"`, one of them with `by=` and two without, and the schema \
+            declares the field for all four states" \
+        obliges="NA.260820.01/schema — thin-slice.state, and the three records that use it" \
+        note="the drift check makes a contradiction visible, which is worth having. It does not make \
+            the redundancy go away, and a field whose only correct value is the one the engine \
+            would compute anyway should not be writable"
+
+    finding "S5" state="open" size="owed-work" \
+        text="the drift rule was wrong when first written: it treated a delivered slice that says \
+            nothing about its own state as drift. That is backwards — silence defers to the \
+            derivation, and flagging it would have pressured every record into keeping the second \
+            copy S4 argues against. Corrected before close, and the corrected rule is what made the \
+            decision above possible" \
+        note="found by asking what the rule would DO to the record rather than whether it passed. \
+            A rule can be green and still be an instruction to make the record worse"
+
+    finding "S6" state="open" size="owed-work" \
+        text="three test fixtures in this iteration were silently malformed. KDL v2 reads a bare \
+            identifier as a string, so `slug \"a\" kind \"command\"` on one line is ONE node with \
+            four arguments rather than two nodes — the fixture parses, and the record it describes \
+            is not the record intended. The shape check caught it, which is the second time it has \
+            caught this exact class in a test fixture" \
+        note="the tests build their own records and nothing checks those records but the assertions \
+            written against them. `praxis check` runs over the tree and not over the fixtures, and \
+            a fixture is a record"
+
+    finding "S7" state="open" size="owed-work" \
+        text="praxis-cli::check attributes corpus-level violations by entity KIND or id, so one \
+            violation is reported once per file whose first node shares that kind — and it carries \
+            a filter term, `std::ptr::eq(&docs[i], &docs[i])`, that is true by construction and \
+            filters nothing" \
+        note="latent: corpus violations are currently zero, so it has never fired. Found by reading \
+            the shell while adding a second command to it, not by any test"
+
+    finding "S8" state="open" size="frame-sized" \
+        text="the fitness function `a-slice-took-more-than-one-iteration` has stopped being \
+            falsified. C1 is met in part, so TS.260820.04 is not delivered, so the tool puts it \
+            back in `ready` and blocks TS.260820.05 on it — and the block cannot clear until the \
+            gate exists, which is what S1 describes. The circular settlement is not a note; it is a \
+            deadlock the record prints" \
+        obliges="NA.260820.01 — record against the fitness function that it fired, and on which \
+            slice. TS.260820.05 must settle C1's residue, and settling it is what unblocks itself" \
+        note="four iterations in, the first slice that needs a second. The falsifier said that if \
+            every slice completes in one iteration the iteration is ceremony and should be cut — \
+            so this is the evidence it is not. It arrived by recording a claim honestly rather \
+            than by anything designed to produce it, which is the only way that evidence counts"
+
+    close {
+        claims-settled "C1" "C2" all-met=#false \
+            note="C1 is met in part. Recording it as met would be the agent's own account of \
+                having been checked, which is the frame's root cause wearing a checkmark"
+        layers-reached "doctrine" "enforcement" "docs" all-evidenced=#true
+        findings-carried "S1" "S2" "S3" "S4" "S5" "S6" "S7"
+        scope-unchanged #true
+        verified "cargo test — 30 passed across four suites" \
+            "praxis check praxis — ok, 13 kinds declared, zero reports" \
+            "praxis ready praxis — 2 ready, 15 blocked, 3 delivered, 2 conditions undecided for all 19"
+        note "the first output of this engine that is not a refusal. Three iterations built rules \
+            that say no; this one built an answer, and the answer's most useful section is the one \
+            listing what it did not decide. Its second most useful is that it refuses to call this \
+                slice delivered, and blocks the gate behind it"
+    }
+
+    contributes "slice-outcome-added" \
+        because="see-what-is-ready — the first answer the engine computes rather than refuses" \
+        note="the bump rule this work matches, from the config. Declared by the iteration \
+            because only whoever did the work knows what kind of change it was"
+
+    trail {
+        entry at="2026-08-21T14:20:00Z" by="agent:principal-engineer" action="amended" \
+            note="S1 now says `carries=C1`. It always did carry it — that is what the finding is \
+                about — but it said so only in prose, so when no-silent-drop was turned on in \
+                ITER.260821.05 this close was the one record in the tree it refused. The rule was \
+                right: the accounting existed and was not legible"
+        entry at="2026-08-21T07:55:00-05:00" by="agent:principal-engineer" action="state-changed" \
+            from="working" to="closed" \
+            note="the record answers a question for the first time. It said the backlog is a chain \
+                eight deep and that disjointness is judged by nothing, neither of which anyone knew"
+        entry at="2026-08-21T04:10:00-05:00" by="agent:principal-engineer" action="created"
+    }
+}

@@ -1,0 +1,147 @@
+// What this plugin GUARANTEES about code it is loaded into, and what keeps each guarantee.
+//
+// Declared by TS.260821.05. the config has said `enable-all-fail-closed #true` and
+// omitted three probes by name since the binding was written, and neither the enabling nor
+// the omitting referred to anything the record held. The ids were strings. What actually
+// enforced them was ten shell scripts and their header comments, and no version of this
+// plugin has ever been able to state what it guarantees without somebody reading all ten.
+//
+// An invariant is what a probe is FOR. The probe is how. The two were never connected.
+
+invariant "no-dumping-grounds" {
+    protects "no file or folder is named for where things go rather than for what it does — utils, helpers, common, shared, misc"
+    severity "refuse"
+    structural "reads structure rather than text, so it applies to every language"
+    note "the oldest guardrail in this plugin and the one an adopter feels first. Structural: it reads names, not contents, so it applies to every language"
+}
+
+invariant "no-skipped-tests" {
+    protects "no source file carries a skipped-test marker"
+    severity "refuse"
+    language "typescript"
+    language "javascript"
+    language "java"
+    language "kotlin"
+    language "python"
+    language "go"
+    language "ruby"
+    language "csharp"
+    language "php"
+    language "rust"
+    note "a skipped test is a dumping ground for flakiness that reports green"
+}
+
+invariant "no-sleep-waits" {
+    protects "no source path waits for correctness by sleeping"
+    severity "refuse"
+    language "typescript"
+    language "javascript"
+    language "java"
+    language "kotlin"
+    language "python"
+    language "go"
+    language "ruby"
+    language "csharp"
+    language "php"
+    language "rust"
+    note "a fixed sleep hides a race and passes CI on a fast machine"
+}
+
+invariant "remote-config-externalization" {
+    protects "every configurable value is read from configuration rather than compiled in"
+    severity "refuse"
+    language "typescript"
+    language "javascript"
+    language "java"
+    language "kotlin"
+    language "python"
+    language "go"
+    language "ruby"
+    language "csharp"
+    language "php"
+    language "rust"
+    note "the id the config already omits by name. It comes from the ADR.260725 seam-conformance lineage, decision D1"
+}
+
+invariant "http-observability" {
+    protects "every cross-process path emits structured logs with a correlation id, plus latency, throughput and error metrics"
+    severity "refuse"
+    language "typescript"
+    language "javascript"
+    language "java"
+    language "kotlin"
+    language "python"
+    language "go"
+    language "ruby"
+    language "csharp"
+    language "php"
+    language "rust"
+    note "omitted by this repository's own profile: Praxis has no HTTP surface. Omitting is not the same as failing, which is why the record has to hold both"
+}
+
+invariant "stateless-request-path" {
+    protects "no request path holds state between requests"
+    severity "refuse"
+    language "typescript"
+    language "javascript"
+    language "java"
+    language "kotlin"
+    language "python"
+    language "go"
+    language "ruby"
+    language "csharp"
+    language "php"
+    language "rust"
+    note "omitted by this repository's profile. There is no request path to keep stateless"
+}
+
+invariant "resilient-boundary" {
+    protects "every external call declares a timeout, a retry policy, a fallback, and a circuit breaker on hot paths"
+    severity "refuse"
+    language "typescript"
+    language "javascript"
+    language "java"
+    language "kotlin"
+    language "python"
+    language "go"
+    language "ruby"
+    language "csharp"
+    language "php"
+    language "rust"
+    note "the Resilient production-readiness anchor, converted from a checklist line into a build-time gate"
+}
+
+invariant "port-adapter-parity" {
+    protects "every declared port has at least one adapter, verified structurally rather than by filename"
+    severity "refuse"
+    structural "reads structure rather than text, so it applies to every language"
+    note "AST-backed since v0.7.0. Structural: it reads the parse tree, so the language list is the parser's, not the probe's"
+}
+
+invariant "seam-contract-parity" {
+    protects "every declared seam contract has a machine-readable shape and a shared behaviour suite"
+    severity "refuse"
+    structural "reads structure rather than text, so it applies to every language"
+    note "the keystone seam probe. Generalises port/adapter parity from ports to every declared seam"
+}
+
+invariant "escape-hatch-visibility" {
+    protects "every use of an opt-out marker is reported by file and line"
+    severity "report"
+    structural "reads structure rather than text, so it applies to every language"
+    note "explicitly NOT a gate, and the only invariant here that says so in its own header. An escape hatch nobody can see is the thing being escaped"
+}
+
+invariant "comments-state-meaning" {
+    protects "no comment narrates history the record already holds — a comment says what a thing is or why it must be so, and stays true as long as the code does"
+    severity "report"
+    note "declared with no probe, deliberately. Whether a sentence states meaning or narrates \
+        change is a judgement, and a grep for `used to` would catch the honest ones and miss \
+        every paraphrase. an-enabled-invariant-is-enforced REPORTS this as unkept, which is the \
+        accurate thing to say: the guarantee is stated and nothing keeps it"
+    note "the failure is specific. A comment that says WHEN something changed is invalidated by \
+        the next change and nobody re-reads it, so it decays into a confident false statement. A \
+        comment that says WHAT a thing means is invalidated only by the thing changing, which is \
+        the edit that would make you read it. Found by ITER.260822.07/AR3, on a comment written \
+        in this repository within the hour"
+}

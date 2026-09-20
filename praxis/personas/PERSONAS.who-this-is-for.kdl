@@ -1,0 +1,55 @@
+// Who this product is for. Declared by TS.260821.15.
+//
+// One persona is named before anything is framed — the primary one, because it is the reason
+// discovery is happening at all. The rest emerged from the work within FRAME.260819.01 and
+// each names what surfaced it.
+//
+// The field that makes these claims rather than descriptions is `judges-by`. A persona
+// nobody can be wrong about is a paragraph.
+
+persona "the-team-building-a-digital-product" {
+    is "engineers, designers and product managers working through an LLM coding agent"
+    came-for "delivery they can trust without re-reading everything the agent produced"
+    does-not-care "how the engine is built, which crate holds what, or why any of it is in KDL"
+    judges-by "they can pick up work somebody else left, and act on the record without asking them"
+    state "primary"
+    note "named before the frame, and it is the reason the frame exists. the Markdown dashboard has \
+        said so in prose since before the delivery graph — `an engineer, product designer, or \
+        product manager working through an LLM coding agent` — and no record has held it"
+}
+
+persona "the-adopter" {
+    is "somebody deciding whether to put this method into a repository that is not ours"
+    came-for "to find out what it does and what it will refuse them, before installing anything"
+    does-not-care "this repository's own frame, its findings, or how the method was arrived at"
+    judges-by "they can run it against their own repository and read the refusals without a guide"
+    state "emergent"
+    found-by "WALK.260822.01"
+    note "surfaced by walking the adoption from an empty directory. Everything that walk found — \
+        a 946-line schema to copy, a second disjoint admits block, a dead binary — was invisible \
+        from inside, because nobody here has ever been this person"
+}
+
+persona "the-reader-of-a-release" {
+    is "somebody who has read nothing else, opening a release to find out what this is"
+    came-for "why it exists and how to start, in that order"
+    does-not-care "iteration ids, which slice contributed what, or how any of it was built"
+    judges-by "they can say what the product is for and run the first command, without opening a second file"
+    state "emergent"
+    found-by "WALK.260822.02"
+    note "surfaced by reading the archival projection0.8.0 as somebody who had not built it. The set was \
+        correct and not worth reading: a hundred and seventy lines of iteration ids, and a guide \
+        that said nothing shipped while five capabilities were active"
+}
+
+persona "the-next-agent" {
+    is "an agent arriving in a repository it did not set up, mid-task"
+    came-for "what is already known, so it does not re-derive it"
+    does-not-care "narrative, history, or why a decision was made — unless the decision binds what it may do now"
+    judges-by "it asks the record and gets an answer it can act on, rather than a document it must read"
+    state "emergent"
+    found-by "TS.260821.11"
+    note "this persona has been in the record as a `needed-by` label since the storm and never as \
+        a record. It is the one the usage log is about: forty checks read as a boolean, four \
+        commands read as counters, eight graph traversals hand-rolled in grep"
+}

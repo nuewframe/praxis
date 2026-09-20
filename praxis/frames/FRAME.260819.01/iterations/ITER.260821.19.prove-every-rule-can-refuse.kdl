@@ -1,0 +1,351 @@
+// Opened by `praxis pick-up`. Every condition below was evaluated against the
+// tree as it stood at 2026-08-21T22:13:45Z, and the verdicts are recorded
+// rather than summarised: a gate whose reasoning is not on the record is a gate
+// you have to trust.
+
+iteration "ITER.260821.19" {
+    slug "prove-every-rule-can-refuse-and-seal-what-cannot-change"
+    on-slice "TS.260821.02"
+    on-slice "TS.260820.18"
+    state "closed"
+    opened-at "2026-08-21T22:13:45Z"
+    opened-by "agent:praxis"
+
+    approval "admission" {
+        status "signed"
+        signer "human:wael"
+        at "2026-08-21T22:13:45Z"
+        signed-by "the ask to pick up this slice"
+    }
+
+    vet "create" state="done" at="2026-08-21T22:13:45Z" {
+        condition "slice-is-shaped" verdict="passed"
+        condition "dependencies-delivered" verdict="passed"
+        condition "no-iteration-in-flight" verdict="passed"
+        condition "nothing-left-to-admit" verdict="passed"
+        condition "work-is-disjoint" verdict="not-computed" \
+            found="no seam manifest exists, so what two iterations would touch cannot be compared. Disjointness is half of what this capability says it judges, and half of what it judges is currently not computed at all"
+        condition "the-slice-is-the-best-available" verdict="left-to-the-maintainer"
+    }
+
+    // 2 of the declared conditions were not decided by the gate. They are
+    // recorded above rather than omitted: an admission that does not say what
+    // it left undecided claims more than it checked.
+
+    // Frozen at open, from the slice. Removing one from the slice now
+    // does not remove it from here — it makes the two disagree, and that is
+    // refused.
+
+    // ================================================================
+    // TRIAGE. Eighty-eight findings from eighteen iterations, sorted by where each
+    // has to land. This is the FindingTriaged step the storm named and nothing had
+    // ever performed on a whole frame's worth at once.
+    //
+    // Three destinations, and most findings need only the first two:
+    //   discovery  — the record was missing a concept. Matured before this opened.
+    //   phase      — an existing slice needs a phase re-run. Named per slice below.
+    //   this iteration — work that has no other home, or that proves the rest.
+    // ================================================================
+
+    finding "AI2" state="open" size="frame-sized" \
+        text="the model said `an iteration is an attempt at ONE slice` and that was wrong. The \
+            ITERATION is the COMMITMENT; a slice is a unit of work that adds value. One ask can \
+            commit to several, and they are worked together or the commitment was never one thing" \
+        note="it survived eighteen iterations because every ask happened to name one slice, so the \
+            model was never asked the question it was answering. NA.260820.01 has carried \
+            `open: what an iteration IS, as an entity` since it was seeded — and ITER.260821.01 \
+            declared the entity with `on-slice each=1`, which answered it quietly and wrongly. A \
+            question marked open and answered by a default is worse than one left alone"
+
+    finding "AI1" state="open" size="observation" \
+        text="W6 happened again, in this iteration, within an hour of the rule against it being \
+            declared. The gate pinned four claims at open and the triage wrote the same four \
+            beside them. `praxis review` showed eight" \
+        note="a-claim-id-is-unique-in-its-iteration is DECLARED and unenforced, so it caught \
+            nothing — which is the exact shape TS.260821.02 exists to report. The slice acquired a \
+            witness before it acquired an implementation, and the witness is this iteration"
+
+    triage "what discovery was missing" done-at="2026-08-21T20:30:00Z" {
+        to-storm "five acts building performed that the storm never named" \
+            added="start-iteration · accept-decision · withdraw-a-claim · amend-a-record" \
+            from="T3 · AE3 · AG3 · AE2" \
+            note="`amended-by` existed as a FIELD from the first day and as an ACT never. Six \
+                amendments were performed across this frame by editing files"
+        to-storm "two policies the storm could not express" \
+            added="ordering-between-commands-is-declared · a-rule-with-no-witness-is-not-a-rule" \
+            from="Y1 · AG1" \
+            note="Y1 is the sharper one: two slices cut on the same day contradicted each other, \
+                each internally coherent, and the contradiction lived in the SPACE BETWEEN two \
+                records — where a checker that validates one at a time cannot look"
+        to-architecture "the vocabulary gap" added="one-of-fields" from="W4" \
+            note="every gap before it was a kind or a field nobody had declared. This one is a gap \
+                in the schema LANGUAGE, which is different owed work"
+        to-architecture "five rules the findings oblige" \
+            added="an-immutable-record-carries-a-seal · a-claim-id-is-unique-in-its-iteration · \
+                a-record-is-filed-in-its-container · a-derived-field-is-recomputed · a-rule-has-a-witness" \
+            from="AE3 · AG3 · W6 · T1 · W7 · AA1 · AG1"
+        to-architecture "the fitness functions get their outcome" from="AH3" \
+            note="a-slice-took-more-than-one-iteration FIRED at ITER.260821.03. \
+                a-finding-travelled-the-whole-loop had NOT fired as of ITER.260821.18, and this \
+                iteration is the first attempt to make it"
+        to-architecture "eight new obligations" from="P2 · S2 · S4 · Z3 · Y5 · AB1 · T3 · Y3 · AA4"
+    }
+
+    // Per slice: which PHASE of a future iteration owns the finding. A finding that
+    // needs a different answer needs design; one that needs the same answer built
+    // needs implement; one that changes what we tell people needs teach.
+    triage "per slice, which phase owes it" done-at="2026-08-21T20:30:00Z" {
+        slice "TS.260820.01" phase="design-system" owes="P2 · S4" \
+            why="depends-on must name a frozen seam, and thin-slice.state must go. Both are shape \
+                decisions about what a slice IS — not implementation"
+        slice "TS.260820.05" phase="implement" owes="T3 · W6" \
+            why="the `start` command and unique claim ids. The design is settled — ITER.260821.04 \
+                recorded WHY the gate writes `open`; what is missing is the second command"
+        slice "TS.260820.06" phase="design-system" owes="Z3" \
+            why="config says harness owns six install manifests, the slice says the CI path. One of \
+                them is wrong and deciding which is a design question, not a code change"
+        slice "TS.260820.07" phase="implement" owes="W6" \
+            why="a-claim-id-is-unique-in-its-iteration, now declared and unenforced"
+        slice "TS.260820.09" phase="implement" owes="X3" \
+            why="the fault-injection test that was skipped because the shape made the state \
+                unconstructible. Better outcome, weaker test — nothing guards a refactor that \
+                splits the write in two"
+        slice "TS.260820.10" phase="implement" owes="Y5" \
+            why="read the archival root from config instead of composing it in the engine. Same \
+                class as AD1: a binding the record declares and the engine does not consult"
+        slice "TS.260820.11" phase="implement" owes="S7 · AG1 · AG2" \
+            why="three attribution bugs, each found by a rule firing and never by a test. This \
+                slice owns verification, and there is still no test that would catch the fourth"
+        slice "TS.260820.14" phase="implement" owes="AE3" \
+            why="seal a decision at acceptance. accept-decision is now a command in the storm; the \
+                design is done and the writing is not"
+        slice "TS.260820.16" phase="implement" owes="W7 · AA1" \
+            why="proposed-bump and proposal-incomplete-for are still derived at write time only. \
+                AA1 answered the class; this is the instance still open"
+        slice "TS.260820.18" phase="implement" owes="AG3" \
+            why="a silent revert is not refused, because the check has no memory. C3 is carried on \
+                it, and this iteration settles it"
+        slice "TS.260820.04" phase="design-ux" owes="Y3" \
+            why="the gate needs a way to admit `this slice settles that slice's residue`. Two \
+                iterations were overruled for the same cause, and the override is a human's every \
+                time — which is how a gate gets switched off"
+        slice "all" phase="learn" owes="AA4 · AF2" \
+            why="the release chain has never run end to end. Not a slice's work — a release's"
+    }
+
+    claim "C1" from-slice="TS.260821.02" state="met" \
+        text="a declared rule that no witness makes refuse is reported, naming the rule" \
+        settled-by="a test declaring a rule with a witness that does not violate it" \
+        evidence="a rule whose witness refuses nothing is reported by name, and \
+            a rule with no witness at all reads differently — `never demonstrated` and \
+            `demonstrated and nothing happened` are different problems and must not read alike"
+    claim "C2" from-slice="TS.260821.02" state="met" \
+        text="a witness proves the rule by producing a refusal the engine computed, never by asserting one exists" \
+        settled-by="a test asserting the report is derived from running the checker over the witness" \
+        evidence="a witness proves a rule by producing a refusal the engine computed, \
+            a refusal enforcing a different rule does not witness this one, and \
+            a witness the codec cannot read is reported as such. The second is the strong \
+            half — without it one malformed record would witness every rule"
+    claim "C3" from-slice="TS.260821.02" state="met" \
+        text="a rule whose refusals are computed and then dropped has no witness" \
+        settled-by="a test reintroducing AG1 and asserting the rule loses its witness" \
+        evidence="a rule whose refusals are computed and dropped has no witness \
+            and the same rule with a witness that reaches it is proven. The prover runs each \
+            witness through the SAME functions that check the tree"
+    claim "C4" from-slice="TS.260821.02" state="met" \
+        text="an-immutable-record-carries-a-seal gains a witness, and sealing this record settles what it refuses" \
+        settled-by="a witness for the seal rule, plus every accepted decision in this record sealed" \
+        evidence="an immutable record with no seal is refused and \
+            a sealed decision raises nothing. On the real tree the rule refused seven records, \
+            `praxis accept` sealed all seven, and editing a sealed decision's body was verified to \
+            break its seal and refuse"
+
+    claim "C1" from-slice="TS.260820.18" state="met" \
+        text="resolving against a release that does not exist is refused" \
+        settled-by="settled by ITER.260821.17 and carried into this commitment unchanged" \
+        evidence="resolving against a release that does not exist is refused, \
+            and now witnessed on the record — resolution-names-a-release is one of the sixteen"
+    claim "C2" from-slice="TS.260820.18" state="met" \
+        text="resolving against a release that bound no slice attacking this symptom is refused" \
+        settled-by="settled by ITER.260821.17 and carried into this commitment unchanged" \
+        evidence="a release that bound no attacking slice is refused"
+    claim "C3" from-slice="TS.260820.18" state="met" \
+        text="a resolved symptom cannot silently return to present" \
+        settled-by="a seal over the symptom's state and what resolved it, refused when absent" \
+        evidence="an-immutable-record-carries-a-seal refuses a resolved symptom with no seal, and \
+            its witness demonstrates it. A revert now has to break a seal, which the checker sees — \
+            where before the check had no memory of what the record said" \
+        note="the residue AG3 carried from ITER.260821.17, and the reason these two slices are one \
+            commitment. This record has no resolved symptom to seal — S1 was withdrawn — so the \
+            witness is where it is demonstrated. Recorded as AJ4"
+
+    vet "start" state="done" at="2026-08-21T20:32:00Z" {
+        condition "the tree is clean and current" verdict="passed" found="HEAD 96bda0c plus the discovery maturation above"
+        condition "the slice's scope is unchanged" verdict="passed" found="four claims, cut in this iteration and read line by line"
+        condition "the discovery it depends on is matured first" verdict="passed" \
+            found="a-rule-has-a-witness is declared on the architecture before the slice that \
+                witnesses it was cut. The rule came from AG1, the slice came from the rule, and \
+                the order matters — a slice cut before its rule is declared is a slice inventing \
+                the rule"
+        condition "what this will report is unknown before it runs" verdict="known-and-recorded" \
+            found="rules are declared and nobody knows how many have ever refused anything. That \
+                number is the point of the slice, and predicting it would be the same mistake AG1 \
+                caught" \
+            answered="forty declared. Thirteen witnessed on the first run, sixteen after this \
+                iteration's own rules were implemented and witnessed. Twenty-four remain named as \
+                having demonstrated nothing"
+    }
+
+    frozen {
+        pins "the entity-and-field schema" at="NA.260820.01/schema" at-commit="96bda0c"
+        pins "the declared rule set" at="NA.260820.01/schema — rule" at-commit="96bda0c"
+        rule "a schema change while this iteration is open is a FINDING, not an edit" \
+            exception="the discovery maturation recorded in the triage blocks above happened BEFORE \
+                this iteration opened, which is why it is triage and not an edit under freeze"
+    }
+
+    layer "doctrine"    state="evidenced" evidence="surface.skill.witness-a-rule, registered in the router" reaches="the skill teaches that declaring a rule includes writing the record that violates it"
+    layer "enforcement" state="evidenced" evidence="183 tests pass; sixteen rules are witnessed, twenty-four are named as not, and three ways of having no witness read differently" reaches="a-rule-has-a-witness, reported over the whole declared rule set"
+    layer "docs"        state="evidenced" evidence="`praxis prove` prints the witnessed and the unwitnessed, and exits zero — the number is the point, not a gate" reaches="the unwitnessed set is readable"
+    layer-set sealed=#true at="2026-08-21T20:32:00Z"
+
+    phase "design-ux" state="complete" required-by="docs" \
+        produced="THREE ways to have no witness, each reading differently — no witness declared, a \
+            witness the codec cannot read, and a witness that produced no refusal enforcing it. The \
+            third is the one worth stopping for: it is what an unreachable rule looks like from \
+            outside, and collapsing it into the first would have hidden exactly what AG1 was"
+    phase "design-system" state="complete" required-by="enforcement" \
+        produced="the witness lives in the RECORD, and the prover runs it through the same functions \
+            that check the tree. Both halves are the design. A witness in Rust would be a second \
+            implementation, and two implementations agreeing proves only that one person wrote \
+            both; a witness checked by a different path would prove that path works and nothing \
+            about the real one — which is exactly how AG1 survived. And a refusal now carries the \
+            RULE it enforces, so a witness must produce THIS rule's refusal rather than any refusal"
+    phase "implement" state="complete" required-by="enforcement · docs" \
+        produced="praxis-core::prove, Refusal::rule, witness parsing on the schema, \
+            an-immutable-record-carries-a-seal, a-claim-id-is-unique-in-its-iteration, \
+            `praxis prove`, `praxis accept`, and eleven tests"
+    phase "learn" state="complete" required-by="always" produced="four findings, three of them defects the prover found in its first hour" \
+        note="never skippable — it is the phase that judges the others"
+    phase "teach" state="skipped" required-by="doctrine" produced="surface.skill.witness-a-rule" \
+        skipped-because="it produced doctrine for an AGENT, which is the doctrine LAYER and is recorded there. Teaching an end user the feature's why and how did not happen — and the record already serves the next agent, whose own persona judges success by NOT needing a document (TS.260821.19, ITER.260822.15/BA1)"
+
+    finding "AJ1" state="open" size="frame-sized" \
+        text="the engine was enforcing five rules the record never named. Writing Refusal::rule — \
+            asking each refusal WHICH rule it enforces — found entity-without-a-required-field, \
+            field-outside-its-cardinality, kind-declared-without-a-shape, a-value-claimed-twice and \
+            a-value-nothing-claims, all enforced since ITER.260820.01 and none declared" \
+        note="A4 says the engine may not hold a rule the record does not state. These were exactly \
+            that, for eighteen iterations, in the engine built to enforce A4. Nothing found them \
+            because nothing had ever asked a refusal what rule it was enforcing — the question had \
+            no answer to give until this slice needed one"
+
+    finding "AJ2" state="open" size="observation" \
+        text="the first witness for dangling-relationship produced nothing. The rule is skipped when \
+            the corpus knows NO entity of the target kind — a guard against false positives on a \
+            partial document — so a witness declaring only the dangling edge witnesses nothing" \
+        note="C2 caught it on the first run, which is the mechanism working. But it means a witness \
+            is not a fragment: it is a record, and some rules only exist in the presence of context. \
+            A reader who writes the minimal violation will be told it witnesses nothing and may \
+            conclude the rule is broken"
+
+    finding "AJ3" state="open" size="frame-sized" \
+        text="a-decision-is-bound-to-an-iteration was DECLARED, IMPLEMENTED and UNREACHABLE. The \
+            dispatch that calls the decision checks tested three of the four decision rules, so \
+            declaring only that one left its code unreached. Found by its own witness, in this \
+            iteration" \
+        note="this is the exact failure the slice was cut for, found by the slice, within an hour of \
+            it working. It had been latent since ITER.260821.15 — the real record declares all four \
+            rules, so the guard passed and the code ran, and nothing would ever have shown it. The \
+            witness ran the rule ALONE, which is what made it visible"
+
+    finding "AK1" state="open" size="frame-sized" \
+        text="`praxis pick-up` panicked on startup for a whole iteration and nothing noticed. The \
+            commitment change made its arguments invalid — a variadic slice list followed by an \
+            optional positional, which clap refuses to BUILD — so the command died at the first \
+            keystroke while 185 tests passed over it" \
+        note="every test calls the CORE. The binary had no test at all, so the one surface a user \
+            actually touches was the one surface nothing checked. Found by running the tool on a \
+            different project, which is the first time in this frame it has been run anywhere but \
+            here. The binary-runs tests now build every subcommand"
+
+    finding "AK2" state="open" size="frame-sized" \
+        text="a new project cannot use the engine without copying two disjoint blocks out of this \
+            repository's own architecture: the 729-line `schema` block, and the `admits` block that \
+            lives inside a capability-role. Neither has a portable home" \
+        obliges="ADR.260819.01 and the config — `governed-by` has had no target since \
+            ADR.260819.02 was withdrawn, and the comment there already says the binding is restored \
+            when the schema has a home that is not a decision. It still does not" \
+        note="the schema is the METHOD's vocabulary — entity kinds, rules, cardinalities — and has \
+            nothing to do with any adopting project. Copying it means every repository forks the \
+            method and drifts from it silently, which is the second-copy problem this frame exists \
+            to attack, applied to the frame's own definition of itself"
+
+    finding "AK3" state="open" size="observation" \
+        text="the router still describes the sprint-era spine — create-wave, start-thin-slice, \
+            create-sprint, intake, close-sprint — and none of those commands exist. The twelve \
+            skills this frame wrote are registered in the index below a spine that contradicts them" \
+        obliges="surface.skill.using-praxis — the spine is the first thing an arriving agent \
+            reads, and it points at a workflow that was replaced" \
+        note="found by asking what a NEW project would do and reading the router as a newcomer \
+            would. Eighteen iterations of building the graph, and the front door still opens onto \
+            the old house"
+
+    finding "AJ6" state="open" size="frame-sized" \
+        text="an iteration can drop a slice's claims entirely by not carrying them, and the close \
+            accepts it. An edit to this record deleted all four TS.260821.02 claims and \
+            `praxis close` passed, reporting three — because the accounting is over the claims the \
+            ITERATION holds, never over the claims its SLICES declare" \
+        obliges="a rule that an iteration carries every claim its committed slices declare" \
+        note="TS.260820.07/C3 refuses deleting a claim from the SLICE to make a close succeed. This \
+            is the same move one level over: leave the slice alone and drop the claim from the \
+            iteration. no-silent-drop checks what is carried, claim-dropped-from-the-slice checks \
+            what is carried against the slice, and NOTHING checks what is not carried at all. Found \
+            by falling into it in the iteration built to find this class"
+
+    finding "AJ5" state="open" size="observation" \
+        text="W6 happened a THIRD time, in this iteration, and this time the rule caught it. The \
+            close was refused with `carries C1 from TS.260820.18 twice` before anything was \
+            committed" \
+        note="AI1 recorded the second occurrence as a witness the slice had acquired before an \
+            implementation. This is the same iteration, an hour later, with the implementation — and \
+            the pattern the rule catches is not carelessness but a real ambiguity: folding a slice \
+            into a commitment writes its claims, and settling them at close writes them again. The \
+            rule is the answer; a command that SETTLES a pinned claim rather than writing beside it \
+            would be the better one"
+
+    finding "AJ4" state="open" size="owed-work" \
+        text="TS.260820.18/C3 is settled by a rule and demonstrated by a witness, and this record has \
+            no resolved symptom to seal — S1 was withdrawn in ITER.260821.17, so the only symptom \
+            that could have carried a seal no longer claims resolution" \
+        obliges="the first release that resolves a symptom — check the seal survives a real \
+            resolution rather than a witnessed one" \
+        note="the same shape as AA4 and AF2. The mechanism is proven where it can be proven, and the \
+            one place it will actually be used has not happened yet"
+    closed-at "2026-08-21T23:10:38Z"
+    outcome "continue"
+
+    close {
+        claims-settled "C1" how="met"
+        claims-settled "C2" how="met"
+        claims-settled "C3" how="met"
+        all-met #true
+        note "the accounting above was computed at close, not asserted. It says every claim is either met or carried by a finding that names it, and nothing about whether the work is any good"
+    }
+
+    trail {
+        entry at="2026-08-21T23:10:38Z" by="agent:praxis" action="state-changed" from="open" to="closed" note="closed by `praxis close`. The accounting was computed; the conclusion is not the machine's to draw"
+
+        entry at="2026-08-21T23:20:00Z" by="agent:principal-engineer" action="amended" \
+            note="the four TS.260821.02 claims restored after an edit dropped them and the close \
+                accepted it. Recorded as AJ6, and the rule that would have caught it is now \
+                declared and witnessed"
+        entry at="2026-08-21T23:05:00Z" by="agent:principal-engineer" action="amended" \
+            note="the prover found three defects in its first hour: five rules the record never \
+                named, a witness that could not reach its rule, and a rule declared, implemented \
+                and unreachable. None would have been found by a test, because every one of them \
+                looks exactly like working code"
+        entry at="2026-08-21T22:13:45Z" by="agent:praxis" action="created" \
+            note="opened by the gate, on the ask of human:wael"
+    }
+}

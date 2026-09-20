@@ -1,6 +1,6 @@
 ---
 applyTo: "src/**,packages/**,services/**,apps/**,libs/**,modules/**"
-description: Engineering guardrails for source code — capability-driven architecture, anti-dumping policy, functional core / imperative shell, ADR discipline, defensive implementation, and structured telemetry. Language-agnostic in doctrine (static probes cover the languages in docs/coverage-matrix.md); scoped to source trees so docs, configs, and tooling files aren't constrained by code-shape rules.
+description: Engineering guardrails for source code — capability-driven architecture, anti-dumping policy, functional core / imperative shell, ADR discipline, defensive implementation, and structured telemetry. Language-agnostic in doctrine (each invariant declares the languages its probe covers); scoped to source trees so docs, configs, and tooling files aren't constrained by code-shape rules.
 ---
 
 # Capability-Driven Engineering Guardrails
@@ -154,14 +154,14 @@ See the `test-by-ownership` skill for full Pyramid Test Strategy discipline.
 
 For any non-trivial change, follow the phased workflow defined by this plugin's skills, in order:
 
-0. `intake-code-contribution` — anchor the request to wave, thin-slice, wave specs, sprint bridge, current code, and red/green test posture.
-1. `discovery-and-ambiguity-log` — surface assumptions, define SLOs, log gaps. Stop and ask before guessing.
+0. `pick-up-a-slice` — the gate vets the slice against the tree as it stands and opens an iteration, or refuses and records why.
+1. `plan-before-building` — surface assumptions, define SLOs, record the approach. Stop and ask before guessing.
 2. `design-system-architecture` — topology, resilience, contracts, data.
-3. `design-capability-layout` — vertical-slice layout, functional core / shell mapping, Port declarations, ADR.
+3. `design-capability-layout` — vertical-slice layout, functional core / shell mapping, Port declarations, and the decision that binds them.
 4. `implement-with-defensive-patterns` — code with security, telemetry, Port-based dependency injection.
-5. `verify-and-assemble-pr` — TDD verification (per `test-by-ownership`), Port/Adapter parity, PR narrative.
+5. `attach-evidence` then `close-an-iteration` — settle every claim on a run the tool watched (per `test-by-ownership`), or carry the shortfall by a finding that names it.
 
-Skip a phase only with explicit human approval.
+Skip a phase only with a rationale on the record. `skipped-phase-without-rationale` refuses a silence.
 
 ## 14. Emergent parallelism — the four-condition disjointness rule
 

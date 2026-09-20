@@ -1,0 +1,95 @@
+// A walk from outside. Every previous exercise of this engine ran against the record that
+// built it, where the answer was already known. This one starts with an empty directory.
+
+walkthrough "WALK.260822.01" {
+    slug "adopting-the-graph-in-a-new-project"
+    title "What a project that is not Praxis has to do to use the delivery graph"
+    frame "FRAME.260819.01"
+    walked-at "2026-08-22T00:00:00Z"
+    walked-by "agent:principal-engineer"
+
+    asks "a project that has never seen this method installs it. What does delivery actually \
+        look like on day one — and what stops before it starts?"
+
+    path "an empty git repository — acme/checkout, a real problem, no method"
+    path "praxis check · truth · ready against nothing, then against a frame, then against a schema"
+    path "cut a capability and a slice, take them through the gate"
+    path "read the router as an arriving agent reads it"
+
+    // What happened, in order. The value of a walk is that someone can walk it again.
+    step "1" did="ran the engine on an empty state root" \
+        found="`no .kdl files under praxis` — correct, and the whole of what a newcomer is told"
+    step "2" did="wrote the config and a frame, then ran check" \
+        found="`the record declares no schema — nothing to check against`. The engine is inert \
+            until the record declares its own vocabulary, which is A4 working exactly as designed \
+            and also the wall (AK2)"
+    step "3" did="lifted the `schema` block out of this repository's own architecture" \
+        found="729 lines. It is the METHOD's vocabulary — entity kinds, rules, cardinalities — and \
+            has nothing to do with checkout. There is no other way to obtain one"
+    step "4" did="ran check against the copied schema" \
+        found="two refusals, both teaching: `config: missing profile`, and a frame field the schema \
+            does not declare. The record instructs a newcomer at the point of the mistake"
+    step "5" did="declared a service profile — api · domain · store · docs" \
+        found="the layer vocabulary is a BINDING and the schema requires it. A service's strata are \
+            not a method's, and the record refuses to assume"
+    step "6" did="wrote a capability and a slice, then ran check" \
+        found="four refusals against the capability: no owns-read-model, no gate-test, no \
+            keeps-consistent, no attacks. That is `name-a-capability` ENFORCED on a project that \
+            has never read the skill — the strongest thing seen on this walk"
+    step "7" did="ran praxis ready, then praxis pick-up" \
+        found="pick-up PANICKED. Its arguments could not be built at all, and had not been since \
+            the commitment change (AK1). 185 tests passed over a binary that dies at the first \
+            keystroke, because every test calls the core"
+    step "8" did="fixed the CLI, added a binary smoke test, ran ready again" \
+        found="`the record declares no admission conditions` — the gate lives in an `admits` block \
+            inside a capability-role, not in the schema. A second disjoint thing to copy (AK2)"
+    step "9" did="copied the admits block, ran pick-up" \
+        found="a commitment opened, on a project that is not this one. Everything downstream of the \
+            schema works"
+    step "10" did="read skills/using-praxis as an arriving agent reads it" \
+        found="the spine still says create-wave, start-thin-slice, create-sprint, intake, \
+            close-sprint. None of those commands exist (AK3)"
+
+    raised "AK1" recorded-in="ITER.260821.19" \
+        text="praxis pick-up could not start, and no test would ever have said so"
+    raised "AK2" recorded-in="ITER.260821.19" \
+        text="the schema and the gate have no portable home, so adoption means forking the method"
+    raised "AK3" recorded-in="ITER.260821.19" \
+        text="the router's spine describes a workflow that was replaced"
+
+    finding "W16" \
+        text="this walk had nowhere to live. The record cites WALK.260820.01 and WALK.260820.02 \
+            THIRTY-FOUR times — by finding id, as `WALK.260820.01/W2`, `/W4`, `/W5`, \
+            `WALK.260820.02/W12`, `/W15` — and both are Markdown files the checker cannot open. \
+            dangling-relationship cannot verify a single one of those citations" \
+        obliges="port WALK.260820.01 and WALK.260820.02 to the record, keeping their finding ids" \
+        note="the frame's own argument, in its own discovery folder: prose that means the right \
+            thing is not accounting. Thirty-four edges into text nothing can follow, cited as \
+            confidently as any checked reference — and every one of them reads like a citation"
+
+    finding "W17" \
+        text="the record taught the newcomer at every step, and each refusal named the thing to fix \
+            rather than the rule that was broken. Steps 4, 5 and 6 are the method working on a \
+            project that has never read a single skill" \
+        note="worth recording as a positive, because the findings from this walk are otherwise all \
+            defects and that would misrepresent what happened. Everything downstream of obtaining a \
+            schema behaved as designed on a repository it had never seen"
+
+    finding "W18" \
+        text="every prior exercise of this engine ran against the record that built it, where the \
+            expected answer was already known. This walk is the first from outside, and it found a \
+            dead binary in its seventh step" \
+        obliges="run the tool against a project that is not this one before each release" \
+        note="AA4 and AF2 say the release chain has never run end to end. This is the same gap on \
+            the other axis — not `never finished` but `never elsewhere`, and elsewhere is where the \
+            adopters are"
+
+    proves "the loop runs on a project that is not Praxis, once a schema is present"
+    does-not-prove "that a project can OBTAIN a schema. It cannot, and that is AK2"
+
+    trail {
+        entry at="2026-08-22T00:00:00Z" by="agent:principal-engineer" action="created" \
+            note="walked in a scratch repository, acme/checkout, from an empty directory to an open \
+                commitment. The findings are recorded where the work was; this is the path"
+    }
+}

@@ -1,0 +1,134 @@
+// The release chain, walked end to end. AA4 and AF2 said it never had been.
+//
+// Not a slice: running a release is using the product, not delivering it. But it produced
+// two defects and a product judgement, and findings need somewhere to live — three source
+// comments and a commit message cite AS1 and AS2, and until this record existed every one of
+// those was a citation into nothing, which is W16 exactly.
+
+walkthrough "WALK.260822.02" {
+    slug "cutting-a-release-for-the-first-time"
+    title "What happens when bind, cut, verify and promote run in sequence"
+    frame "FRAME.260819.01"
+    walked-at "2026-08-22T00:00:00Z"
+    walked-by "agent:principal-engineer"
+
+    asks "thirty slices are delivered and seven symptoms are still `present`. The frame shrinks \
+        by a RELEASE and no release has ever been cut. What is between here and one?"
+
+    path "bind the closed iterations nothing binds"
+    path "publish, commit, cut — and find out what order the tool actually requires"
+    path "verify, promote, and ask whether a symptom can now be resolved"
+    path "read the published set as a stranger would"
+    path "withdraw the cut, once the reading was in"
+
+    step "1" did="asked which closed iterations no release binds" \
+        found="grep, not the tool. Seven of twenty-seven, all from today. The traversal exists in \
+            the Corpus and there is no way to ask it — logged, and cut as TS.260821.11"
+    step "2" did="bound all seven to 0.8.0" \
+        found="each bind re-proposed the bump from the configured rules. Twenty-seven bound"
+    step "3" did="ran cut-release" \
+        found="REFUSED — the published set had uncommitted changes, so the commit about to be \
+            indexed would not contain it. The tool taught the order: publish, commit, THEN cut"
+    step "4" did="committed and ran cut-release again" \
+        found="REFUSED — the-maintainer-confirms-the-version. The record proposes; choosing is \
+            the maintainer's. Two refusals, two different rules, both correct"
+    step "5" did="cut with --confirm" \
+        found="0.8.0 cut at 8ddfd00. The index points at a commit and carries a seal"
+    step "6" did="ran check" \
+        found="six refusals. Five were promoted-truth-is-derived telling us the next command, \
+            which is the chain working. The sixth was AS1"
+    step "7" did="ran promote" \
+        found="five capabilities went sought → active, with shipped counts derived from what bound. \
+            The two PRODUCT capabilities did not, because no bound slice realizes them"
+    step "8" did="ran verify-published" \
+        found="verified, five documents unchanged. True, and it means less than it sounds — see AS3"
+    step "10" did="withdrew the cut rather than adding a flag to republish over it" \
+        found="the seal is only checked at state=released, so withdrawal is clean — but promotion \
+            had no inverse (AS6), and `withdrawn` needed declaring twice (AS7). The prior \
+            artifacts are archived at the usage baseline as the thing the replacement has to beat"
+    step "9" did="opened the archival projection0.8.0 and read it as somebody who had read nothing else" \
+        found="it is correct and not worth reading. That is AS4, and it is the finding of this walk"
+
+    finding "AS1" \
+        text="`praxis cut-release` recomposes the release node whole and dropped `proposed-bump`, \
+            because the Corpus never held the field. Every cut would have dropped it" \
+        note="what the record PROPOSED and what the maintainer CONFIRMED are two facts, and a cut \
+            keeping only the second cannot be asked whether they agreed. Found by praxis check \
+            immediately after the cut, which is the record catching the tool that writes it"
+
+    finding "AS2" \
+        text="`when-state` was declared on schema fields and never implemented. `proposed-bump` \
+            said `each=1` unconditionally, so a cut release was required to carry a field whose \
+            purpose is discharged at the cut" \
+        obliges="scope proposed-bump to when-state=planned, and make when-state enforced" \
+        note="a property nothing reads looks exactly like one that is honoured — the same shape \
+            a-rule-has-a-witness exists to catch, one level down. `when-kind` beside it was real, \
+            which is what made the omission invisible"
+
+    finding "AS3" \
+        text="verify-published compares the tree against the commit its release names, and passed \
+            — while the capability guide said `this release promoted no capability's truth` \
+            and five capabilities had just been promoted" \
+        obliges="AO2 — the published set depicts the record AT PUBLISH TIME, and the version stamp \
+            is not the guarantee its wording implies" \
+        note="the guarantee is `nobody hand-edited this`, which is real and is not `this is still \
+            true`. Publishing before promoting is the ordinary order and it leaves the guide false, \
+            so the chain has a step it does not state"
+
+    finding "AS4" state="open" size="frame-sized" \
+        text="the published set is correct and not worth reading. the release notes is a hundred \
+            and seventy lines of iteration ids with one bump category repeated on every row; the \
+            guide says nothing shipped while twelve `usage` lines sit unused in the capability \
+            records" \
+        obliges="TS.260821.12" \
+        note="the record is MORE human-readable than its own projection. Every slice declares \
+            title, trigger, outcome and useful-alone — sentences written by hand, for people — and \
+            the Slice the corpus builds holds none of them. The publisher was never short of \
+            material; it reads the accounting half. Being the right MECHANISM stood in for being \
+            worth reading, for four slices and a release"
+
+    finding "AS5" \
+        text="no symptom was resolved. All seven have attacking slices bound to 0.8.0, and \
+            resolution was not attempted because the walk stopped to fix what it found" \
+        obliges="resolve the symptoms 0.8.0 can demonstrably attack, or record why each cannot" \
+        note="the point of cutting was to make progress computable. It now is, and the computation \
+            has not been run — which is a smaller gap than `no release exists` and is still a gap"
+
+    finding "AS6" state="open" size="frame-sized" \
+        text="withdrawing a cut release has no inverse for promotion. `praxis promote` refuses on a \
+            release that is not cut, so the entries it already wrote into five capability records \
+            stay — derived from a release that no longer stands, and unwindable only by hand" \
+        obliges="promoted truth is DERIVED, so it must be recomputable downward as well as upward — \
+            a recompute that reads every cut release and rewrites what each capability says it is" \
+        note="the rule is named promoted-truth-is-derived and it caught the inconsistency \
+            immediately, which is the record working. What it cannot do is fix it: every command in \
+            this chain moves forward, and the one operation that moves back was performed with a \
+            text editor"
+
+    finding "AS7" state="open" size="observation" \
+        text="`withdrawn` had to be added in TWO places on the release entity — `states=` on the \
+            kind and `one-of=` on its `state` field — and the first edit alone left the refusal \
+            unchanged, which read as the schema not having been picked up" \
+        note="two declarations of one vocabulary, and nothing says they must agree. A kind whose \
+            `states=` and whose `state` field's `one-of=` differ is a record that refuses \
+            something it also permits"
+
+    finding "AS9" state="open" size="observation" \
+        text="`audit_excludes` in the version-bump script was defined and never called, so the \
+            exclude list in .the bump-proposal artifact read to nothing. Adding an entry to it changed \
+            no behaviour, which looked like the entry being wrong" \
+        note="third instance today of a declaration nothing reads — `when-state` on schema fields \
+            (AS2), `needed-by` on read models, and now an audit exclude list. Each looks honoured \
+            from the file that declares it, and only fails when somebody adds an entry expecting \
+            it to work. A config key nothing reads is the enforcement version of an unwitnessed rule"
+
+    proves "the release chain runs end to end, and refuses in the right places when it should not"
+    does-not-prove "that a release is worth having. Four documents were produced and the walk's \
+        strongest finding is that nobody would read them twice"
+
+    trail {
+        entry at="2026-08-22T00:00:00Z" by="agent:principal-engineer" action="created" \
+            note="walked because AA4 and AF2 both said the chain never had been. Two defects and a \
+                product judgement, in nine steps"
+    }
+}

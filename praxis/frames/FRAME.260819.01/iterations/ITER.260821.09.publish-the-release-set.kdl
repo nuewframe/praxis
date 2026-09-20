@@ -1,0 +1,188 @@
+// The ninth iteration, and the second admitted over a refusal the machine gate wrote.
+// REF.260821.05 stands: TS.260820.09 is not delivered because its C3 is met-in-part, and
+// the residue can only be settled by this slice. The same shape as ITER.260821.04, which
+// is what makes it structural rather than unlucky (Y3).
+
+iteration "ITER.260821.09" {
+    slug "publish-the-release-set"
+    on-slice "TS.260820.10"
+    state "closed"
+    opened-at "2026-08-21T14:36:00Z"
+    opened-by "agent:principal-engineer"
+    closed-at "2026-08-21T15:10:00Z"
+    outcome "continue" \
+        because="the archival surface exists, it is byte-reproducible, and building it found a \
+            contradiction between this slice and the one it depends on that neither could have \
+            shown alone"
+
+    approval "admission" {
+        status "signed"
+        signer "human:waelrabadi"
+        at "2026-08-21T14:36:00Z"
+        signed-by "the ask to work the rest of the slices through to done"
+    }
+
+    vet "create" state="done" at="2026-08-21T14:36:00Z" {
+        condition "the machine gate was asked first" verdict="refused" \
+            found="`praxis pick-up TS.260820.10` refused and wrote REF.260821.05 — \
+                dependencies-delivered: TS.260820.09 is not delivered" \
+            resolved-by="admitted on the human's ask, with the refusal left standing. The block is \
+                real and its cause is X1: TS.260820.09/C3 is met-in-part, and the residue is owed \
+                to THIS slice. Settling it here is what clears the block"
+        condition "no other iteration is open" verdict="passed" found="all eight prior iterations are closed"
+        condition "the slice is the best available" verdict="passed" \
+            found="it is the only slice that can settle X1, and everything left in the release chain \
+                is downstream of it"
+    }
+
+    vet "start" state="done" at="2026-08-21T14:40:00Z" {
+        condition "the tree is clean and current" verdict="passed" found="HEAD 2108fd1"
+        condition "the slice's scope is unchanged" verdict="amended-first" \
+            found="its trigger read `a release has been cut`, which cannot be true at the same time \
+                as TS.260820.09/C3" \
+            resolved-by="the trigger amended to `about to be cut`, with the argument recorded on the \
+                slice as `amended-by`. The four claims are untouched. Recorded as Y1"
+        condition "what this will write is known before it writes" verdict="known-and-recorded" \
+            found="two documents under the 0.8.0 archival projection — the first files this engine has \
+                written outside the state root. Nothing enforces that boundary (Y5)"
+    }
+
+    frozen {
+        pins "the entity-and-field schema" at="NA.260820.01/schema" at-commit="2108fd1"
+        pins "read-model@v1" at="NA.260820.01/seam" at-commit="2108fd1"
+        rule "a schema change while this iteration is open is a FINDING, not an edit" \
+            exception="none. This iteration changed no schema"
+    }
+
+    claim "C1" from-slice="TS.260820.10" state="met" \
+        text="publishing regenerates whole and performs no in-place edit" \
+        settled-by="a test asserting each output file is byte-identical to a fresh render, plus a check that no regex substitution path exists" \
+        evidence="publishing twice produces the same documents and \
+            composition happens before any write. `publish` returns the whole set as VALUES, so \
+            a caller cannot splice — it can only write what it was handed. There is no substitution \
+            path to check for because there is nowhere to put one"
+    claim "C2" from-slice="TS.260820.10" state="met" \
+        text="every published document names its release, and lands under that release's directory" \
+        settled-by="a test asserting a stamp on every file, and that no file is written outside the archival projection" \
+        evidence="every document names its release and lands under that version"
+    claim "C3" from-slice="TS.260820.10" state="met" \
+        text="rendering needs no code path specific to any one read model, AND no emitted cell contains markup" \
+        settled-by="a test rendering a newly declared read model with no renderer change, plus a check rejecting markup in any cell" \
+        evidence="a newly declared read model renders with no renderer change \
+            and no emitted cell contains markup. There are now TWO renderers over the one result \
+            type — terminal and Markdown — with no branch on a view's name in either, which is a \
+            harder test of E10's falsifier than the walkthrough could run (Y4)"
+    claim "C4" from-slice="TS.260820.10" state="met" \
+        text="publishing never writes outside the current release's directory" \
+        settled-by="a test asserting prior release directories are byte-unchanged after a publish" \
+        evidence="publishing writes nothing outside this release directory — \
+            asserted on the composed paths rather than by publishing twice and diffing, because the \
+            paths are what a future change would get wrong"
+
+    claim "C3" from-slice="TS.260820.09" state="met" \
+        text="the recorded commit resolves in git and contains that release's published directory" \
+        settled-by="cut-release refusing until the published directory exists AND is committed" \
+        evidence="published_and_committed() refuses the cut when \
+            the archival projection is absent or has uncommitted changes, verified against the real \
+            tree: `praxis cut-release 0.8.0 --confirm` refused with `?? the 0.8.0 archival projection`" \
+        note="the residue X1 carried from ITER.260821.08. It is settled by making the containment \
+            true BY CONSTRUCTION rather than by asserting it after the fact — the cut cannot happen \
+            until the commit it will name contains the documents"
+
+    contributes "slice-outcome-added" \
+        because="publish-the-release-set, and the archival surface made byte-reproducible"
+
+    layer "doctrine"    state="evidenced" evidence="surface.skill.publish-the-release-set, registered in the router" reaches="the skill forbids editing a published document toward a new state"
+    layer "enforcement" state="evidenced" evidence="85 tests pass; publishing after a cut is refused, and cutting before a publish is refused" reaches="stamp-on-publish, and archival immutability"
+    layer "docs"        state="evidenced" evidence="the 0.8.0 what-shipped document and the capabilities document — the first archival documents this engine has produced" reaches="this slice IS the docs layer"
+    layer-set sealed=#true at="2026-08-21T14:40:00Z"
+
+    phase "design-ux" state="complete" required-by="docs" \
+        produced="what an archival document SAYS about itself. `Depicts 0.8.0, and nothing else. \
+            Regenerated whole from the record; never edited in place.` — which tells a reader both \
+            what the document is true of and that editing it is not how it changes"
+    phase "design-system" state="complete" required-by="enforcement" \
+        produced="an archival result carries no clock. The composing function does not TAKE the \
+            moment, rather than taking it and remembering not to use it — a function with an unused \
+            timestamp parameter is one refactor away from a document that can never be verified. \
+            And the ordering: publish, commit, then cut, enforced at the cut"
+    phase "implement" state="complete" required-by="enforcement · docs" \
+        produced="praxis-core::publish, a Markdown renderer over the same result type, \
+            `praxis publish`, the containment check at cut, and eleven tests"
+    phase "learn" state="complete" required-by="always" produced="five findings, one of them a contradiction between two slices" \
+        note="never skippable — it is the phase that judges the others"
+    phase "teach" state="skipped" required-by="doctrine" produced="surface.skill.publish-the-release-set" \
+        skipped-because="it produced doctrine for an AGENT, which is the doctrine LAYER and is recorded there. Teaching an end user the feature's why and how did not happen — and the record already serves the next agent, whose own persona judges success by NOT needing a document (TS.260821.19, ITER.260822.15/BA1)"
+
+    finding "Y1" state="open" size="frame-sized" \
+        text="TS.260820.10 and TS.260820.09 contradicted each other and both were cut from the same \
+            storm on the same day. This slice was triggered by `a release has been cut`; that slice \
+            requires the release index's commit to CONTAIN this release's published directory. A \
+            commit taken at cut time cannot contain documents written afterwards, so at most one of \
+            them could ever have been satisfied" \
+        obliges="cut a slice whose claims name an ORDERING between commands, since neither slice's \
+            shape could express `this happens before that` and the checker cannot see it" \
+        note="found by building, not by reading — and unfindable by reading, because each slice is \
+            internally coherent. The contradiction lives in the SPACE BETWEEN two records, which is \
+            precisely where a checker that validates records one at a time cannot look"
+
+    finding "Y2" state="open" size="owed-work" carries="none" \
+        text="the archival documents first carried a `Generated at <clock>` line, so two publishes \
+            of an unchanged record produced different bytes. Verification of a published tree is a \
+            COMPARISON, so that document could never have been verified" \
+        note="the fix was to remove the timestamp PARAMETER, not merely to stop printing it. A \
+            function that takes the moment and remembers not to use it is one refactor away from \
+            using it, and the failure would surface as an unverifiable release rather than as a bug"
+
+    finding "Y3" state="open" size="frame-sized" \
+        text="this is the second iteration admitted over a machine refusal, and both have the same \
+            cause: a slice's claim residue is owed to a DOWNSTREAM slice, so the upstream slice is \
+            never delivered, so the gate refuses the downstream one that would settle it" \
+        obliges="X2's class — the gate needs a way to admit `this slice settles that slice's \
+            residue`, or the override stays the only route and every instance costs a human signature" \
+        note="two instances is a pattern. The override works and is recorded honestly both times, \
+            but a gate a human must overrule at every dependency inversion is a gate that will get \
+            switched off"
+
+    finding "Y4" state="open" size="observation" \
+        text="E10's falsifier is now under a harder test than the walkthrough could apply: TWO \
+            renderers over one result type, terminal and Markdown, with no branch on a view's name \
+            in either. WALK.260820.01/W2 tested one renderer and could not distinguish `no branch \
+            needed` from `only one shape rendered so far`" \
+        note="the second renderer wanted a completely different output shape — tables, headings, \
+            a stamp — and still needed nothing view-specific. That is the strongest evidence the \
+            read-side split is real that this frame has produced"
+
+    finding "Y5" state="open" size="owed-work" \
+        text="publish is the first command to write OUTSIDE the state root, into docs/. the config \
+            declares archival-projection as the archival projection, and nothing reads that declaration or \
+            enforces the boundary — the path is composed in the engine" \
+        obliges="read the archival root from config like the bump rules are read, and refuse a write \
+            outside it" \
+        note="the same class as the bump rules before W3: a binding the record declares and the \
+            engine does not consult. C4 asserts the paths are inside the release directory, which \
+            is the property that matters, but the ROOT is still the engine's opinion"
+
+    close {
+        claims-settled "C1" "C2" "C3" "C4" all-met=#true \
+            note="and TS.260820.09/C3, the residue X1 carried. Five claims across two slices"
+        layers-reached "doctrine" "enforcement" "docs" all-evidenced=#true
+        findings-carried "Y1" "Y2" "Y3" "Y4" "Y5"
+        scope-unchanged #false \
+            note="the slice's TRIGGER was amended — recorded on the slice with its argument. Its \
+                four claims are untouched"
+        verified "cargo test — 85 passed across ten suites" \
+            "praxis check praxis — ok, 14 kinds declared, zero reports" \
+            "praxis publish 0.8.0 twice — byte-identical output" \
+            "praxis cut-release 0.8.0 --confirm — refused, naming the uncommitted published set"
+    }
+
+    trail {
+        entry at="2026-08-21T15:10:00Z" by="agent:principal-engineer" action="state-changed" \
+            from="working" to="closed" \
+            note="the archival surface exists and is reproducible. Building it found that two slices \
+                cut on the same day could not both be satisfied"
+        entry at="2026-08-21T14:36:00Z" by="agent:principal-engineer" action="created" \
+            note="admitted over REF.260821.05 on the human's ask, with the refusal left standing"
+    }
+}

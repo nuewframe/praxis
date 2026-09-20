@@ -1,0 +1,78 @@
+// The demolition, cut as a slice rather than done as a chore.
+//
+// v0.7.1 is tagged. Everything removed here is recoverable by name, which is what lets this
+// slice exclude a compatibility shim outright: the old method is not deprecated, it is
+// SUPERSEDED, and a shim would keep two spines alive in one plugin — the second-copy problem
+// this frame exists to attack, applied to the plugin's own doctrine.
+
+thin-slice "TS.260821.04" {
+    slug "retire-the-pre-graph-spine"
+    title "Take the unanchored count to zero, and close the rule behind it"
+    kind "view"
+    realizes "CAP.delivery-record"
+    from-storm "ES.260819.01"
+
+    read-model "what-this-plugin-ships"
+    actor "an agent arriving in a repository that has Praxis loaded"
+    needs-read-model "what-is-currently-true"
+
+    trigger "an agent reads the router and follows a spine whose five commands do not exist"
+    outcome "the router describes the workflow the record actually holds, every remaining surface is anchored, and re-adding an unanchored one refuses"
+
+    scenario #"""
+        Given twenty-five shipped skills with no anchor, and a router whose spine names
+             create-wave, start-thin-slice, create-sprint, intake and close-sprint
+        When each unanchored surface is decided — anchored to what it serves, or retired
+        Then the audit reports zero, the rule flips from report to refuse, and the spine an
+             arriving agent reads is the one the record can be asked about — because a method
+             that tells an agent to run a command it does not have has not narrowed
+             improvisation, it has mandated it.
+        """#
+
+    step "1" does="decide each of the twenty-five, one at a time, in the record. Two outcomes only: it names what it serves, or it retires"
+    step "2" does="retire by removing the file and recording the surface as retired, naming v0.7.1 as where it stands"
+    step "3" does="rewrite the router's spine, personas, tier branching and enforcement table to the commands that exist"
+    step "4" does="flip every-shipped-surface-is-anchored from report to refuse, once the count is zero"
+    step "5" does="the README, the Markdown dashboard and the plugin validator reference sets follow — they cross-check a surface list that just changed"
+
+    excludes "a compatibility shim or a deprecation window. v0.7.1 is tagged; recovery is `git \
+        checkout v0.7.1 -- skills/<name>`. Keeping both spines loaded would mean an arriving agent \
+        reads two methods and picks one, which is the symptom"
+    excludes "deciding the twenty-five in one edit. Each is a separate judgement — some are replaced \
+        outright, some are still wanted and merely unanchored, and a sweep cannot tell those apart"
+    excludes "rewriting a retained skill's CONTENT. Anchoring says the record asks for it; whether it \
+        teaches the current method is its own work, and conflating the two is how a cleanup becomes a quarter"
+
+    layer "doctrine"    reaches="the router is the front door and is now a projection of what the record holds"
+    layer "enforcement" reaches="every-shipped-surface-is-anchored at refuse — re-adding an unanchored surface fails the check"
+    layer "docs"        reaches="README and the Markdown dashboard name only surfaces that exist and are asked for"
+
+    claim "C1" text="the audit from TS.260821.03 reports zero unanchored surfaces" \
+        settled-by="`praxis check` over this record, with the count in the iteration's evidence"
+    claim "C2" text="every retirement is recorded, naming the release the file stands at" \
+        settled-by="a retired `doctrine-surface` per removed file, and a test that a retired surface whose path still ships is refused"
+    claim "C3" text="the rule refuses. Adding an unanchored surface after this slice fails the check" \
+        settled-by="a witness declaring a shipped surface with no anchor, asserting a refusal — the witness a-rule-has-a-witness requires"
+    claim "C4" text="the router's spine names only commands the CLI has" \
+        settled-by="a test comparing every command named in surface.skill.using-praxis against the binary's subcommand list"
+
+    depends-on "TS.260821.03 — nothing can be taken to zero before it can be counted"
+
+    useful-alone "the front door stops contradicting the house. An arriving agent reads a spine it \
+        can execute, which is the first thing every session does and currently the first thing that \
+        misleads it"
+    useful-to "the-next-agent" "the-adopter"
+
+    attacks "S1"
+
+    cut-from "ITER.260821.19/AK3"
+
+    principle-note "C4 is the claim that matters, and it is the one that generalises: a document \
+        whose instructions are checked against the thing they instruct cannot go stale in silence. \
+        The router went eighteen iterations describing a replaced workflow because nothing compared \
+        it to anything"
+
+    proves "the plugin ships one method, and adding a second refuses"
+    does-not-prove "that the retained skills teach the graph well. Twenty-two anchored surfaces are \
+        asked for by the record; how good their prose is went untouched here, deliberately"
+}

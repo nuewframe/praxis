@@ -1,0 +1,188 @@
+// Opened by `praxis pick-up`. Every condition below was evaluated against the
+// tree as it stood at 2026-08-23T17:23:04Z, and the verdicts are recorded
+// rather than summarised: a gate whose reasoning is not on the record is a gate
+// you have to trust.
+
+iteration "ITER.260823.11" {
+    slug "an-iteration-is-not-the-first"
+    on-slice "TS.260823.10"
+    state "closed"
+    opened-at "2026-08-23T17:23:04Z"
+    opened-by "agent:praxis"
+
+    approval "admission" {
+        status "asked"
+        asked-by "human:wael"
+        at "2026-08-23T17:23:04Z"
+        via "the ask to pick up this slice"
+    }
+
+    vet "create" state="done" at="2026-08-23T17:23:04Z" on-slice="TS.260823.10" {
+        condition "slice-is-shaped" verdict="passed"
+        condition "dependencies-delivered" verdict="passed"
+        condition "no-iteration-in-flight" verdict="passed"
+        condition "nothing-left-to-admit" verdict="passed"
+        condition "work-is-disjoint" verdict="not-computed" \
+            found="no seam manifest exists, so what two iterations would touch cannot be compared. Disjointness is half of what this capability says it judges, and half of what it judges is currently not computed at all"
+        condition "the-slice-is-the-best-available" verdict="left-to-the-maintainer"
+    }
+
+    // 2 of the declared conditions were not decided by the gate. They are
+    // recorded above rather than omitted: an admission that does not say what
+    // it left undecided claims more than it checked.
+
+    // Frozen at open, from the slices. Removing one from a slice now
+    // does not remove it from here — it makes the two disagree, and that is
+    // refused.
+    claim "C1" from-slice="TS.260823.10" state=met{
+        ran "cargo test --quiet --test iteration_continuation"
+        exited 0
+        digest "fnv1a64:987df45e4691f82e"
+        witnessed-at "2026-08-23T17:24:42Z"
+    }
+    claim "C2" from-slice="TS.260823.10" state=met{
+        ran "cargo test --quiet --test iteration_continuation"
+        exited 0
+        digest "fnv1a64:d229f4291cbbed14"
+        witnessed-at "2026-08-23T17:24:56Z"
+    }
+    claim "C3" from-slice="TS.260823.10" state=met{
+        ran "cargo test --quiet --test iteration_continuation"
+        exited 0
+        digest "fnv1a64:ddf213692af7fba8"
+        witnessed-at "2026-08-23T17:25:10Z"
+    }
+    claim "C4" from-slice="TS.260823.10" state=met{
+        ran "cargo test --quiet --test iteration_continuation"
+        exited 0
+        digest "fnv1a64:21ae873a04234188"
+        witnessed-at "2026-08-23T17:25:25Z"
+    }
+    claim "C5" from-slice="TS.260823.10" state=met{
+        ran "cargo test --quiet --test iteration_continuation"
+        exited 0
+        digest "fnv1a64:89242e207dd04e2e"
+        witnessed-at "2026-08-23T17:25:40Z"
+    }
+    claim "C6" from-slice="TS.260823.10" state=met{
+        ran "cargo test --quiet --test iteration_continuation"
+        exited 0
+        digest "fnv1a64:c9b6f44c4c925f78"
+        witnessed-at "2026-08-23T17:25:54Z"
+    }
+
+    phase "design-system" state="complete" worked-by="agent:principal-engineer" {
+        approach "`continues` is a field on the iteration, referencing a prior iteration" {
+            over "a `continuation` entity of its own, holding both iterations' ids"
+            over "inferring it from `on-slice` overlap, with nothing written down"
+            because "the same distinction `declare-an-entity-kind` already draws: a fact ABOUT \
+                an iteration is a field, and only a thing the iteration CONTAINS needs `holds`. \
+                A continuation is the first, and the field carries `references=\"iteration\"` for \
+                free — the same generic reference check every other cross-reference gets"
+        }
+
+        approach "a carried claim is identified by a `carried-from` CITATION, never by the word `carried`" {
+            over "reserving the literal state value `carried` for this feature"
+            over "a boolean flag beside `state`, e.g. `inherited=#true`"
+            because "the corpus already used `state=\"carried\"` as free prose for a claim a \
+                FINDING carries forward (`ITER.260823.07`'s close accounting) — a fact this \
+                design did not know until an existing close-accounting test broke on the first \
+                build. Reusing the \
+                word for a second, incompatible meaning would make the two indistinguishable by \
+                the very engine meant to keep facts apart. The citation is the new fact; the word \
+                stays free text either way, which is honest about how little of `claim` this \
+                engine actually validates"
+            note "carried, not settled: see F1"
+        }
+
+        approach "produced approaches are the union of a design's own and the one it continues" {
+            over "requiring a continuing iteration to restate the approach in its own words"
+            over "exempting a continuation from `implement-follows-an-approach` entirely"
+            because "F2 of `ITER.260823.08` passed by holding NO design at all, which is the \
+                right outcome — the claim was carried out — reached by a route that would have \
+                looked identical for an iteration that carried out nothing. Naming the approach \
+                it continues is the difference, so `produced` has to include it for `followed` \
+                to ever resolve"
+        }
+
+        approach "an approach's disposition is graded on whether ITS OWN implement is complete" {
+            over "always refusing an untaken approach, and exempting continuations from it"
+            over "a new phase state meaning `in progress`, beside pending/active/complete/skipped"
+            because "F4 of `ITER.260823.06` found the rule refusing the ordinary state of any \
+                iteration that designed before it built. The phase already declares the state \
+                that answers this — `active` and `pending` both mean not finished — so the fix \
+                reads a fact the schema already carries rather than adding a fact to carry"
+        }
+
+        produced "four approaches, three new fields on `iteration`, two new rules and their \
+            witnesses, and a severity split on a rule that already existed"
+    }
+
+    phase "implement" state="complete" worked-by="agent:principal-engineer" \
+        produced="`continues` and its slice-overlap and stated-reason checks, `carried-from` \
+            citation on a claim and its accounting at close, a continued design's approaches \
+            counted toward `implement-follows-an-approach`, an in-flight approach reported \
+            instead of refused, and eight tests" {
+        followed "`continues` is a field on the iteration, referencing a prior iteration"
+        followed "a carried claim is identified by a `carried-from` CITATION, never by the word `carried`"
+        followed "produced approaches are the union of a design's own and the one it continues"
+        followed "an approach's disposition is graded on whether ITS OWN implement is complete"
+    }
+
+    layer "doctrine" state="evidenced" \
+        evidence="`pick-up-a-slice` and `close-an-iteration` gain the vocabulary a second \
+            attempt needs: `--continues`/`--because` on the gate, and a carried claim's \
+            citation read back at close" \
+        reaches="the skill an agent follows when a slice is getting a second attempt"
+
+    layer "enforcement" state="evidenced" \
+        evidence="`a-continuation-shares-its-slice` and `a-continuation-states-why` are declared \
+            and witnessed; `implement-follows-an-approach` counts a continued design's approaches; \
+            `the-plan-and-the-code-agree` reports rather than refuses while implement is in \
+            flight; a carried claim is accounted at close without a finding, and exempted from \
+            `no-silent-drop` by its citation" \
+        reaches="every completeness question `ITER.260823.08/F1`, `ITER.260823.08/F2` and \
+            `ITER.260823.06/F4` found asking the wrong span"
+
+    layer "docs" state="evidenced" \
+        evidence="`what does this slice still owe` is answerable by reading `continues` and the \
+            claims it carries, across however many iterations the slice has had, instead of only \
+            the one open now" \
+        reaches="the question those three findings could not answer from one iteration alone"
+
+    layer-set sealed=#true at="2026-08-23T17:23:04Z"
+
+    finding "F1" \
+        text="the design's second approach exists because the FIRST attempt at it did not know \
+            the corpus already spends the word `carried` on a claim a finding carries forward — \
+            found only when an existing close-accounting test broke against the first build, not \
+            by reasoning about the vocabulary beforehand. The word itself is still unreserved: \
+            `claim` declares no field and nothing stops a third meaning being written under it. \
+            Formalizing `claim` as a shaped, contained entity — the way `phase` was declared by \
+            `ITER.260821.01` — would let a `one-of` catch this the way it now catches `phase` and \
+            `iteration` themselves" \
+        note="not owed against this slice: `TS.260823.10` explicitly excludes deciding what a \
+            claim's own shape should be, and inventing that scope here would be exactly the \
+            second-guessing `plan-before-building` asks an iteration not to do"
+    closed-at "2026-08-23T17:26:11Z"
+    outcome "continue"
+
+    close {
+        claims-settled "C1" how="met"
+        claims-settled "C2" how="met"
+        claims-settled "C3" how="met"
+        claims-settled "C4" how="met"
+        claims-settled "C5" how="met"
+        claims-settled "C6" how="met"
+        all-met #true
+        attested-by "human:wael"
+        note "the accounting above was computed at close, not asserted. It says every claim is either met or carried by a finding that names it, and nothing about whether the work is any good"
+    }
+
+    trail {
+        entry at="2026-08-23T17:26:11Z" by="agent:praxis" action="state-changed" from="open" to="closed" note="closed by `praxis close`. The accounting was computed; the conclusion is not the machine's to draw"
+
+        entry at="2026-08-23T17:23:04Z" by="agent:praxis" action="created" \
+            note="opened by the gate, on the ask of human:wael"
+    }
+}

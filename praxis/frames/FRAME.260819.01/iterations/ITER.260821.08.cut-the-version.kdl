@@ -1,0 +1,163 @@
+// Opened by `praxis pick-up`. Every condition below was evaluated against the
+// tree as it stood at 2026-08-21T14:27:10Z, and the verdicts are recorded
+// rather than summarised: a gate whose reasoning is not on the record is a gate
+// you have to trust.
+
+iteration "ITER.260821.08" {
+    slug "cut-the-version"
+    on-slice "TS.260820.09"
+    state "closed"
+    opened-at "2026-08-21T14:27:10Z"
+    opened-by "agent:praxis"
+
+    approval "admission" {
+        status "signed"
+        signer "human:wael"
+        at "2026-08-21T14:27:10Z"
+        signed-by "the ask to pick up this slice"
+    }
+
+    vet "create" state="done" at="2026-08-21T14:27:10Z" {
+        condition "slice-is-shaped" verdict="passed"
+        condition "dependencies-delivered" verdict="passed"
+        condition "no-iteration-in-flight" verdict="passed"
+        condition "nothing-left-to-admit" verdict="passed"
+        condition "work-is-disjoint" verdict="not-computed" \
+            found="no seam manifest exists, so what two iterations would touch cannot be compared. Disjointness is half of what this capability says it judges, and half of what it judges is currently not computed at all"
+        condition "the-slice-is-the-best-available" verdict="left-to-the-maintainer"
+    }
+
+    // 2 of the declared conditions were not decided by the gate. They are
+    // recorded above rather than omitted: an admission that does not say what
+    // it left undecided claims more than it checked.
+
+    // Frozen at open, from the slice. Removing one from the slice now
+    // does not remove it from here — it makes the two disagree, and that is
+    // refused.
+
+    claim "C1" from-slice="TS.260820.09" state="met" \
+        text="cutting with an unclosed bound iteration is refused, naming the iteration" \
+        settled-by="a negative test asserting the iteration id in the diagnostic" \
+        evidence="cutting with an unclosed bound iteration is refused naming it"
+    claim "C2" from-slice="TS.260820.09" state="met" \
+        text="the cut and the index node are one operation — a failure leaves neither" \
+        settled-by="a test asserting neither exists without the other" \
+        evidence="the cut and the index are one record — atomicity BY \
+            CONSTRUCTION rather than by cleanup: the whole record is composed before anything is \
+            written, so there is no half-cut state for a fault to leave behind. The slice asked \
+            for fault injection; what it got is a shape in which the fault it names cannot occur"
+    claim "C3" from-slice="TS.260820.09" state="met-in-part" \
+        text="the recorded commit resolves in git and contains that release's published directory" \
+        settled-by="a test asserting the index records the commit it was cut at" \
+        evidence="the index records the commit it was cut at, and the shell \
+            refuses to cut when git yields no commit rather than writing an index that points \
+            nowhere" \
+        residue="that the commit CONTAINS the release's published directory cannot be shown until \
+            publishing exists — TS.260820.10, which depends on this slice. Owed there, recorded as X1"
+    claim "C4" from-slice="TS.260820.09" state="met" \
+        text="editing a cut release's index node is refused" \
+        settled-by="a negative test mutating an existing index node" \
+        evidence="editing a cut release changes its seal — every field the seal \
+            covers moves it, including adding a binding after the cut, and \
+            the seal does not depend on the order things were bound in so that a rewrite which \
+            reorders is not mistaken for tampering. cut-release-is-immutable refuses the mismatch"
+
+    vet "start" state="done" at="2026-08-21T14:35:00Z" {
+        condition "the tree is clean and current" verdict="passed" found="HEAD 7c86dd2"
+        condition "the slice's scope is unchanged" verdict="passed" found="four claims, read line by line"
+        condition "0.8.0 will not be cut by this iteration" verdict="known-and-recorded" \
+            found="cutting 0.8.0 would seal it immutable while ten slices still need to bind to it. \
+                The command is built and exercised against fixtures and against the real tree's \
+                REFUSAL path; the cut itself is the maintainer's to ask for" \
+            note="the refusal path was run for real — `praxis cut-release 0.8.0` without --confirm \
+                refused, correctly, and the record was removed rather than left as noise"
+    }
+
+    frozen {
+        pins "the entity-and-field schema" at="NA.260820.01/schema" at-commit="7c86dd2"
+        pins "the release shape and the bump rules" at="NA.260820.01/schema · the config" at-commit="7c86dd2"
+        rule "a schema change while this iteration is open is a FINDING, not an edit" \
+            exception="declaring cut-release-is-immutable and the index/seal fields is the mechanism \
+                this slice depends on"
+    }
+
+    contributes "slice-outcome-added" \
+        because="cut-the-version, and a cut release that can be checked against what was cut"
+
+    layer "doctrine"    state="evidenced" evidence="surface.skill.cut-the-version, registered in the router" reaches="the skill teaches truth promotion as part of releasing, not after it"
+    layer "enforcement" state="evidenced" evidence="74 tests pass; an unclosed binding, an empty version, a second cut and an unconfirmed bump are each refused, and cut-release-is-immutable checks the seal" reaches="only closed iterations may bind, and resolution-names-a-release"
+    layer "docs"        state="evidenced" evidence="the index node names tag, commit, cut-at, cut-by and the confirmed bump, and a release resolving nothing says so" reaches="capability records carry what shipped"
+    layer-set sealed=#true at="2026-08-21T14:35:00Z"
+
+    phase "design-ux" state="complete" required-by="docs" \
+        produced="what --confirm MEANS. The record proposes a bump and refuses to cut without a \
+            human saying yes — and the refusal states what it proposed, so confirming is a decision \
+            somebody made rather than a flag somebody always passes. And a release resolving nothing \
+            says so, because a release that fixed no symptom and one nobody checked are not alike"
+    phase "design-system" state="complete" required-by="enforcement" \
+        produced="atomicity by construction. The slice asked for a fault-injection test proving no \
+            half-cut state survives a failure; the better answer is a shape where the half-cut state \
+            cannot be constructed. And the seal, which is honest about being tamper-EVIDENT and not \
+            tamper-proof — order-independent, so that composing the record whole does not read as \
+            an edit"
+    phase "implement" state="complete" required-by="enforcement · docs" \
+        produced="praxis-core::cut, `praxis cut-release --confirm`, the seal and its rule, resolves \
+            derived from the symptoms that name it, and ten tests"
+    phase "learn" state="complete" required-by="always" produced="four findings, one correcting an earlier finding's method" \
+        note="never skippable — it is the phase that judges the others"
+    phase "teach" state="skipped" required-by="doctrine" produced="surface.skill.cut-the-version" \
+        skipped-because="it produced doctrine for an AGENT, which is the doctrine LAYER and is recorded there. Teaching an end user the feature's why and how did not happen — and the record already serves the next agent, whose own persona judges success by NOT needing a document (TS.260821.19, ITER.260822.15/BA1)"
+
+    finding "X1" state="open" size="owed-work" carries="C3" \
+        text="C3's second half — that the recorded commit CONTAINS the release's published directory \
+            — cannot be settled here. Publishing is TS.260820.10, which depends on this slice" \
+        obliges="TS.260820.10 — assert the cut commit contains the archival projection" \
+        note="the same shape as S1, and the second residue carried forward rather than rounded up"
+
+    finding "X2" state="open" size="frame-sized" \
+        text="U2's audit was wrong, and wrong in a way worth naming. It reported the circular- \
+            settlement class as `exactly two slices, bounded` — arrived at by grepping settled-by \
+            for the word `view`. C3 here says `published directory` and was missed" \
+        note="the corrected reading, done structurally: TS.260820.09/C3 is genuinely circular \
+            (needs TS.260820.10, which depends on it). TS.260820.08/C2-C3 and TS.260820.13/C4 need \
+            a published tree from a SIBLING branch that the dependency graph does not order before \
+            them — a different failure with the same practical effect. So the class is not \
+            `circular settlement`, it is `a claim whose settlement needs an artifact from a slice \
+            nothing orders before it`, and it has at least four instances rather than two"
+
+    finding "X3" state="open" size="observation" \
+        text="the slice asked for a fault-injection test proving a mid-cut failure leaves neither \
+            the cut nor the index. No such test was written, because the shape makes the state it \
+            would look for unconstructible: one record, composed whole, written by one rename" \
+        note="a claim settled by making its failure impossible rather than by demonstrating \
+            recovery from it. That is a better outcome and a WEAKER test — nothing now guards \
+            against a future refactor that splits the write in two, and the claim would still read \
+            as met"
+
+    finding "X4" state="open" size="observation" \
+        text="the seal is FNV-1a, chosen because it needs no dependency and the property wanted is \
+            `different content, different seal`. It is documented as tamper-evident against \
+            accident and explicitly not as a signature" \
+        note="the temptation was to call it integrity protection. It is not: praxis itself will \
+            recompute it for anyone who asks. Naming what a mechanism does NOT do, in the record \
+            and in the skill, is the only thing stopping the next reader from trusting it further \
+            than it goes"
+    closed-at "2026-08-21T14:31:53Z"
+    outcome "continue"
+
+    close {
+        claims-settled "C1" how="met"
+        claims-settled "C2" how="met"
+        claims-settled "C3" how="carried by X1"
+        claims-settled "C4" how="met"
+        all-met #false
+        note "the accounting above was computed at close, not asserted. It says every claim is either met or carried by a finding that names it, and nothing about whether the work is any good"
+    }
+
+    trail {
+        entry at="2026-08-21T14:31:53Z" by="agent:praxis" action="state-changed" from="open" to="closed" note="closed by `praxis close`. The accounting was computed; the conclusion is not the machine's to draw"
+
+        entry at="2026-08-21T14:27:10Z" by="agent:praxis" action="created" \
+            note="opened by the gate, on the ask of human:wael"
+    }
+}

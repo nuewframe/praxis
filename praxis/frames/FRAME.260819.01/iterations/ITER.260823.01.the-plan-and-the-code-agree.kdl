@@ -1,0 +1,132 @@
+// Opened by `praxis pick-up`. Every condition below was evaluated against the
+// tree as it stood at 2026-08-23T00:48:17Z, and the verdicts are recorded
+// rather than summarised: a gate whose reasoning is not on the record is a gate
+// you have to trust.
+
+iteration "ITER.260823.01" {
+    slug "the-plan-and-the-code-agree"
+    on-slice "TS.260821.20"
+    state "closed"
+    opened-at "2026-08-23T00:48:17Z"
+    opened-by "agent:praxis"
+
+    approval "admission" {
+        status "signed"
+        signer "human:wael"
+        at "2026-08-23T00:48:17Z"
+        signed-by "the ask to pick up this slice"
+    }
+
+    vet "create" state="done" at="2026-08-23T00:48:17Z" on-slice="TS.260821.20" {
+        condition "slice-is-shaped" verdict="passed"
+        condition "dependencies-delivered" verdict="passed"
+        condition "no-iteration-in-flight" verdict="passed"
+        condition "nothing-left-to-admit" verdict="passed"
+        condition "work-is-disjoint" verdict="not-computed" \
+            found="no seam manifest exists, so what two iterations would touch cannot be compared. Disjointness is half of what this capability says it judges, and half of what it judges is currently not computed at all"
+        condition "the-slice-is-the-best-available" verdict="left-to-the-maintainer"
+    }
+
+    // 2 of the declared conditions were not decided by the gate. They are
+    // recorded above rather than omitted: an admission that does not say what
+    // it left undecided claims more than it checked.
+
+    // Frozen at open, from the slices. Removing one from a slice now
+    // does not remove it from here — it makes the two disagree, and that is
+    // refused.
+    claim "C1" from-slice="TS.260821.20" state="met" \
+        evidence="following an approach nobody recorded is refused — the case \
+            that passed before this slice. The refusal says an account of a choice nobody made is \
+            worse than no plan, because a reader has no reason to distrust it"
+    claim "C2" from-slice="TS.260821.20" state="met" \
+        evidence="an approach that was planned and not taken is named — named, \
+            and the message says how to fix it rather than which rule fired"
+    claim "C3" from-slice="TS.260821.20" state="met" \
+        evidence="an abandoned approach satisfies the rule and remains — the \
+            exit is one field, and the abandoned approach stays in the record because the \
+            alternative considered is why the plan was worth writing"
+
+    layer "doctrine"    state="evidenced" \
+        evidence="surface.skill.plan-before-building gains the abandonment half — abandoning is \
+            expected, and the approach is not deleted" \
+        reaches="abandoning a plan is a recorded act rather than a failure"
+    layer "enforcement" state="evidenced" \
+        evidence="the-plan-and-the-code-agree refuses and is witnessed with two refusals. It \
+            caught five real cases on its first run, four of them in iterations closed hours \
+            earlier" \
+        reaches="a `followed` naming no approach is refused; an approach neither followed nor abandoned is refused"
+    layer "docs"        state="evidenced" \
+        evidence="`praxis ask iteration --show phase` carries the plan and what became of each part of it" \
+        reaches="`what did they plan, and what did they actually do` is answerable per iteration"
+
+    phase "implement" state="complete" required-by="enforcement · docs" \
+        worked-by="agent:principal-engineer" {
+        followed "abandonment is a recorded act, not an absence"
+        followed "`followed` becomes an edge inside the iteration"
+    }
+    phase "learn" state="complete" required-by="always" worked-by="agent:principal-engineer" \
+        produced="BB1 — a repeated KDL property collapses, and the record claimed four approaches while holding one"
+    phase "teach" state="skipped" required-by="doctrine" worked-by="agent:principal-engineer" \
+        skipped-because="it produced doctrine for an agent, which is the doctrine LAYER and is \
+            recorded there. The reader of a release learns nothing from this slice, and saying so \
+            is more useful than claiming the record taught the next agent — which is true of every \
+            iteration by construction (ITER.260822.14/BA1)"
+
+    finding "BB1" state="open" size="frame-sized" \
+        text="ITER.260822.14 recorded four `followed=` PROPERTIES on one node. KDL keeps only the \
+            last of a repeated property, so the iteration claimed four approaches and the record \
+            held one — and nothing said so until this rule ran" \
+        obliges="a report over any field declared `each=\"0..n\"` or `1..n` that appears as a \
+            repeated property rather than as child nodes. The value is silently discarded, which \
+            is the AB1 family: reading one value of something that carries several" \
+        note="corrected to child nodes rather than matured, because nothing about the decision \
+            changed — the file never held what was decided. That distinction is worth keeping: a \
+            transcription error and a change of mind look identical afterwards, and only one of \
+            them is a maturation" \
+        note="the rule caught FOUR cases in iterations closed within the last two hours, plus one \
+            in the iteration writing it. Every one was a plan claiming work that was done \
+            differently or not at all"
+
+    phase "design-system" state="complete" worked-by="agent:principal-engineer" {
+        approach "abandonment is a recorded act, not an absence" {
+            over "requiring every approach to be followed, with no way out"
+            over "letting an unfollowed approach be deleted"
+            over "reporting rather than refusing an unfollowed approach"
+            because "building teaches things a plan cannot know, and abandoning one is the normal \
+                consequence of having planned at all. A rule with no exit teaches people to record \
+                only what they have already built, which is the behaviour TS.260821.19 exists to \
+                fix — so the exit must be cheap AND must leave the alternative in the record, \
+                because the alternative is why the plan was worth writing"
+            note "refusing rather than reporting, because unlike teach-reaches-an-end-user this \
+                lands on a count of zero: every approach in the record today is followed. There is \
+                nothing to back-fill and no adoption cost"
+        }
+
+        approach "`followed` becomes an edge inside the iteration" {
+            over "a global reference, resolved anywhere in the record"
+            over "matching on the approach's text rather than by name"
+            because "an approach belongs to one iteration's design-system phase and nowhere else. \
+                Resolving it globally would let one iteration claim another's plan, and matching \
+                on text would break the moment somebody fixed a typo — which is the second-copy \
+                problem in miniature"
+        }
+    }
+    closed-at "2026-08-23T00:51:49Z"
+    outcome "continue"
+
+    close {
+        claims-settled "C1" how="met"
+        claims-settled "C2" how="met"
+        claims-settled "C3" how="met"
+        all-met #true
+        attested-by "human:waelrabadi"
+        note "the accounting above was computed at close, not asserted. It says every claim is either met or carried by a finding that names it, and nothing about whether the work is any good"
+    }
+
+    trail {
+        entry at="2026-08-23T00:51:49Z" by="agent:praxis" action="state-changed" from="open" to="closed" note="closed by `praxis close`. The accounting was computed; the conclusion is not the machine's to draw"
+
+        entry at="2026-08-23T00:48:17Z" by="agent:praxis" action="created" \
+            note="opened by the gate, on the ask of human:wael"
+    }
+}

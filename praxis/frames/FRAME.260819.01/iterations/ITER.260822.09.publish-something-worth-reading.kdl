@@ -1,0 +1,117 @@
+// Opened by `praxis pick-up`. Every condition below was evaluated against the
+// tree as it stood at 2026-08-22T09:48:44Z, and the verdicts are recorded
+// rather than summarised: a gate whose reasoning is not on the record is a gate
+// you have to trust.
+
+iteration "ITER.260822.09" {
+    slug "publish-something-worth-reading"
+    on-slice "TS.260821.12"
+    state "closed"
+    opened-at "2026-08-22T09:48:44Z"
+    opened-by "agent:praxis"
+
+    approval "admission" {
+        status "signed"
+        signer "human:wael"
+        at "2026-08-22T09:48:44Z"
+        signed-by "the ask to pick up this slice"
+    }
+
+    vet "create" state="done" at="2026-08-22T09:48:44Z" on-slice="TS.260821.12" {
+        condition "slice-is-shaped" verdict="passed"
+        condition "dependencies-delivered" verdict="passed"
+        condition "no-iteration-in-flight" verdict="passed"
+        condition "nothing-left-to-admit" verdict="passed"
+        condition "work-is-disjoint" verdict="not-computed" \
+            found="no seam manifest exists, so what two iterations would touch cannot be compared. Disjointness is half of what this capability says it judges, and half of what it judges is currently not computed at all"
+        condition "the-slice-is-the-best-available" verdict="left-to-the-maintainer"
+    }
+
+    // 2 of the declared conditions were not decided by the gate. They are
+    // recorded above rather than omitted: an admission that does not say what
+    // it left undecided claims more than it checked.
+
+    // Frozen at open, from the slices. Removing one from a slice now
+    // does not remove it from here — it makes the two disagree, and that is
+    // refused.
+    claim "C1" from-slice="TS.260821.12" state="met" \
+        evidence="what you can do comes from the slice and not from its id \
+            — the slice's own title and useful-alone, with no iteration id above the reader's \
+            question, and the long sentence REFERENCED rather than inlined"
+    claim "C2" from-slice="TS.260821.12" state="met" \
+        evidence="how to start is the command and the moment it is for — the command and the \
+            trigger it is for, from the slice"
+    claim "C3" from-slice="TS.260821.12" state="met" \
+        evidence="the architecture publishes what each part refuses to do — `not` beside `doing`, \
+            because a description omitting what a thing cannot do is the artifact this frame distrusts"
+    claim "C4" from-slice="TS.260821.12" state="met" \
+        evidence="what is known missing is published with what it says — the finding's id in the \
+            row and what it SAYS defined beside it"
+    claim "C5" from-slice="TS.260821.12" state="met" \
+        evidence="the ledger is kept and is the last section — kept, and asserted to be LAST"
+    claim "C6" from-slice="TS.260821.12" state="met" \
+        evidence="the concepts carry the problem and the vocabulary — the frame's title and \
+            principle, and the glossary from the schema's own `is=` verbatim, so a kind an \
+            adopting project declares appears in ITS release with nothing changed here"
+    claim "C7" from-slice="TS.260821.12" state="met" \
+        evidence="the architecture publishes what each part refuses to do asserts `what each \
+            keeps true` as well — the sharpest thing a capability record says, and the published \
+            set had never carried it"
+
+    layer "doctrine"    state="evidenced" \
+        evidence="a slice's `outcome` and `useful-alone` are now written knowing they will be \
+            published, which is stated on the slice" \
+        reaches="the fields written for people are the ones a release uses"
+    layer "enforcement" state="evidenced" \
+        evidence="read-model@v1 constraint 2 enforced twice — usage and useful-alone are \
+            referenced, not inlined, because a usage line is markup in a cell by the seam's own \
+            test. 33 test targets pass" \
+        reaches="a slice missing outcome or useful-alone is already refused by the shape check"
+    layer "docs"        state="evidenced" \
+        evidence="the 0.8.0 archival projection opens with what you can do now; concepts/ and \
+            architecture/ are new; the usage baseline holds what it replaced" \
+        reaches="the release directory is the first thing to hand somebody"
+
+    phase "design-ux" state="complete" required-by="docs" worked-by="agent:principal-engineer" \
+        produced="the order IS the argument — what you gained, how to begin, what is missing, then \
+            the ledger. A reader who stops after the first section has the answer they came for"
+    phase "design-system" state="complete" required-by="enforcement" worked-by="agent:principal-engineer" \
+        produced="prose is referenced and never inlined, so the publisher never rewrites its source"
+    phase "implement" state="complete" required-by="enforcement · docs" worked-by="agent:principal-engineer" \
+        produced="the prose fields on Slice and Capability, the concepts and architecture views, \
+            the reordered release notes, and a renderer that keeps paragraph breaks"
+    phase "learn" state="complete" required-by="always" worked-by="agent:principal-engineer" \
+        produced="AS8 — a guide that could never have had content, and five tests asserting it"
+    phase "teach" state="skipped" required-by="doctrine" worked-by="agent:principal-engineer" \
+        produced="the published document is the teaching artifact for this slice" \
+        skipped-because="it produced doctrine for an AGENT, which is the doctrine LAYER and is recorded there. Teaching an end user the feature's why and how did not happen — and the record already serves the next agent, whose own persona judges success by NOT needing a document (TS.260821.19, ITER.260822.15/BA1)"
+
+    finding "AU1" state="open" size="observation" \
+        text="the readable set cannot land in 0.8.0 as first cut. Archival immutability froze the \
+            documents this slice replaces, so the improvement required withdrawing the release" \
+        note="the cost of not having read the artifact before cutting, which is exactly what W18 \
+            says: run it from outside BEFORE each release. The baseline kept at \
+            the usage baseline is what made the withdrawal defensible rather than tidy"
+    closed-at "2026-08-22T18:46:41Z"
+    outcome "continue"
+
+    close {
+        claims-settled "C1" how="met"
+        claims-settled "C2" how="met"
+        claims-settled "C3" how="met"
+        claims-settled "C4" how="met"
+        claims-settled "C5" how="met"
+        claims-settled "C6" how="met"
+        claims-settled "C7" how="met"
+        all-met #true
+        attested-by "human:waelrabadi"
+        note "the accounting above was computed at close, not asserted. It says every claim is either met or carried by a finding that names it, and nothing about whether the work is any good"
+    }
+
+    trail {
+        entry at="2026-08-22T18:46:41Z" by="agent:praxis" action="state-changed" from="open" to="closed" note="closed by `praxis close`. The accounting was computed; the conclusion is not the machine's to draw"
+
+        entry at="2026-08-22T09:48:44Z" by="agent:praxis" action="created" \
+            note="opened by the gate, on the ask of human:wael"
+    }
+}

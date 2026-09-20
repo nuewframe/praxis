@@ -1,0 +1,16 @@
+// Written by `praxis bind`, which refused. Nothing was bound, and the
+// version's content is unchanged.
+
+refusal "REF.260822.08" {
+    on-version "0.8.0"
+    at "2026-08-22T09:27:43Z"
+    by "agent:praxis"
+    asked-by "human:wael"
+    condition "an-iteration-binds-exactly-once" failed=#true \
+        found="ITER.260822.03 is already bound to 0.8.0 — an iteration binds exactly once, or the same work is counted in two releases"
+
+    trail {
+        entry at="2026-08-22T09:27:43Z" by="agent:praxis" action="created" \
+            note="the bind was refused. Nothing was bound"
+    }
+}

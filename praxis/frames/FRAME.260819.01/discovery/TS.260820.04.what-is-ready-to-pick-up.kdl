@@ -1,0 +1,48 @@
+thin-slice "TS.260820.04" {
+    slug "what-is-ready-to-pick-up"
+    title "See which slices could be started right now, and what would refuse each of the rest"
+    kind "view"
+    realizes "CAP.work-admission"
+    from-storm "ES.260819.01"
+
+    read-model "what-is-ready-to-pick-up"
+    content-owned-by "CAP.work-admission"
+    actor "working-agent"
+
+    trigger "an agent is about to choose what to work on"
+    outcome "it sees what is admissible now, and for everything else the condition that blocks it"
+
+    scenario #"""
+        Given slices cut against capabilities, some blocked and some not
+        When the working agent asks what is ready
+        Then it sees the admissible set, and for every excluded slice the specific condition
+             that excludes it — an unfrozen dependency, an iteration already in flight, work that
+             is not disjoint — so the answer teaches the gate instead of merely applying it.
+        """#
+
+    step "1" does="ask against the tree and the graph as they now stand"
+    step "2" does="each slice is evaluated against every admission condition"
+    step "3" does="the ready set comes back, and every excluded slice comes back with its blocking condition"
+
+    excludes "picking. Seeing is not choosing, and the commitment happens at TS.260820.05"
+    excludes "ranking or recommending. Selection is the maintainer's judgement, not the tool's"
+
+    layer "doctrine"    reaches="the skill tells an agent to ask this before choosing, not after"
+    layer "enforcement" reaches="the same conditions the gate uses — one implementation, so the view cannot drift from the gate"
+    layer "docs"        reaches="rendered on demand as a working projection"
+
+    claim "C1" text="the view and the gate evaluate identical conditions" \
+        settled-by="a property test asserting every slice the view calls ready is admitted by the gate, and every slice it excludes is refused"
+    claim "C2" text="every excluded slice names its blocking condition" \
+        settled-by="a test asserting no exclusion has an empty reason"
+
+    depends-on "TS.260820.01 — slices must exist and have a checked shape"
+
+    useful-alone "an agent stops choosing work by reading prose and guessing. Useful with no \
+        gate implemented at all, because the answer is already true"
+    useful-to "the-next-agent" "the-team-building-a-digital-product"
+
+    attacks "S3"
+    note "this is one of the two slices that test finding E10: its content is owned here, and \
+        document-projection must render it without knowing what `ready` means"
+}

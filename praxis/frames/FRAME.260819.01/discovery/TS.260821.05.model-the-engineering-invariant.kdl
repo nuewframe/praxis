@@ -1,0 +1,90 @@
+// Cut from ITER.260822.02, mid-iteration, when the count would not go to zero honestly.
+//
+// TS.260821.04 set out to take unanchored surfaces to zero. Twenty went to zero by being
+// RETIRED — they described a spine that no longer exists. Twenty-five did not, and the
+// reason is not that they are stale. It is that the record models DELIVERY and does not
+// model ENGINEERING at all: there is no node for "a probe enforces an invariant", so there
+// is nothing for a probe to serve.
+//
+// Anchoring them to the frame would have taken the count to zero and made the rule mean
+// nothing. That is the move this frame refuses everywhere else, so it was refused here.
+
+thin-slice "TS.260821.05" {
+    slug "model-the-engineering-invariant"
+    title "Hold the engineering invariant as a record kind, so a probe can name what it enforces"
+    kind "command"
+    realizes "CAP.delivery-record"
+    from-storm "ES.260819.01"
+
+    command "check-invariants"
+    actor "automation"
+    produces-event "InvariantEnforced" "InvariantUnenforced"
+    needs-read-model "what-is-currently-true"
+
+    trigger "a probe fails, and what it was protecting is written only in its own header comment"
+    outcome "every invariant the config enables names what enforces it, and every probe names the invariant it enforces"
+
+    scenario #"""
+        Given a config enabling invariants by id and omitting three by name, and fourteen probes
+             under scripts/ that enforce them
+        When the invariants are checked
+        Then an enabled invariant nothing enforces is REPORTED and an enforcing probe naming no
+             invariant is REPORTED — because `enable-all-fail-closed #true` is today a claim about
+             fourteen shell scripts that nothing has ever compared against anything, which is the
+             root cause wearing the enforcement layer's clothes.
+        """#
+
+    step "1" does="declare `invariant` as an entity kind — id, what it protects, severity, which profile enables it"
+    step "2" does="config's `invariants` block binds by id and may never invent one, exactly as it says today"
+    step "3" does="a probe's doctrine-surface serves the invariant it enforces, so the probes anchor"
+    step "4" does="an enabled invariant with no enforcing probe is reported; an omitted one is not"
+    step "5" does="the guardrail file and the engineering skills serve the invariants they state"
+
+    excludes "rewriting the probes. They enforce what they enforce; this makes what that IS \
+        something the record holds, and a probe that turns out to enforce nothing is a finding \
+        rather than a rewrite"
+    excludes "moving the probes into the engine. A shell probe runs in an adopter's CI against \
+        their languages, which is exactly where it belongs"
+    excludes "the three personas. A persona is not an invariant and forcing it into this kind to \
+        make a count go to zero is the failure this slice was cut to avoid"
+
+    layer "doctrine"    reaches="declaring an invariant is part of writing the probe that enforces it"
+    layer "enforcement" reaches="an-enabled-invariant-is-enforced, over the config's enabled set"
+    layer "docs"        reaches="`what does this plugin actually guarantee` is answerable from the record rather than from fourteen header comments"
+
+    claim "C1" text="an enabled invariant that no probe enforces is reported, naming the invariant" \
+        settled-by="a test enabling an invariant with no enforcing surface, asserting it is named"
+    claim "C2" text="a probe anchors by naming the invariant it enforces, so the 14 probes leave the unanchored set" \
+        settled-by="`praxis audit-surfaces` reporting the probes as anchored, with the count in the iteration's evidence"
+    claim "C3" text="config may bind an invariant and may never declare one" \
+        settled-by="a test declaring an invariant id in config that the schema does not hold, asserting a refusal"
+
+    depends-on "TS.260821.03 — a probe anchors by serving an invariant, so doctrine-surface exists first"
+
+    note "originally declared depends-on TS.260821.04, which deadlocked the record: 04 carries C1 \
+        and C3 against THIS slice, so 04 cannot deliver until 05 lands, and 05 could not start \
+        until 04 delivered. The dependency was never real — retiring the sprint spine has nothing \
+        to do with modelling an invariant. It was a preference about ORDER written into the field \
+        that means necessity, and `depends-on` does not distinguish the two"
+
+    useful-alone "`what does this plugin guarantee, and what enforces it` becomes answerable. \
+        Today `enable-all-fail-closed #true` is a claim about fourteen shell scripts that nothing \
+        has ever checked"
+    useful-to "the-adopter" "the-team-building-a-digital-product"
+
+    attacks "S3"
+
+    cut-from "ITER.260822.02" \
+        note="cut mid-iteration because TS.260821.04/C1 could not be met honestly. The alternative \
+            was to anchor twenty-five surfaces to the frame, which would have made the count zero \
+            and the rule worthless"
+
+    principle-note "the audit rule was built to catch doctrine that stopped corresponding to \
+        anything. Its first real run found something else: doctrine that never corresponded to \
+        anything, because the record had no vocabulary for it. A measurement that only ever \
+        confirms what you expected is not measuring"
+
+    proves "every guarantee this plugin makes names the thing that keeps it"
+    does-not-prove "that the probe is CORRECT. It proves the invariant has an enforcer, never that \
+        the enforcer works — which is what witnessing is for, one level down"
+}

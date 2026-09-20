@@ -1,0 +1,74 @@
+// Ported from surface.retired.cap-conformance-md by
+// TS.260821.06, and narrowed on the way: the Markdown record claimed the probes AND the
+// plugin validator AND the version audit AND the cross-reference scanner AND the test
+// fixtures. That is a list of scripts, not a consistency boundary.
+//
+// What it actually keeps consistent is one thing: every guarantee this plugin makes has
+// something that keeps it. TS.260821.05 gave that a vocabulary, and this capability owns it.
+
+capability "conformance-probes" {
+    doing "keep every guarantee this plugin makes about code it is loaded into paired with something that enforces it, at a severity an adopter can read"
+    not "it does not decide WHETHER a guarantee is worth making, and it never proves a probe works — only that a guarantee has a keeper"
+    state "sought"
+    facet "product"
+
+    derived-from "ES.260819.01"
+    from-cluster "evidence-and-settlement"
+
+    owns-event "InvariantEnforced" "InvariantUnenforced"
+    owns-read-model "none" \
+        note="`what this plugin ships` is a projection over surfaces AND invariants, and is \
+            owned by delivery-record with the rest of what is true. This capability owns the \
+            pairing, not the view of it"
+
+    matured "doing" {
+        from "owns the automated quality probes, the plugin validation probe, the version \
+            single-source audit, the cross-reference scanners, and the test-suite fixtures"
+        to "keep every guarantee this plugin makes about code it is loaded into paired with \
+            something that enforces it, at a severity an adopter can read"
+        at "2026-08-22"
+        because "the prior claim was five script families, which is a list rather than a \
+            consistency boundary. What it actually keeps consistent is one thing, and \
+            TS.260821.05 gave the record a word for it"
+        taught-by "ITER.260822.03"
+        note "entered retroactively by TS.260821.18. The narrowing happened on port and the \
+            prior claim was simply gone — right as a change, invisible as one"
+    }
+
+    attacks "S3"
+
+    property "severity is declared, not inferred" \
+        because="the difference between a gate and a notice is the whole of what an adopter needs, \
+            and describing a probe as stronger than it is was already a named failure in this \
+            repository's own README"
+    property "omitted is not unkept" \
+        because="a profile that says it has no HTTP surface has ANSWERED the question. Reporting \
+            it anyway teaches adopters to ignore the report, which is how a rule stops being read"
+    property "coverage is declared per language" \
+        because="static enforcement is best-effort per language, and which languages is a fact \
+            about the probe rather than a hope. A structural probe says so instead of listing nine"
+
+    gate-test "names-a-doing" verdict="pass" \
+        because="pairing a guarantee with its keeper, and reporting the ones with none, is a doing"
+    gate-test "fundable-on-own-terms" verdict="pass" \
+        because="`what does this plugin actually guarantee` is a question an adopter asks before \
+            installing, and it was unanswerable for every version before 0.8.0"
+    gate-test "slices-deliver-independently" verdict="pass" \
+        because="declare the invariant / anchor the probe / publish the posture are three outcomes, \
+            and TS.260821.05 and TS.260821.07 are two of them"
+    gate-test "states-an-exclusion" verdict="pass" \
+        because="it never proves a probe WORKS. A probe anchored to an invariant and silently \
+            broken looks exactly like a working one from here — that is witnessing's job, one \
+            level down, and the exclusion is what keeps the two claims apart"
+
+    keeps-consistent "every invariant the profile enables against the surfaces that enforce it" \
+        "each invariant's declared severity against what its probe actually does"
+
+    usage "`praxis check-invariants` — what this plugin guarantees, what keeps each guarantee, and which are omitted by this repository's profile rather than unkept."
+
+    trail {
+        entry at="2026-08-22T00:00:00Z" by="agent:principal-engineer" action="created" \
+            note="ported and NARROWED. The Markdown record listed five script families; this \
+                declares one consistency boundary and states what it excludes"
+    }
+}

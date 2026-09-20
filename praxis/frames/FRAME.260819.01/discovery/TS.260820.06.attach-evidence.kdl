@@ -1,0 +1,50 @@
+thin-slice "TS.260820.06" {
+    slug "attach-evidence"
+    title "Back a layer's claim with an artifact instead of the agent's word for it"
+    kind "command"
+    realizes "CAP.claim-settlement"
+    from-storm "ES.260819.01"
+
+    command "attach-evidence"
+    actor "working-agent"
+    produces-event "EvidenceAttached"
+    needs-read-model "what-this-iteration-claims-and-has-shown"
+    feeds-read-model "what-this-iteration-claims-and-has-shown"
+
+    trigger "a layer declared by the slice has been reached"
+    outcome "the claim is backed by something that exists, and the layer it evidences is named"
+
+    scenario #"""
+        Given a slice declaring the layers it must reach
+        When the agent attaches evidence
+        Then the evidence names which declared layer it evidences, and evidence naming a layer
+             the slice never declared is refused — so an artifact looking identical whether
+             the agent reasoned hard or pattern-matched a template stops being possible at
+             the layer granularity the slice itself set.
+        """#
+
+    step "1" does="reach a layer the slice declared"
+    step "2" does="attach the artifact that shows it — a test, a diagnostic, a generated file"
+    step "3" does="name which declared layer it evidences"
+    step "4" does="the evidence is bound to the claim it settles, not filed beside the iteration"
+
+    excludes "judging the evidence. It refuses absence and mismatch, never quality"
+    excludes "producing the evidence. That is the work itself"
+
+    layer "doctrine"    reaches="the skill teaches evidence naming its layer at the moment the layer is reached"
+    layer "enforcement" reaches="evidence-names-its-layer, refusing an undeclared layer"
+    layer "docs"        reaches="evidence appears against its claim in the review view and the release record"
+
+    claim "C1" text="evidence naming a layer the slice did not declare is refused" \
+        settled-by="a negative test with an undeclared layer"
+    claim "C2" text="a declared layer with no evidence is visible as unevidenced, not absent" \
+        settled-by="a test asserting the view lists the layer with no artifact rather than omitting it"
+
+    depends-on "TS.260820.05 — an iteration must be open for evidence to attach to"
+
+    useful-alone "how much of a slice was actually reached becomes readable off the record, \
+        with nothing else about closing or releasing in place"
+    useful-to "the-team-building-a-digital-product"
+
+    attacks "S2" "S3"
+}

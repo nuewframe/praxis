@@ -1,0 +1,177 @@
+// Opened by `praxis pick-up`. Every condition below was evaluated against the
+// tree as it stood at 2026-08-21T14:07:50Z, and the verdicts are recorded
+// rather than summarised: a gate whose reasoning is not on the record is a gate
+// you have to trust.
+
+iteration "ITER.260821.06" {
+    slug "close-an-iteration"
+    on-slice "TS.260820.07"
+    state "closed"
+    opened-at "2026-08-21T14:07:50Z"
+    opened-by "agent:praxis"
+
+    approval "admission" {
+        status "signed"
+        signer "human:wael"
+        at "2026-08-21T14:07:50Z"
+        signed-by "the ask to pick up this slice"
+    }
+
+    vet "create" state="done" at="2026-08-21T14:07:50Z" {
+        condition "slice-is-shaped" verdict="passed"
+        condition "dependencies-delivered" verdict="passed"
+        condition "no-iteration-in-flight" verdict="passed"
+        condition "nothing-left-to-admit" verdict="passed"
+        condition "work-is-disjoint" verdict="not-computed" \
+            found="no seam manifest exists, so what two iterations would touch cannot be compared. Disjointness is half of what this capability says it judges, and half of what it judges is currently not computed at all"
+        condition "the-slice-is-the-best-available" verdict="left-to-the-maintainer"
+    }
+
+    // 2 of the declared conditions were not decided by the gate. They are
+    // recorded above rather than omitted: an admission that does not say what
+    // it left undecided claims more than it checked.
+
+    // Frozen at open, from the slice. Removing one from the slice now
+    // does not remove it from here — it makes the two disagree, and that is
+    // refused.
+    claim "C1" from-slice="TS.260820.07" state="met" \
+        text="closing with an unmet claim and no finding is refused, naming the claim" \
+        settled-by="a negative test asserting the refusal names the claim" \
+        evidence="closing with an unmet claim and no finding is refused naming the claim, \
+            and the refusal leaves the iteration open — the refusal is a REF record and the \
+            iteration keeps its state"
+    claim "C2" from-slice="TS.260820.07" state="met" \
+        text="closing with an unmet claim AND a recorded finding succeeds" \
+        settled-by="a positive test asserting the close and the finding both persist" \
+        evidence="closing with an unmet claim and a recorded finding succeeds \
+            — and the close records all-met=#false rather than rounding up"
+    claim "C3" from-slice="TS.260820.07" state="met" \
+        text="deleting a claim to make a close succeed is itself refused" \
+        settled-by="a negative test mutating the slice to remove a claim mid-iteration" \
+        evidence="deleting a claim to make a close succeed is itself refused \
+            — the claims are frozen into the iteration at open, so the deletion does not remove \
+            the claim, it makes the two disagree"
+
+    vet "start" state="done" at="2026-08-21T14:12:00Z" {
+        condition "the tree is clean and current" verdict="passed" found="HEAD 2c993dc"
+        condition "the slice's scope is unchanged" verdict="passed" found="three claims, read line by line"
+        condition "C3 is implementable at all" verdict="known-and-recorded" \
+            found="it is not, against the slice alone — a claim list read fresh each time can \
+                always be edited to match. It needs the claims PINNED when the iteration opens, \
+                which means changing `pick-up`, a command delivered two iterations ago" \
+            resolved-by="the gate now writes the slice's claims into the iteration it opens. \
+                Recorded as V4"
+    }
+
+    frozen {
+        pins "the entity-and-field schema" at="NA.260820.01/schema" at-commit="2c993dc"
+        pins "the read-model and change-set seams" at="NA.260820.01/seam" at-commit="2c993dc"
+        rule "a schema change while this iteration is open is a FINDING, not an edit" \
+            exception="declaring no-silent-drop and claim-dropped-from-the-slice is the mechanism \
+                this slice depends on. Both have been policies since the storm was held"
+    }
+
+    layer "doctrine"    state="evidenced" evidence="surface.skill.close-an-iteration, registered in the router" reaches="the skill teaches that a shortfall is recorded, never quietly dropped"
+    layer "enforcement" state="evidenced" evidence="54 tests pass; no-silent-drop fails closed and names each unaccounted claim" reaches="no-silent-drop, failing closed and naming each unaccounted claim"
+    layer "docs"        state="evidenced" evidence="the accounting block is written at close, computed rather than asserted, and every carried claim names the finding that carries it" reaches="unmet claims and their findings survive into the release record"
+    layer-set sealed=#true at="2026-08-21T14:12:00Z"
+
+    phase "design-ux" state="complete" required-by="docs" \
+        produced="what a refused close TELLS you. Not `the close was refused` but which claim, in \
+            what state, and what would account for it — record a finding that names it, or settle \
+            it. And the refusal for a DELETED claim says something different from the refusal for \
+            an unmet one, because they are different mistakes and the second is a decision"
+    phase "design-system" state="complete" required-by="enforcement" \
+        produced="the claims are frozen at open, by the gate, and checked at close. The rule lives \
+            in two places on purpose: the COMMAND refuses at the moment, and the CHECK refuses \
+            forever, over a record nobody is currently asking about. A rule enforced only by the \
+            command that writes is a rule you can get around by writing the file yourself"
+    phase "implement" state="complete" required-by="enforcement · docs" \
+        produced="praxis-core::close, `praxis close`, two corpus rules, claims pinned at open, and \
+            eight tests"
+    phase "learn" state="complete" required-by="always" produced="five findings" \
+        note="never skippable — it is the phase that judges the others"
+    phase "teach" state="skipped" required-by="doctrine" produced="surface.skill.close-an-iteration" \
+        skipped-because="it produced doctrine for an AGENT, which is the doctrine LAYER and is recorded there. Teaching an end user the feature's why and how did not happen — and the record already serves the next agent, whose own persona judges success by NOT needing a document (TS.260821.19, ITER.260822.15/BA1)"
+
+    finding "V1" state="open" size="observation" \
+        text="turning no-silent-drop on refused exactly one record in the tree: ITER.260821.03, \
+            whose C1 was met-in-part and whose finding S1 carried it in prose and nowhere else. \
+            The accounting existed and was not legible" \
+        note="the fifth rule in a row to find a real instance the moment it was turned on, and the \
+            first to find one in a record written by the same agent three iterations earlier while \
+            being careful about exactly this. Prose that means the right thing is not accounting"
+
+    finding "V2" state="open" size="observation" \
+        text="this is the first command that CHANGES a record rather than adding one. Everything \
+            before either read the tree or wrote a new file, where `whole or nothing` is a rename. \
+            A mutation has to preserve what it did not touch, which is why the ADR chose a document \
+            model over a derive-based codec" \
+        note="the choice was made on ADR.260819.01's argument about round-tripping comments, and \
+            this is the first place it was actually load-bearing rather than merely correct"
+
+    finding "V3" state="open" size="observation" \
+        text="the machine writes the accounting and refuses to write the conclusion. `state`, \
+            `closed-at`, `outcome` and the settled claims are computed; WHY the iteration reached \
+            its conclusion, what the findings mean, and whether to continue are left empty for a \
+            human" \
+        note="the line is worth stating as doctrine rather than as an implementation detail: the \
+            machine states what it checked. A machine-written judgement would be the agent's own \
+            account of its work wearing the record's clothes, which is the root cause with better \
+            formatting"
+
+    finding "V4" state="open" size="owed-work" \
+        text="C3 is not implementable against the slice alone. A claim list read fresh at close can \
+            always be edited to match, so the claims must be PINNED when the iteration opens — \
+            which meant changing `pick-up`, a command delivered two iterations earlier" \
+        note="a rule that only works if an earlier command cooperates. Nothing in the record says \
+            `pick-up` must freeze the claims, and nothing would refuse an iteration opened by hand \
+            without them. The rule is enforced; its precondition is not"
+
+    finding "V5" state="open" size="observation" \
+        text="C3 nearly broke the residue mechanism from ITER.260821.04. A claim carried \
+            from-slice=X while the iteration is on Y is exactly how a residue gets settled later, \
+            and a naive `every claim must be declared by this slice` would have refused it" \
+        note="caught by writing the test, not by reading the rule. The two mechanisms were built \
+            three iterations apart and their interaction is not written down anywhere but in that \
+            test"
+    finding "V6" state="open" size="owed-work" \
+        text="the first close the command wrote was CORRECT and materially worse to read than the \
+            file it edited: values written as bare identifiers, so `state \"open\"` became \
+            `state closed`; new nodes appended after the trail rather than before it; and the \
+            trail entry rendered on the same line as the brace it went inside" \
+        note="a node built through the API carries no formatting, and a KDL document's indentation \
+            is each node's own leading trivia. Composing new nodes as TEXT and parsing them keeps \
+            what they were written with. Nothing in the record says a machine-written record must \
+            be readable, and praxis check passed on every one of those versions"
+
+    closed-at "2026-08-21T14:15:34Z"
+    outcome "continue"
+
+    close {
+        claims-settled "C1" how="met"
+        claims-settled "C2" how="met"
+        claims-settled "C3" how="met"
+        all-met #true
+        note "the accounting above was computed at close, not asserted. It says every claim is either met or carried by a finding that names it, and nothing about whether the work is any good"
+    }
+
+    contributes "slice-outcome-added" \
+        because="close-an-iteration, and no-silent-drop enforced" \
+        note="the bump rule this work matches, from the config. Declared by the iteration \
+            because only whoever did the work knows what kind of change it was"
+
+    trail {
+        entry at="2026-08-21T14:16:00Z" by="agent:principal-engineer" action="amended" \
+            note="V6 recorded after the close. The command closed the iteration the moment its \
+                claims were accounted for, which is what it is for — and LEARN was not finished, \
+                because closing IS how the last of this slice's learning arrived"
+        entry at="2026-08-21T14:15:34Z" by="agent:praxis" action="state-changed" from="open" to="closed" note="closed by `praxis close`. The accounting was computed; the conclusion is not the machine's to draw"
+
+        entry at="2026-08-21T14:12:00Z" by="agent:principal-engineer" action="amended" \
+            note="claims settled, layers evidenced, phases and findings recorded. The close itself \
+                is left to `praxis close`, which is this slice's own deliverable"
+        entry at="2026-08-21T14:07:50Z" by="agent:praxis" action="created" \
+            note="opened by the gate, on the ask of human:wael"
+    }
+}

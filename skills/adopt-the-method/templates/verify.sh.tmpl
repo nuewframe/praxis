@@ -1,0 +1,73 @@
+#!/usr/bin/env bash
+# verify.sh — the one command this repository runs to say whether a change holds.
+#
+# Written by `praxis adopt`. The probe steps below were generated from the record of what
+# this plugin ACTUALLY SHIPS, not from a list somebody maintained: the version this replaced
+# called two scripts that did not exist, one of them described in its own comment as
+# "HARD-FAIL by design, no warn mode". A gate that cannot run is worse than no gate, because
+# it reads as one.
+#
+# Edit the stack steps. Leave the entry point and the order: fast → slow, cheap → expensive,
+# and the record's own check first, because a record that does not hold makes every answer
+# below it about something else.
+#
+# Skip steps with VERIFY_SKIP="format,lint" — comma-separated step names.
+#
+# Exit codes:
+#   0 — every step passed
+#   N — the first failing step's exit code
+
+set -u
+
+REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+cd "$REPO_ROOT"
+
+SKIP="${VERIFY_SKIP:-}"
+
+skipped() {
+  case ",$SKIP," in
+    *",$1,"*) return 0 ;;
+    *)        return 1 ;;
+  esac
+}
+
+run_step() {
+  local name="$1"; shift
+  if skipped "$name"; then
+    echo "verify: skip $name"
+    return 0
+  fi
+  echo "verify: $name"
+  "$@"
+  local rc=$?
+  if [[ $rc -ne 0 ]]; then
+    echo "verify: $name failed (exit $rc)" >&2
+    exit $rc
+  fi
+}
+
+# --- The record. Everything below is about code; this is about whether the record that
+# --- describes the code still holds.
+step_record()    { praxis check; }
+
+# --- Your stack. Edit these four.
+step_format()    { {{format}}; }
+step_lint()      { {{lint}}; }
+step_typecheck() { {{typecheck}}; }
+step_tests()     { {{test}}; }
+
+# --- The probes this plugin ships. Generated from the record of what it ships, so this list
+# --- cannot name one that is absent. After a plugin upgrade, `praxis adopt --dry-run` prints
+# --- what the current templates would produce; diff it against this file.
+{{probe-steps}}
+
+# --- Pipeline.
+
+run_step record     step_record
+run_step format     step_format
+run_step lint       step_lint
+run_step typecheck  step_typecheck
+{{probe-pipeline}}
+run_step tests      step_tests
+
+echo "verify: every step passed"

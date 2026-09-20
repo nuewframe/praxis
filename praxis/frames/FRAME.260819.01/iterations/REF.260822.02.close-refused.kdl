@@ -1,0 +1,17 @@
+// Written by `praxis close`, which refused. The iteration stays open, and
+// every claim it could not account for is named below. Nothing was closed.
+
+refusal "REF.260822.02" {
+    on-slice "TS.260821.03"
+    at "2026-08-22T02:29:01Z"
+    by "agent:praxis"
+    asked-by "human:wael"
+    on-iteration "ITER.260822.01"
+    condition "claim-no-is-unaccounted" failed=#true \
+        found="no names finding AL4, which this iteration does not hold"
+
+    trail {
+        entry at="2026-08-22T02:29:01Z" by="agent:praxis" action="created" \
+            note="the close was refused. The iteration stays open"
+    }
+}

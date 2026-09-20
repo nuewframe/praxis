@@ -1,0 +1,363 @@
+// The first iteration. ITERATE, run by hand because there is no engine yet — which is the
+// same reason walk-001 ran the loop by hand, and the same justification: running the
+// blueprint is not a description of the loop, it is an iteration of it.
+//
+// The iteration entity did not exist until this file. NA.260820.01 carried it as an open
+// question — three capabilities wrote facts about it and none defined it — and it is
+// defined here by opening one, then declared on the schema. Cutting is how you learn.
+
+iteration "ITER.260820.01" {
+    slug "first-iteration-at-cut-a-slice"
+    on-slice "TS.260820.01"
+    state "closed"
+    opened-at "2026-08-20T23:10:00-05:00"
+    opened-by "agent:principal-engineer"
+    closed-at "2026-08-21T01:10:00-05:00"
+    outcome "continue" \
+        because="the slice delivered what it claimed and the frame's next slice is visible — P9, the \
+            engine ignoring kinds the schema does not declare, is the obvious follow-on"
+
+    // ================================================================
+    // ADMISSION — the only gate, and it is human. Selection IS the commitment, so the
+    // human's ask is the approval: there is no separate plan or design gate, and adding
+    // one would contradict ITERATE's `gate="the only gate"`.
+    //
+    // It is recorded rather than assumed. Without a signed node, "a human asked for this"
+    // is the agent's own account of having been asked — the tier this frame exists to shrink.
+    // ================================================================
+
+    approval "admission" {
+        status "signed"
+        signer "human:waelrabadi"
+        at "2026-08-21T00:20:00-05:00"
+        signed-by "the ask to start work on this iteration"
+        note "the ask itself is the approval — there is no separate ceremony. Recorded so that \
+            `a human authorised this` is a fact on the record rather than the agent's account of it"
+    }
+
+    // ================================================================
+    // THE VET — run TWICE. Once when the iteration is asked for, to establish it is ready
+    // for work; again when the ask to start is given, because the tree moves in between and
+    // an admission computed against a tree that has since changed is an admission of
+    // something else.
+    // ================================================================
+
+    vet "create" state="done" at="2026-08-20T23:10:00-05:00" \
+        triggered-by="the ask to select a slice and start an iteration" {
+        condition "the slice's dependencies are frozen" verdict="admitted-on-condition" \
+            found="TS.260820.01 depends on `the capability record format, frozen`, and nothing had \
+                frozen it — there is no seam manifest yet" \
+            resolved-by="this iteration freezes it, which is exactly what freeze-dependency is for: \
+                pinning what an iteration stands on for its duration, not globally"
+        condition "no other iteration is open on this slice" verdict="passed" \
+            found="no iteration exists at all. This is the first"
+        condition "the work is disjoint from what is in flight" verdict="passed" \
+            found="nothing is in flight"
+        condition "the slice is admissible at all" verdict="passed" \
+            found="TS.260820.01 is the only slice at dependency depth 0 of eighteen, and the only \
+                one whose depends-on names a contract rather than another slice"
+
+        selected-over "TS.260820.11" \
+            because="TS.260820.11 is the only slice reaching the `harness` layer and would have \
+                exercised the most layers — and it sits at depth 8, the deepest in the set. \
+                Maximum coverage and admissibility point at opposite ends of the DAG, and the \
+                gate decides admissibility"
+        note "selection is the commitment. Choosing this is choosing not to do the other seventeen"
+    }
+
+    vet "start" state="done" at="2026-08-21T00:20:00-05:00" \
+        triggered-by="the ask to start work, which also signed the admission" {
+        condition "the freeze is still current" verdict="refused-and-refrozen" \
+            found="it was not. The create-vet pinned the entity schema with no commit at all, and \
+                the schema then moved in 418c4cb — the commit that gave it a home" \
+            resolved-by="re-frozen at 969081b, against a clean tree"
+        condition "no other iteration has opened on this slice" verdict="passed" \
+            found="ITER.260820.01 is still the only iteration in the record"
+        condition "the work is still disjoint from what is in flight" verdict="passed" \
+            found="nothing else is in flight"
+        condition "the slice's scope is unchanged since create" verdict="changed-and-acknowledged" \
+            found="TS.260820.01 gained SliceCutRefused by amendment. The sealed layer set and the \
+                three claims are untouched; the amendment ADDED an outcome the docs layer already \
+                required, so it widens what must be built rather than narrowing what was promised" \
+            note="acknowledged here rather than inherited silently, which is the whole point of \
+                vetting a second time"
+        condition "the tree is clean" verdict="passed" found="HEAD 969081b, no uncommitted changes"
+
+        note "the second vet refused one condition on its first run. It was written expecting to."
+    }
+
+    // ================================================================
+    // FROZEN — DependencyFrozen. What this iteration stands on, pinned so it cannot move
+    // underneath it. Pinned to a commit, because that is the only clock the record has.
+    // ================================================================
+
+    frozen {
+        pins "the capability record format" at-commit="82c8f42" \
+            shape="the five a capability record records as committed — doing · not · state · derived-from · \
+                from-cluster · owns-event · owns-read-model · enforces · attacks · gate-test · \
+                keeps-consistent · trail" \
+            note="frozen for this iteration only. An iteration freezes; it does not legislate"
+        pins "the thin-slice schema" at="TS.260820.01's own header comment" \
+            note="the slice being built carries the schema it must enforce, which is why it can be \
+                its own first test"
+        pins "the entity schema" at="NA.260820.01/schema" at-commit="969081b" \
+            was-pinned="82c8f42, with no commit recorded" \
+            re-frozen-by="vet start" \
+            note="a pin without a commit is not a freeze. Re-frozen against a clean tree"
+        pins "the encoding and layout rules" at="ADR.260819.01/enforces" at-commit="969081b"
+
+        rule "the schema is frozen for the duration of this iteration. A schema change while it is \
+            open is a FINDING, not an edit" \
+            because="an engine validating against a node that moves weekly is chasing, never building"
+    }
+
+    // ================================================================
+    // PHASES — WHEN in the attempt, as a layer is WHERE in the stack. Declared late:
+    // this iteration went from admission straight to implement because no record
+    // carried the phase set forward from the withdrawn ADR.260819.02 (P8). Recorded
+    // here as what ACTUALLY happened, including the two that ran without being named.
+    // ================================================================
+
+    phase "design-ux" state="complete" \
+        produced="the refusal a maintainer actually sees — the field named, the line pointed at, \
+            and the schema's own `because` carried into the message rather than a generic 'invalid'" \
+        evidence="the rendered diagnostic for a slice missing actor, layer and produces-event" \
+        note="ran before it was named. It was the C2 conversation, conducted as a decision"
+
+    phase "design-system" state="complete" \
+        produced="functional core / imperative shell, and the shape check placed in the core over a \
+            parsed document" \
+        evidence="the two recorded decisions on this iteration, and ADR.260819.01/A4" \
+        note="also ran before it was named"
+
+    phase "implement" state="complete" \
+        produced="a workspace, a kdl-rs document read, a schema loader that hardcodes nothing, and a \
+            validator that refuses a slice by naming the field" \
+        evidence="cargo test — 7 passed; praxis check refuses 4 and exits 1 on a malformed slice, \
+            and passes on the committed record"
+
+    phase "teach" state="skipped" \
+        produced="surface.skill.cut-a-slice, registered in the using-praxis router" \
+        evidence="the skill teaches naming the command, the one actor, the declared layers and the \
+            claims-with-evidence, and teaches that a refusable command names its refusal too" \
+        note="it deliberately does NOT restate the field list. Doctrine that duplicates a fact the \
+            graph owns becomes a second writer for it, so the skill points at `praxis check` and \
+            says the answer is the checker's, not the document's" \
+        skipped-because="it produced doctrine for an AGENT, which is the doctrine LAYER and is recorded there. Teaching an end user the feature's why and how did not happen — and the record already serves the next agent, whose own persona judges success by NOT needing a document (TS.260821.19, ITER.260822.15/BA1)"
+
+    phase "learn" state="complete" \
+        produced="nine findings. Four changed the record while the iteration was open — the missing \
+            refusal event, the missing field declarations, the missing phase entity, and the stale \
+            freeze — and five are carried as owed work" \
+        note="learn closes last because it is the phase that judges the others"
+
+    // ================================================================
+    // CARRIED CLAIMS — stated at cut time, on the slice, not here. This iteration may settle
+    // them or carry a shortfall; it may not edit them (TS.260820.07 C3).
+    // ================================================================
+
+    claim "C1" from-slice="TS.260820.01" state="met" \
+        text="a slice missing any of command/actor/event/layer is refused at write time" \
+        settled-by="one negative test per missing field" \
+        evidence="every required field is refused when absent" \
+        note="the test enumerates the required fields FROM THE SCHEMA rather than listing them, so a \
+            field added to the record is covered without editing the test"
+    claim "C2" from-slice="TS.260820.01" state="met" \
+        text="the refusal names which field is missing, not that the file is invalid" \
+        settled-by="a test asserting the field name appears in the diagnostic" \
+        evidence="the refusal names the missing field, \
+            plus the rendered CLI diagnostic naming actor, layer and produces-event with spans"
+    claim "C3" from-slice="TS.260820.01" state="met" \
+        text="a slice that names a capability which does not exist is refused" \
+        settled-by="a negative test naming an absent capability" \
+        evidence="a slice naming an absent capability is refused"
+
+    // ================================================================
+    // LAYERS — declared by the slice, sealed at this first iteration. Evidence attaches per
+    // layer as it is reached; a declared layer with no evidence is visible as unevidenced,
+    // never absent.
+    // ================================================================
+
+    layer "doctrine"    state="evidenced" reaches="the skill teaches naming the command, the actor and the layers before writing the slice" \
+        evidence="surface.skill.cut-a-slice, registered in surface.skill.using-praxis"
+    layer "enforcement" state="evidenced" reaches="slice-shape, refusing at write time and naming the missing field" \
+        evidence="cargo test — 7 passed; praxis check exits 1 with 4 refusals on a malformed slice"
+    layer "docs"        state="evidenced" reaches="a refused slice and its reason are readable off the record" \
+        evidence="the diagnostic carries the schema's own `because` text and a source span, so the \
+            reason is read off the record rather than restated in the engine"
+    layer-set sealed=#true at="2026-08-20T23:10:00-05:00" \
+        because="the set is fixed before the cost is known, so it cannot be trimmed at close to make done cheaper"
+
+    // ================================================================
+    // DECISIONS THIS PASS MUST MAKE — bound to the work that forced them, rather than
+    // filed beside it. Each becomes a DecisionRecorded, or the iteration cannot close.
+    // ================================================================
+
+    // DecisionRecorded — bound to the work that forced it. It amended ADR.260819.01
+    // rather than living here, because the choice is durable and the iteration is not.
+    decision "the KDL parser" state="accepted" at="2026-08-20T23:40:00-05:00" \
+        chose="kdl-rs, as a document model. Not knuffel, and not any derive-based deserializer" \
+        because="the disqualifying property is derive, not the version. The schema lives in \
+            NA.260820.01, so the engine must validate against a schema loaded at runtime — types \
+            that encode it would make extending a vocabulary a recompile" \
+        over="knuffel · a maintained derive-based successor · serde with a generic value model · a hand-rolled parser" \
+        falsified-by="a derive-based codec that can validate against a schema loaded at RUNTIME. If \
+            one exists, the disqualifying property was never derive and this decision was about \
+            maturity, which is a different argument with a different answer" \
+        raised="ADR.260819.01/A4" \
+        note="serde was rejected on spans: its data model carries none, and C2 requires the \
+            refusal to name the missing FIELD" seal=fnv1a64:6f58ae16a5eaaaf7
+    decision "where the shape check lives" state="accepted" at="2026-08-21T00:00:00-05:00" \
+        chose="a praxis-core validator over a parsed document, never a codec-level refusal" \
+        over="a codec-level refusal · a two-stage parse that types the document as it reads it" \
+        falsified-by="a codec-level refusal that names the MISSING FIELD rather than the syntax \
+            error. If a codec can say `missing realizes`, the layering here is one indirection \
+            nobody needed" \
+        because="A4 rejected derive, so the codec can only fail on SYNTAX. `which field is missing` \
+            is semantic and lives above it — C2 is unreachable from the codec" \
+        note="a derivation from A4 rather than a choice. Recorded because a decision nobody wrote \
+            down is one the next agent re-derives" seal=fnv1a64:98824524a6d5d1b3
+
+    // ================================================================
+    // WHAT THIS PASS ALREADY LEARNED — findings raised at the moment they cost something.
+    // ================================================================
+
+    finding "P1" state="open" \
+        text="no slice in this set reaches all four layers. Sixteen of eighteen reach three; the \
+            only slice touching `harness` is TS.260820.11, and it sits at depth 8. This frame's \
+            slice set cannot exercise the full layer vocabulary in any single iteration, ever" \
+        size="owed-work" \
+        note="consistent with ES.260819.01/E11 — the storm modelled work moving through a \
+            repository, not Praxis being installed — and with WALK.260820.02/W15. It is evidence \
+            the layer vocabulary in the config is wider than this frame, not that the slices are thin"
+
+    finding "P2" state="open" \
+        text="seventeen of eighteen slices declare depends-on another slice, which NA.260820.01's \
+            schema forbids: dependency is only ever on a frozen contract. TS.260820.01 is the sole \
+            conforming slice, and it is conforming by accident rather than by check — nothing \
+            refused the other seventeen" \
+        size="owed-work" \
+        note="the rule and its violation are both on the record and neither is enforced, which is \
+            precisely the tier this frame exists to shrink" \
+        disposition="dormant until a seam manifest exists. The rule cannot be SATISFIED today — \
+            there is nothing frozen to depend on — so re-cutting seventeen slices by hand, with no \
+            checker, would introduce errors nothing can detect. It fails closed the day the \
+            manifest lands, and the engine audits the re-cut"
+
+    finding "P4" state="open" \
+        text="the parser decision was reached on a principle the record already held — the engine \
+            may not encode what the record declares — and neither ADR.260819.01 nor NA.260820.01 \
+            stated it as a rule anything could check. It was inferred from the deleted spike's one \
+            interesting property" \
+        size="owed-work" \
+        note="A4 states it as a change. Whether it is also a schema rule — an engine that hardcodes \
+            a vocabulary is refused — is unsettled, and the checker that would refuse it is the \
+            engine itself"
+
+    finding "P5" state="open" \
+        text="TS.260820.01's sealed `docs` layer — a refused slice and its reason are readable off \
+            the record — was unsatisfiable: cut-slice produced no refusal event, alone among the \
+            storm's refusable commands. C1 and C2 could have been settled at `enforcement` while \
+            the sealed docs layer stayed unreachable" \
+        size="owed-work" \
+        obliged="ES.260819.01/E29 — SliceCutRefused added; TS.260820.01 amended to produce it" \
+        note="found by trying to BUILD the command, not by reading the model. refusal-is-a-fact was \
+            declared as a policy and violated by the storm that declared it"
+
+    finding "P6" state="open" \
+        text="the create-vet's freeze went stale inside one commit. It pinned the entity schema with \
+            no commit at all, and the schema then moved in 418c4cb — the very commit that gave it a \
+            home. An iteration froze against a node that changed underneath it, which is the failure \
+            `depends-on a frozen contract` exists to prevent, occurring inside the freeze mechanism" \
+        size="owed-work" \
+        note="it is also the argument for vetting twice: the second vet catches exactly this, and it \
+            caught it here before running"
+
+    finding "P7" state="open" \
+        text="the schema declared entity KINDS, states and relationships, but no FIELDS. The shape \
+            validator therefore had nothing to read: `a slice names one command, one actor, at \
+            least one event` lived in the storm's slice-shape policy as prose and in \
+            TS.260820.01's header comment, neither of which a checker can consume" \
+        size="owed-work" \
+        obliged="NA.260820.01/schema — thin-slice field declarations, derived from slice-shape and E13" \
+        note="the freeze rule says a schema change while the iteration is open is a FINDING, not an \
+            edit. This is that finding, and the amendment follows from it. Without it the validator \
+            would have hardcoded the fields, which is precisely what ADR.260819.01/A4 forbids — the \
+            first line of engine code would have violated the decision that authorised it"
+
+    finding "P8" state="open" \
+        text="`phase` was never declared. design-ux · design-system · implement · learn · teach were \
+            first-class under ADR.260819.02 and nothing carried them forward when it was withdrawn, \
+            so this iteration ran admission straight into implement. Two phases had in fact already \
+            happened — the C2 diagnostic conversation was design-ux, and the core/shell placement was \
+            design-system — and neither was recorded as one" \
+        size="owed-work" \
+        obliged="NA.260820.01/schema — phase declared, with its kind and state vocabularies" \
+        note="withdrawing a decision dropped an entity that the model still needed. Supersession was \
+            treated as replacement when parts of it were load-bearing — the same mistake ADR.260819.01 \
+            avoided by recording PARTIAL supersession"
+
+    finding "P9" state="open" \
+        text="the engine silently ignores any node kind the schema does not declare, while the schema \
+            declares `undeclared-entity-kind refuses a kind this schema does not name`. The rule is \
+            declared and unenforced, so exactly the entities that were missing — iteration, \
+            read-model, phase — are the ones the checker could never have flagged" \
+        size="owed-work" \
+        note="not fixed here: TS.260820.01's scope is sealed to slice shape, and enforcing it now \
+            would refuse config and every root node the schema has not yet described. It is the \
+            obvious next slice"
+
+    finding "P3" state="open" \
+        text="the iteration entity was undefined until this iteration opened. Three capabilities wrote facts \
+            about it and none declared it, and it went unnoticed through a storm, two walks and an \
+            architecture" \
+        size="owed-work" \
+        note="a schema derived from what the record ALREADY says will miss an entity nothing \
+            declares. `read-model` was the same case, found in the same act, and `phase` was the \
+            third (P8). Three undeclared entities in one frame is not an oversight, it is the \
+            method: the delivery graph is INCOMPLETE in discovery by construction, and building \
+            is what completes it"
+
+    // ================================================================
+    // CLOSE — every claim settled against evidence, every declared layer reached, and
+    // every shortfall carried forward as a recorded finding. Nothing was dropped in
+    // silence, and the sealed layer set was never trimmed to make `done` cheaper.
+    // ================================================================
+
+    close {
+        claims-settled "C1" "C2" "C3" all-met=#true
+        layers-reached "doctrine" "enforcement" "docs" all-evidenced=#true
+        findings-carried "P1" "P2" "P3" "P4" "P5" "P6" "P7" "P8" "P9" \
+            note="carried as owed work, not resolved. Five are owed against future slices; four \
+                already obliged changes that were made while this iteration was open"
+        scope-unchanged #true \
+            note="the layer set sealed at open was never edited. TS.260820.01 gained an event by \
+                amendment, which WIDENED what had to be built rather than narrowing what was promised"
+        verified "cargo test — 7 passed" "praxis check praxis — ok" \
+            "praxis check on a malformed slice — 4 refusals, exit 1"
+        note "the close itself was refused first. Writing this block introduced two malformed nodes \
+            — a dropped line continuation and a bare property with no node name — and `praxis check` \
+            named both with spans. The throwaway parser used before the engine existed had tolerated \
+            the same class of error silently. The first thing the engine refused was its own author, \
+            which is the only kind of evidence this frame accepts"
+    }
+
+    contributes "slice-outcome-added" \
+        because="the first slice delivered — cut-a-slice, and the shape check behind it" \
+        note="the bump rule this work matches, from the config. Declared by the iteration \
+            because only whoever did the work knows what kind of change it was"
+
+    trail {
+        entry at="2026-08-21T01:10:00-05:00" by="agent:principal-engineer" action="state-changed" \
+            from="working" to="closed" \
+            note="closed with every claim met and every declared layer evidenced. Nine findings \
+                carried. The engine that this iteration built is what will check the next one"
+        entry at="2026-08-21T00:20:00-05:00" by="human:waelrabadi" action="state-changed" \
+            from="open" to="working" \
+            note="admission signed by the ask to start. The start-vet refused one condition — the \
+                freeze was stale — and re-froze at 969081b before any code was written"
+        entry at="2026-08-20T23:10:00-05:00" by="agent:principal-engineer" action="created" \
+            note="opened by hand. The gate, the freeze and the seal are recorded as facts rather \
+                than performed by an engine, because the engine is what this iteration is for"
+    }
+}

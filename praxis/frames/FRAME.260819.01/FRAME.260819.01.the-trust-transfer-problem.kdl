@@ -1,0 +1,122 @@
+// The problem Praxis exists to solve. Permanent: it has no terminal state, and its
+// symptoms resolve individually as releases reach them.
+//
+// This frame is not new. `INIT.trust-transfer` shipped against it and closed part of it.
+// It is re-opened because the symptoms it did not reach are the ones that matter most,
+// and the current answer has a ceiling it cannot be pushed past.
+
+frame "FRAME.260819.01" {
+    slug "the-trust-transfer-problem"
+    title "Trust in an agent's artifact is unearned, because fidelity is invisible"
+    under "name-the-person-before-the-system"
+
+    // ---- Symptoms. Each resolves on its own schedule, by naming a release. ----
+    symptom "S1" state="present" \
+        text="agents improvise structure instead of following a method — narrowed by guardrails and skills, not closed" \
+        previously-claimed="partially-resolved by 0.5.0" \
+        withdrawn-because="resolution-names-a-release refused it, correctly. 0.5.0 predates the \
+            delivery graph: the record holds no cut release at that version and therefore no slice \
+            whose `attacks` names S1. The narrowing may well have happened — it is not that the \
+            claim is false, it is that it is UNCOMPUTABLE, and this frame's whole argument is that \
+            an assertion nobody can check is not evidence" \
+        note="withdrawn rather than grandfathered. A method that exempts its own progress reports \
+            from the standard it sets is the root cause with a nicer surface, and the first thing \
+            self-application cost this frame was a claimed win" {
+        felt-by "the-team-building-a-digital-product"
+    }
+    symptom "S2" state="present" \
+        text="an artifact looks identical whether the agent reasoned hard or pattern-matched a template" {
+        felt-by "the-team-building-a-digital-product"
+    }
+    symptom "S3" state="present" \
+        text="how much process a unit of work received is declared by the agent that received it" {
+        felt-by "the-team-building-a-digital-product"
+    }
+    symptom "S4" state="present" \
+        text="a slice claimed vertical cannot be shown to have cut anything" {
+        felt-by "the-team-building-a-digital-product"
+    }
+    symptom "S5" state="present" \
+        text="scope drifts silently — work closes with unmet claims and nothing objects" {
+        felt-by "the-team-building-a-digital-product"
+    }
+    symptom "S6" state="present" \
+        text="a published document carries no evidence of when, or whether, it was ever true" {
+        felt-by "the-reader-of-a-release"
+    }
+    symptom "S7" state="present" \
+        text="the next agent re-derives what is already known, because current truth is prose" {
+        felt-by "the-next-agent"
+    }
+
+    // ---- The convergence gate. ----
+    root-cause "execution fidelity is invisible in the artifact, so trust in it must be granted rather than computed"
+
+    principle "fidelity is a property computed from the record, never a claim made by whoever produced it"
+
+    // ---- Why the existing answer cannot reach the rest. ----
+    //
+    // Not the problem — the ceiling on the current attempt at it. Recorded here because a
+    // re-opened frame has to say why it is being re-opened.
+    current-ceiling #"""
+        Praxis holds its own operational state in prose Markdown, so enforcement's ceiling
+        is whatever `grep` can conclude about paragraphs. A probe can prove a file exists
+        and a phrase appears. It cannot prove a slice claimed complete was ever designed,
+        that a capability record reflects something that shipped, or that a tier was
+        classified honestly.
+
+        The consequence is the three-tier split in the Markdown dashboard: script-enforced gates
+        fail closed, human-signed gates do not, and the agent-attested tier — the largest —
+        is trusted because the agent was asked. Every symptom still marked `present` above
+        sits in that third tier, and no amount of further prose discipline moves them out
+        of it. The obstacle is the substrate, not the doctrine.
+        """#
+
+    affected "a reviewer accepting an agent's artifact" \
+        "a maintainer building on work they did not do" \
+        "a reader trusting a published document" \
+        "the next agent, which re-derives what the last one already knew"
+
+    baseline "thirteen named fidelity checks are agent-attested" \
+        "closing a unit of work edits five documents in sequence with no transaction" \
+        "roughly fifteen shell probes whose ceiling is textual pattern matching"
+
+    cost-of-inaction "the product's stated purpose — making execution fidelity visible and \
+        verifiable — remains unmet in the tier where most of it lives"
+
+    // ---- What discovery converged on. ----
+    //
+    // Each traces to a cluster of events in ES.260819.01 rather than to a name someone
+    // chose. A capability named off a frame is a claim made by whoever produced it, which
+    // is this frame's own root cause — so the derivation is recorded or the capability
+    // does not stand.
+
+    identifies "CAP.delivery-record"      from="ES.260819.01" clusters="problem-record + discovery-record + work-decomposition"
+    identifies "CAP.work-admission"       from="ES.260819.01" clusters="iteration-control"
+    identifies "CAP.claim-settlement"     from="ES.260819.01" clusters="evidence-and-settlement"
+    identifies "CAP.release-binding"      from="ES.260819.01" clusters="release-binding"
+    identifies "CAP.document-projection"  from="ES.260819.01" clusters="projection"
+
+    retires "CAP.plugin-conformance-and-validation-probes" \
+        because="the storm's ten policies distributed across all five capabilities rather than \
+            clustering into one. Enforcement is a property of each capability, not a capability \
+            beside them — a probe layer bolted next to the thing it checks is the current ceiling, \
+            not the way out of it"
+
+    out-of-scope "distribution and the six install paths" \
+        because="ES.260819.01 modelled work moving through a repository, not Praxis being \
+            installed, so nothing about distribution is derivable from it. \
+            CAP.multi-harness-distribution survives as an outsider to this frame"
+
+    created-by "human:waelrabadi"
+    created-at "2026-08-19T09:13:00-05:00"
+
+    trail {
+        entry at="2026-08-19T09:13:00-05:00" by="human:waelrabadi" action="created"
+        entry at="2026-08-20T07:10:00-05:00" by="agent:principal-engineer" action="state-changed" \
+            from="state-and-deliverable-are-one-artifact" to="the-trust-transfer-problem" \
+            note="Corrected. The earlier framing named the obstacle — Markdown state and a regex ceiling — as the problem. That is why the current answer stalls, not what Praxis is for. The obstacle is now recorded as current-ceiling."
+        entry at="2026-08-20T00:00:00-05:00" by="agent:principal-engineer" action="capabilities-identified" \
+            note="Five capabilities converged from ES.260819.01 by clustering events on their consistency boundaries. Discovery is closed for this frame pending a WALK in depth on the riskiest path."
+    }
+}

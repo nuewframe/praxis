@@ -1,0 +1,44 @@
+capability "release-binding" {
+    doing "bind finished iterations to a version, cut it, and promote what shipped into what each capability says it is"
+    not "it does not write documents. It moves truth; document-projection renders it"
+    state "sought"
+    facet "engine"
+
+    derived-from "ES.260819.01"
+    from-cluster "release-binding"
+
+    owns-event "WorkBound" "ReleaseCut" "TruthPromoted"
+
+    owns-read-model "the-published-set-for-a-release" \
+        answers="what was true at version N?" \
+        note="moved here from document-projection. Its CONTENT is what TruthPromoted produced, \
+            so it belongs to the capability that moved the truth, not to the one that renders it"
+
+    attacks "S6"
+
+    gate-test "names-a-doing" verdict="pass" \
+        because="binding work to a point on the version line is a doing, and it is what makes `resolved-by` a checkable claim"
+    gate-test "fundable-on-own-terms" verdict="pass" \
+        because="binding alone answers `what is queued for the next release`, which is useful before anything is cut"
+    gate-test "slices-deliver-independently" verdict="pass" \
+        because="bind a finished iteration / cut the version / promote what shipped into current truth"
+    gate-test "states-an-exclusion" verdict="pass" \
+        because="it produces no document. Every published artifact is projection's output"
+
+    keeps-consistent "a version's content against the iterations bound to it" \
+        "current truth against the last release that moved it"
+
+    principle-note "truth moving as a CONSEQUENCE of a release, in one place, is what stops it \
+        being a chore performed beside the work — and a chore beside the work is the thing that \
+        gets skipped when the work is late"
+
+    usage "`praxis bind <ITER> <VERSION> [--undo]` — attach closed work to a version. Only closed iterations bind, each binds once, and a cut release does not change."
+    usage "`praxis cut-release <VERSION> --confirm` — cut the version and write its index node in one record. Refused until the published set exists and is committed."
+    usage "`praxis promote <VERSION>` — fold what a cut release shipped into what each capability says it is. Derived from bound work and recomputed by a rule."
+
+
+
+    trail {
+        entry at="2026-08-20T00:00:00-05:00" by="agent:principal-engineer" action="created"
+    }
+}

@@ -1,0 +1,53 @@
+thin-slice "TS.260820.15" {
+    slug "document-how-a-capability-is-used"
+    title "Write usage while building, and refuse to publish a guide for truth that never shipped"
+    kind "command"
+    realizes "CAP.delivery-record"
+    from-storm "ES.260819.01"
+
+    command "document-usage"
+    actor "working-agent"
+    produces-event "UsageDocumented"
+    needs-read-model "capabilities-and-what-they-own"
+    feeds-read-model "how-to-use-a-capability"
+
+    trigger "a capability gained a usable surface during an iteration"
+    outcome "usage prose is attached to the capability record, and it can only publish for a release that actually promoted it"
+
+    scenario #"""
+        Given an iteration that added something a person can use
+        When the agent documents the usage
+        Then the prose attaches to the capability record as the work happens — not assembled at
+             release time — and publishing it for a release whose truth was never promoted is
+             refused, because a guide describing behaviour that never shipped is worse than no
+             guide: it is a document that is confidently wrong.
+        """#
+
+    step "1" does="write the usage against the capability, while the capability is being built"
+    step "2" does="attach it to the capability record. It is data, not a file beside the code"
+    step "3" does="at release, it publishes only if that release promoted the truth it describes"
+    step "4" does="a capability with a usable surface and no usage prose is reported, not silently omitted"
+
+    excludes "writing guides at release time. That is the chore-beside-the-work pattern this frame exists to remove"
+    excludes "rendering. The guide is prose in the record until document-projection composes it"
+    excludes "judging whether the prose is any good"
+
+    layer "doctrine"    reaches="the skill teaches documenting usage inside the iteration, not after it"
+    layer "enforcement" reaches="guide-follows-promoted-truth, and a report on capabilities with a usable surface and no usage"
+    layer "docs"        reaches="published under the archival projection's guides"
+
+    claim "C1" text="publishing a guide for a release that did not promote the truth it describes is refused" \
+        settled-by="a negative test asserting non-zero exit and the capability name in the diagnostic"
+    claim "C2" text="usage prose is stored in the record, not in a file the record points at" \
+        settled-by="a test asserting the guide renders with no filesystem read outside the state root"
+    claim "C3" text="a capability with a usable surface and no usage prose is reported, not omitted" \
+        settled-by="a test asserting the gap is named rather than the guide silently missing"
+
+    depends-on "TS.260820.17 — truth promotion must exist for the guide to follow it"
+
+    useful-alone "usage stops being written from memory at release time, which is when it is \
+        least accurate and most rushed"
+    useful-to "the-reader-of-a-release"
+
+    attacks "S2" "S6"
+}

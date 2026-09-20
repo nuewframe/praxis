@@ -1,0 +1,125 @@
+// Opened by `praxis pick-up`. Every condition below was evaluated against the
+// tree as it stood at 2026-08-22T18:47:38Z, and the verdicts are recorded
+// rather than summarised: a gate whose reasoning is not on the record is a gate
+// you have to trust.
+
+iteration "ITER.260822.11" {
+    slug "know-who-this-is-for"
+    on-slice "TS.260821.15"
+    state "closed"
+    opened-at "2026-08-22T18:47:38Z"
+    opened-by "agent:praxis"
+
+    approval "admission" {
+        status "signed"
+        signer "human:wael"
+        at "2026-08-22T18:47:38Z"
+        signed-by "the ask to pick up this slice"
+    }
+
+    vet "create" state="done" at="2026-08-22T18:47:38Z" on-slice="TS.260821.15" {
+        condition "slice-is-shaped" verdict="passed"
+        condition "dependencies-delivered" verdict="passed"
+        condition "no-iteration-in-flight" verdict="passed"
+        condition "nothing-left-to-admit" verdict="passed"
+        condition "work-is-disjoint" verdict="not-computed" \
+            found="no seam manifest exists, so what two iterations would touch cannot be compared. Disjointness is half of what this capability says it judges, and half of what it judges is currently not computed at all"
+        condition "the-slice-is-the-best-available" verdict="left-to-the-maintainer"
+    }
+
+    // 2 of the declared conditions were not decided by the gate. They are
+    // recorded above rather than omitted: an admission that does not say what
+    // it left undecided claims more than it checked.
+
+    // Frozen at open, from the slices. Removing one from a slice now
+    // does not remove it from here — it makes the two disagree, and that is
+    // refused.
+    claim "C1" from-slice="TS.260821.15" state="met" \
+        evidence="a persona nobody could be wrong about is refused — \
+            `judges-by` is required, and it is the field that turns a description into a claim"
+    claim "C2" from-slice="TS.260821.15" state="met" \
+        evidence="a view needed by nobody the record holds dangles. \
+            ES.260819.01's eleven `needed-by` values now name personas, so dangling-relationship \
+            carries it without a rule of its own"
+    claim "C3" from-slice="TS.260821.15" state="carried" \
+        evidence="not done. `useful-to` is declared on thin-slice and references persona, so a \
+            slice CAN name whose value it claims — nothing reports a slice that does not"
+    claim "C4" from-slice="TS.260821.15" state="met" \
+        evidence="`felt-by` declared on symptom and referencing persona; FRAME.260819.01 amended \
+            so all seven name somebody — S1 through S5 the team, S6 the reader of a release, S7 \
+            the next agent. Optional, because every symptom predates the kind"
+    claim "C5" from-slice="TS.260821.15" state="met" \
+        evidence="one persona is enough and none is reported — one primary is a \
+            complete answer, none is REPORTED at Severity::Report, and the test asserts the \
+            severity so nothing pushes anybody toward enumerating personas upfront"
+    claim "C6" from-slice="TS.260821.15" state="met" \
+        evidence="an emergent persona with no origin is refused. `found-by` is \
+            required WHEN emergent, enforced by entity-without-a-required-field rather than by a \
+            rule of its own — a second rule saying the same thing is a second thing to keep in step"
+
+    layer "doctrine"    state="evidenced" \
+        evidence="surface.skill.name-a-persona, anchored and registered. 51 of 51 surfaces anchored" \
+        reaches="discovery names the person before it names the system"
+    layer "enforcement" state="evidenced" \
+        evidence="a-record-names-somebody-it-is-for reports; needed-by dangles on a persona the \
+            record does not hold; found-by is required when emergent. 22 of 51 rules witnessed" \
+        reaches="needed-by references persona; a record naming nobody is reported"
+    layer "docs"        state="evidenced" \
+        evidence="PERSONAS.who-this-is-for holds four, and the Markdown dashboard \
+            names the primary one as the anchor" \
+        reaches="`who is this for` is answerable from the record"
+
+    phase "design-ux" state="complete" required-by="docs" worked-by="agent:principal-engineer" \
+        produced="`does-not-care` is the field people skip and should not — it is why two personas \
+            need two documents rather than one longer one"
+    phase "design-system" state="complete" required-by="enforcement" worked-by="agent:principal-engineer" \
+        produced="one primary required, the rest emergent and citing their origin. A rule failing \
+            closed on the day it lands would push toward exactly the upfront enumeration this excludes"
+    phase "implement" state="complete" required-by="enforcement · docs" worked-by="agent:principal-engineer" \
+        produced="the persona kind, four personas, needed-by rewired to reference them, felt-by on \
+            symptom, useful-to on thin-slice, and the report rule"
+    phase "learn" state="complete" required-by="always" worked-by="agent:principal-engineer" \
+        produced="two findings, and one claim carried rather than met"
+    phase "teach" state="skipped" required-by="doctrine" worked-by="agent:principal-engineer" \
+        produced="surface.skill.name-a-persona" \
+        skipped-because="it produced doctrine for an AGENT, which is the doctrine LAYER and is recorded there. Teaching an end user the feature's why and how did not happen — and the record already serves the next agent, whose own persona judges success by NOT needing a document (TS.260821.19, ITER.260822.15/BA1)"
+
+    finding "AV1" state="open" size="observation" \
+        carries="C3" \
+        text="`useful-to` is declared on thin-slice and nothing reports a slice that omits it. \
+            Every slice in this record claims value with an unstated subject, and the field that \
+            would let them say whose is optional and unchecked" \
+        obliges="a report over slices whose useful-alone names no persona, once enough slices \
+            carry one that the report is readable rather than a list of everything" \
+        note="carried deliberately. Turning it on today names thirty slices, which is the \
+            severity mistake every enforcement in this frame has had to avoid making once"
+
+    finding "AV2" state="open" size="observation" \
+        text="the four personas were all derived from work already done — three of them cite \
+            walkthroughs and a slice from this same session. None came from talking to anybody" \
+        note="honest limit on the whole kind. `judges-by` makes a persona contradictable, and \
+            nobody has contradicted these. The adopter persona in particular is an account of \
+            what an agent found walking a scratch repository, which is not the same as what a \
+            person would have wanted"
+    closed-at "2026-08-22T21:12:14Z"
+    outcome "continue"
+
+    close {
+        claims-settled "C1" how="met"
+        claims-settled "C2" how="met"
+        claims-settled "C3" how="carried by AV1"
+        claims-settled "C4" how="met"
+        claims-settled "C5" how="met"
+        claims-settled "C6" how="met"
+        all-met #false
+        attested-by "human:waelrabadi"
+        note "the accounting above was computed at close, not asserted. It says every claim is either met or carried by a finding that names it, and nothing about whether the work is any good"
+    }
+
+    trail {
+        entry at="2026-08-22T21:12:14Z" by="agent:praxis" action="state-changed" from="open" to="closed" note="closed by `praxis close`. The accounting was computed; the conclusion is not the machine's to draw"
+
+        entry at="2026-08-22T18:47:38Z" by="agent:praxis" action="created" \
+            note="opened by the gate, on the ask of human:wael"
+    }
+}

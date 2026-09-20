@@ -135,7 +135,7 @@ The outputs above are the durable architecture record. **They must not evaporate
 
 **Decisions** → one ADR per durable choice — sync/async boundary, storage engine, resilience strategy, trust boundary — via `create-adr`, each carrying a diagram *as of that decision*.
 
-These are **living** documents. On later waves, edit the overview and capability records **in place** to reflect the current truth; spawn a **superseding** ADR when a durable decision changes. The wave `product-architecture.md` stays the **hypothesis** (the educated theory) and only points into these records — it never duplicates current-state topology (**Wave = educated theory; capability record = truth**).
+These are **living** documents. On later iterations, edit the overview and capability records **in place** to reflect the current truth; spawn a **superseding** decision when a durable choice changes. A slice's architecture stays the **hypothesis** (the educated theory) and only points into these records — it never duplicates current-state topology (**the slice is an educated theory; the capability record is truth**).
 
 ### Step 8 — Stop
 

@@ -1,0 +1,160 @@
+// Opened by `praxis pick-up`. Every condition below was evaluated against the
+// tree as it stood at 2026-08-21T19:54:08Z, and the verdicts are recorded
+// rather than summarised: a gate whose reasoning is not on the record is a gate
+// you have to trust.
+
+iteration "ITER.260821.15" {
+    slug "record-a-decision"
+    on-slice "TS.260820.14"
+    state "closed"
+    opened-at "2026-08-21T19:54:08Z"
+    opened-by "agent:praxis"
+
+    approval "admission" {
+        status "signed"
+        signer "human:wael"
+        at "2026-08-21T19:54:08Z"
+        signed-by "the ask to pick up this slice"
+    }
+
+    vet "create" state="done" at="2026-08-21T19:54:08Z" {
+        condition "slice-is-shaped" verdict="passed"
+        condition "dependencies-delivered" verdict="passed"
+        condition "no-iteration-in-flight" verdict="passed"
+        condition "nothing-left-to-admit" verdict="passed"
+        condition "work-is-disjoint" verdict="not-computed" \
+            found="no seam manifest exists, so what two iterations would touch cannot be compared. Disjointness is half of what this capability says it judges, and half of what it judges is currently not computed at all"
+        condition "the-slice-is-the-best-available" verdict="left-to-the-maintainer"
+    }
+
+    // 2 of the declared conditions were not decided by the gate. They are
+    // recorded above rather than omitted: an admission that does not say what
+    // it left undecided claims more than it checked.
+
+    // Frozen at open, from the slice. Removing one from the slice now
+    // does not remove it from here — it makes the two disagree, and that is
+    // refused.
+
+    claim "C1" from-slice="TS.260820.14" state="met" \
+        text="editing the body of an accepted decision is refused; appending an amendment is not" \
+        settled-by="a negative test mutating an accepted body, and a positive test appending an amendment" \
+        evidence="editing the body of an accepted decision is refused and \
+            appending an amendment is not an edit — the seal covers the body and deliberately \
+            NOT the amendments, because otherwise the only way to correct a decision would be to \
+            break its seal and append-only would be unusable"
+    claim "C2" from-slice="TS.260820.14" state="met" \
+        text="a decision with no alternatives and no falsifier is refused" \
+        settled-by="two negative tests, one per missing field" \
+        evidence="a decision with no alternatives is refused and \
+            a decision with no falsifier is refused"
+    claim "C3" from-slice="TS.260820.14" state="met" \
+        text="a decision not bound to an iteration is refused" \
+        settled-by="a negative test with a dangling iteration reference" \
+        evidence="a decision bound to no iteration is refused — binding is by \
+            NESTING rather than by reference, so a dangling reference is not the failure mode; a \
+            decision at the root is, and that is what the test builds"
+    claim "C4" from-slice="TS.260820.14" state="met" \
+        text="findings that tested a decision are reachable from it" \
+        settled-by="a test asserting the traversal from a decision to the findings raised against it" \
+        evidence="findings that tested a decision are reachable from it — a \
+            finding says `tests=<the decision's title>` and the composed document walks from the \
+            decision to it. T3 in ITER.260821.04 now carries that edge, which is the first one"
+
+    decision "the seal covers the body and not the amendments" \
+        chose="compute the seal over title, chose, over, because and falsified-by only" \
+        over="sealing the whole node, amendments included" \
+        because="if the seal covered amendments, appending one would break it — and the only way to \
+            correct a decision would be to break its seal, which makes append-only unusable and \
+            teaches everyone to ignore the refusal" \
+        falsified-by="an amendment that contradicts the body rather than extending it. If that \
+            happens the split is wrong, because a contradiction would pass unsealed" \
+        state="accepted" seal=fnv1a64:2101d04fc331528b
+
+    vet "start" state="done" at="2026-08-21T19:52:00Z" {
+        condition "the tree is clean and current" verdict="passed" found="HEAD 866a44c"
+        condition "the slice's scope is unchanged" verdict="passed" found="four claims, read line by line"
+        condition "what this will refuse is known before it is turned on" verdict="known-and-recorded" \
+            found="the record holds decisions from four iterations and none names a falsifier, so \
+                the rule will refuse every one. Amending them is the work, not a side effect" \
+            note="recorded as AE1"
+    }
+
+    frozen {
+        pins "the entity-and-field schema" at="NA.260820.01/schema" at-commit="866a44c"
+        pins "the lifetime declarations" at="ES.260819.01 — read-model" at-commit="866a44c"
+        rule "a schema change while this iteration is open is a FINDING, not an edit" \
+            exception="declaring the `decision` kind and its four rules is the mechanism this slice \
+                depends on"
+    }
+
+    contributes "slice-outcome-added" \
+        because="record-a-decision, and every decision in the frame made falsifiable"
+
+    layer "doctrine"    state="evidenced" evidence="surface.skill.record-a-decision, registered in the router" reaches="the skill teaches append-only correction and the falsifier requirement"
+    layer "enforcement" state="evidenced" evidence="142 tests pass; a decision with no alternative, no falsifier, no iteration, or a body that moved after acceptance is refused" reaches="an edit to an accepted decision's body is refused; an amendment is not"
+    layer "docs"        state="evidenced" evidence="the-decisions-that-shaped-this composes from the record, and publish now has three of the four composers it needs" reaches="published under the archival projection's decisions, composed with the options discovery rejected"
+    layer-set sealed=#true at="2026-08-21T19:52:00Z"
+
+    phase "design-ux" state="complete" required-by="doctrine" \
+        produced="how to WRITE a falsifier. Not `this might be wrong if circumstances change` but \
+            the thing that would happen — `a derive-based codec that validates against a runtime \
+            schema`, `the second vet never catching a tree that moved`. The skill says plainly that \
+            if you cannot write one you have not made a decision yet"
+    phase "design-system" state="complete" required-by="enforcement" \
+        produced="the seal covers the body and not the amendments — recorded as a decision of its \
+            own, because getting it backwards makes append-only unusable rather than merely wrong. \
+            And binding by NESTING rather than by reference, which is why C3's failure mode is a \
+            root-level decision and not a dangling id"
+    phase "implement" state="complete" required-by="enforcement · docs" \
+        produced="the Decision corpus reader, four rules, the decisions composer, the tests=<decision> \
+            edge, and nine tests"
+    phase "learn" state="complete" required-by="always" produced="three findings" \
+        note="never skippable — it is the phase that judges the others"
+    phase "teach" state="skipped" required-by="doctrine" produced="surface.skill.record-a-decision" \
+        skipped-because="it produced doctrine for an AGENT, which is the doctrine LAYER and is recorded there. Teaching an end user the feature's why and how did not happen — and the record already serves the next agent, whose own persona judges success by NOT needing a document (TS.260821.19, ITER.260822.15/BA1)"
+
+    finding "AE1" state="open" size="frame-sized" \
+        text="the rule refused every decision the frame had ever recorded — six, across four \
+            iterations, and not one named a falsifier. Two of them also used an older vocabulary, \
+            `decided=` and `alternatives=`, that nothing had ever normalised" \
+        note="fifteen iterations of arguing that a claim needs evidence and a capability needs a \
+            derivation, while recording decisions that could not be wrong. The rule is not what is \
+            interesting — the fifteen iterations of not noticing are. Every one of those decisions \
+            reads well, which is exactly why nobody looked"
+
+    finding "AE2" state="open" size="observation" \
+        text="C3 as cut says `a decision not bound to an iteration is refused, settled by a negative \
+            test with a dangling iteration reference`. There is no dangling reference to build: \
+            binding is by nesting, so a decision either sits inside an iteration or does not" \
+        note="the claim assumed a reference model the schema does not use, and the test that settles \
+            it builds a root-level decision instead. Settled at the claim's TEXT rather than its \
+            named mechanism — the third time in this frame, after U3 and Z2, and the pattern is \
+            always the same: settled-by names a route the author imagined before the shape existed"
+
+    finding "AE3" state="open" size="owed-work" \
+        text="the seal is checked only when present, so the four amended decisions in this record \
+            are protected by nothing. Append-only is implemented and unused" \
+        obliges="either a command that seals a decision at acceptance, or a rule that refuses an \
+            accepted decision carrying no seal" \
+        note="the second half is the better rule and would refuse the whole record today. Not done \
+            here because sealing four decisions by hand is exactly the manual step this frame \
+            exists to remove, and doing it badly would be worse than owing it"
+    closed-at "2026-08-21T19:59:14Z"
+    outcome "continue"
+
+    close {
+        claims-settled "C1" how="met"
+        claims-settled "C2" how="met"
+        claims-settled "C3" how="met"
+        claims-settled "C4" how="met"
+        all-met #true
+        note "the accounting above was computed at close, not asserted. It says every claim is either met or carried by a finding that names it, and nothing about whether the work is any good"
+    }
+
+    trail {
+        entry at="2026-08-21T19:59:14Z" by="agent:praxis" action="state-changed" from="open" to="closed" note="closed by `praxis close`. The accounting was computed; the conclusion is not the machine's to draw"
+
+        entry at="2026-08-21T19:54:08Z" by="agent:praxis" action="created" \
+            note="opened by the gate, on the ask of human:wael"
+    }
+}

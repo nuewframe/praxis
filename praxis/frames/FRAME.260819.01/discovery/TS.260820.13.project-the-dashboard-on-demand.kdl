@@ -1,0 +1,59 @@
+thin-slice "TS.260820.13" {
+    slug "project-the-dashboard-on-demand"
+    title "See where the product stands right now, without committing a document that ages"
+    kind "view"
+    realizes "CAP.document-projection"
+    from-storm "ES.260819.01"
+
+    read-model "what-is-currently-true" "what-is-ready-to-pick-up" "the-published-set-for-a-release"
+    composes #true
+    content-owned-by "CAP.delivery-record" "CAP.work-admission" "CAP.release-binding"
+    lifetime "working"
+    actor "maintainer"
+
+    trigger "someone wants to know where the product actually is"
+    outcome "they get a dashboard composed at the moment they asked, and nothing is committed"
+
+    scenario #"""
+        Given a record spanning open frames, work in flight and releases already cut
+        When the maintainer asks where the product stands
+        Then one document is composed from several read models at once — each still owned by
+             a single capability — and it is thrown away, because a dashboard's entire value
+             is being current and a committed dashboard is a claim that starts decaying the
+             moment it is written.
+        """#
+
+    step "1" does="ask, at any moment"
+    step "2" does="each owning capability emits its own result. Nothing crosses ownership"
+    step "3" does="compose them, in declared order, into one document"
+    step "4" does="mark it as of now, not as of a release"
+    step "5" does="discard. the archival projection is untouched"
+
+    excludes "committing it. This is the view the publication test rejects, and it is rejected \
+        by name (ES.260819.01/E17)"
+    excludes "a cross-capability owner. A DOCUMENT composes several read models; a READ MODEL \
+        still has exactly one owner (ES.260819.01/E19)"
+
+    layer "doctrine"    reaches="the skill teaches asking for the dashboard rather than reading a stale committed one"
+    layer "enforcement" reaches="the working path is gitignored, so a dashboard cannot be committed by accident"
+    layer "docs"        reaches="none by design — this slice's output never enters the archival projection"
+
+    claim "C1" text="composing needs no code path specific to any one read model, and no owner appears in more than one result" \
+        settled-by="a test composing three results from three capabilities with no renderer change, plus an ownership check"
+    claim "C2" text="the dashboard is marked as of a moment, never as of a release" \
+        settled-by="a golden test on the header"
+    claim "C3" text="asking twice across a state change gives two different answers, with no regeneration step" \
+        settled-by="a test mutating state between two asks"
+    claim "C4" text="nothing is written under the archival projection" \
+        settled-by="a test asserting the published tree is byte-unchanged after composing"
+
+    depends-on "TS.260820.03 and TS.260820.04 — the composed views must exist to be composed"
+
+    useful-alone "the Markdown dashboard can be retired without losing anything, because the answer it \
+        was approximating is now available whenever anyone asks for it"
+    useful-to "the-team-building-a-digital-product"
+
+    attacks "S2" "S6" "S7"
+    note "this is the slice that lets ES.260819.01/E17 be acted on. Retiring a published \
+        dashboard is only safe once the on-demand one exists"
+}

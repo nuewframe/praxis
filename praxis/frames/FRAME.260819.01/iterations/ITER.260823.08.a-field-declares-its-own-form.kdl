@@ -1,0 +1,137 @@
+// Opened by `praxis pick-up`. Every condition below was evaluated against the
+// tree as it stood at 2026-08-23T06:11:31Z, and the verdicts are recorded
+// rather than summarised: a gate whose reasoning is not on the record is a gate
+// you have to trust.
+
+iteration "ITER.260823.08" {
+    slug "a-field-declares-its-own-form"
+    on-slice "TS.260823.04"
+    state "closed"
+    opened-at "2026-08-23T06:11:31Z"
+    opened-by "agent:praxis"
+
+    approval "admission" {
+        status "asked"
+        asked-by "human:wael"
+        at "2026-08-23T06:11:31Z"
+        via "the ask to pick up this slice"
+    }
+
+    vet "create" state="done" at="2026-08-23T06:11:31Z" on-slice="TS.260823.04" {
+        condition "slice-is-shaped" verdict="passed"
+        condition "dependencies-delivered" verdict="passed"
+        condition "no-iteration-in-flight" verdict="passed"
+        condition "nothing-left-to-admit" verdict="passed"
+        condition "work-is-disjoint" verdict="not-computed" \
+            found="no seam manifest exists, so what two iterations would touch cannot be compared. Disjointness is half of what this capability says it judges, and half of what it judges is currently not computed at all"
+        condition "the-slice-is-the-best-available" verdict="left-to-the-maintainer"
+    }
+
+    // 2 of the declared conditions were not decided by the gate. They are
+    // recorded above rather than omitted: an admission that does not say what
+    // it left undecided claims more than it checked.
+
+    // Frozen at open, from the slices. Removing one from a slice now
+    // does not remove it from here — it makes the two disagree, and that is
+    // refused.
+    claim "C1" from-slice="TS.260823.04" state=met \
+        text="a field written in the form the schema declares is accepted, in both directions" \
+        settled-by="a test writing one field as a property and another as a node, each matching its declaration, asserting both check clean"{
+        ran "cargo test --quiet --test field_form"
+        exited 0
+        digest "fnv1a64:0d9a74d6d3179ff6"
+        witnessed-at "2026-08-23T06:12:19Z"
+    }
+    claim "C2" from-slice="TS.260823.04" state=met \
+        text="a field absent in both forms says `missing`, and a field present in either never does" \
+        settled-by="a test writing each field in the form the other declares, asserting neither is reported missing, and one omitted entirely, asserting it is"{
+        ran "cargo test --quiet --test field_form"
+        exited 0
+        digest "fnv1a64:2518934cf51c4e42"
+        witnessed-at "2026-08-23T06:12:26Z"
+    }
+    claim "C3" from-slice="TS.260823.04" state=met \
+        text="cardinality over nodes and over values are separately declared and separately reported" \
+        settled-by="a test declaring a multi-valued field, writing it as repeated nodes, and asserting the refusal explains which of the two was exceeded"{
+        ran "cargo test --quiet --test field_form"
+        exited 0
+        digest "fnv1a64:f1a214d04a115f63"
+        witnessed-at "2026-08-23T06:12:33Z"
+    }
+    claim "C4" from-slice="TS.260823.04" state=met \
+        text="every kind the gate requires a trail of declares a trail field" \
+        settled-by="a test over the method asserting no kind is required to carry a field its own shape does not declare"{
+        ran "cargo test --quiet --test field_form"
+        exited 0
+        digest "fnv1a64:0d9a74d6d3179ff6"
+        witnessed-at "2026-08-23T06:12:40Z"
+    }
+    claim "C5" from-slice="TS.260823.04" state=met \
+        text="an identity prefix is resolved from the record rather than trimmed by the engine" \
+        settled-by="a test resolving references in a corpus whose prefixes differ from this repository's"{
+        ran "cargo test --quiet --test field_form"
+        exited 0
+        digest "fnv1a64:f1a214d04a115f63"
+        witnessed-at "2026-08-23T06:12:46Z"
+    }
+
+
+    phase "implement" state="complete" worked-by="agent:principal-engineer" \
+        produced="the amended C2 and its test — one claim's worth of work, and four re-witnessed"
+
+    layer "doctrine" state="evidenced" \
+        evidence="`declare-an-entity-kind` already carries the form doctrine from ITER.260823.07; \
+            this iteration adds nothing to it, and says so rather than restating it to look busy" \
+        reaches="nothing new, honestly"
+
+    layer "enforcement" state="evidenced" \
+        evidence="`missing` is said when the field is absent in BOTH forms and never when it is \
+            present in either — the half of C2 that survived D1" \
+        reaches="the word that sent an author to the wrong place"
+
+    layer "docs" state="evidenced" \
+        evidence="the amended claim carries what it was cut as and why it changed, so a reader \
+            meeting C2 sees the supersession rather than a claim that quietly became something else" \
+        reaches="the amendment itself"
+
+    layer-set sealed=#true at="2026-08-23T06:00:00Z"
+
+    finding "F1" \
+        text="the gate re-pinned all five claims as pending, though C1, C3, C4 and C5 were met \
+            and WITNESSED by ITER.260823.07 minutes earlier. A second iteration on a slice re-owes \
+            everything: the gate has no notion of a claim a prior iteration already settled. Here \
+            it cost four re-runs of tests that already passed, which is cheap and arguably better \
+            — the evidence is now a run against the tree as it stands rather than as it stood. It \
+            would not be cheap for a slice whose verification is slow, and the fitness function \
+            `a-slice-took-more-than-one-iteration` sees the shape without seeing this cause" \
+        owed-against="TS.260823.04"
+
+    finding "F2" \
+        text="no design phase here, and none was needed: this iteration follows D1, which \
+            ITER.260823.07 recorded and sealed. `implement-follows-an-approach` only fires when a \
+            COMPLETE design-system phase exists, so an iteration executing a decision made \
+            elsewhere passes by having no design at all rather than by naming the decision it \
+            follows. That is the right outcome reached by the wrong route — a second iteration \
+            carrying out a prior one's approach should be able to SAY so" \
+        owed-against="TS.260821.20"
+    closed-at "2026-08-23T06:15:22Z"
+    outcome "continue"
+
+    close {
+        claims-settled "C1" how="met"
+        claims-settled "C2" how="met"
+        claims-settled "C3" how="met"
+        claims-settled "C4" how="met"
+        claims-settled "C5" how="met"
+        all-met #true
+        attested-by "human:wael"
+        note "the accounting above was computed at close, not asserted. It says every claim is either met or carried by a finding that names it, and nothing about whether the work is any good"
+    }
+
+    trail {
+        entry at="2026-08-23T06:15:22Z" by="agent:praxis" action="state-changed" from="open" to="closed" note="closed by `praxis close`. The accounting was computed; the conclusion is not the machine's to draw"
+
+        entry at="2026-08-23T06:11:31Z" by="agent:praxis" action="created" \
+            note="opened by the gate, on the ask of human:wael"
+    }
+}

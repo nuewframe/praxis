@@ -1,0 +1,92 @@
+// Cut from the dumping ground I built.
+//
+// ITER.260822.04 anchored three personas to FRAME.260819.01 and recorded a decision saying
+// the falsifier was "a fourth persona". The falsifier fired in the same iteration and
+// differently: the frame went from one surface to four, and the reason is structural rather
+// than numeric. The frame is the ROOT. Every surface descends from it by construction, so
+// `serves "FRAME.260819.01"` is true of everything and discriminates nothing.
+//
+// The fix is not a rule that detects the pile. no-dumping-grounds — this plugin's oldest
+// invariant — forbids the NAMES utils, helpers, common, shared. It never measures whether a
+// folder became a junk drawer. Anti-dumping works by making the dumping ground unnameable,
+// and the same move applies to an edge: remove `frame` from the vocabulary.
+//
+// Which leaves the personas needing somewhere real to point, and that turns out to be worth
+// having for its own sake.
+
+thin-slice "TS.260821.08" {
+    slug "hold-who-may-attest-what"
+    title "Refuse a close whose reviewer is the agent that did the work"
+    kind "command"
+    realizes "CAP.claim-settlement"
+    from-storm "ES.260819.01"
+
+    command "close"
+    actor "the agent closing an iteration"
+    produces-event "SelfApprovalRefused" "AttestationAccepted"
+    needs-read-model "what-this-iteration-claims-and-has-shown"
+
+    trigger "an iteration closes, and the only thing standing between it and self-attestation is a sentence in a Markdown file"
+    outcome "who may attest what is a record the engine reads, and an attestation by the identity that produced the work is refused"
+
+    scenario #"""
+        Given an iteration whose phases record who worked them, and a role vocabulary saying
+             which phases each role owns and what it may sign
+        When the iteration is closed
+        Then a close attested by the identity that worked the `implement` phase is REFUSED —
+             because an artifact looks identical whether the reviewer was a different mind or the
+             same one wearing a second hat, and that is S2 stated in prose in two files and
+             computed nowhere.
+        """#
+
+    step "1" does="declare `role` — who, which phases it owns, what it may sign, and what it may never sign for itself"
+    step "2" does="a phase records who worked it. The record already holds `by` on trail entries and nothing on phases"
+    step "3" does="close refuses when the attesting identity worked a phase the attestation covers"
+    step "4" does="remove `frame` from the `serves` vocabulary — with roles declared, nothing needs it"
+    step "5" does="the three persona files serve the roles they describe, and using-praxis serves multi-harness-distribution, which owns RouterInjected"
+
+    excludes "deciding WHO a human is. The record holds `human:<name>` from git identity and that \
+        is as far as identity goes here — an engine that adjudicates whether two names are one \
+        person is an engine with an opinion about employment"
+    excludes "refusing an agent from working two phases. Doing the design and the implementation is \
+        normal and often better; what is refused is ATTESTING your own work, which is a different act"
+    excludes "a `phase-kind` vocabulary. The five stages are prose on the phase entity today and \
+        that is a separate weakness — fixing it here would make this slice about the schema \
+        rather than about attestation"
+
+    layer "doctrine"    reaches="a persona file says which role it is, and the role says what that means to the engine"
+    layer "enforcement" reaches="close refuses a self-attested iteration, and `serves` can no longer name the frame"
+    layer "docs"        reaches="`who checked this` has an answer that is not `the person who wrote it`"
+
+    claim "C1" text="a close attested by the identity that worked a covered phase is refused" \
+        settled-by="a test closing an iteration whose implement phase and whose attestation carry one identity, asserting a refusal"
+    claim "C2" text="the same identity working two phases is NOT refused — only attesting its own work is" \
+        settled-by="a test with one identity across design-system and implement and a different attester, asserting the close succeeds"
+    claim "C3" text="`frame` is not a `serves` target, so the root cannot be used as an anchor" \
+        settled-by="a test that a doctrine-surface serving a frame is refused by dangling-relationship, plus praxis check clean at 48 of 48 with no surface naming the frame"
+    claim "C4" text="every persona names the role it is, and a role names the phases it owns" \
+        settled-by="praxis check over three role records and three persona surfaces, and a test that a role owning a phase no vocabulary declares is reported"
+
+    depends-on "TS.260821.04 — the anchor vocabulary this corrects was flipped to refuse there"
+
+    useful-alone "`the same engineer cannot self-approve` moves from agent-attested doctrine, the \
+        bottom row of the enforcement table, to record-enforced, the top. It is the single rule this \
+        plugin states most confidently and enforces least"
+    useful-to "the-team-building-a-digital-product"
+
+    attacks "S2"
+
+    cut-from "ITER.260822.04, and the decision `what a persona serves` recorded there" \
+        note="the decision is amended rather than replaced. It was correctly reasoned and wrongly \
+            concluded, and an append that says so is worth more than a record that never shows the \
+            wrong turn"
+
+    principle-note "the personas resisted anchoring for the same reason the probes did in AM1: the \
+        record had no word for what they are. AO1 called that a vocabulary gap rather than a \
+        backlog. This is the third time, and the tell is the same both times — a surface that will \
+        only anchor to the root is a surface the record cannot describe"
+
+    proves "an attestation names an identity the engine can compare against who did the work"
+    does-not-prove "that the reviewer reviewed. It refuses the one case that is definitionally not \
+        a review, and a different mind rubber-stamping is still a rubber stamp"
+}

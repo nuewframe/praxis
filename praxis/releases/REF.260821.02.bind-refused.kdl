@@ -1,0 +1,16 @@
+// Written by `praxis bind`, which refused. Nothing was bound, and the
+// version's content is unchanged.
+
+refusal "REF.260821.02" {
+    on-version "0.8.0"
+    at "2026-08-21T14:21:10Z"
+    by "agent:praxis"
+    asked-by "human:wael"
+    condition "only-closed-iterations-bind" failed=#true \
+        found="ITER.260821.07 is \"open\" and only a closed iteration may bind — unsettled: C1, C2, C3, C4. A version whose content includes work still in flight has no definite content"
+
+    trail {
+        entry at="2026-08-21T14:21:10Z" by="agent:praxis" action="created" \
+            note="the bind was refused. Nothing was bound"
+    }
+}

@@ -1,0 +1,48 @@
+capability "work-admission" {
+    doing "decide whether a slice may be started right now, and record the decision either way"
+    not "it does not judge whether the work was done well. It judges readiness and disjointness, at one moment, and then it is finished"
+    state "sought"
+    facet "engine"
+
+    derived-from "ES.260819.01"
+    from-cluster "iteration-control"
+    split-reason "predicted to merge with claim-settlement and did not. They are complementary \
+        exclusions — this one judges readiness at open, that one judges completeness at close — \
+        and each ships and is useful with the other absent"
+
+    owns-event "SliceVetted" "PickupRefused" "DependencyFrozen" "IterationClosed" "CloseRefused" \
+        "IterationStarted" "StartRefused"
+
+    owns-read-model "what-is-ready-to-pick-up" \
+        answers="which slices could be started right now, and what would refuse each of them?" \
+        note="its CONTENT is owned here; document-projection renders it and knows nothing about what `ready` means"
+
+    enforces "refusal-is-a-fact"
+
+    attacks "S3"
+
+    gate-test "names-a-doing" verdict="pass" \
+        because="admitting and refusing is a doing, and it is the method's only gate"
+    gate-test "fundable-on-own-terms" verdict="pass" \
+        because="a gate that records its refusals is worth funding with no other gate present"
+    gate-test "slices-deliver-independently" verdict="pass" \
+        because="vet on pickup / record the refusal and its failing condition / freeze dependencies / refuse a second concurrent iteration"
+    gate-test "states-an-exclusion" verdict="pass" \
+        because="quality is claim-settlement's business. This capability never looks at the work, only at its preconditions"
+
+    keeps-consistent "a slice's pickup against every other iteration in flight" \
+        "an iteration's frozen dependencies against what it stands on" \
+        "a refusal against the condition that caused it"
+
+    principle-note "selection is the commitment. Choosing to work this is choosing not to work \
+        something else, and it is the first moment the information needed to decide actually exists"
+
+    usage "`praxis ready` — which slices could be started right now, and what would refuse each of the rest. Read the `not decided for you` section first: it names the conditions the gate declares and did not compute."
+    usage "`praxis pick-up <SLICE>` — take a slice through the one gate. Either an iteration opens, or a refusal record is written naming the condition that failed. Selection is the commitment."
+
+
+
+    trail {
+        entry at="2026-08-20T00:00:00-05:00" by="agent:principal-engineer" action="created"
+    }
+}

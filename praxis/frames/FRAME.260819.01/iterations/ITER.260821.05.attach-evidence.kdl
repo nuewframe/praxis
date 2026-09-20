@@ -1,0 +1,180 @@
+// Opened by `praxis pick-up`. Every condition below was evaluated against the
+// tree as it stood at 2026-08-21T14:00:37Z, and the verdicts are recorded
+// rather than summarised: a gate whose reasoning is not on the record is a gate
+// you have to trust.
+
+iteration "ITER.260821.05" {
+    slug "attach-evidence"
+    on-slice "TS.260820.06"
+    state "closed"
+    opened-at "2026-08-21T14:00:37Z"
+    opened-by "agent:praxis"
+    closed-at "2026-08-21T10:30:00-05:00"
+    outcome "continue" \
+        because="the record can now say how much of a slice was reached, at the granularity the \
+            slice itself set. evidence-names-its-layer was a policy the day the storm was held and \
+            has been enforced by nothing for five iterations"
+
+    approval "admission" {
+        status "signed"
+        signer "human:wael"
+        at "2026-08-21T14:00:37Z"
+        signed-by "the ask to pick up this slice"
+    }
+
+    vet "create" state="done" at="2026-08-21T14:00:37Z" {
+        condition "slice-is-shaped" verdict="passed"
+        condition "dependencies-delivered" verdict="passed"
+        condition "no-iteration-in-flight" verdict="passed"
+        condition "nothing-left-to-admit" verdict="passed"
+        condition "work-is-disjoint" verdict="not-computed" \
+            found="no seam manifest exists, so what two iterations would touch cannot be compared. Disjointness is half of what this capability says it judges, and half of what it judges is currently not computed at all"
+        condition "the-slice-is-the-best-available" verdict="left-to-the-maintainer"
+    }
+
+    // 2 of the declared conditions were not decided by the gate. They are
+    // recorded above rather than omitted: an admission that does not say what
+    // it left undecided claims more than it checked.
+
+    vet "start" state="done" at="2026-08-21T14:05:00Z" {
+        condition "the tree is clean and current" verdict="passed" \
+            found="HEAD ffaba78. The create vet above was computed by the gate at 14:00:37Z and \
+                this vet is a second look, five minutes later, which is the whole reason there are \
+                two of them"
+        condition "the slice's scope is unchanged" verdict="passed" found="read line by line"
+        condition "C2 is settleable here" verdict="admitted-on-condition" \
+            found="C2 names the review VIEW as its mechanism, and that view belongs to TS.260820.08 \
+                — which depends on this slice. The second instance of ITER.260821.03/S1, found by \
+                the audit S1 obliged" \
+            resolved-by="settled against the claim's TEXT rather than its named mechanism: the \
+                layer is visible as unevidenced, reported by name, not omitted. The mechanism is \
+                owed against TS.260820.08. Recorded as U3"
+    }
+
+    frozen {
+        pins "the entity-and-field schema" at="NA.260820.01/schema" at-commit="ffaba78"
+        pins "the engine's public surface" at="praxis-core 0.8.0" at-commit="ffaba78"
+        rule "a schema change while this iteration is open is a FINDING, not an edit" \
+            exception="declaring evidence-names-its-layer as a rule is the mechanism this slice \
+                depends on, and the engine now applies it only BECAUSE it is declared"
+    }
+
+    claim "C1" from-slice="TS.260820.06" state="met" \
+        text="evidence naming a layer the slice did not declare is refused" \
+        settled-by="a negative test with an undeclared layer" \
+        evidence="evidence naming an undeclared layer is refused — the \
+            refusal names the layer, the slice that never declared it, AND what the slice did \
+            declare, because the reader's next question is which one was meant"
+    claim "C2" from-slice="TS.260820.06" state="met" \
+        text="a declared layer with no evidence is visible as unevidenced, not absent" \
+        settled-by="a test asserting the layer is reported by name rather than omitted" \
+        evidence="a declared layer with no evidence is reported not omitted \
+            — reported, not refused: an iteration may close having reached less than it hoped, but \
+            not silently" \
+        note="settled against the claim's text rather than the review view it names, because that \
+            view is downstream of this slice. See U3"
+
+    layer "doctrine"    state="evidenced" evidence="surface.skill.attach-evidence, registered in the router" reaches="the skill teaches evidence naming its layer at the moment the layer is reached"
+    layer "enforcement" state="evidenced" evidence="46 tests pass; evidence-names-its-layer fails closed on an undeclared layer for the first time since the storm declared it" reaches="evidence-names-its-layer, refusing an undeclared layer"
+    layer "docs"        state="evidenced" evidence="the report names the layer and the slice that declared it, so an unevidenced layer reads as a gap rather than as nothing" reaches="evidence appears against its claim in the review view and the release record"
+    layer-set sealed=#true at="2026-08-21T14:05:00Z"
+
+    phase "design-ux" state="complete" required-by="docs" \
+        produced="the asymmetry. An undeclared layer is REFUSED and an unevidenced one is REPORTED, \
+            because they are different failures: the first is evidence for something nobody asked \
+            about, the second is an honest shortfall that must not be able to hide. And the \
+            refusal names what the slice DID declare, since `harness is not declared` leaves the \
+            reader to go and look"
+    phase "design-system" state="complete" required-by="enforcement" \
+        produced="rules become declarable. The engine now asks whether the record declares a rule \
+            before applying it — proved by a test that removes the declaration and watches the same \
+            record go silent with no change to the engine. This is the `admits` pattern from \
+            ITER.260821.03 generalised from conditions to rules"
+    phase "implement" state="complete" required-by="enforcement · docs" \
+        produced="Schema::declares_rule, check_layers, two refusal variants, six tests, and the fix \
+            for S7"
+    phase "learn" state="complete" required-by="always" produced="six findings, and the audit S1 obliged" \
+        note="never skippable — it is the phase that judges the others"
+    phase "teach" state="skipped" required-by="doctrine" produced="surface.skill.attach-evidence" \
+        skipped-because="it produced doctrine for an AGENT, which is the doctrine LAYER and is recorded there. Teaching an end user the feature's why and how did not happen — and the record already serves the next agent, whose own persona judges success by NOT needing a document (TS.260821.19, ITER.260822.15/BA1)"
+
+    finding "U1" state="open" size="observation" \
+        text="the gate's first generated record was misindented — the continuation lines of its \
+            header comment ran off the left margin — and it named the iteration `picked-up-<slug>`. \
+            Both were valid KDL and passed praxis check" \
+        note="the gate writes records that humans read, and nothing checks whether one is readable. \
+            The slug is the more interesting half: it names the ATTEMPT, and the machine cannot \
+            know what an attempt will be about, only which slice it is on. It seeds from the slice \
+            and expects renaming"
+
+    finding "U2" state="open" size="answered" \
+        text="the audit S1 obliged is done. Exactly TWO slices of nineteen settle a claim against a \
+            view a downstream slice owns: TS.260820.04/C1, settled in ITER.260821.04, and \
+            TS.260820.06/C2, settled here against its text. No others" \
+        note="the class is bounded and both instances are in the ITERATE region, where a command \
+            and the view of its result were cut as separate slices. That is where to look for it \
+            in the next frame, and it is not a general defect in how claims are written"
+
+    finding "U3" state="open" size="owed-work" \
+        text="C2's named mechanism — the review view listing an unevidenced layer — belongs to \
+            TS.260820.08, which depends on this slice. Settled against the claim's text instead: \
+            the layer is visible, reported by name" \
+        obliges="TS.260820.08 — the review view must list a declared layer with no evidence, and \
+            not merely omit it" \
+        note="the second time a claim has been settled against what it SAYS rather than against the \
+            mechanism it names. That is legitimate once and a pattern twice, so it is worth saying \
+            plainly: settled-by names an expected route, and the claim text is the obligation"
+
+    finding "U4" state="open" size="owed-work" \
+        text="S7 is fixed. Corpus violations were attributed by entity kind OR id, so one violation \
+            would have printed once per file holding any record of that kind — six times, now that \
+            there are six iterations" \
+        note="latent for two iterations because corpus violations were zero. This slice is the \
+            first to add a corpus rule that fires on iterations, which is what made the bug \
+            reachable. It was found by reading, not by a test, and there is still no test that \
+            would catch its return"
+
+    finding "U5" state="open" size="observation" \
+        text="the rule fires on nothing in the current tree. All six iterations reach exactly the \
+            layers their slices declared" \
+        note="which is a weak result, because the same author wrote both the slices and the \
+            iterations, in the same sitting, having just read one to write the other. The rule is \
+            for when those differ — a slice cut weeks earlier, by someone else. Green here is not \
+            evidence it works, only that it does not misfire"
+
+    finding "U6" state="open" size="observation" \
+        text="the report is gated on `layer-set sealed`. Discovered by running the checker against \
+            the record the GATE had just written: an iteration opened with no layers would have \
+            been reported as unevidenced on every layer its slice declares, at the moment it \
+            opened, before anyone had a chance to reach one" \
+        note="an unsealed layer set is not yet a promise. The coupling between the gate's output and \
+            this rule was not visible from either side alone, and appeared the first time the \
+            engine read something the engine had written"
+
+    close {
+        claims-settled "C1" "C2" all-met=#true
+        layers-reached "doctrine" "enforcement" "docs" all-evidenced=#true
+        findings-carried "U1" "U2" "U3" "U4" "U5" "U6"
+        scope-unchanged #true
+        verified "cargo test — 46 passed across six suites" \
+            "praxis check praxis — ok, 14 kinds declared, zero reports" \
+            "the rule goes silent when the record stops declaring it, with no change to the engine"
+        note "the first iteration OPENED by the gate rather than by hand. Its create vet is the \
+            machine's, verbatim, and its start vet is a human's five minutes later — which is the \
+            two-stage vet doing the thing it exists for rather than being described"
+    }
+
+    contributes "slice-outcome-added" \
+        because="attach-evidence, and evidence-names-its-layer enforced" \
+        note="the bump rule this work matches, from the config. Declared by the iteration \
+            because only whoever did the work knows what kind of change it was"
+
+    trail {
+        entry at="2026-08-21T10:30:00-05:00" by="agent:principal-engineer" action="state-changed" \
+            from="open" to="closed" \
+            note="evidence-names-its-layer is enforced. Declared as a policy when the storm was \
+                held, and checked by nothing for five iterations"
+        entry at="2026-08-21T14:00:37Z" by="agent:praxis" action="created" \
+            note="opened by the gate, on the ask of human:wael"
+    }
+}
