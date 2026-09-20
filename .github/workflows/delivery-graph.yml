@@ -26,6 +26,16 @@ jobs:
           # history is what makes the check answerable, not what makes it lenient.
           fetch-depth: 0
 
+      # The attestation tests build a signer from the ambient git identity, and a bare runner
+      # has none — so three of them fail on the wrong refusal, reporting "no git identity"
+      # rather than exercising what they are about. They pass on a developer machine only
+      # because the identity happens to be there. The tests should establish one in the
+      # fixtures they create; until they do, this supplies it and the coverage is real again.
+      - name: A git identity, so an admission has somebody to sign it
+        run: |
+          git config --global user.name "praxis ci"
+          git config --global user.email "ci@nuewframe.invalid"
+
       - name: Install the pinned toolchain
         run: rustup show active-toolchain || rustup toolchain install
 
