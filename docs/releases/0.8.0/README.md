@@ -68,10 +68,10 @@ what problem does this exist for, and what does every word mean?
 | capability | a permanent doing the system must have |
 | thin-slice | an atomic vertical slice — one command or one read model, cut so it can exercise a capability |
 | doctrine-surface | one file this plugin SHIPS as instruction — a skill, a guardrail, an agent, or a probe |
+| decision | a choice an iteration could not make implicitly, with what it rejected and what would show it wrong |
 | iteration | one COMMITMENT — the slices an ask committed to, worked together |
 | refusal | a pick-up the gate refused, and the condition that failed |
 | release | an index into history — what it binds, what it resolves |
-| decision | a choice an iteration could not make implicitly, with what it rejected and what would show it wrong |
 
 ### In detail
 
